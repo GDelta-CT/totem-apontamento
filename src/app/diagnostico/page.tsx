@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { buscarApontamentoEmAndamento } from "@/lib/supabase/queries";
+import { buscarApontamentoAtivo } from "@/lib/supabase/queries";
 
 export default function DiagnosticoPage() {
   const [resultado, setResultado] = useState<string>("Carregando...");
 
   useEffect(() => {
     (async () => {
-      const r = await buscarApontamentoEmAndamento("João Silva");
+      const r = await buscarApontamentoAtivo("João Silva");
       const linhas: string[] = [];
 
       linhas.push("==== TIMESTAMP DESTA TELA ====");
