@@ -1,0 +1,55 @@
+name: Backup Supabase Database
+
+# Roda todo dia às 03:00 (horário UTC = 00:00 horário BR)
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:  # Permite rodar manualmente também
+
+jobs:
+  backup:
+    name: Daily Backup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Generate timestamp
+        id: timestamp
+        run: echo "ts=$(date +'%Y-%m-%d_%H%M%S')" >> $GITHUB_OUTPUT
+
+      - name: Dump database
+        env:
+          PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          pg_dump \
+            -h ${{ secrets.SUPABASE_DB_HOST }} \
+            -U postgres \
+            -d postgres \
+            --no-owner \
+            --no-acl \
+            -f gdelta_backup_${{ steps.timestamp.outputs.ts }}.sql
+
+      - name: Compress backup
+        run: |
+          gzip gdelta_backup_${{ steps.timestamp.outputs.ts }}.sql
+
+      - name: Upload backup as artifact (retém 30 dias gratuitamente)
+        uses: actions/upload-artifact@v4
+        with:
+          name: gdelta-backup-${{ steps.timestamp.outputs.ts }}
+          path: gdelta_backup_${{ steps.timestamp.outputs.ts }}.sql.gz
+          retention-days: 30
+
+      - name: Notify on success
+        if: success()
+        run: echo "✅ Backup do banco realizado com sucesso em ${{ steps.timestamp.outputs.ts }}"
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "❌ BACKUP FALHOU em ${{ steps.timestamp.outputs.ts }}"
+          echo "Verificar logs e segredos do GitHub"
+          exit 1

@@ -1,0 +1,90 @@
+═══════════════════════════════════════════════════════════════
+PROMPT 001 — APLICAR MIGRATION DE RLS
+═══════════════════════════════════════════════════════════════
+
+CONTEXTO:
+Sou o CEO/PO do projeto GDelta. O diagnóstico técnico identificou
+um vazamento crítico de segurança no banco Supabase: as tabelas
+não têm RLS (Row Level Security) ativada, e a ANON_KEY no frontend
+permite que qualquer pessoa acesse todos os dados.
+
+Esta migration fecha esse vazamento.
+
+═══════════════════════════════════════════════════════════════
+TAREFA 1 — Criar o arquivo de migration
+═══════════════════════════════════════════════════════════════
+
+Criar a estrutura abaixo no projeto (NÃO modifique nenhum outro arquivo):
+
+PASTA: supabase
+SUBPASTA: migrations
+ARQUIVO: 001_enable_rls.sql
+
+CONTEÚDO EXATO DO ARQUIVO:
+
+-- Migration 001 — Ativar Row Level Security
+ALTER TABLE IF EXISTS public.funcionarios       ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.ordens_servico     ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.apontamentos       ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.pontos_eletronicos ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE IF EXISTS public.funcionarios       FORCE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.ordens_servico     FORCE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.apontamentos       FORCE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.pontos_eletronicos FORCE ROW LEVEL SECURITY;
+
+REVOKE ALL ON public.funcionarios       FROM anon, authenticated;
+REVOKE ALL ON public.ordens_servico     FROM anon, authenticated;
+REVOKE ALL ON public.apontamentos       FROM anon, authenticated;
+REVOKE ALL ON public.pontos_eletronicos FROM anon, authenticated;
+
+-- Verificação
+SELECT tablename, rowsecurity AS rls_ativo
+FROM pg_tables
+WHERE schemaname = 'public'
+ORDER BY tablename;
+
+═══════════════════════════════════════════════════════════════
+TAREFA 2 — Criar o rollback
+═══════════════════════════════════════════════════════════════
+
+Na mesma pasta, criar:
+ARQUIVO: 001_rollback.sql
+
+CONTEÚDO EXATO:
+
+-- Rollback Migration 001
+ALTER TABLE IF EXISTS public.funcionarios       DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.ordens_servico     DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.apontamentos       DISABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.pontos_eletronicos DISABLE ROW LEVEL SECURITY;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.funcionarios       TO anon, authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.ordens_servico     TO anon, authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.apontamentos       TO anon, authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.pontos_eletronicos TO anon, authenticated;
+
+═══════════════════════════════════════════════════════════════
+REGRAS IMPORTANTES
+═══════════════════════════════════════════════════════════════
+
+- NÃO modifique nenhum arquivo fora de /supabase/migrations/
+- NÃO altere o código TypeScript / React
+- NÃO rode os SQLs no banco — apenas crie os arquivos
+- Quando terminar, responda: "PRONTO. Arquivos criados em supabase/migrations/. Próximo passo: rodar 001_enable_rls.sql no Supabase Studio manualmente."
+
+═══════════════════════════════════════════════════════════════
+PÓS-EXECUÇÃO (Eliel faz no Supabase Studio)
+═══════════════════════════════════════════════════════════════
+
+1. Abrir https://supabase.com/dashboard
+2. Selecionar projeto GDelta
+3. SQL Editor (menu lateral)
+4. Colar TODO o conteúdo de 001_enable_rls.sql
+5. Clicar "Run"
+6. Verificar que 4 linhas aparecem com rls_ativo=true
+
+ATENÇÃO: Após rodar, o app /totem PARA de funcionar. Isso é esperado
+e POSITIVO — significa que o banco está blindado. A próxima migration
+(002 — multi-tenant) prepara o terreno para reabilitar o acesso de
+forma segura.
