@@ -89,6 +89,10 @@
 | Análise técnica completa | `ANALISE-360-GDELTA.md` (na raiz) |
 | Resposta do diagnóstico de Claude dashboard | (em arquivo `.docx`) |
 
+**ESTRUTURA DE MIGRATIONS**
+- `/supabase/migrations/` → SQLs que avançam o estado do banco
+- `/supabase/rollbacks/` → SQLs de reversão (não aplicar via CLI)
+
 ---
 
 ## 🆘 Quando algo der errado
