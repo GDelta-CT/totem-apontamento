@@ -3,19 +3,19 @@
 > {{DESCRIPTION}}
 > Squad: {{SQUADNAME}}
 > Created: {{CREATEDAT}}
-{{#IF STORYID}}
+> {{#IF STORYID}}
 > Story: {{STORYID}}
-{{/IF}}
+> {{/IF}}
 
 ---
 
 ## Template Variables
 
-| Variable | Type | Required | Description |
-|----------|------|----------|-------------|
-| `{{VAR1}}` | string | Yes | Description of variable 1 |
-| `{{VAR2}}` | string | No | Description of variable 2 |
-| `{{VAR3}}` | date | No | Description of variable 3 |
+| Variable   | Type   | Required | Description               |
+| ---------- | ------ | -------- | ------------------------- |
+| `{{VAR1}}` | string | Yes      | Description of variable 1 |
+| `{{VAR2}}` | string | No       | Description of variable 2 |
+| `{{VAR3}}` | date   | No       | Description of variable 3 |
 
 ---
 
@@ -63,7 +63,7 @@ Final content...
 
 ---
 
-*Generated from {{COMPONENTNAME}} template*
+_Generated from {{COMPONENTNAME}} template_
 
 <!-- END TEMPLATE -->
 
@@ -94,4 +94,4 @@ const result = await renderTemplate('{{COMPONENTNAME}}.md', {
 
 ---
 
-*Template created by squad-creator*
+_Template created by squad-creator_

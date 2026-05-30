@@ -68,7 +68,7 @@ function parseCSVContent(content) {
     } else if (char === '\n' && !inQuotes) {
       // End of record
       currentRecord.push(currentValue);
-      if (currentRecord.some(v => v !== '')) {
+      if (currentRecord.some((v) => v !== '')) {
         records.push(currentRecord);
       }
       currentRecord = [];
@@ -84,7 +84,7 @@ function parseCSVContent(content) {
   // Don't forget the last field and record
   if (currentValue !== '' || currentRecord.length > 0) {
     currentRecord.push(currentValue);
-    if (currentRecord.some(v => v !== '')) {
+    if (currentRecord.some((v) => v !== '')) {
       records.push(currentRecord);
     }
   }
@@ -167,13 +167,12 @@ class ManifestValidator {
       results.tasks = tasks;
 
       // Build summary
-      [agents, workers, tasks].forEach(r => {
+      [agents, workers, tasks].forEach((r) => {
         if (r.valid) results.summary.valid++;
         else results.summary.invalid++;
         results.summary.missing.push(...r.missingFiles);
         results.summary.orphan.push(...r.orphanFiles);
       });
-
     } catch (error) {
       results.error = error.message;
     }
@@ -267,7 +266,6 @@ class ManifestValidator {
 
       // Check for orphan files (files on disk not in manifest)
       await this.checkOrphanFiles(result, schema);
-
     } catch (error) {
       result.valid = false;
       result.errors.push(`Error validating ${filename}: ${error.message}`);

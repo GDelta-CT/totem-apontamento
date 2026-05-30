@@ -667,7 +667,7 @@ class RecoveryHandler extends EventEmitter {
    */
   getEpicLogs(epicNum) {
     return this.logs.filter(
-      (log) => log.message.includes(`Epic ${epicNum}`) || log.message.includes(`epic-${epicNum}`),
+      (log) => log.message.includes(`Epic ${epicNum}`) || log.message.includes(`epic-${epicNum}`)
     );
   }
 

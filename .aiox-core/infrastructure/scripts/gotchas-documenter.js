@@ -747,7 +747,7 @@ Each gotcha includes the **wrong** approach, the **right** approach, and the **r
       text.includes('gotcha') ||
       text.includes('wrong') ||
       text.includes('avoid') ||
-      text.includes('don\'t') ||
+      text.includes("don't") ||
       text.includes('should not') ||
       text.includes('instead of') ||
       text.includes('common mistake')
@@ -868,7 +868,8 @@ Each gotcha includes the **wrong** approach, the **right** approach, and the **r
    * @private
    */
   _detectCategory(gotcha) {
-    const text = `${gotcha.wrong || ''} ${gotcha.right || ''} ${gotcha.reason || ''} ${gotcha.description || ''} ${gotcha.title || ''}`.toLowerCase();
+    const text =
+      `${gotcha.wrong || ''} ${gotcha.right || ''} ${gotcha.reason || ''} ${gotcha.description || ''} ${gotcha.title || ''}`.toLowerCase();
 
     for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
       for (const keyword of keywords) {

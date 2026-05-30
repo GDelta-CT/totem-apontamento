@@ -16,10 +16,10 @@ class TransactionManager {
     this.transactionPath = path.join(this.rootPath, 'aiox-core', 'transactions');
     this.backupPath = path.join(this.rootPath, 'aiox-core', 'backups');
     this.componentMetadata = new ComponentMetadata({ rootPath: this.rootPath });
-    
+
     // Active transactions
     this.activeTransactions = new Map();
-    
+
     // Transaction retention (30 days)
     this.retentionDays = options.retentionDays || 30;
   }
@@ -32,7 +32,7 @@ class TransactionManager {
   async beginTransaction(options = {}) {
     try {
       const transactionId = this.generateTransactionId();
-      
+
       const transaction = {
         id: transactionId,
         type: options.type || 'component_operation',
@@ -43,19 +43,18 @@ class TransactionManager {
         operations: [],
         backups: [],
         metadata: options.metadata || {},
-        rollbackOnError: options.rollbackOnError !== false
+        rollbackOnError: options.rollbackOnError !== false,
       };
-      
+
       // Save initial transaction state
       await this.saveTransaction(transaction);
-      
+
       // Store in active transactions
       this.activeTransactions.set(transactionId, transaction);
-      
+
       console.log(chalk.blue(`📋 Transaction started: ${transactionId}`));
-      
+
       return transactionId;
-      
     } catch (error) {
       console.error(chalk.red(`Failed to begin transaction: ${error.message}`));
       throw error;
@@ -74,7 +73,7 @@ class TransactionManager {
       if (!transaction) {
         throw new Error(`Transaction not found: ${transactionId}`);
       }
-      
+
       const operationRecord = {
         id: `op-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         timestamp: new Date().toISOString(),
@@ -83,25 +82,24 @@ class TransactionManager {
         path: operation.path,
         previousState: null,
         newState: null,
-        metadata: operation.metadata || {}
+        metadata: operation.metadata || {},
       };
-      
+
       // Backup current state if needed
       if (operation.type === 'update' || operation.type === 'delete') {
         operationRecord.previousState = await this.backupCurrentState(operation.path);
       }
-      
+
       // Record new state for create/update
       if (operation.type === 'create' || operation.type === 'update') {
         operationRecord.newState = operation.content || operation.data;
       }
-      
+
       // Add to transaction
       transaction.operations.push(operationRecord);
-      
+
       // Save updated transaction
       await this.saveTransaction(transaction);
-      
     } catch (error) {
       console.error(chalk.red(`Failed to record operation: ${error.message}`));
       throw error;
@@ -119,28 +117,27 @@ class TransactionManager {
       if (!transaction) {
         throw new Error(`Transaction not found: ${transactionId}`);
       }
-      
+
       transaction.endTime = new Date().toISOString();
       transaction.status = 'committed';
       transaction.duration = new Date(transaction.endTime) - new Date(transaction.startTime);
-      
+
       // Save final transaction state
       await this.saveTransaction(transaction);
-      
+
       // Clean up backups after successful commit (keep for history)
       await this.archiveBackups(transaction);
-      
+
       // Remove from active transactions
       this.activeTransactions.delete(transactionId);
-      
+
       console.log(chalk.green(`✅ Transaction committed: ${transactionId}`));
-      
+
       return {
         transactionId,
         operations: transaction.operations.length,
-        duration: transaction.duration
+        duration: transaction.duration,
       };
-      
     } catch (error) {
       console.error(chalk.red(`Failed to commit transaction: ${error.message}`));
       throw error;
@@ -155,57 +152,56 @@ class TransactionManager {
    */
   async rollbackTransaction(transactionId, options = {}) {
     try {
-      const transaction = this.activeTransactions.get(transactionId) || 
-                         await this.loadTransaction(transactionId);
-      
+      const transaction =
+        this.activeTransactions.get(transactionId) || (await this.loadTransaction(transactionId));
+
       if (!transaction) {
         throw new Error(`Transaction not found: ${transactionId}`);
       }
-      
+
       console.log(chalk.yellow(`⚙️  Rolling back transaction: ${transactionId}`));
-      
+
       const rollbackResults = {
         transactionId,
         successful: [],
         failed: [],
-        warnings: []
+        warnings: [],
       };
-      
+
       // Process operations in reverse order
       const operations = [...transaction.operations].reverse();
-      
+
       for (const operation of operations) {
         try {
           await this.rollbackOperation(operation, rollbackResults);
         } catch (error) {
           rollbackResults.failed.push({
             operation: operation.id,
-            error: error.message
+            error: error.message,
           });
-          
+
           if (!options.continueOnError) {
             throw error;
           }
         }
       }
-      
+
       // Update transaction status
       transaction.status = 'rolled_back';
       transaction.rollbackTime = new Date().toISOString();
       transaction.rollbackResults = rollbackResults;
-      
+
       await this.saveTransaction(transaction);
-      
+
       // Remove from active transactions
       this.activeTransactions.delete(transactionId);
-      
+
       console.log(chalk.green(`✅ Rollback completed`));
       console.log(chalk.gray(`   Successful: ${rollbackResults.successful.length}`));
       console.log(chalk.gray(`   Failed: ${rollbackResults.failed.length}`));
       console.log(chalk.gray(`   Warnings: ${rollbackResults.warnings.length}`));
-      
+
       return rollbackResults;
-      
     } catch (error) {
       console.error(chalk.red(`Rollback failed: ${error.message}`));
       throw error;
@@ -218,7 +214,7 @@ class TransactionManager {
    */
   async rollbackOperation(operation, results) {
     console.log(chalk.gray(`  Rolling back: ${operation.type} ${operation.path}`));
-    
+
     switch (operation.type) {
       case 'create':
         // Delete created file
@@ -227,17 +223,17 @@ class TransactionManager {
           results.successful.push({
             operation: operation.id,
             action: 'deleted',
-            path: operation.path
+            path: operation.path,
           });
         } else {
           results.warnings.push({
             operation: operation.id,
             warning: 'File already removed',
-            path: operation.path
+            path: operation.path,
           });
         }
         break;
-        
+
       case 'update':
         // Restore previous state
         if (operation.previousState) {
@@ -245,17 +241,17 @@ class TransactionManager {
           results.successful.push({
             operation: operation.id,
             action: 'restored',
-            path: operation.path
+            path: operation.path,
           });
         } else {
           results.warnings.push({
             operation: operation.id,
             warning: 'No backup available',
-            path: operation.path
+            path: operation.path,
           });
         }
         break;
-        
+
       case 'delete':
         // Restore deleted file
         if (operation.previousState) {
@@ -263,31 +259,31 @@ class TransactionManager {
           results.successful.push({
             operation: operation.id,
             action: 'restored',
-            path: operation.path
+            path: operation.path,
           });
         } else {
           results.warnings.push({
             operation: operation.id,
             warning: 'No backup available',
-            path: operation.path
+            path: operation.path,
           });
         }
         break;
-        
+
       case 'manifest_update':
         // Special handling for manifest updates
         await this.rollbackManifestUpdate(operation, results);
         break;
-        
+
       case 'metadata_update':
         // Special handling for metadata updates
         await this.rollbackMetadataUpdate(operation, results);
         break;
-        
+
       default:
         results.warnings.push({
           operation: operation.id,
-          warning: `Unknown operation type: ${operation.type}`
+          warning: `Unknown operation type: ${operation.type}`,
         });
     }
   }
@@ -299,31 +295,28 @@ class TransactionManager {
   async getLastTransaction() {
     try {
       const transactionsDir = this.transactionPath;
-      if (!await fs.pathExists(transactionsDir)) {
+      if (!(await fs.pathExists(transactionsDir))) {
         return null;
       }
-      
+
       // Get all transaction files
       const files = await fs.readdir(transactionsDir);
-      const transactionFiles = files.filter(f => f.endsWith('.json'));
-      
+      const transactionFiles = files.filter((f) => f.endsWith('.json'));
+
       if (transactionFiles.length === 0) {
         return null;
       }
-      
+
       // Sort by timestamp (newest first)
       const transactions = [];
       for (const file of transactionFiles) {
         const transaction = await fs.readJson(path.join(transactionsDir, file));
         transactions.push(transaction);
       }
-      
-      transactions.sort((a, b) => 
-        new Date(b.startTime) - new Date(a.startTime)
-      );
-      
+
+      transactions.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+
       return transactions[0];
-      
     } catch (error) {
       console.error(chalk.red(`Failed to get last transaction: ${error.message}`));
       return null;
@@ -338,13 +331,13 @@ class TransactionManager {
   async listTransactions(limit = 10) {
     try {
       const transactionsDir = this.transactionPath;
-      if (!await fs.pathExists(transactionsDir)) {
+      if (!(await fs.pathExists(transactionsDir))) {
         return [];
       }
-      
+
       const files = await fs.readdir(transactionsDir);
-      const transactionFiles = files.filter(f => f.endsWith('.json'));
-      
+      const transactionFiles = files.filter((f) => f.endsWith('.json'));
+
       const transactions = [];
       for (const file of transactionFiles) {
         const transaction = await fs.readJson(path.join(transactionsDir, file));
@@ -356,17 +349,14 @@ class TransactionManager {
           startTime: transaction.startTime,
           endTime: transaction.endTime,
           status: transaction.status,
-          operations: transaction.operations.length
+          operations: transaction.operations.length,
         });
       }
-      
+
       // Sort by start time (newest first)
-      transactions.sort((a, b) => 
-        new Date(b.startTime) - new Date(a.startTime)
-      );
-      
+      transactions.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+
       return transactions.slice(0, limit);
-      
     } catch (error) {
       console.error(chalk.red(`Failed to list transactions: ${error.message}`));
       return [];
@@ -380,25 +370,25 @@ class TransactionManager {
   async cleanupOldTransactions() {
     try {
       const transactionsDir = this.transactionPath;
-      if (!await fs.pathExists(transactionsDir)) {
+      if (!(await fs.pathExists(transactionsDir))) {
         return 0;
       }
-      
+
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - this.retentionDays);
-      
+
       const files = await fs.readdir(transactionsDir);
       let cleaned = 0;
-      
+
       for (const file of files) {
         if (file.endsWith('.json')) {
           const filePath = path.join(transactionsDir, file);
           const transaction = await fs.readJson(filePath);
-          
+
           if (new Date(transaction.startTime) < cutoffDate) {
             // Clean up transaction and its backups
             await fs.remove(filePath);
-            
+
             // Remove associated backups
             if (transaction.backups) {
               for (const backup of transaction.backups) {
@@ -407,15 +397,14 @@ class TransactionManager {
                 }
               }
             }
-            
+
             cleaned++;
           }
         }
       }
-      
+
       console.log(chalk.gray(`🧹 Cleaned up ${cleaned} old transactions`));
       return cleaned;
-      
     } catch (error) {
       console.error(chalk.red(`Cleanup failed: ${error.message}`));
       return 0;
@@ -428,29 +417,28 @@ class TransactionManager {
    */
   async backupCurrentState(filePath) {
     try {
-      if (!await fs.pathExists(filePath)) {
+      if (!(await fs.pathExists(filePath))) {
         return null;
       }
-      
+
       const content = await fs.readFile(filePath, 'utf8');
       const hash = crypto.createHash('sha256').update(content).digest('hex');
-      
+
       const backup = {
         path: filePath,
         content: content,
         hash: hash,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
-      
+
       // Save backup
       const backupId = `backup-${Date.now()}-${hash.substr(0, 8)}`;
       const backupPath = path.join(this.backupPath, backupId);
-      
+
       await fs.ensureDir(this.backupPath);
       await fs.writeJson(backupPath, backup, { spaces: 2 });
-      
+
       return backupId;
-      
     } catch (error) {
       console.error(chalk.red(`Backup failed: ${error.message}`));
       return null;
@@ -465,15 +453,14 @@ class TransactionManager {
     try {
       const backupPath = path.join(this.backupPath, backupId);
       const backup = await fs.readJson(backupPath);
-      
+
       // Ensure directory exists
       await fs.ensureDir(path.dirname(targetPath));
-      
+
       // Restore content
       await fs.writeFile(targetPath, backup.content, 'utf8');
-      
+
       console.log(chalk.green(`   ✓ Restored: ${path.basename(targetPath)}`));
-      
     } catch (error) {
       console.error(chalk.red(`Restore failed: ${error.message}`));
       throw error;
@@ -487,29 +474,28 @@ class TransactionManager {
   async rollbackManifestUpdate(operation, results) {
     try {
       const manifestPath = path.join(this.rootPath, 'aiox-core', 'team-manifest.yaml');
-      
+
       if (operation.previousState) {
         // Restore previous manifest state
         const backupPath = path.join(this.backupPath, operation.previousState);
         const backup = await fs.readJson(backupPath);
         await fs.writeFile(manifestPath, backup.content, 'utf8');
-        
+
         results.successful.push({
           operation: operation.id,
           action: 'manifest_restored',
-          path: manifestPath
+          path: manifestPath,
         });
       } else {
         results.warnings.push({
           operation: operation.id,
-          warning: 'No manifest backup available'
+          warning: 'No manifest backup available',
         });
       }
-      
     } catch (error) {
       results.failed.push({
         operation: operation.id,
-        error: `Manifest rollback failed: ${error.message}`
+        error: `Manifest rollback failed: ${error.message}`,
       });
     }
   }
@@ -525,14 +511,13 @@ class TransactionManager {
         // This would need integration with ComponentMetadata
         results.warnings.push({
           operation: operation.id,
-          warning: 'Metadata rollback not fully implemented'
+          warning: 'Metadata rollback not fully implemented',
         });
       }
-      
     } catch (error) {
       results.failed.push({
         operation: operation.id,
-        error: `Metadata rollback failed: ${error.message}`
+        error: `Metadata rollback failed: ${error.message}`,
       });
     }
   }
@@ -545,7 +530,7 @@ class TransactionManager {
     // Move backups to archive directory with transaction reference
     const archivePath = path.join(this.backupPath, 'archive', transaction.id);
     await fs.ensureDir(archivePath);
-    
+
     // Archive transaction file
     const transactionArchive = path.join(archivePath, 'transaction.json');
     await fs.writeJson(transactionArchive, transaction, { spaces: 2 });

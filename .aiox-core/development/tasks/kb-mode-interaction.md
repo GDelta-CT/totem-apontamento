@@ -203,7 +203,9 @@ updated_at: 2025-11-17
  Powered by AIOX™ Core -->
 
 ---
+
 # No checklists needed - interactive KB mode facilitation task, no validation workflow required
+
 ---
 
 # KB Mode Interaction Task
@@ -214,7 +216,7 @@ Provide a user-friendly interface to the AIOX knowledge base without overwhelmin
 
 ## Instructions
 
-When entering KB mode (*kb-mode), follow these steps:
+When entering KB mode (\*kb-mode), follow these steps:
 
 ### 1. Welcome and Guide
 
@@ -256,12 +258,12 @@ Or ask me about anything else related to aiox-core!
 When user is done or wants to exit KB mode:
 
 - Summarize key points discussed if helpful
-- Remind them they can return to KB mode anytime with *kb-mode
+- Remind them they can return to KB mode anytime with \*kb-mode
 - Suggest next steps based on what was discussed
 
 ## Example Interaction
 
-**User**: *kb-mode
+**User**: \*kb-mode
 
 **Assistant**: I've entered KB mode and have access to the full AIOX knowledge base. I can help you with detailed information about any aspect of aiox-core.
 
@@ -281,4 +283,3 @@ Or ask me about anything else related to aiox-core!
 **User**: Tell me about workflows
 
 **Assistant**: [Provides focused information about workflows from the KB, then offers to explore specific workflow types or related topics]
- 

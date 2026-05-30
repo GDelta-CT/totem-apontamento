@@ -122,14 +122,17 @@ class ToolResolver {
     // Validate version format (basic semver check)
     const semverPattern = /^\d+\.\d+\.\d+$/;
     if (!semverPattern.test(tool.version)) {
-      throw new Error(`Invalid version format '${tool.version}'. Expected semantic versioning (e.g., 1.0.0)`);
+      throw new Error(
+        `Invalid version format '${tool.version}'. Expected semantic versioning (e.g., 1.0.0)`
+      );
     }
 
     // Validate schema_version if present (support both string and numeric formats)
     if (tool.schema_version) {
-      const version = typeof tool.schema_version === 'number'
-        ? tool.schema_version
-        : parseFloat(tool.schema_version);
+      const version =
+        typeof tool.schema_version === 'number'
+          ? tool.schema_version
+          : parseFloat(tool.schema_version);
 
       if (![1.0, 2.0].includes(version)) {
         throw new Error(`Invalid schema_version '${tool.schema_version}'. Must be '1.0' or '2.0'`);
@@ -205,9 +208,10 @@ class ToolResolver {
     const hasExecutableKnowledge = !!tool.executable_knowledge;
     const hasApiComplexity = !!tool.api_complexity;
     const hasAntiPatterns = !!tool.anti_patterns;
-    const hasEnhancedExamples = tool.examples &&
-      Object.values(tool.examples).some(ex =>
-        ex.some(e => e.scenario && ['success', 'failure_invalid_param'].includes(e.scenario)),
+    const hasEnhancedExamples =
+      tool.examples &&
+      Object.values(tool.examples).some((ex) =>
+        ex.some((e) => e.scenario && ['success', 'failure_invalid_param'].includes(e.scenario))
       );
 
     if (hasExecutableKnowledge || hasApiComplexity || hasAntiPatterns || hasEnhancedExamples) {
@@ -330,10 +334,7 @@ class ToolResolver {
    * Reset search paths to default
    */
   resetSearchPaths() {
-    this.basePaths = [
-      'aiox-core/tools',
-      'common/tools',
-    ];
+    this.basePaths = ['aiox-core/tools', 'common/tools'];
   }
 }
 

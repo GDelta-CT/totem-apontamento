@@ -39,9 +39,7 @@ async function run(context) {
     };
   }
 
-  const hookFiles = entries.filter(
-    (e) => e.isFile() && e.name.endsWith('.cjs'),
-  );
+  const hookFiles = entries.filter((e) => e.isFile() && e.name.endsWith('.cjs'));
   const hookCount = hookFiles.length;
 
   if (hookCount === 0) {
@@ -80,7 +78,7 @@ async function run(context) {
 
       // Check if at least some hook files are referenced in settings
       const referencedCount = hookFiles.filter(
-        (f) => hooksStr.includes(f.name) || hooksStr.includes(f.name.replace('.cjs', '')),
+        (f) => hooksStr.includes(f.name) || hooksStr.includes(f.name.replace('.cjs', ''))
       ).length;
 
       registered = referencedCount > 0;

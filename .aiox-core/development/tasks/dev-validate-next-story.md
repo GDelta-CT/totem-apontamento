@@ -182,6 +182,7 @@ token_usage: ~3,000-10,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Break into smaller workflows; implement checkpointing; use async processing where possible
 
 ---
@@ -202,10 +203,12 @@ updated_at: 2025-11-17
 ---
 
 tools:
-  - github-cli        # Validate repository structure and file paths
-  - context7          # Verify technical specifications and patterns
-checklists:
-  - po-master-checklist.md
+
+- github-cli # Validate repository structure and file paths
+- context7 # Verify technical specifications and patterns
+  checklists:
+- po-master-checklist.md
+
 ---
 
 # Validate Next Story Task
@@ -346,4 +349,3 @@ Provide a structured validation report including:
 - **NO-GO**: Story requires fixes before implementation
 - **Implementation Readiness Score**: 1-10 scale
 - **Confidence Level**: High/Medium/Low for successful implementation
- 

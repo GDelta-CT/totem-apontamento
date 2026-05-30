@@ -115,7 +115,7 @@ class GitignoreCheck extends BaseCheck {
             healable: true,
             healingTier: 1,
             details,
-          },
+          }
         );
       }
 

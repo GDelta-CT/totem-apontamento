@@ -11,13 +11,16 @@
 ### Color Contrast
 
 **Text:**
+
 - Normal text (< 18px): ≥ 4.5:1 contrast ratio
 - Large text (≥ 18px or bold ≥ 14px): ≥ 3:1 contrast ratio
 
 **Non-Text (UI components):**
+
 - Icons, buttons, form borders: ≥ 3:1 contrast ratio
 
 **Testing:**
+
 ```bash
 # Use browser dev tools or:
 npm install -g pa11y
@@ -27,6 +30,7 @@ pa11y --standard WCAG2AA http://localhost:3000
 ### Keyboard Navigation
 
 **Required:**
+
 - All interactive elements accessible via Tab key
 - Logical tab order (top → bottom, left → right)
 - Enter/Space activates buttons
@@ -34,53 +38,47 @@ pa11y --standard WCAG2AA http://localhost:3000
 - Escape closes modals, dropdowns
 
 **Focus Indicators:**
+
 - Visible focus outline (≥ 3:1 contrast)
 - Never `outline: none` without replacement
 
 ```css
 /* Good */
 button:focus {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 /* Bad */
 button:focus {
-    outline: none;  /* ❌ Removes keyboard navigation indicator */
+  outline: none; /* ❌ Removes keyboard navigation indicator */
 }
 ```
 
 ### ARIA Attributes
 
 **When to use:**
+
 - Custom widgets (not semantic HTML)
 - Dynamic content updates
 - Complex interactions
 
 **Common ARIA:**
+
 ```html
 <!-- Button with icon only -->
 <button aria-label="Close dialog">
-    <CloseIcon />
+  <CloseIcon />
 </button>
 
 <!-- Loading state -->
-<div aria-live="polite" aria-busy="true">
-    Loading...
-</div>
+<div aria-live="polite" aria-busy="true">Loading...</div>
 
 <!-- Expanded state -->
-<button
-    aria-expanded="false"
-    aria-controls="menu"
->
-    Menu
-</button>
+<button aria-expanded="false" aria-controls="menu">Menu</button>
 
 <!-- Disabled -->
-<button disabled aria-disabled="true">
-    Submit
-</button>
+<button disabled aria-disabled="true">Submit</button>
 ```
 
 ---
@@ -88,6 +86,7 @@ button:focus {
 ## WCAG AAA (Target, not required)
 
 **Enhanced Requirements:**
+
 - Text contrast: ≥ 7:1 (normal), ≥ 4.5:1 (large)
 - No images of text
 - Enhanced visual presentation (line height ≥ 1.5)
@@ -142,15 +141,11 @@ button:focus {
 
 ```tsx
 // ✅ Good
-<div
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="dialog-title"
->
-    <h2 id="dialog-title">Confirm Action</h2>
-    <p>Are you sure?</p>
-    <button onClick={onConfirm}>Yes</button>
-    <button onClick={onCancel}>No</button>
+<div role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+  <h2 id="dialog-title">Confirm Action</h2>
+  <p>Are you sure?</p>
+  <button onClick={onConfirm}>Yes</button>
+  <button onClick={onCancel}>No</button>
 </div>
 
 // Focus trap: Tab cycles within modal
@@ -208,14 +203,14 @@ test('Button is accessible', async () => {
 ```css
 /* ❌ Bad */
 .text {
-    color: #999;           /* 2.8:1 contrast */
-    background: #fff;
+  color: #999; /* 2.8:1 contrast */
+  background: #fff;
 }
 
 /* ✅ Good */
 .text {
-    color: #666;           /* 5.7:1 contrast ✓ */
-    background: #fff;
+  color: #666; /* 5.7:1 contrast ✓ */
+  background: #fff;
 }
 ```
 
@@ -257,6 +252,7 @@ test('Button is accessible', async () => {
 ## Design System Enforcement
 
 **All components MUST:**
+
 - Pass axe automated tests
 - Have ≥ 4.5:1 text contrast
 - Be keyboard navigable

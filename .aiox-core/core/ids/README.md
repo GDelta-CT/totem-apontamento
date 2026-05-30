@@ -10,40 +10,40 @@ The registry is stored at `.aiox-core/data/entity-registry.yaml` as a single YAM
 
 ```yaml
 metadata:
-  version: "1.0.0"           # Semver
-  lastUpdated: "ISO-8601"    # Last population timestamp
-  entityCount: 474           # Total entities
-  checksumAlgorithm: "sha256"
+  version: '1.0.0' # Semver
+  lastUpdated: 'ISO-8601' # Last population timestamp
+  entityCount: 474 # Total entities
+  checksumAlgorithm: 'sha256'
 
 entities:
-  <category>:                # tasks, templates, scripts, modules, agents, checklists, data
+  <category>: # tasks, templates, scripts, modules, agents, checklists, data
     <entity-id>:
-      path: "relative/path"  # From repo root
-      type: "task"           # task|template|script|module|agent|checklist|data
-      purpose: "Brief desc"  # What this entity does (max 200 chars)
-      keywords: ["k1", "k2"] # For keyword search
-      usedBy: ["entity-ids"] # Reverse dependencies
-      dependencies: ["ids"]  # Forward dependencies
+      path: 'relative/path' # From repo root
+      type: 'task' # task|template|script|module|agent|checklist|data
+      purpose: 'Brief desc' # What this entity does (max 200 chars)
+      keywords: ['k1', 'k2'] # For keyword search
+      usedBy: ['entity-ids'] # Reverse dependencies
+      dependencies: ['ids'] # Forward dependencies
       adaptability:
-        score: 0.0-1.0       # How safely it can be adapted
-        constraints: []       # What cannot be changed
-        extensionPoints: []   # Where it can be extended
-      checksum: "sha256:hex" # File integrity hash
-      lastVerified: "ISO-8601"
+        score: 0.0-1.0 # How safely it can be adapted
+        constraints: [] # What cannot be changed
+        extensionPoints: [] # Where it can be extended
+      checksum: 'sha256:hex' # File integrity hash
+      lastVerified: 'ISO-8601'
 
 categories:
-  - id: "tasks"
-    description: "Executable task workflows"
-    basePath: ".aiox-core/development/tasks"
+  - id: 'tasks'
+    description: 'Executable task workflows'
+    basePath: '.aiox-core/development/tasks'
 ```
 
 ### Adaptability Scores
 
-| Score | Meaning | Example |
-|-------|---------|---------|
-| 0.0-0.3 | Low — changes likely break consumers | Agent definitions, core templates |
-| 0.4-0.6 | Medium — needs careful impact analysis | Shared utilities, modules |
-| 0.7-1.0 | High — safe to adapt with docs | Specific tasks, scripts |
+| Score   | Meaning                                | Example                           |
+| ------- | -------------------------------------- | --------------------------------- |
+| 0.0-0.3 | Low — changes likely break consumers   | Agent definitions, core templates |
+| 0.4-0.6 | Medium — needs careful impact analysis | Shared utilities, modules         |
+| 0.7-1.0 | High — safe to adapt with docs         | Specific tasks, scripts           |
 
 ## RegistryLoader API
 
@@ -54,20 +54,20 @@ const loader = new RegistryLoader(); // uses default path
 
 ### Methods
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `load()` | `Object` | Parse registry YAML (returns empty registry if file missing) |
-| `queryByKeywords(keywords)` | `Array` | Find entities matching any keyword (case-insensitive) |
-| `queryByType(type)` | `Array` | Find entities by type (task, script, agent, etc.) |
-| `queryByPath(pattern)` | `Array` | Find entities by path substring |
-| `queryByPurpose(text)` | `Array` | Find entities by purpose text substring |
-| `getRelationships(id)` | `{usedBy, dependencies}` | Get both relationship arrays |
-| `getUsedBy(id)` | `Array` | Get entities that depend on this one |
-| `getDependencies(id)` | `Array` | Get entities this one depends on |
-| `getMetadata()` | `Object` | Registry metadata (version, count, etc.) |
-| `getCategories()` | `Array` | List of category definitions |
-| `getEntityCount()` | `Number` | Total entities in registry |
-| `verifyChecksum(id, repoRoot)` | `Boolean\|null` | Verify file integrity |
+| Method                         | Returns                  | Description                                                  |
+| ------------------------------ | ------------------------ | ------------------------------------------------------------ |
+| `load()`                       | `Object`                 | Parse registry YAML (returns empty registry if file missing) |
+| `queryByKeywords(keywords)`    | `Array`                  | Find entities matching any keyword (case-insensitive)        |
+| `queryByType(type)`            | `Array`                  | Find entities by type (task, script, agent, etc.)            |
+| `queryByPath(pattern)`         | `Array`                  | Find entities by path substring                              |
+| `queryByPurpose(text)`         | `Array`                  | Find entities by purpose text substring                      |
+| `getRelationships(id)`         | `{usedBy, dependencies}` | Get both relationship arrays                                 |
+| `getUsedBy(id)`                | `Array`                  | Get entities that depend on this one                         |
+| `getDependencies(id)`          | `Array`                  | Get entities this one depends on                             |
+| `getMetadata()`                | `Object`                 | Registry metadata (version, count, etc.)                     |
+| `getCategories()`              | `Array`                  | List of category definitions                                 |
+| `getEntityCount()`             | `Number`                 | Total entities in registry                                   |
+| `verifyChecksum(id, repoRoot)` | `Boolean\|null`          | Verify file integrity                                        |
 
 ### Examples
 
@@ -82,7 +82,7 @@ console.log(`Found ${tasks.length} tasks`);
 
 // Search by keywords
 const results = loader.queryByKeywords(['validate', 'story']);
-results.forEach(e => console.log(`${e.id}: ${e.purpose}`));
+results.forEach((e) => console.log(`${e.id}: ${e.purpose}`));
 
 // Check relationships
 const rels = loader.getRelationships('create-doc');
@@ -102,6 +102,7 @@ node .aiox-core/development/scripts/populate-entity-registry.js
 ```
 
 The script:
+
 1. Scans 7 category directories for artifacts
 2. Extracts metadata (purpose, keywords) from file content
 3. Detects dependencies via import/require analysis

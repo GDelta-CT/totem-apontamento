@@ -56,8 +56,9 @@ class L3WorkflowProcessor extends LayerProcessor {
     }
 
     // 2. Find domain with matching workflowTrigger
-    const domainKey = Object.keys(manifest.domains || {})
-      .find(k => manifest.domains[k].workflowTrigger === workflowId);
+    const domainKey = Object.keys(manifest.domains || {}).find(
+      (k) => manifest.domains[k].workflowTrigger === workflowId
+    );
 
     if (!domainKey) {
       return null;

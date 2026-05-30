@@ -182,6 +182,7 @@ token_usage: ~1,500-5,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Cache template compilation; minimize data transformations; lazy load resources
 
 ---
@@ -202,9 +203,12 @@ updated_at: 2025-11-17
 ---
 
 # No checklists needed - this task creates research prompts, validation is built into the research methodology
+
 tools:
-  - exa               # Conduct deep research on markets and technologies
-  - context7          # Look up technical documentation and patterns
+
+- exa # Conduct deep research on markets and technologies
+- context7 # Look up technical documentation and patterns
+
 ---
 
 # Create Deep Research Prompt Task
@@ -230,63 +234,54 @@ CRITICAL: First, help the user select the most appropriate research focus based 
 Present these numbered options to the user:
 
 1. **Product Validation Research**
-
    - Validate product hypotheses and market fit
    - Test assumptions about user needs and solutions
    - Assess technical and business feasibility
    - Identify risks and mitigation strategies
 
 2. **Market Opportunity Research**
-
    - Analyze market size and growth potential
    - Identify market segments and dynamics
    - Assess market entry strategies
    - Evaluate timing and market readiness
 
 3. **User & Customer Research**
-
    - Deep dive into user personas and behaviors
    - Understand jobs-to-be-done and pain points
    - Map customer journeys and touchpoints
    - Analyze willingness to pay and value perception
 
 4. **Competitive Intelligence Research**
-
    - Detailed competitor analysis and positioning
    - Feature and capability comparisons
    - Business model and strategy analysis
    - Identify competitive advantages and gaps
 
 5. **Technology & Innovation Research**
-
    - Assess technology trends and possibilities
    - Evaluate technical approaches and architectures
    - Identify emerging technologies and disruptions
    - Analyze build vs. buy vs. partner options
 
 6. **Industry & Ecosystem Research**
-
    - Map industry value chains and dynamics
    - Identify key players and relationships
    - Analyze regulatory and compliance factors
    - Understand partnership opportunities
 
 7. **Strategic Options Research**
-
    - Evaluate different strategic directions
    - Assess business model alternatives
    - Analyze go-to-market strategies
    - Consider expansion and scaling paths
 
 8. **Risk & Feasibility Research**
-
    - Identify and assess various risk factors
    - Evaluate implementation challenges
    - Analyze resource requirements
    - Consider regulatory and legal implications
 
 9. **Custom Research Focus**
-
    - User-defined research objectives
    - Specialized domain investigation
    - Cross-functional research needs
@@ -455,13 +450,11 @@ CRITICAL: collaborate with the user to develop specific, actionable research que
 ### 5. Review and Refinement
 
 1. **Present Complete Prompt**
-
    - Show the full research prompt
    - Explain key elements and rationale
    - Highlight any assumptions made
 
 2. **Gather Feedback**
-
    - Are the objectives clear and correct?
    - Do the questions address all concerns?
    - Is the scope appropriate?
@@ -498,9 +491,10 @@ CRITICAL: collaborate with the user to develop specific, actionable research que
 - Plan for iterative refinement based on initial findings
 
 ## Handoff
+
 next_agent: @pm
-next_command: *write-spec
+next_command: \*write-spec
 condition: Research complete (research.json created)
 alternatives:
-  - agent: @architect, command: *analyze-impact, condition: Research reveals higher complexity than expected
- 
+
+- agent: @architect, command: \*analyze-impact, condition: Research reveals higher complexity than expected

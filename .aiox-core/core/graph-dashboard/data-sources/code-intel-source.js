@@ -189,7 +189,7 @@ class CodeIntelSource {
           type: entity.type || category,
           path: entity.path || '',
           category: _detectCategory(category, entity.path || ''),
-          lifecycle: entity.lifecycle || 'production',  // NOG-16C: pass lifecycle for graph filtering
+          lifecycle: entity.lifecycle || 'production', // NOG-16C: pass lifecycle for graph filtering
         });
 
         for (const dep of entity.dependencies || []) {

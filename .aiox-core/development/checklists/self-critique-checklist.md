@@ -62,9 +62,9 @@ Be honest. Finding bugs NOW saves debugging time LATER.]]
 
 ### 5.5.1 Predicted Bugs (minimum 3)
 
-- [ ] Identified potential bug #1: ********\_\_\_\_********
-- [ ] Identified potential bug #2: ********\_\_\_\_********
-- [ ] Identified potential bug #3: ********\_\_\_\_********
+- [ ] Identified potential bug #1: **\*\*\*\***\_\_\_\_**\*\*\*\***
+- [ ] Identified potential bug #2: **\*\*\*\***\_\_\_\_**\*\*\*\***
+- [ ] Identified potential bug #3: **\*\*\*\***\_\_\_\_**\*\*\*\***
 - [ ] (Optional) Additional bugs identified
 
 [[LLM: List specific bugs, not vague concerns. Example:
@@ -75,9 +75,9 @@ Be honest. Finding bugs NOW saves debugging time LATER.]]
 
 ### 5.5.2 Edge Cases (minimum 3)
 
-- [ ] Considered edge case #1: ********\_\_\_\_********
-- [ ] Considered edge case #2: ********\_\_\_\_********
-- [ ] Considered edge case #3: ********\_\_\_\_********
+- [ ] Considered edge case #1: **\*\*\*\***\_\_\_\_**\*\*\*\***
+- [ ] Considered edge case #2: **\*\*\*\***\_\_\_\_**\*\*\*\***
+- [ ] Considered edge case #3: **\*\*\*\***\_\_\_\_**\*\*\*\***
 - [ ] (Optional) Additional edge cases considered
 
 [[LLM: List specific edge cases with expected behavior. Example:

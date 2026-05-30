@@ -21,11 +21,7 @@ const {
   createDefaultState,
 } = require('./observability-panel');
 
-const {
-  PanelRenderer,
-  BOX,
-  STATUS,
-} = require('./panel-renderer');
+const { PanelRenderer, BOX, STATUS } = require('./panel-renderer');
 
 module.exports = {
   // Main panel

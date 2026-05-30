@@ -338,7 +338,9 @@ structuring:
         "properties": {
           "id": { "type": "string", "pattern": "^NFR-\\d+$" },
           "description": { "type": "string", "minLength": 10 },
-          "category": { "enum": ["performance", "security", "scalability", "usability", "reliability"] }
+          "category": {
+            "enum": ["performance", "security", "scalability", "usability", "reliability"]
+          }
         }
       }
     },
@@ -545,8 +547,10 @@ metadata:
 ```
 
 ## Handoff
+
 next_agent: @architect
-next_command: *analyze-impact
+next_command: \*analyze-impact
 condition: Requirements gathered (requirements.json created)
 alternatives:
-  - agent: @pm, command: *write-spec, condition: SIMPLE complexity, skip assessment
+
+- agent: @pm, command: \*write-spec, condition: SIMPLE complexity, skip assessment

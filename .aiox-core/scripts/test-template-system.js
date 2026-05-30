@@ -33,7 +33,6 @@ class TestTemplateSystem {
 
       console.log(chalk.green('✅ Test template system initialized'));
       return true;
-
     } catch (error) {
       console.error(chalk.red(`Failed to initialize test template system: ${error.message}`));
       throw error;
@@ -45,7 +44,7 @@ class TestTemplateSystem {
    */
   async getTemplate(componentType, testType, framework = 'jest', options = {}) {
     const templateKey = `${_framework}-${componentType}-${testType}`;
-    
+
     // Check cache first
     if (this.templateCache.has(templateKey)) {
       return this.templateCache.get(templateKey);
@@ -53,14 +52,14 @@ class TestTemplateSystem {
 
     // Load template from file or generate from base template
     let template = await this.loadTemplateFromFile(templateKey);
-    
+
     if (!template) {
       template = await this.generateTemplate(componentType, testType, _framework, options);
     }
 
     // Cache the template
     this.templateCache.set(templateKey, template);
-    
+
     return template;
   }
 
@@ -68,16 +67,11 @@ class TestTemplateSystem {
    * Generate test content using template
    */
   async generateTestContent(component, testFile, config) {
-    const template = await this.getTemplate(
-      component.type,
-      testFile.test_type,
-      config.framework,
-      {
-        qualityLevel: config.qualityLevel,
-        mockLevel: config.mockLevel,
-        coverageTarget: config.coverageTarget,
-      },
-    );
+    const template = await this.getTemplate(component.type, testFile.test_type, config.framework, {
+      qualityLevel: config.qualityLevel,
+      mockLevel: config.mockLevel,
+      coverageTarget: config.coverageTarget,
+    });
 
     const templateData = {
       component: component,
@@ -98,7 +92,7 @@ class TestTemplateSystem {
    */
   async createCustomTemplate(templateName, templateContent, options = {}) {
     const templatePath = path.join(this.templatesDir, 'custom', `${templateName}.template.js`);
-    
+
     const templateWrapper = {
       name: templateName,
       type: options.type || 'custom',
@@ -114,13 +108,12 @@ class TestTemplateSystem {
     try {
       await fs.mkdir(path.dirname(templatePath), { recursive: true });
       await fs.writeFile(templatePath, JSON.stringify(templateWrapper, null, 2));
-      
+
       // Add to cache
       this.templateCache.set(templateName, templateWrapper);
-      
+
       console.log(chalk.green(`✅ Custom template created: ${templateName}`));
       return templateWrapper;
-
     } catch (error) {
       console.error(chalk.red(`Failed to create custom template: ${error.message}`));
       throw error;
@@ -132,7 +125,7 @@ class TestTemplateSystem {
    */
   async loadTemplateFromFile(templateKey) {
     const templatePath = path.join(this.templatesDir, `${templateKey}.template.js`);
-    
+
     try {
       const content = await fs.readFile(templatePath, 'utf-8');
       return JSON.parse(content);
@@ -272,7 +265,8 @@ describe('{{component.name}}', function() {
       vitest: {
         name: 'Vitest',
         imports: {
-          testFramework: "import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';",
+          testFramework:
+            "import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';",
           assertions: '',
           mocks: '',
         },
@@ -319,11 +313,7 @@ describe('{{component.name}}', () => {
           "const yaml = require('js-yaml');",
         ],
         setup: {
-          variables: [
-            'let agentPath;',
-            'let agentContent;',
-            'let agentConfig;',
-          ],
+          variables: ['let agentPath;', 'let agentContent;', 'let agentConfig;'],
           beforeEach: [
             "agentPath = path.join(__dirname, '../../../aiox-core/agents/{{component.name}}.md');",
             "agentContent = await fs.readFile(agentPath, 'utf-8');",
@@ -363,16 +353,9 @@ describe('{{component.name}}', () => {
         },
       },
       task: {
-        imports: [
-          "const fs = require('fs').promises;",
-          "const path = require('path');",
-        ],
+        imports: ["const fs = require('fs').promises;", "const path = require('path');"],
         setup: {
-          variables: [
-            'let taskPath;',
-            'let taskContent;',
-            'let TaskClass;',
-          ],
+          variables: ['let taskPath;', 'let taskContent;', 'let TaskClass;'],
           beforeEach: [
             "taskPath = path.join(__dirname, '../../../aiox-core/tasks/{{component.name}}.md');",
             "taskContent = await fs.readFile(taskPath, 'utf-8');",
@@ -416,10 +399,7 @@ describe('{{component.name}}', () => {
           "const yaml = require('js-yaml');",
         ],
         setup: {
-          variables: [
-            'let workflowPath;',
-            'let workflowConfig;',
-          ],
+          variables: ['let workflowPath;', 'let workflowConfig;'],
           beforeEach: [
             "workflowPath = path.join(__dirname, '../../../aiox-core/workflows/{{component.name}}.yaml');",
             "const workflowContent = await fs.readFile(workflowPath, 'utf-8');",
@@ -459,14 +439,9 @@ describe('{{component.name}}', () => {
         },
       },
       util: {
-        imports: [
-          "const path = require('path');",
-        ],
+        imports: ["const path = require('path');"],
         setup: {
-          variables: [
-            'let UtilClass;',
-            'let utilInstance;',
-          ],
+          variables: ['let UtilClass;', 'let utilInstance;'],
           beforeEach: [
             "UtilClass = require('../../../aiox-core/scripts/{{component.name}}');",
             'utilInstance = new UtilClass();',
@@ -483,9 +458,7 @@ describe('{{component.name}}', () => {
             },
             {
               name: 'should have required methods',
-              assertions: [
-                "expect(typeof utilInstance.initialize).toBe('function');",
-              ],
+              assertions: ["expect(typeof utilInstance.initialize).toBe('function');"],
             },
           ],
           functionality: [
@@ -508,12 +481,12 @@ describe('{{component.name}}', () => {
   generateImports(componentType, testType, _framework, options) {
     const _frameworkConfig = this.frameworks[framework];
     const componentTemplate = this.componentTemplates[componentType];
-    
+
     const imports = [
       frameworkConfig.imports.testFramework,
       frameworkConfig.imports.assertions,
       frameworkConfig.imports.mocks,
-    ].filter(imp => imp);
+    ].filter((imp) => imp);
 
     // Add component-specific imports
     if (componentTemplate && componentTemplate.imports) {
@@ -524,13 +497,13 @@ describe('{{component.name}}', () => {
     if (testType === 'integration') {
       imports.push(
         "const request = require('supertest');",
-        "const { setupTestDB, teardownTestDB } = require('../../helpers/db-helper');",
+        "const { setupTestDB, teardownTestDB } = require('../../helpers/db-helper');"
       );
     }
 
     if (testType === 'e2e') {
       imports.push(
-        "const { setupTestEnvironment, cleanupTestEnvironment } = require('../../helpers/e2e-helper');",
+        "const { setupTestEnvironment, cleanupTestEnvironment } = require('../../helpers/e2e-helper');"
       );
     }
 
@@ -619,7 +592,9 @@ describe('{{component.name}}', () => {
 
     // Add component-specific teardown
     if (componentType === 'util') {
-      teardown.afterEach.push('if (utilInstance && utilInstance.cleanup) await utilInstance.cleanup();');
+      teardown.afterEach.push(
+        'if (utilInstance && utilInstance.cleanup) await utilInstance.cleanup();'
+      );
     }
 
     return teardown;
@@ -695,12 +670,12 @@ describe('{{component.name}}', () => {
    * Render template sections
    */
   renderImports(imports, data) {
-    return imports.filter(imp => imp).join('\n');
+    return imports.filter((imp) => imp).join('\n');
   }
 
   renderSetup(setup, data) {
     let content = '';
-    
+
     if (setup.variables.length > 0) {
       content += setup.variables.join('\n') + '\n\n';
     }
@@ -725,21 +700,23 @@ describe('{{component.name}}', () => {
   }
 
   renderTestCases(testCases, data) {
-    return testCases.map(testCase => {
-      let caseContent = `  it('${testCase.name}', async () => {\n`;
-      
-      if (testCase.setup) {
-        caseContent += `    ${testCase.setup}\n\n`;
-      }
-      
-      if (testCase.assertions) {
-        caseContent += testCase.assertions.map(assertion => `    ${assertion}`).join('\n');
-      }
-      
-      caseContent += '\n  });';
-      
-      return caseContent;
-    }).join('\n\n');
+    return testCases
+      .map((testCase) => {
+        let caseContent = `  it('${testCase.name}', async () => {\n`;
+
+        if (testCase.setup) {
+          caseContent += `    ${testCase.setup}\n\n`;
+        }
+
+        if (testCase.assertions) {
+          caseContent += testCase.assertions.map((assertion) => `    ${assertion}`).join('\n');
+        }
+
+        caseContent += '\n  });';
+
+        return caseContent;
+      })
+      .join('\n\n');
   }
 
   renderTeardown(teardown, data) {
@@ -765,19 +742,23 @@ afterAll(async () => {
   renderMocks(mocks, data) {
     if (mocks.length === 0) return '';
 
-    return mocks.map(mock => {
-      if (mock.type === 'module') {
-        return `jest.mock('${mock.target}', () => (${mock.implementation}));`;
-      }
-      return '';
-    }).filter(mock => mock).join('\n') + '\n';
+    return (
+      mocks
+        .map((mock) => {
+          if (mock.type === 'module') {
+            return `jest.mock('${mock.target}', () => (${mock.implementation}));`;
+          }
+          return '';
+        })
+        .filter((mock) => mock)
+        .join('\n') + '\n'
+    );
   }
 
   renderUtilities(utilities, data) {
     if (utilities.length === 0) return '';
 
-    return '\n// Test Utilities\n' + 
-           utilities.map(util => util.implementation).join('\n\n');
+    return '\n// Test Utilities\n' + utilities.map((util) => util.implementation).join('\n\n');
   }
 
   renderMetadata(metadata, data) {
@@ -793,7 +774,7 @@ afterAll(async () => {
    */
   replaceTemplateVariables(content, sections) {
     let result = content;
-    
+
     Object.entries(sections).forEach(([key, value]) => {
       const placeholder = `{{${key}}}`;
       result = result.replace(new RegExp(placeholder, 'g'), value || '');
@@ -813,13 +794,13 @@ afterAll(async () => {
   formatGeneratedCode(content, framework) {
     // Remove excessive blank lines
     content = content.replace(/\n{3,}/g, '\n\n');
-    
+
     // Ensure proper spacing around blocks
     content = content.replace(/}\n{/g, '}\n\n{');
-    
+
     // Clean up any template artifacts
     content = content.replace(/\{\{[^}]+\}\}/g, '');
-    
+
     return content.trim();
   }
 
@@ -829,13 +810,13 @@ afterAll(async () => {
   async loadTemplates() {
     try {
       const templateFiles = await this.findTemplateFiles();
-      
+
       for (const templateFile of templateFiles) {
         try {
           const content = await fs.readFile(templateFile, 'utf-8');
           const template = JSON.parse(content);
           const templateKey = path.basename(templateFile, '.template.js');
-          
+
           this.templateCache.set(templateKey, template);
         } catch (error) {
           console.warn(chalk.yellow(`Failed to load template ${templateFile}: ${error.message}`));
@@ -843,7 +824,6 @@ afterAll(async () => {
       }
 
       console.log(chalk.gray(`Loaded ${this.templateCache.size} template(s)`));
-
     } catch (error) {
       console.warn(chalk.yellow(`Failed to load templates: ${error.message}`));
     }
@@ -854,15 +834,15 @@ afterAll(async () => {
    */
   async findTemplateFiles() {
     const templateFiles = [];
-    
+
     try {
       const entries = await fs.readdir(this.templatesDir, { withFileTypes: true });
-      
+
       for (const entry of entries) {
         if (entry.isDirectory()) {
           const subDir = path.join(this.templatesDir, entry.name);
           const subFiles = await fs.readdir(subDir);
-          
+
           for (const subFile of subFiles) {
             if (subFile.endsWith('.template.js')) {
               templateFiles.push(path.join(subDir, subFile));
@@ -895,8 +875,9 @@ afterAll(async () => {
    * Convert component name to class name
    */
   toClassName(name) {
-    return name.split('-')
-      .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+    return name
+      .split('-')
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
       .join('');
   }
 
@@ -905,13 +886,13 @@ afterAll(async () => {
    */
   getAvailableTemplates() {
     const templates = {};
-    
+
     for (const [key, template] of this.templateCache.entries()) {
       const [framework, componentType, testType] = key.split('-');
-      
+
       if (!templates[framework]) templates[framework] = {};
       if (!templates[framework][componentType]) templates[framework][componentType] = [];
-      
+
       templates[framework][componentType].push(_testType);
     }
 
@@ -923,7 +904,7 @@ afterAll(async () => {
    */
   validateTemplate(_template) {
     const required = ['name', 'type', 'framework', 'componentType'];
-    
+
     for (const field of required) {
       if (!template[field]) {
         throw new Error(`Template missing required field: ${field}`);

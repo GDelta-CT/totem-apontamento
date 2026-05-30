@@ -23,18 +23,43 @@ const fs = require('fs');
 const yaml = require('js-yaml');
 
 // Resolve core config modules (relative from .aiox-core/cli/commands/config/)
-const configResolverPath = path.resolve(__dirname, '..', '..', '..', 'core', 'config', 'config-resolver');
+const configResolverPath = path.resolve(
+  __dirname,
+  '..',
+  '..',
+  '..',
+  'core',
+  'config',
+  'config-resolver'
+);
 const mergeUtilsPath = path.resolve(__dirname, '..', '..', '..', 'core', 'config', 'merge-utils');
-const envInterpolatorPath = path.resolve(__dirname, '..', '..', '..', 'core', 'config', 'env-interpolator');
+const envInterpolatorPath = path.resolve(
+  __dirname,
+  '..',
+  '..',
+  '..',
+  'core',
+  'config',
+  'env-interpolator'
+);
 
 /**
  * Lazy-load config modules (avoids failing at import time if yaml not installed)
  */
 function loadModules() {
-  const { resolveConfig, isLegacyMode, getConfigAtLevel, CONFIG_FILES } = require(configResolverPath);
+  const { resolveConfig, isLegacyMode, getConfigAtLevel, CONFIG_FILES } = require(
+    configResolverPath
+  );
   const { deepMerge } = require(mergeUtilsPath);
   const { lintEnvPatterns } = require(envInterpolatorPath);
-  return { resolveConfig, isLegacyMode, getConfigAtLevel, CONFIG_FILES, deepMerge, lintEnvPatterns };
+  return {
+    resolveConfig,
+    isLegacyMode,
+    getConfigAtLevel,
+    CONFIG_FILES,
+    deepMerge,
+    lintEnvPatterns,
+  };
 }
 
 /**
@@ -104,9 +129,7 @@ function printDebugConfig(config, sources, prefix = '') {
       console.log(`${fullKey}: ${tag}`);
       printDebugConfig(value, sources, fullKey);
     } else {
-      const display = Array.isArray(value)
-        ? JSON.stringify(value)
-        : String(value);
+      const display = Array.isArray(value) ? JSON.stringify(value) : String(value);
       console.log(`  ${fullKey} = ${display}  ${tag}`);
     }
   }
@@ -125,7 +148,7 @@ function diffAction(options) {
     process.exit(1);
   }
 
-  const [levelA, levelB] = options.levels.split(',').map(l => l.trim());
+  const [levelA, levelB] = options.levels.split(',').map((l) => l.trim());
   if (!levelA || !levelB) {
     console.error('Error: --levels requires two levels separated by comma (e.g., --levels 1,2)');
     process.exit(1);
@@ -189,7 +212,9 @@ function computeDiff(objA, objB, _labelA, _labelB, prefix = '') {
   return diff;
 }
 
-function isObj(v) { return v !== null && typeof v === 'object' && !Array.isArray(v); }
+function isObj(v) {
+  return v !== null && typeof v === 'object' && !Array.isArray(v);
+}
 
 function formatValue(v) {
   if (v === null || v === undefined) return 'null';
@@ -238,10 +263,12 @@ function migrateAction(options) {
     const localPath = path.join(root, CONFIG_FILES.local);
 
     if (!options.force) {
-      const exists = [fwPath, projPath, localPath].filter(p => fs.existsSync(p));
+      const exists = [fwPath, projPath, localPath].filter((p) => fs.existsSync(p));
       if (exists.length > 0) {
         console.error('Split config files already exist:');
-        exists.forEach((p) => { console.error(`  ${p}`); });
+        exists.forEach((p) => {
+          console.error(`  ${p}`);
+        });
         console.error('Use --force to overwrite.');
         process.exit(1);
       }
@@ -253,15 +280,18 @@ function migrateAction(options) {
     console.log(`Backup created: ${backupPath}`);
 
     // Write split files
-    const header1 = '# AIOX Framework Configuration (Level 1)\n# DO NOT EDIT — Part of the AIOX framework.\n# Override in project-config.yaml or local-config.yaml.\n\n';
+    const header1 =
+      '# AIOX Framework Configuration (Level 1)\n# DO NOT EDIT — Part of the AIOX framework.\n# Override in project-config.yaml or local-config.yaml.\n\n';
     fs.writeFileSync(fwPath, header1 + yaml.dump(l1Sections, { lineWidth: 120 }));
     console.log(`Created: ${CONFIG_FILES.framework}`);
 
-    const header2 = '# AIOX Project Configuration (Level 2)\n# Project-specific settings shared across the team.\n\n';
+    const header2 =
+      '# AIOX Project Configuration (Level 2)\n# Project-specific settings shared across the team.\n\n';
     fs.writeFileSync(projPath, header2 + yaml.dump(l2Sections, { lineWidth: 120 }));
     console.log(`Created: ${CONFIG_FILES.project}`);
 
-    const header4 = '# AIOX Local Configuration (Level 4)\n# Machine-specific overrides. DO NOT commit to git.\n\n';
+    const header4 =
+      '# AIOX Local Configuration (Level 4)\n# Machine-specific overrides. DO NOT commit to git.\n\n';
     fs.writeFileSync(localPath, header4 + yaml.dump(l4Sections, { lineWidth: 120 }));
     console.log(`Created: ${CONFIG_FILES.local}`);
 
@@ -277,7 +307,9 @@ function migrateAction(options) {
       console.log('\nValidation: PASS — Resolved config matches original.');
     } else {
       console.log('\nValidation: WARNING — Resolved config differs from original.');
-      console.log('This may be expected due to key normalization. Run `aiox config diff` to inspect.');
+      console.log(
+        'This may be expected due to key normalization. Run `aiox config diff` to inspect.'
+      );
     }
 
     console.log('\nMigration complete. Original preserved at core-config.yaml.backup');
@@ -363,9 +395,11 @@ function splitL2(config) {
   if (config.devStoryLocation) docs.stories_dir = config.devStoryLocation;
   if (config.devDebugLog) docs.dev_debug_log = config.devDebugLog;
   if (config.slashPrefix) docs.slash_prefix = config.slashPrefix;
-  if (config.customTechnicalDocuments !== undefined) docs.custom_technical_documents = config.customTechnicalDocuments;
+  if (config.customTechnicalDocuments !== undefined)
+    docs.custom_technical_documents = config.customTechnicalDocuments;
   if (config.devLoadAlwaysFiles) docs.dev_load_always_files = config.devLoadAlwaysFiles;
-  if (config.devLoadAlwaysFilesFallback) docs.dev_load_always_files_fallback = config.devLoadAlwaysFilesFallback;
+  if (config.devLoadAlwaysFilesFallback)
+    docs.dev_load_always_files_fallback = config.devLoadAlwaysFilesFallback;
   if (Object.keys(docs).length > 0) l2.documentation_paths = docs;
 
   // github_integration (Section 8)
@@ -473,13 +507,13 @@ function validateAction(options) {
       const l1 = getConfigAtLevel(root, 'framework');
       if (l1) {
         const l1Lint = lintEnvPatterns(l1, CONFIG_FILES.framework);
-        issues.push(...l1Lint.map(w => `[LINT WARNING] ${w}`));
+        issues.push(...l1Lint.map((w) => `[LINT WARNING] ${w}`));
       }
 
       const l2 = getConfigAtLevel(root, 'project');
       if (l2) {
         const l2Lint = lintEnvPatterns(l2, CONFIG_FILES.project);
-        issues.push(...l2Lint.map(w => `[LINT WARNING] ${w}`));
+        issues.push(...l2Lint.map((w) => `[LINT WARNING] ${w}`));
       }
     }
 
@@ -558,8 +592,7 @@ function initLocalAction() {
  * @returns {Command}
  */
 function createConfigCommand() {
-  const configCmd = new Command('config')
-    .description('Manage layered configuration (ADR-PRO-002)');
+  const configCmd = new Command('config').description('Manage layered configuration (ADR-PRO-002)');
 
   // aiox config show
   configCmd

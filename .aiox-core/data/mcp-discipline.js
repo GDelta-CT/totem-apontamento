@@ -55,7 +55,7 @@ function backupConfig(config) {
 function getEssentialServers() {
   const caps = loadCapabilities();
   if (caps && caps.essentialServers) {
-    return caps.essentialServers.map(s => s.name);
+    return caps.essentialServers.map((s) => s.name);
   }
   // Hardcoded fallback
   return ['nogic', 'code-graph'];
@@ -80,7 +80,9 @@ function apply() {
   }
 
   saveMcpConfig(config);
-  console.log(`\n📋 MCP Discipline applied: ${disabled} servers disabled, ${essential.length} essential kept`);
+  console.log(
+    `\n📋 MCP Discipline applied: ${disabled} servers disabled, ${essential.length} essential kept`
+  );
   console.log(`   Backup saved to: ${BACKUP_PATH}`);
 }
 
@@ -119,7 +121,9 @@ function status() {
 
   if (caps) {
     console.log(`Strategy: ${caps.strategy.primary}`);
-    console.log(`Tool Search: ${caps.runtime.toolSearch.available ? 'AVAILABLE' : 'NOT AVAILABLE'}\n`);
+    console.log(
+      `Tool Search: ${caps.runtime.toolSearch.available ? 'AVAILABLE' : 'NOT AVAILABLE'}\n`
+    );
   }
 
   for (const [name, serverConfig] of Object.entries(servers)) {

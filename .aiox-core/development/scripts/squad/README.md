@@ -5,17 +5,18 @@ Utilities for the squad-creator agent to manage squads in AIOX projects.
 ## Overview
 
 This module provides utilities for:
+
 - **Loading** squad manifests from local directories
 - **Validating** squad structure and configuration (SQS-3)
 - **Generating** new squads from templates (SQS-4)
 
 ## Components
 
-| File | Story | Description |
-|------|-------|-------------|
-| `squad-loader.js` | SQS-2 | Load and resolve squad manifests |
-| `squad-validator.js` | SQS-3 | Validate squad structure |
-| `squad-generator.js` | SQS-4 | Generate new squads |
+| File                 | Story | Description                      |
+| -------------------- | ----- | -------------------------------- |
+| `squad-loader.js`    | SQS-2 | Load and resolve squad manifests |
+| `squad-validator.js` | SQS-3 | Validate squad structure         |
+| `squad-generator.js` | SQS-4 | Generate new squads              |
 
 ## Usage
 
@@ -26,8 +27,8 @@ const { SquadLoader } = require('./.aiox-core/development/scripts/squad');
 
 // Create loader instance
 const loader = new SquadLoader({
-  squadsPath: './squads',  // Default: './squads'
-  verbose: false           // Enable debug logging
+  squadsPath: './squads', // Default: './squads'
+  verbose: false, // Enable debug logging
 });
 
 // Resolve squad by name
@@ -59,12 +60,12 @@ try {
 
 ### Error Codes
 
-| Code | Description | Suggestion |
-|------|-------------|------------|
-| `SQUAD_NOT_FOUND` | Squad directory not found | Create squad with: @squad-creator *create-squad {name} |
-| `MANIFEST_NOT_FOUND` | No manifest file in squad | Create squad.yaml in squad directory |
-| `YAML_PARSE_ERROR` | Invalid YAML syntax | Check YAML syntax - use a YAML linter |
-| `PERMISSION_DENIED` | File permission error | Check file permissions: chmod 644 {path} |
+| Code                 | Description               | Suggestion                                              |
+| -------------------- | ------------------------- | ------------------------------------------------------- |
+| `SQUAD_NOT_FOUND`    | Squad directory not found | Create squad with: @squad-creator \*create-squad {name} |
+| `MANIFEST_NOT_FOUND` | No manifest file in squad | Create squad.yaml in squad directory                    |
+| `YAML_PARSE_ERROR`   | Invalid YAML syntax       | Check YAML syntax - use a YAML linter                   |
+| `PERMISSION_DENIED`  | File permission error     | Check file permissions: chmod 644 {path}                |
 
 ## Manifest Files
 
@@ -107,6 +108,6 @@ npm test -- tests/unit/squad/squad-loader.test.js --coverage --collectCoverageFr
 
 ## Version History
 
-| Version | Date | Description |
-|---------|------|-------------|
-| 1.0.0 | 2025-12-18 | Initial implementation (Story SQS-2) |
+| Version | Date       | Description                          |
+| ------- | ---------- | ------------------------------------ |
+| 1.0.0   | 2025-12-18 | Initial implementation (Story SQS-2) |

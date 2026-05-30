@@ -36,7 +36,7 @@ class CodeIntelEnricher {
           } catch {
             return { file, references: null, complexity: null };
           }
-        }),
+        })
       );
 
       const allRefs = results.flatMap((r) => r.references || []);
@@ -119,11 +119,7 @@ class CodeIntelEnricher {
 
       return refs.filter((ref) => {
         const file = (ref.file || '').toLowerCase();
-        return (
-          file.includes('test') ||
-          file.includes('spec') ||
-          file.includes('__tests__')
-        );
+        return file.includes('test') || file.includes('spec') || file.includes('__tests__');
       });
     } catch {
       return null;

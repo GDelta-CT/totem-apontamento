@@ -6,13 +6,13 @@
 const agentElicitationSteps = [
   {
     title: 'Basic Agent Information',
-    description: 'Let\'s start with the fundamental details about your agent',
+    description: "Let's start with the fundamental details about your agent",
     help: 'An agent is a specialized AI assistant with a specific role and set of capabilities. Think of it as a team member with expertise in a particular area.',
     questions: [
       {
         type: 'input',
         name: 'agentName',
-        message: 'What is the agent\'s name?',
+        message: "What is the agent's name?",
         examples: ['data-analyst', 'code-reviewer', 'project-manager'],
         validate: (input) => {
           if (!input) return 'Agent name is required';
@@ -25,14 +25,16 @@ const agentElicitationSteps = [
       {
         type: 'input',
         name: 'agentTitle',
-        message: 'What is the agent\'s professional title?',
+        message: "What is the agent's professional title?",
         examples: ['Senior Data Analyst', 'Code Review Specialist', 'Project Manager'],
         smartDefault: {
           type: 'fromAnswer',
           source: 'agentName',
-          transform: (name) => name.split('-').map(w => 
-            w.charAt(0).toUpperCase() + w.slice(1),
-          ).join(' '),
+          transform: (name) =>
+            name
+              .split('-')
+              .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+              .join(' '),
         },
       },
       {
@@ -55,16 +57,16 @@ const agentElicitationSteps = [
     ],
     required: ['agentName', 'agentTitle', 'whenToUse'],
   },
-  
+
   {
     title: 'Agent Persona & Style',
     description: 'Define how your agent communicates and behaves',
-    help: 'The persona defines the agent\'s personality, communication style, and approach to tasks.',
+    help: "The persona defines the agent's personality, communication style, and approach to tasks.",
     questions: [
       {
         type: 'input',
         name: 'personaRole',
-        message: 'What is the agent\'s professional role?',
+        message: "What is the agent's professional role?",
         examples: [
           'Expert Data Scientist & Analytics Specialist',
           'Senior Software Engineer & Code Quality Expert',
@@ -114,7 +116,7 @@ const agentElicitationSteps = [
     ],
     required: ['personaRole', 'personaStyle', 'personaIdentity'],
   },
-  
+
   {
     title: 'Agent Commands',
     description: 'Define what commands this agent will respond to',
@@ -147,11 +149,11 @@ const agentElicitationSteps = [
         message: 'Enter custom commands (comma-separated, format: "name:description"):',
         when: (answers) => answers.addCustomCommands,
         examples: ['optimize:Optimize performance', 'debug:Debug issues'],
-        filter: (input) => input.split(',').map(cmd => cmd.trim()),
+        filter: (input) => input.split(',').map((cmd) => cmd.trim()),
       },
     ],
   },
-  
+
   {
     title: 'Dependencies & Resources',
     description: 'Specify what resources this agent needs',
@@ -174,7 +176,7 @@ const agentElicitationSteps = [
         message: 'Enter task dependencies (comma-separated):',
         when: (answers) => answers.dependencyTypes.includes('tasks'),
         examples: ['analyze-data.md', 'generate-report.md'],
-        filter: (input) => input ? input.split(',').map(t => t.trim()) : [],
+        filter: (input) => (input ? input.split(',').map((t) => t.trim()) : []),
       },
       {
         type: 'input',
@@ -182,11 +184,11 @@ const agentElicitationSteps = [
         message: 'Enter template dependencies (comma-separated):',
         when: (answers) => answers.dependencyTypes.includes('templates'),
         examples: ['report-template.md', 'analysis-template.yaml'],
-        filter: (input) => input ? input.split(',').map(t => t.trim()) : [],
+        filter: (input) => (input ? input.split(',').map((t) => t.trim()) : []),
       },
     ],
   },
-  
+
   {
     title: 'Security & Access Control',
     description: 'Configure security settings for this agent',
@@ -215,7 +217,7 @@ const agentElicitationSteps = [
       {
         type: 'confirm',
         name: 'enableAuditLogging',
-        message: 'Enable audit logging for this agent\'s operations?',
+        message: "Enable audit logging for this agent's operations?",
         default: true,
         when: (answers) => answers.securityLevel !== 'standard',
       },
@@ -236,7 +238,7 @@ const agentElicitationSteps = [
       },
     ],
   },
-  
+
   {
     title: 'Advanced Options',
     description: 'Configure advanced agent features',
@@ -257,7 +259,7 @@ const agentElicitationSteps = [
           'Follow security best practices',
           'Provide clear explanations',
         ],
-        filter: (input) => input ? input.split(',').map(p => p.trim()) : [],
+        filter: (input) => (input ? input.split(',').map((p) => p.trim()) : []),
       },
       {
         type: 'input',

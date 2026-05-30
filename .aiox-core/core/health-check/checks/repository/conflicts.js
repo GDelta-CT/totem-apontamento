@@ -56,7 +56,7 @@ class ConflictsCheck extends BaseCheck {
             cwd: projectRoot,
             encoding: 'utf8',
             windowsHide: true,
-          },
+          }
         );
 
         conflictFiles = output

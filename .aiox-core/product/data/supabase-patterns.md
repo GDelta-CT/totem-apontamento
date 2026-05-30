@@ -9,6 +9,7 @@
 ## PROJECT STRUCTURE
 
 ### Recommended Organization
+
 ```
 project/
 ├── supabase/
@@ -33,20 +34,22 @@ project/
 ## CLIENT INITIALIZATION
 
 ### Browser Client (Public)
+
 ```typescript
-import { createClient } from '@supabase/supabase-js'
-import type { Database } from '@/types/database'
+import { createClient } from '@supabase/supabase-js';
+import type { Database } from '@/types/database';
 
 export const supabase = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+);
 ```
 
 ### Server Client (Service Role)
+
 ```typescript
-import { createClient } from '@supabase/supabase-js'
-import type { Database } from '@/types/database'
+import { createClient } from '@supabase/supabase-js';
+import type { Database } from '@/types/database';
 
 // Only use server-side, never expose to client
 export const supabaseAdmin = createClient<Database>(
@@ -55,10 +58,10 @@ export const supabaseAdmin = createClient<Database>(
   {
     auth: {
       autoRefreshToken: false,
-      persistSession: false
-    }
+      persistSession: false,
+    },
   }
-)
+);
 ```
 
 ---
@@ -66,6 +69,7 @@ export const supabaseAdmin = createClient<Database>(
 ## AUTHENTICATION PATTERNS
 
 ### Sign Up with Email
+
 ```typescript
 const { data, error } = await supabase.auth.signUp({
   email: 'user@example.com',
@@ -74,33 +78,38 @@ const { data, error } = await supabase.auth.signUp({
     data: {
       full_name: 'User Name',
       // Additional user metadata
-    }
-  }
-})
+    },
+  },
+});
 ```
 
 ### Sign In
+
 ```typescript
 const { data, error } = await supabase.auth.signInWithPassword({
   email: 'user@example.com',
-  password: 'secure-password'
-})
+  password: 'secure-password',
+});
 ```
 
 ### OAuth Provider
+
 ```typescript
 const { data, error } = await supabase.auth.signInWithOAuth({
   provider: 'github',
   options: {
-    redirectTo: `${window.location.origin}/auth/callback`
-  }
-})
+    redirectTo: `${window.location.origin}/auth/callback`,
+  },
+});
 ```
 
 ### Session Management
+
 ```typescript
 // Get current session
-const { data: { session } } = await supabase.auth.getSession()
+const {
+  data: { session },
+} = await supabase.auth.getSession();
 
 // Listen to auth changes
 supabase.auth.onAuthStateChange((event, session) => {
@@ -109,7 +118,7 @@ supabase.auth.onAuthStateChange((event, session) => {
   } else if (event === 'SIGNED_OUT') {
     // Handle sign out
   }
-})
+});
 ```
 
 ---
@@ -117,20 +126,21 @@ supabase.auth.onAuthStateChange((event, session) => {
 ## DATABASE PATTERNS
 
 ### Type-Safe Queries
+
 ```typescript
 // Fetch with type safety
 const { data, error } = await supabase
   .from('profiles')
   .select('id, username, avatar_url')
   .eq('id', userId)
-  .single()
+  .single();
 
 // Insert with return
 const { data, error } = await supabase
   .from('posts')
   .insert({ title, content, author_id: userId })
   .select()
-  .single()
+  .single();
 
 // Update
 const { data, error } = await supabase
@@ -138,40 +148,41 @@ const { data, error } = await supabase
   .update({ username: newUsername })
   .eq('id', userId)
   .select()
-  .single()
+  .single();
 
 // Delete
-const { error } = await supabase
-  .from('posts')
-  .delete()
-  .eq('id', postId)
+const { error } = await supabase.from('posts').delete().eq('id', postId);
 ```
 
 ### Relationships
+
 ```typescript
 // Fetch with foreign key relation
 const { data, error } = await supabase
   .from('posts')
-  .select(`
+  .select(
+    `
     id,
     title,
     content,
     author:profiles(id, username, avatar_url)
-  `)
+  `
+  )
   .eq('id', postId)
-  .single()
+  .single();
 ```
 
 ### Pagination
+
 ```typescript
-const pageSize = 10
-const page = 1
+const pageSize = 10;
+const page = 1;
 
 const { data, count, error } = await supabase
   .from('posts')
   .select('*', { count: 'exact' })
   .order('created_at', { ascending: false })
-  .range((page - 1) * pageSize, page * pageSize - 1)
+  .range((page - 1) * pageSize, page * pageSize - 1);
 ```
 
 ---
@@ -179,6 +190,7 @@ const { data, count, error } = await supabase
 ## REALTIME PATTERNS
 
 ### Subscribe to Changes
+
 ```typescript
 const channel = supabase
   .channel('posts-changes')
@@ -188,32 +200,33 @@ const channel = supabase
       event: '*',
       schema: 'public',
       table: 'posts',
-      filter: `author_id=eq.${userId}`
+      filter: `author_id=eq.${userId}`,
     },
     (payload) => {
-      console.log('Change received:', payload)
+      console.log('Change received:', payload);
     }
   )
-  .subscribe()
+  .subscribe();
 
 // Cleanup
-channel.unsubscribe()
+channel.unsubscribe();
 ```
 
 ### Presence (Online Status)
+
 ```typescript
-const channel = supabase.channel('room:lobby')
+const channel = supabase.channel('room:lobby');
 
 channel
   .on('presence', { event: 'sync' }, () => {
-    const state = channel.presenceState()
-    console.log('Online users:', state)
+    const state = channel.presenceState();
+    console.log('Online users:', state);
   })
   .subscribe(async (status) => {
     if (status === 'SUBSCRIBED') {
-      await channel.track({ user_id: userId, online_at: new Date() })
+      await channel.track({ user_id: userId, online_at: new Date() });
     }
-  })
+  });
 ```
 
 ---
@@ -221,29 +234,30 @@ channel
 ## STORAGE PATTERNS
 
 ### Upload File
+
 ```typescript
 const { data, error } = await supabase.storage
   .from('avatars')
   .upload(`${userId}/avatar.png`, file, {
     cacheControl: '3600',
-    upsert: true
-  })
+    upsert: true,
+  });
 ```
 
 ### Get Public URL
-```typescript
-const { data } = supabase.storage
-  .from('avatars')
-  .getPublicUrl(`${userId}/avatar.png`)
 
-const publicUrl = data.publicUrl
+```typescript
+const { data } = supabase.storage.from('avatars').getPublicUrl(`${userId}/avatar.png`);
+
+const publicUrl = data.publicUrl;
 ```
 
 ### Signed URL (Private)
+
 ```typescript
 const { data, error } = await supabase.storage
   .from('private-docs')
-  .createSignedUrl(`${userId}/document.pdf`, 3600) // 1 hour
+  .createSignedUrl(`${userId}/document.pdf`, 3600); // 1 hour
 ```
 
 ---
@@ -251,10 +265,11 @@ const { data, error } = await supabase.storage
 ## EDGE FUNCTIONS
 
 ### Function Structure
+
 ```typescript
 // supabase/functions/hello-world/index.ts
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 serve(async (req) => {
   const supabaseClient = createClient(
@@ -262,19 +277,20 @@ serve(async (req) => {
     Deno.env.get('SUPABASE_ANON_KEY') ?? '',
     {
       global: {
-        headers: { Authorization: req.headers.get('Authorization')! }
-      }
+        headers: { Authorization: req.headers.get('Authorization')! },
+      },
     }
-  )
+  );
 
   // Get user from JWT
-  const { data: { user } } = await supabaseClient.auth.getUser()
+  const {
+    data: { user },
+  } = await supabaseClient.auth.getUser();
 
-  return new Response(
-    JSON.stringify({ message: `Hello ${user?.email}` }),
-    { headers: { 'Content-Type': 'application/json' } }
-  )
-})
+  return new Response(JSON.stringify({ message: `Hello ${user?.email}` }), {
+    headers: { 'Content-Type': 'application/json' },
+  });
+});
 ```
 
 ---
@@ -282,6 +298,7 @@ serve(async (req) => {
 ## TYPE GENERATION
 
 ### Generate Types from Schema
+
 ```bash
 # Install Supabase CLI
 npm install -g supabase
@@ -294,12 +311,13 @@ supabase gen types typescript --local > src/types/database.ts
 ```
 
 ### Usage
-```typescript
-import type { Database } from '@/types/database'
 
-type Profile = Database['public']['Tables']['profiles']['Row']
-type InsertProfile = Database['public']['Tables']['profiles']['Insert']
-type UpdateProfile = Database['public']['Tables']['profiles']['Update']
+```typescript
+import type { Database } from '@/types/database';
+
+type Profile = Database['public']['Tables']['profiles']['Row'];
+type InsertProfile = Database['public']['Tables']['profiles']['Insert'];
+type UpdateProfile = Database['public']['Tables']['profiles']['Update'];
 ```
 
 ---
@@ -307,24 +325,21 @@ type UpdateProfile = Database['public']['Tables']['profiles']['Update']
 ## ERROR HANDLING
 
 ### Standard Pattern
+
 ```typescript
 async function fetchProfile(userId: string) {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', userId)
-    .single()
+  const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single();
 
   if (error) {
-    console.error('Error fetching profile:', error)
-    throw new Error(`Failed to fetch profile: ${error.message}`)
+    console.error('Error fetching profile:', error);
+    throw new Error(`Failed to fetch profile: ${error.message}`);
   }
 
-  return data
+  return data;
 }
 ```
 
 ---
 
-**Reviewer:** ________ **Date:** ________
+**Reviewer:** **\_\_\_\_** **Date:** **\_\_\_\_**
 **Quality Gate:** [ ] PASS [ ] NEEDS REVIEW

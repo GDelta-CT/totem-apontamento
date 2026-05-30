@@ -462,7 +462,8 @@ if (isCodeIntelAvailable()) {
 
       // If HIGH risk, add warning note to subtask
       if (impact.riskLevel === 'HIGH') {
-        subtask.notes = (subtask.notes || '') +
+        subtask.notes =
+          (subtask.notes || '') +
           ` ⚠️ HIGH blast radius (${impact.blastRadius} refs) — consider additional review.`;
       }
     }
@@ -485,6 +486,7 @@ subtasks:
 ```
 
 **Risk Level Thresholds:**
+
 - **LOW:** 0-4 references affected
 - **MEDIUM:** 5-15 references affected
 - **HIGH:** >15 references affected — add risk note to subtask

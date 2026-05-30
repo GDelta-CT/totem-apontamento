@@ -70,7 +70,7 @@ function interpolateEnvVars(config, options = {}) {
   }
 
   if (Array.isArray(config)) {
-    return config.map(item => interpolateEnvVars(item, { warnings }));
+    return config.map((item) => interpolateEnvVars(item, { warnings }));
   }
 
   if (isPlainObject(config)) {
@@ -106,7 +106,9 @@ function lintEnvPatterns(config, sourceFile) {
         walk(value, path ? `${path}.${key}` : key);
       }
     } else if (Array.isArray(obj)) {
-      obj.forEach((item, i) => { walk(item, `${path}[${i}]`); });
+      obj.forEach((item, i) => {
+        walk(item, `${path}[${i}]`);
+      });
     }
   }
 

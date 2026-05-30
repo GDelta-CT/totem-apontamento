@@ -135,8 +135,7 @@ function printSummary(result) {
 
   console.log('\n━'.repeat(50));
 
-  const statusIcon = result.status === 'passed' ? '✅' :
-    result.status === 'pending' ? '⏳' : '❌';
+  const statusIcon = result.status === 'passed' ? '✅' : result.status === 'pending' ? '⏳' : '❌';
 
   console.log(`Result: ${statusIcon} ${result.status.toUpperCase()}`);
   console.log(`Duration: ${formatDuration(result.duration)}`);

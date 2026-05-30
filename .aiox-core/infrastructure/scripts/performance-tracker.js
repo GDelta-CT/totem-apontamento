@@ -26,10 +26,10 @@ const performanceData = {
  * Performance targets (from agent-config-requirements.yaml)
  */
 const PERFORMANCE_TARGETS = {
-  critical: 30,   // aiox-master
-  high: 50,       // dev, qa, devops, security
-  medium: 75,     // po, sm, architect, data-engineer, db-sage
-  low: 100,        // pm, analyst, ux-expert
+  critical: 30, // aiox-master
+  high: 50, // dev, qa, devops, security
+  medium: 75, // po, sm, architect, data-engineer, db-sage
+  low: 100, // pm, analyst, ux-expert
 };
 
 /**
@@ -37,17 +37,17 @@ const PERFORMANCE_TARGETS = {
  */
 const AGENT_PRIORITIES = {
   'aiox-master': 'critical',
-  'dev': 'high',
-  'qa': 'high',
-  'devops': 'high',
-  'security': 'high',
-  'po': 'medium',
-  'sm': 'medium',
-  'architect': 'medium',
+  dev: 'high',
+  qa: 'high',
+  devops: 'high',
+  security: 'high',
+  po: 'medium',
+  sm: 'medium',
+  architect: 'medium',
   'data-engineer': 'medium',
   'db-sage': 'medium',
-  'pm': 'low',
-  'analyst': 'low',
+  pm: 'low',
+  analyst: 'low',
   'ux-expert': 'low',
 };
 
@@ -73,7 +73,8 @@ function trackConfigLoad(loadData) {
     sectionsCount: loadData.sectionsLoaded?.length || 0,
     priority: AGENT_PRIORITIES[loadData.agentId] || 'unknown',
     target: PERFORMANCE_TARGETS[AGENT_PRIORITIES[loadData.agentId]] || 100,
-    meetsTarget: loadData.loadTime <= (PERFORMANCE_TARGETS[AGENT_PRIORITIES[loadData.agentId]] || 100),
+    meetsTarget:
+      loadData.loadTime <= (PERFORMANCE_TARGETS[AGENT_PRIORITIES[loadData.agentId]] || 100),
   };
 
   performanceData.configLoads.push(entry);
@@ -99,7 +100,9 @@ function trackAgentActivation(activationData) {
     initTime: activationData.initTime,
     priority: AGENT_PRIORITIES[activationData.agentId] || 'unknown',
     target: PERFORMANCE_TARGETS[AGENT_PRIORITIES[activationData.agentId]] || 100,
-    meetsTarget: activationData.totalTime <= (PERFORMANCE_TARGETS[AGENT_PRIORITIES[activationData.agentId]] || 100),
+    meetsTarget:
+      activationData.totalTime <=
+      (PERFORMANCE_TARGETS[AGENT_PRIORITIES[activationData.agentId]] || 100),
   };
 
   performanceData.agentActivations.push(entry);
@@ -134,18 +137,18 @@ function startSession(sessionType = 'default') {
  * @param {string} sessionId - Session to end
  */
 function endSession(sessionId) {
-  const session = performanceData.sessions.find(s => s.id === sessionId);
+  const session = performanceData.sessions.find((s) => s.id === sessionId);
   if (session) {
     session.endTime = Date.now();
     session.duration = session.endTime - session.startTime;
 
     // Count operations in this session
     session.configLoads = performanceData.configLoads.filter(
-      load => load.timestamp >= session.startTime && load.timestamp <= session.endTime,
+      (load) => load.timestamp >= session.startTime && load.timestamp <= session.endTime
     ).length;
 
     session.agentActivations = performanceData.agentActivations.filter(
-      act => act.timestamp >= session.startTime && act.timestamp <= session.endTime,
+      (act) => act.timestamp >= session.startTime && act.timestamp <= session.endTime
     ).length;
   }
 
@@ -170,31 +173,35 @@ function getStatistics() {
   }
 
   // Config load stats
-  const avgLoadTime = configLoads.reduce((sum, load) => sum + load.loadTime, 0) / configLoads.length;
-  const avgConfigSize = configLoads.reduce((sum, load) => sum + load.configSize, 0) / configLoads.length;
-  const cacheHits = configLoads.filter(load => load.cacheHit).length;
-  const cacheHitRate = (cacheHits / configLoads.length * 100).toFixed(1);
-  const meetsTarget = configLoads.filter(load => load.meetsTarget).length;
-  const targetSuccessRate = (meetsTarget / configLoads.length * 100).toFixed(1);
+  const avgLoadTime =
+    configLoads.reduce((sum, load) => sum + load.loadTime, 0) / configLoads.length;
+  const avgConfigSize =
+    configLoads.reduce((sum, load) => sum + load.configSize, 0) / configLoads.length;
+  const cacheHits = configLoads.filter((load) => load.cacheHit).length;
+  const cacheHitRate = ((cacheHits / configLoads.length) * 100).toFixed(1);
+  const meetsTarget = configLoads.filter((load) => load.meetsTarget).length;
+  const targetSuccessRate = ((meetsTarget / configLoads.length) * 100).toFixed(1);
 
   // Agent activation stats
-  const avgActivationTime = agentActivations.length > 0
-    ? agentActivations.reduce((sum, act) => sum + act.totalTime, 0) / agentActivations.length
-    : 0;
+  const avgActivationTime =
+    agentActivations.length > 0
+      ? agentActivations.reduce((sum, act) => sum + act.totalTime, 0) / agentActivations.length
+      : 0;
 
-  const activationTargetMet = agentActivations.filter(act => act.meetsTarget).length;
-  const activationSuccessRate = agentActivations.length > 0
-    ? (activationTargetMet / agentActivations.length * 100).toFixed(1)
-    : '0';
+  const activationTargetMet = agentActivations.filter((act) => act.meetsTarget).length;
+  const activationSuccessRate =
+    agentActivations.length > 0
+      ? ((activationTargetMet / agentActivations.length) * 100).toFixed(1)
+      : '0';
 
   // By priority stats
   const byPriority = {};
-  Object.keys(PERFORMANCE_TARGETS).forEach(priority => {
-    const loads = configLoads.filter(load => load.priority === priority);
+  Object.keys(PERFORMANCE_TARGETS).forEach((priority) => {
+    const loads = configLoads.filter((load) => load.priority === priority);
     if (loads.length > 0) {
       const avgTime = loads.reduce((sum, load) => sum + load.loadTime, 0) / loads.length;
       const target = PERFORMANCE_TARGETS[priority];
-      const meets = loads.filter(load => load.meetsTarget).length;
+      const meets = loads.filter((load) => load.meetsTarget).length;
 
       byPriority[priority] = {
         count: loads.length,
@@ -260,9 +267,14 @@ function generateReport() {
 `;
 
   Object.entries(stats.byPriority).forEach(([priority, data]) => {
-    const emoji = priority === 'critical' ? '🔴' :
-      priority === 'high' ? '🟠' :
-        priority === 'medium' ? '🟡' : '🟢';
+    const emoji =
+      priority === 'critical'
+        ? '🔴'
+        : priority === 'high'
+          ? '🟠'
+          : priority === 'medium'
+            ? '🟡'
+            : '🟢';
 
     report += `### ${emoji} ${priority.toUpperCase()} (Target: ${data.target}ms)\n\n`;
     report += `- Loads: ${data.count}\n`;
@@ -281,7 +293,7 @@ function generateReport() {
   report += '| Agent | Load Time | Config Size | Cache Hit | Meets Target |\n';
   report += '|-------|-----------|-------------|-----------|-------------|\n';
 
-  recent.forEach(load => {
+  recent.forEach((load) => {
     const meetsEmoji = load.meetsTarget ? '✅' : '❌';
     const cacheEmoji = load.cacheHit ? '💚' : '💛';
 

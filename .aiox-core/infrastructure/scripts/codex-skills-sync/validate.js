@@ -35,7 +35,10 @@ function isParsableAgent(agent) {
 function validateSkillContent(content, expected) {
   const issues = [];
   const requiredChecks = [
-    { ok: content.includes(`name: ${expected.skillId}`), reason: `missing frontmatter name "${expected.skillId}"` },
+    {
+      ok: content.includes(`name: ${expected.skillId}`),
+      reason: `missing frontmatter name "${expected.skillId}"`,
+    },
     {
       ok: content.includes(`.aiox-core/development/agents/${expected.filename}`),
       reason: `missing canonical agent path "${expected.filename}"`,
@@ -70,7 +73,7 @@ function validateCodexSkills(options = {}) {
   }
 
   const agents = parseAllAgents(resolved.sourceDir).filter(isParsableAgent);
-  const expected = agents.map(agent => ({
+  const expected = agents.map((agent) => ({
     agentId: agent.id,
     filename: agent.filename,
     skillId: getSkillId(agent.id),
@@ -98,16 +101,19 @@ function validateCodexSkills(options = {}) {
     }
   }
 
-  const expectedIds = new Set(expected.map(item => item.skillId));
+  const expectedIds = new Set(expected.map((item) => item.skillId));
   const orphaned = [];
   if (resolved.strict) {
-    const dirs = fs.readdirSync(resolved.skillsDir, { withFileTypes: true })
-      .filter(entry => entry.isDirectory() && entry.name.startsWith('aiox-'))
-      .map(entry => entry.name);
+    const dirs = fs
+      .readdirSync(resolved.skillsDir, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory() && entry.name.startsWith('aiox-'))
+      .map((entry) => entry.name);
     for (const dir of dirs) {
       if (!expectedIds.has(dir)) {
         orphaned.push(dir);
-        errors.push(`Orphaned skill directory: ${path.join(path.relative(resolved.projectRoot, resolved.skillsDir), dir)}`);
+        errors.push(
+          `Orphaned skill directory: ${path.join(path.relative(resolved.projectRoot, resolved.skillsDir), dir)}`
+        );
       }
     }
   }
@@ -134,11 +140,11 @@ function formatHumanReport(result) {
 
   const lines = [
     `❌ Codex skills validation failed (${result.errors.length} issue(s))`,
-    ...result.errors.map(error => `- ${error}`),
+    ...result.errors.map((error) => `- ${error}`),
   ];
 
   if (result.warnings.length > 0) {
-    lines.push(...result.warnings.map(warning => `⚠️ ${warning}`));
+    lines.push(...result.warnings.map((warning) => `⚠️ ${warning}`));
   }
   return lines.join('\n');
 }

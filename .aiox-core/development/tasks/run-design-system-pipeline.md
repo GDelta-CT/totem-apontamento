@@ -42,26 +42,26 @@ inputs:
   - name: project_path
     type: string
     required: false
-    default: "."
-    prompt: "Project directory path"
+    default: '.'
+    prompt: 'Project directory path'
 
   - name: mode
     type: string
     required: false
-    default: "interactive"
-    prompt: "Execution mode (yolo|interactive|preflight)"
+    default: 'interactive'
+    prompt: 'Execution mode (yolo|interactive|preflight)'
 
   - name: skip_steps
     type: array
     required: false
     default: []
-    prompt: "Steps to skip (build|document|a11y|roi)"
+    prompt: 'Steps to skip (build|document|a11y|roi)'
 
   - name: output_dir
     type: string
     required: false
-    default: "outputs/design-system/"
-    prompt: "Output directory for artifacts"
+    default: 'outputs/design-system/'
+    prompt: 'Output directory for artifacts'
 
 outputs:
   - name: pipeline_report

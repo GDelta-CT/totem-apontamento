@@ -16,23 +16,23 @@ const path = require('path');
  */
 const DECISION_TYPES = {
   'library-choice': 'Selecting external dependencies',
-  'architecture': 'System design and structural decisions',
-  'algorithm': 'Algorithm selection and optimization',
+  architecture: 'System design and structural decisions',
+  algorithm: 'Algorithm selection and optimization',
   'error-handling': 'Error handling and recovery strategies',
   'testing-strategy': 'Test approach and coverage decisions',
-  'performance': 'Performance optimization choices',
-  'security': 'Security implementation decisions',
-  'database': 'Data model and query optimization',
+  performance: 'Performance optimization choices',
+  security: 'Security implementation decisions',
+  database: 'Data model and query optimization',
 };
 
 /**
  * Priority levels for decisions (AC7)
  */
 const PRIORITY_LEVELS = {
-  'critical': 'High-impact architectural decisions with long-term consequences',
-  'high': 'Significant technical choices affecting multiple components',
-  'medium': 'Standard implementation decisions with local impact',
-  'low': 'Minor preference decisions with minimal impact',
+  critical: 'High-impact architectural decisions with long-term consequences',
+  high: 'Significant technical choices affecting multiple components',
+  medium: 'Standard implementation decisions with local impact',
+  low: 'Minor preference decisions with minimal impact',
 };
 
 /**
@@ -86,7 +86,13 @@ class DecisionContext {
    * @param {string} decision.priority - Priority level (from PRIORITY_LEVELS)
    * @returns {Object} The recorded decision with timestamp
    */
-  recordDecision({ description, reason, alternatives = [], type = 'architecture', priority = 'medium' }) {
+  recordDecision({
+    description,
+    reason,
+    alternatives = [],
+    type = 'architecture',
+    priority = 'medium',
+  }) {
     if (!this.enabled) return null;
 
     // Validate decision type and priority
@@ -124,8 +130,8 @@ class DecisionContext {
     const normalizedPath = path.normalize(filePath);
 
     // Avoid duplicates - update existing entry if path already tracked
-    const existingIndex = this.filesModified.findIndex(f =>
-      (typeof f === 'string' ? f : f.path) === normalizedPath,
+    const existingIndex = this.filesModified.findIndex(
+      (f) => (typeof f === 'string' ? f : f.path) === normalizedPath
     );
 
     if (existingIndex >= 0) {
@@ -213,8 +219,8 @@ class DecisionContext {
       decisionsCount: this.decisions.length,
       filesModifiedCount: this.filesModified.length,
       testsRunCount: this.testsRun.length,
-      testsPassed: this.testsRun.filter(t => t.passed).length,
-      testsFailed: this.testsRun.filter(t => !t.passed).length,
+      testsPassed: this.testsRun.filter((t) => t.passed).length,
+      testsFailed: this.testsRun.filter((t) => !t.passed).length,
       duration: this.endTime ? this.endTime - this.startTime : Date.now() - this.startTime,
       status: this.status,
     };

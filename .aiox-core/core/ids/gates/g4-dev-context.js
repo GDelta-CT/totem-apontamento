@@ -96,7 +96,7 @@ class G4DevContextGate extends VerificationGate {
     const warnings = [];
     if (opportunities.length > 0) {
       warnings.push(
-        `[Dev Context] ${opportunities.length} relevant artifacts found. Consider REUSE/ADAPT before creating new.`,
+        `[Dev Context] ${opportunities.length} relevant artifacts found. Consider REUSE/ADAPT before creating new.`
       );
     }
 

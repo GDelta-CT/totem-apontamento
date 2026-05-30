@@ -9,16 +9,19 @@
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -186,6 +189,7 @@ token_usage: ~2,000-8,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Iterative analysis with depth limits; cache intermediate results; batch similar operations
 
 ---
@@ -205,14 +209,13 @@ updated_at: 2025-11-17
 
 ---
 
-
 ## Description
 
 Reduce UI pattern redundancy by clustering similar patterns using intelligent algorithms (HSL color clustering at 5% threshold, semantic button grouping). Target: >80% reduction.
 
 ## Prerequisites
 
-- Audit completed (*audit command run successfully)
+- Audit completed (\*audit command run successfully)
 - .state.yaml exists with inventory results
 - pattern-inventory.json available
 
@@ -309,34 +312,34 @@ This task uses interactive elicitation to review consolidation decisions.
 ```yaml
 # .state.yaml consolidation section
 consolidation:
-  completed_at: "2025-10-27T12:30:00Z"
+  completed_at: '2025-10-27T12:30:00Z'
   patterns_consolidated:
     colors:
       before: 89
       after: 12
-      reduction: "86.5%"
+      reduction: '86.5%'
       clusters: 8
     buttons:
       before: 47
       after: 3
-      reduction: "93.6%"
-      variants: ["primary", "secondary", "destructive"]
+      reduction: '93.6%'
+      variants: ['primary', 'secondary', 'destructive']
     spacing:
       before: 19
       after: 7
-      reduction: "63.2%"
-      scale: ["xs", "sm", "md", "lg", "xl", "2xl", "3xl"]
+      reduction: '63.2%'
+      scale: ['xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl']
     typography:
       before: 21
       after: 10
-      reduction: "52.4%"
-  overall_reduction: "81.8%"
+      reduction: '52.4%'
+  overall_reduction: '81.8%'
   target_met: true
 ```
 
 ## Success Criteria
 
-- [ ] >80% overall pattern reduction achieved
+- [ ] > 80% overall pattern reduction achieved
 - [ ] Color clustering uses HSL similarity (not just hex distance)
 - [ ] Button variants identified by semantic purpose
 - [ ] Spacing scale based on consistent base unit
@@ -346,7 +349,7 @@ consolidation:
 
 ## Error Handling
 
-- **No audit data found**: Exit with message to run *audit first
+- **No audit data found**: Exit with message to run \*audit first
 - **Insufficient patterns to consolidate**: Report that codebase is already clean
 - **Cannot achieve 80% reduction**: Explain why and show actual reduction achieved
 - **Invalid state file**: Attempt to recover from backup or prompt re-audit
@@ -367,6 +370,7 @@ consolidation:
 ```
 
 Output:
+
 ```
 🎨 CONSOLIDATING COLORS...
 Found 89 unique colors

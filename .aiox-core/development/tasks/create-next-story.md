@@ -182,6 +182,7 @@ token_usage: ~3,000-10,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Break into smaller workflows; implement checkpointing; use async processing where possible
 
 ---
@@ -202,11 +203,13 @@ updated_at: 2025-11-17
 ---
 
 tools:
-  - github-cli        # Access repository structure and previous stories
-  - context7          # Look up documentation for technical requirements
-  - clickup           # Manage story metadata and tracking
-checklists:
-  - po-master-checklist.md
+
+- github-cli # Access repository structure and previous stories
+- context7 # Look up documentation for technical requirements
+- clickup # Manage story metadata and tracking
+  checklists:
+- po-master-checklist.md
+
 ---
 
 # Create Next Story Task
@@ -272,10 +275,12 @@ To identify the next logical story based on project progress and epic definition
 **CRITICAL: File Fallback Strategy**
 
 When attempting to read architecture files, use this fallback order:
+
 1. Try primary filename (e.g., `tech-stack.md`)
 2. If not found, try fallback alternatives from `devLoadAlwaysFilesFallback` in core-config.yaml
 3. If still not found, check for Portuguese equivalents
-4. If none exist, note the 
+4. If none exist, note the
+
 ## Configuration Dependencies
 
 This task requires the following configuration keys from `core-config.yaml`:
@@ -283,6 +288,7 @@ This task requires the following configuration keys from `core-config.yaml`:
 - **`qaLocation`**: QA output directory (typically docs/qa) - Required to write quality reports
 
 **Loading Config:**
+
 ```javascript
 const yaml = require('js-yaml');
 const fs = require('fs');
@@ -297,6 +303,7 @@ const qaLocation = config.qa?.qaLocation || 'docs/qa';
 missing file in Dev Notes
 
 **Common Fallback Mappings:**
+
 ```yaml
 tech-stack.md → [technology-stack.md, pilha-tecnologica.md, stack.md]
 coding-standards.md → [code-standards.md, padroes-de-codigo.md, standards.md]
@@ -306,12 +313,14 @@ database-schema.md → [db-schema.md, esquema.md, schema.md]
 ```
 
 **For ALL Stories (try in fallback order):**
+
 - tech-stack.md
 - unified-project-structure.md (or project-structure.md, source-tree.md)
 - coding-standards.md
 - testing-strategy.md
 
 **For Backend/API Stories, additionally:**
+
 - data-models.md
 - database-schema.md
 - backend-architecture.md
@@ -319,6 +328,7 @@ database-schema.md → [db-schema.md, esquema.md, schema.md]
 - external-apis.md
 
 **For Frontend/UI Stories, additionally:**
+
 - frontend-architecture.md
 - components.md
 - core-workflows.md (or workflows.md, user-flows.md)
@@ -327,6 +337,7 @@ database-schema.md → [db-schema.md, esquema.md, schema.md]
 **For Full-Stack Stories:** Read both Backend and Frontend sections above
 
 **Important:** When a fallback file is used, note it in Dev Notes:
+
 ```
 [Note: Using fallback file 'pilha-tecnologica.md' instead of 'tech-stack.md']
 ```
@@ -376,7 +387,7 @@ ALWAYS cite source documents: `[Source: architecture/{filename}.md#{section}]`
 
 - **Step 2: Search for Epic in Backlog**
   - Use `get_workspace_tasks` with parameters:
-    - list_ids: [{backlog_list_id}]  # From Step 1
+    - list_ids: [{backlog_list_id}] # From Step 1
     - tags: ["epic-{epicNum}"]
     - status: ["Planning", "In Progress"]
 
@@ -388,7 +399,7 @@ ALWAYS cite source documents: `[Source: architecture/{filename}.md#{section}]`
     - List: Backlog (list_id: {backlog_list_id})
     - Tags: ['epic', 'epic-{epicNum}']
     - Status: Planning or In Progress
-    Then retry story creation."
+      Then retry story creation."
 
 - **If Epic found:**
   - Capture epic_task_id for parent relationship
@@ -408,11 +419,11 @@ ALWAYS cite source documents: `[Source: architecture/{filename}.md#{section}]`
 - Prepare ClickUp section structure (will be populated after ClickUp task creation):
   ```yaml
   clickup:
-    task_id: ""  # To be filled
-    epic_task_id: "{epic_task_id from 5.1}"
-    list: "Backlog"
-    url: ""  # To be filled
-    last_sync: ""  # To be filled
+    task_id: '' # To be filled
+    epic_task_id: '{epic_task_id from 5.1}'
+    list: 'Backlog'
+    url: '' # To be filled
+    last_sync: '' # To be filled
   ```
 
 #### 5.3 Create Story Task in ClickUp
@@ -422,36 +433,40 @@ ALWAYS cite source documents: `[Source: architecture/{filename}.md#{section}]`
 - **CRITICAL:** Use numeric list_id from Step 5.1, NOT a list name string
 
 **Task Creation Parameters:**
+
 ```yaml
-list_id: "{backlog_list_id}"  # MUST be numeric string from 5.1 (e.g., "901317181013")
-name: "Story {epicNum}.{storyNum}: {Story Title}"
-parent: "{epic_task_id}"  # Creates as subtask of Epic (from 5.1)
-markdown_description: "{entire story .md file content}"
+list_id: '{backlog_list_id}' # MUST be numeric string from 5.1 (e.g., "901317181013")
+name: 'Story {epicNum}.{storyNum}: {Story Title}'
+parent: '{epic_task_id}' # Creates as subtask of Epic (from 5.1)
+markdown_description: '{entire story .md file content}'
 tags:
-  - "story"
-  - "epic-{epicNum}"
-  - "story-{epicNum}.{storyNum}"
+  - 'story'
+  - 'epic-{epicNum}'
+  - 'story-{epicNum}.{storyNum}'
 custom_fields:
-  - id: "epic_number"
-    value: {epicNum}
-  - id: "story_number"
-    value: "{epicNum}.{storyNum}"
-  - id: "story_file_path"
-    value: "{devStoryLocation}/{epicNum}.{storyNum}.story.md"
-  - id: "story-status"
-    value: "Draft"
+  - id: 'epic_number'
+    value: { epicNum }
+  - id: 'story_number'
+    value: '{epicNum}.{storyNum}'
+  - id: 'story_file_path'
+    value: '{devStoryLocation}/{epicNum}.{storyNum}.story.md'
+  - id: 'story-status'
+    value: 'Draft'
 ```
 
 **Validation Notes:**
+
 - list_id MUST be numeric string (validated by /^\d+$/)
 - Using "Backlog" or other non-numeric values will fail validation
 - assignees (if provided) must be array, not object
 
 **Response Handling:**
+
 - **Capture:** story_task_id from response
 - **Log:** "✅ Story task created in ClickUp: {story_task_id}"
 
 **Error Handling:**
+
 - If create_task fails with validation error, display the exact error and parameters used
 - If API error occurs, log error but continue (local story still valid)
 - Warn user: "⚠️ Story created locally but ClickUp sync failed: {error_message}"
@@ -461,11 +476,11 @@ custom_fields:
 - Update the frontmatter YAML clickup section with captured values:
   ```yaml
   clickup:
-    task_id: "{story_task_id from 5.3}"
-    epic_task_id: "{epic_task_id from 5.1}"
-    list: "Backlog"
-    url: "https://app.clickup.com/t/{story_task_id}"
-    last_sync: "{current ISO 8601 timestamp}"
+    task_id: '{story_task_id from 5.3}'
+    epic_task_id: '{epic_task_id from 5.1}'
+    list: 'Backlog'
+    url: 'https://app.clickup.com/t/{story_task_id}'
+    last_sync: '{current ISO 8601 timestamp}'
   ```
 - Save story file with updated frontmatter
 - Log: "✅ Story task created in ClickUp: {story_task_id}"
@@ -477,12 +492,14 @@ custom_fields:
 ```yaml
 # core-config.yaml check
 coderabbit_integration:
-  enabled: true|false  # ← This controls whether to populate CodeRabbit section
+  enabled: true|false # ← This controls whether to populate CodeRabbit section
 ```
 
 **IF `coderabbit_integration.enabled: false`:**
+
 - SKIP this entire step (5.2.5)
 - In the story file, render only the skip notice in the CodeRabbit Integration section:
+
   ```markdown
   ## 🤖 CodeRabbit Integration
 
@@ -492,10 +509,12 @@ coderabbit_integration:
   > Quality validation will use manual review process only.
   > To enable, set `coderabbit_integration.enabled: true` in core-config.yaml
   ```
+
 - Log: "ℹ️ CodeRabbit Integration disabled - skipping quality gate configuration"
 - Proceed to Step 5.3
 
 **IF `coderabbit_integration.enabled: true`:**
+
 - Continue with full CodeRabbit section population below
 - Include self-healing configuration based on Story 6.3.3
 
@@ -506,6 +525,7 @@ coderabbit_integration:
 **Story Type Detection Rules:**
 
 Analyze the story's technical characteristics based on:
+
 - Acceptance Criteria keywords
 - Architecture files referenced in Step 3.2
 - Data models, APIs, or components mentioned in epic
@@ -514,11 +534,13 @@ Analyze the story's technical characteristics based on:
 **Type 1: Database Story**
 
 **Detection Indicators:**
+
 - References to `database-schema.md` or `data-models.md`
 - Acceptance Criteria mention: schema, table, migration, RLS, foreign key, index
 - File locations include `supabase/migrations/` or database-related paths
 
 **Assignment:**
+
 - **Primary Agents**: @db-sage, @dev
 - **Quality Gates**: Pre-Commit (schema validation), Pre-PR (SQL review)
 - **Focus Areas**:
@@ -530,11 +552,13 @@ Analyze the story's technical characteristics based on:
 **Type 2: API Story**
 
 **Detection Indicators:**
+
 - References to `rest-api-spec.md` or `backend-architecture.md`
 - Acceptance Criteria mention: endpoint, API, service, controller, route
 - File locations include `api/src/` or backend paths
 
 **Assignment:**
+
 - **Primary Agents**: @dev, @architect (if new patterns)
 - **Quality Gates**: Pre-Commit (security scan), Pre-PR (API contract validation)
 - **Focus Areas**:
@@ -546,11 +570,13 @@ Analyze the story's technical characteristics based on:
 **Type 3: Frontend Story**
 
 **Detection Indicators:**
+
 - References to `frontend-architecture.md` or `components.md`
 - Acceptance Criteria mention: UI, component, page, form, display, user interface
 - File locations include `src/components/` or frontend paths
 
 **Assignment:**
+
 - **Primary Agents**: @ux-expert, @dev
 - **Quality Gates**: Pre-Commit (a11y validation), Pre-PR (UX consistency check)
 - **Focus Areas**:
@@ -562,11 +588,13 @@ Analyze the story's technical characteristics based on:
 **Type 4: Deployment/Infrastructure Story**
 
 **Detection Indicators:**
+
 - Acceptance Criteria mention: deploy, CI/CD, environment, configuration, infrastructure
 - References to deployment pipelines or environment configuration
 - File locations include `.github/workflows/`, `docker/`, or config files
 
 **Assignment:**
+
 - **Primary Agents**: @github-devops, @dev
 - **Quality Gates**: Pre-Commit (config validation), Pre-Deployment (deep scan)
 - **Focus Areas**:
@@ -578,11 +606,13 @@ Analyze the story's technical characteristics based on:
 **Type 5: Security Story**
 
 **Detection Indicators:**
+
 - Acceptance Criteria mention: authentication, authorization, security, encryption, vulnerability
 - References to security patterns or threat models
 - Implements OWASP-related features
 
 **Assignment:**
+
 - **Primary Agents**: @dev, @architect
 - **Quality Gates**: Pre-Commit (SAST scan), Pre-PR (security review)
 - **Focus Areas**:
@@ -594,11 +624,13 @@ Analyze the story's technical characteristics based on:
 **Type 6: Architecture Story**
 
 **Detection Indicators:**
+
 - Acceptance Criteria mention: refactor, pattern, architecture, scalability
 - Affects multiple layers or introduces new patterns
 - References to `backend-architecture.md` or system design
 
 **Assignment:**
+
 - **Primary Agents**: @architect, @dev
 - **Quality Gates**: Pre-Commit (pattern validation), Pre-PR (architecture review)
 - **Focus Areas**:
@@ -610,11 +642,13 @@ Analyze the story's technical characteristics based on:
 **Type 7: Integration Story**
 
 **Detection Indicators:**
+
 - Acceptance Criteria mention: integration, external API, webhook, third-party
 - References to `external-apis.md`
 - Connects to external systems
 
 **Assignment:**
+
 - **Primary Agents**: @dev, @architect, @github-devops
 - **Quality Gates**: Pre-Commit, Pre-PR (integration safety)
 - **Focus Areas**:
@@ -662,6 +696,7 @@ Based on the detected story type(s), populate the template fields:
 **Multi-Type Stories:**
 
 If story spans multiple types (e.g., Database + API):
+
 - List primary type first (the one with most work)
 - List secondary type(s) in order of importance
 - Combine agent assignments (no duplicates)
@@ -725,24 +760,25 @@ If story spans multiple types (e.g., Database + API):
 
 After populating the basic CodeRabbit sections, add the Self-Healing Configuration based on the primary agent:
 
-| Primary Agent | Mode | Max Iterations | Timeout | Severity Filter |
-|---------------|------|----------------|---------|-----------------|
-| @dev | light | 2 | 15 min | CRITICAL |
-| @qa | full | 3 | 30 min | CRITICAL, HIGH |
-| @github-devops | check | 0 | N/A | report_only |
+| Primary Agent  | Mode  | Max Iterations | Timeout | Severity Filter |
+| -------------- | ----- | -------------- | ------- | --------------- |
+| @dev           | light | 2              | 15 min  | CRITICAL        |
+| @qa            | full  | 3              | 30 min  | CRITICAL, HIGH  |
+| @github-devops | check | 0              | N/A     | report_only     |
 
 **Severity Behavior Matrix:**
 
-| Severity | @dev (light) | @qa (full) | @github-devops (check) |
-|----------|--------------|------------|------------------------|
-| CRITICAL | auto_fix | auto_fix | report_only |
-| HIGH | document_only | auto_fix | report_only |
-| MEDIUM | ignore | document_as_debt | report_only |
-| LOW | ignore | ignore | ignore |
+| Severity | @dev (light)  | @qa (full)       | @github-devops (check) |
+| -------- | ------------- | ---------------- | ---------------------- |
+| CRITICAL | auto_fix      | auto_fix         | report_only            |
+| HIGH     | document_only | auto_fix         | report_only            |
+| MEDIUM   | ignore        | document_as_debt | report_only            |
+| LOW      | ignore        | ignore           | ignore                 |
 
 Use the primary agent from "Specialized Agent Assignment" to determine which self-healing configuration to document.
 
 **Log Completion:**
+
 - After populating this section, log: "✅ Story type analysis complete: [Primary Type] | Agents assigned: [agent list] | Quality gates: [gate count] | Self-healing: [mode]"
 
 - **`Dev Notes` section (CRITICAL):**
@@ -784,8 +820,10 @@ Use the primary agent from "Specialized Agent Assignment" to determine which sel
 **ClickUp Integration Note:** This task now includes Epic verification (Section 5.1), ClickUp story task creation (Section 5.3), and automatic frontmatter updates (Section 5.4). Stories are created as subtasks of their parent Epic in ClickUp's Backlog list. If Epic verification or ClickUp sync fails, the story file will still be created locally with a warning message.
 
 ## Handoff
+
 next_agent: @po
-next_command: *validate-story-draft {story-id}
+next_command: \*validate-story-draft {story-id}
 condition: Story status is Draft
 alternatives:
-  - agent: @dev, command: *develop {story-id}, condition: Story already validated by PO
+
+- agent: @dev, command: \*develop {story-id}, condition: Story already validated by PO

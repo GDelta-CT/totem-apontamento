@@ -99,7 +99,7 @@ class GitInstallCheck extends BaseCheck {
               version,
               configIssues,
             },
-          },
+          }
         );
       }
 

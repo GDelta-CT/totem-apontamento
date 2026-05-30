@@ -254,26 +254,26 @@ Next steps:
 
 ## Common Search Examples
 
-| Search Query | Finds | Use Case |
-|--------------|-------|----------|
-| `notion` | Notion workspace MCP | Document management |
-| `database` | postgres, mysql, sqlite, redis | Database access |
-| `slack` | Slack messaging MCP | Team communication |
-| `browser` | puppeteer, playwright | Browser automation |
-| `storage` | s3, gcs, azure-blob | Cloud storage |
-| `github` | GitHub API MCP | Repository management |
-| `*` | All available MCPs | Browse full catalog |
+| Search Query | Finds                          | Use Case              |
+| ------------ | ------------------------------ | --------------------- |
+| `notion`     | Notion workspace MCP           | Document management   |
+| `database`   | postgres, mysql, sqlite, redis | Database access       |
+| `slack`      | Slack messaging MCP            | Team communication    |
+| `browser`    | puppeteer, playwright          | Browser automation    |
+| `storage`    | s3, gcs, azure-blob            | Cloud storage         |
+| `github`     | GitHub API MCP                 | Repository management |
+| `*`          | All available MCPs             | Browse full catalog   |
 
 ---
 
 ## Related Commands
 
-| Command | Description |
-|---------|-------------|
-| `*add-mcp` | Add an MCP server to Docker MCP Toolkit |
-| `*list-mcps` | List currently enabled MCPs |
-| `*remove-mcp` | Remove an MCP from Docker MCP Toolkit |
-| `*setup-mcp-docker` | Initial Docker MCP Toolkit setup |
+| Command             | Description                             |
+| ------------------- | --------------------------------------- |
+| `*add-mcp`          | Add an MCP server to Docker MCP Toolkit |
+| `*list-mcps`        | List currently enabled MCPs             |
+| `*remove-mcp`       | Remove an MCP from Docker MCP Toolkit   |
+| `*setup-mcp-docker` | Initial Docker MCP Toolkit setup        |
 
 ---
 

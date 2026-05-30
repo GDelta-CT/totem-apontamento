@@ -36,8 +36,8 @@ function levenshteinDistance(a, b) {
       } else {
         matrix[i][j] = Math.min(
           matrix[i - 1][j - 1] + 1, // substitution
-          matrix[i][j - 1] + 1,     // insertion
-          matrix[i - 1][j] + 1,      // deletion
+          matrix[i][j - 1] + 1, // insertion
+          matrix[i - 1][j] + 1 // deletion
         );
       }
     }
@@ -74,8 +74,8 @@ function fuzzyMatchScore(text, query) {
   }
 
   // Check individual words
-  const queryWords = queryLower.split(/\s+/).filter(w => w.length > 0);
-  const textWords = textLower.split(/\s+/).filter(w => w.length > 0);
+  const queryWords = queryLower.split(/\s+/).filter((w) => w.length > 0);
+  const textWords = textLower.split(/\s+/).filter((w) => w.length > 0);
 
   // Quick check: if no word overlap possible, return early
   if (textWords.length === 0 || queryWords.length === 0) {
@@ -125,7 +125,7 @@ function fuzzyMatchScore(text, query) {
 
         const distance = levenshteinDistance(queryWord, textWord);
         const maxLen = Math.max(queryWord.length, textWord.length);
-        const similarity = 1 - (distance / maxLen);
+        const similarity = 1 - distance / maxLen;
 
         if (similarity >= 0.7) {
           bestWordScore = Math.max(bestWordScore, Math.round(similarity * 70));
@@ -183,7 +183,9 @@ function buildSearchFields(worker) {
       ...(worker.tags || []),
       ...(worker.inputs || []),
       ...(worker.outputs || []),
-    ].filter(Boolean).join(' '),
+    ]
+      .filter(Boolean)
+      .join(' '),
   };
 }
 
@@ -223,8 +225,8 @@ async function searchKeyword(query) {
     }
 
     // Check tags quickly
-    const tags = (worker.tags || []).map(t => t.toLowerCase());
-    const tagMatch = tags.find(t => t === queryLower || t.includes(queryLower));
+    const tags = (worker.tags || []).map((t) => t.toLowerCase());
+    const tagMatch = tags.find((t) => t === queryLower || t.includes(queryLower));
     if (tagMatch) {
       results.push({ ...worker, score: 85, matchType: 'tags' });
       continue;
@@ -288,7 +290,7 @@ async function searchByTags(tags) {
   for (const tag of tags) {
     const workers = await registry.getByTag(tag);
     for (const worker of workers) {
-      if (!results.find(r => r.id === worker.id)) {
+      if (!results.find((r) => r.id === worker.id)) {
         results.push({
           ...worker,
           score: 100,

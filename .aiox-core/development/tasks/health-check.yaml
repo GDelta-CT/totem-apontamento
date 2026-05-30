@@ -5,7 +5,7 @@
 
 name: health-check
 id: health-check
-version: "3.0"
+version: '3.0'
 description: |
   Unified health diagnostic for AIOX projects.
   Invokes `aiox doctor --json` internally via Bash tool and adds governance
@@ -18,9 +18,9 @@ category: development
 owner: devops
 
 # CLI integration
-command: "*health-check"
+command: '*health-check'
 aliases:
-  - "*hc"
+  - '*hc'
 # NOTE: *doctor alias REMOVED (INS-4.8) to avoid confusion with CLI `aiox doctor`
 
 # Task parameters
@@ -28,12 +28,12 @@ parameters:
   - name: fix
     type: boolean
     default: false
-    description: "Pass --fix to aiox doctor for auto-remediation"
+    description: 'Pass --fix to aiox doctor for auto-remediation'
 
   - name: verbose
     type: boolean
     default: false
-    description: "Show all checks including passed ones"
+    description: 'Show all checks including passed ones'
 
 # Execution instructions
 instructions: |
@@ -111,94 +111,94 @@ instructions: |
 # Governance Interpretation Map (Constitution → Check)
 governance_map:
   settings-json:
-    article: "II"
-    article_name: "Agent Authority"
-    governance_note: "Boundary protection — deny rules enforce framework immutability"
-    remediation: "aiox doctor --fix"
+    article: 'II'
+    article_name: 'Agent Authority'
+    governance_note: 'Boundary protection — deny rules enforce framework immutability'
+    remediation: 'aiox doctor --fix'
 
   rules-files:
-    article: "II"
-    article_name: "Agent Authority"
-    governance_note: "Agent authority rules provide behavioral constraints"
-    remediation: "aiox doctor --fix"
+    article: 'II'
+    article_name: 'Agent Authority'
+    governance_note: 'Agent authority rules provide behavioral constraints'
+    remediation: 'aiox doctor --fix'
 
   agent-memory:
-    article: "II"
-    article_name: "Agent Authority"
-    governance_note: "Agent identity persistence across sessions"
-    remediation: "aiox doctor --fix"
+    article: 'II'
+    article_name: 'Agent Authority'
+    governance_note: 'Agent identity persistence across sessions'
+    remediation: 'aiox doctor --fix'
 
   entity-registry:
-    article: "III"
-    article_name: "Story-Driven Development"
-    governance_note: "Code intelligence registry for entity-aware development"
-    remediation: "aiox doctor --fix"
+    article: 'III'
+    article_name: 'Story-Driven Development'
+    governance_note: 'Code intelligence registry for entity-aware development'
+    remediation: 'aiox doctor --fix'
 
   git-hooks:
-    article: "V"
-    article_name: "Quality First"
-    governance_note: "Quality gates enforced at git operations"
-    remediation: "aiox doctor --fix"
+    article: 'V'
+    article_name: 'Quality First'
+    governance_note: 'Quality gates enforced at git operations'
+    remediation: 'aiox doctor --fix'
 
   core-config:
-    article: "I"
-    article_name: "CLI First"
-    governance_note: "Configuration integrity — core-config.yaml drives CLI behavior"
-    remediation: "aiox doctor --fix"
+    article: 'I'
+    article_name: 'CLI First'
+    governance_note: 'Configuration integrity — core-config.yaml drives CLI behavior'
+    remediation: 'aiox doctor --fix'
 
   claude-md:
-    article: "II"
-    article_name: "Agent Authority"
-    governance_note: "Agent context — CLAUDE.md provides system prompt foundation"
-    remediation: "aiox doctor --fix"
+    article: 'II'
+    article_name: 'Agent Authority'
+    governance_note: 'Agent context — CLAUDE.md provides system prompt foundation'
+    remediation: 'aiox doctor --fix'
 
   ide-sync:
-    article: "II"
-    article_name: "Agent Authority"
-    governance_note: "Agent consistency across IDE configurations"
-    remediation: "aiox doctor --fix"
+    article: 'II'
+    article_name: 'Agent Authority'
+    governance_note: 'Agent consistency across IDE configurations'
+    remediation: 'aiox doctor --fix'
 
   graph-dashboard:
-    article: "I"
-    article_name: "CLI First"
-    governance_note: "CLI observability dashboard availability"
-    remediation: "Manual — install graph-dashboard package"
+    article: 'I'
+    article_name: 'CLI First'
+    governance_note: 'CLI observability dashboard availability'
+    remediation: 'Manual — install graph-dashboard package'
 
   code-intel:
-    article: "III"
-    article_name: "Story-Driven Development"
-    governance_note: "Code intelligence for entity-aware development workflows"
-    remediation: "aiox doctor --fix"
+    article: 'III'
+    article_name: 'Story-Driven Development'
+    governance_note: 'Code intelligence for entity-aware development workflows'
+    remediation: 'aiox doctor --fix'
 
   node-version:
-    article: "V"
-    article_name: "Quality First"
-    governance_note: "Runtime requirements — Node.js 18+ required"
-    remediation: "Manual — upgrade Node.js to 18+"
+    article: 'V'
+    article_name: 'Quality First'
+    governance_note: 'Runtime requirements — Node.js 18+ required'
+    remediation: 'Manual — upgrade Node.js to 18+'
 
   npm-packages:
-    article: "V"
-    article_name: "Quality First"
-    governance_note: "Dependencies installed and consistent"
-    remediation: "npm install"
+    article: 'V'
+    article_name: 'Quality First'
+    governance_note: 'Dependencies installed and consistent'
+    remediation: 'npm install'
 
   skills-count:
-    article: "II"
-    article_name: "Agent Authority"
-    governance_note: "Agent capabilities — skills extend agent functionality"
-    remediation: "npx aiox-core install --force"
+    article: 'II'
+    article_name: 'Agent Authority'
+    governance_note: 'Agent capabilities — skills extend agent functionality'
+    remediation: 'npx aiox-core install --force'
 
   commands-count:
-    article: "II"
-    article_name: "Agent Authority"
-    governance_note: "Agent action vocabulary — commands define what agents can do"
-    remediation: "npx aiox-core install --force"
+    article: 'II'
+    article_name: 'Agent Authority'
+    governance_note: 'Agent action vocabulary — commands define what agents can do'
+    remediation: 'npx aiox-core install --force'
 
   hooks-claude-count:
-    article: "V"
-    article_name: "Quality First"
-    governance_note: "Quality gates — hooks enforce governance at runtime"
-    remediation: "npx aiox-core install --force"
+    article: 'V'
+    article_name: 'Quality First'
+    governance_note: 'Quality gates — hooks enforce governance at runtime'
+    remediation: 'npx aiox-core install --force'
 
 # Output schema
 output:
@@ -206,27 +206,27 @@ output:
   properties:
     summary:
       type: string
-      description: "PASS/WARN/FAIL count summary"
+      description: 'PASS/WARN/FAIL count summary'
     issues:
       type: array
-      description: "List of FAIL and WARN items with governance context"
+      description: 'List of FAIL and WARN items with governance context'
     report:
       type: string
-      description: "Full markdown report"
+      description: 'Full markdown report'
 
 # Examples
 examples:
-  - name: "Quick health check"
-    command: "*health-check"
-    description: "Run all 15 doctor checks with governance interpretation"
+  - name: 'Quick health check'
+    command: '*health-check'
+    description: 'Run all 15 doctor checks with governance interpretation'
 
-  - name: "Health check with auto-fix"
-    command: "*health-check --fix"
-    description: "Run checks and auto-fix where possible"
+  - name: 'Health check with auto-fix'
+    command: '*health-check --fix'
+    description: 'Run checks and auto-fix where possible'
 
-  - name: "Verbose output"
-    command: "*health-check --verbose"
-    description: "Show all checks including passed ones"
+  - name: 'Verbose output'
+    command: '*health-check --verbose'
+    description: 'Show all checks including passed ones'
 
 # Help text
 help: |

@@ -1,6 +1,6 @@
 ---
 task: Publish Squad
-responsavel: "@squad-creator"
+responsavel: '@squad-creator'
 responsavel_type: agent
 atomic_layer: task
 status: active
@@ -15,17 +15,17 @@ Saida: |
   - branch: Nome do branch criado
   - validation_result: Resultado da validação pré-publish
 Checklist:
-  - "[ ] Validar squad (deve passar sem errors)"
-  - "[ ] Verificar autenticação GitHub"
-  - "[ ] Verificar se squad já existe no registry"
-  - "[ ] Criar branch no fork/clone"
-  - "[ ] Copiar arquivos do squad"
-  - "[ ] Atualizar registry.json"
-  - "[ ] Criar Pull Request"
-  - "[ ] Exibir URL do PR"
+  - '[ ] Validar squad (deve passar sem errors)'
+  - '[ ] Verificar autenticação GitHub'
+  - '[ ] Verificar se squad já existe no registry'
+  - '[ ] Criar branch no fork/clone'
+  - '[ ] Copiar arquivos do squad'
+  - '[ ] Atualizar registry.json'
+  - '[ ] Criar Pull Request'
+  - '[ ] Exibir URL do PR'
 ---
 
-# *publish-squad
+# \*publish-squad
 
 Publishes a local squad to the aiox-squads GitHub repository via Pull Request.
 
@@ -108,10 +108,10 @@ Next steps:
 
 ## Options
 
-| Option | Description |
-|--------|-------------|
-| `--dry-run` | Preview publish without creating PR |
-| `--verbose` | Show detailed progress |
+| Option       | Description                         |
+| ------------ | ----------------------------------- |
+| `--dry-run`  | Preview publish without creating PR |
+| `--verbose`  | Show detailed progress              |
 | `--category` | Squad category (default: community) |
 
 ## Workflow
@@ -169,11 +169,11 @@ The generated PR body includes:
 
 ### Components
 
-| Type | Count |
-|------|-------|
-| Tasks | {n} |
-| Agents | {n} |
-| Workflows | {n} |
+| Type      | Count |
+| --------- | ----- |
+| Tasks     | {n}   |
+| Agents    | {n}   |
+| Workflows | {n}   |
 
 ### Pre-submission Checklist
 
@@ -185,30 +185,32 @@ The generated PR body includes:
 
 ## Error Handling
 
-| Error | Cause | Solution |
-|-------|-------|----------|
-| `AUTH_REQUIRED` | Not authenticated | Run `gh auth login` |
-| `VALIDATION_FAILED` | Squad has errors | Fix errors with `*validate-squad` |
-| `SQUAD_NOT_FOUND` | Invalid path | Check squad path exists |
-| `MANIFEST_ERROR` | Missing name/version | Update squad.yaml |
-| `PR_ERROR` | GitHub CLI error | Check `gh` is working |
+| Error               | Cause                | Solution                          |
+| ------------------- | -------------------- | --------------------------------- |
+| `AUTH_REQUIRED`     | Not authenticated    | Run `gh auth login`               |
+| `VALIDATION_FAILED` | Squad has errors     | Fix errors with `*validate-squad` |
+| `SQUAD_NOT_FOUND`   | Invalid path         | Check squad path exists           |
+| `MANIFEST_ERROR`    | Missing name/version | Update squad.yaml                 |
+| `PR_ERROR`          | GitHub CLI error     | Check `gh` is working             |
 
 ## Requirements
 
 ### Manifest Fields
 
 Required for publishing:
+
 ```yaml
 # squad.yaml
-name: my-squad          # Required
-version: 1.0.0          # Required
-description: "..."      # Recommended
-author: your-name       # Recommended
+name: my-squad # Required
+version: 1.0.0 # Required
+description: '...' # Recommended
+author: your-name # Recommended
 ```
 
 ### Validation Rules
 
 Squad must pass validation:
+
 - Valid squad.yaml with required fields
 - Task files in tasks/ directory
 - No critical errors
@@ -216,6 +218,7 @@ Squad must pass validation:
 ## Implementation
 
 Uses `SquadPublisher` class from:
+
 - `.aiox-core/development/scripts/squad/squad-publisher.js`
 
 ## Related Tasks

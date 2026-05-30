@@ -1,9 +1,9 @@
 /**
  * Personalized Output Formatter - Layer 2 of Agent Identity System
- * 
+ *
  * Implements template engine with personality injection while maintaining
  * fixed output structure (familiaridade + personalização).
- * 
+ *
  * Story: 6.1.6 - Output Formatter Implementation
  * Performance Target: <50ms per output generation
  */
@@ -14,7 +14,7 @@ const yaml = require('js-yaml');
 
 /**
  * Personalized Output Formatter
- * 
+ *
  * Generates standardized task execution reports with agent personality injection.
  * Maintains fixed structure (Duration line 7, Tokens line 8, Metrics last) while
  * allowing flexible tone/vocabulary in status messages.
@@ -31,7 +31,7 @@ class PersonalizedOutputFormatter {
     this.results = results;
     this.personaProfile = null;
     this.vocabularyCache = new Map();
-    
+
     // Load persona_profile from agent
     this._loadPersonaProfile();
   }
@@ -49,7 +49,7 @@ class PersonalizedOutputFormatter {
       }
 
       const agentPath = path.join(process.cwd(), '.aiox-core', 'agents', `${this.agent.id}.md`);
-      
+
       if (!fs.existsSync(agentPath)) {
         console.warn(`[OutputFormatter] Agent file not found: ${agentPath}`);
         this.personaProfile = this._getNeutralProfile();
@@ -58,7 +58,7 @@ class PersonalizedOutputFormatter {
 
       const content = fs.readFileSync(agentPath, 'utf8');
       const yamlMatch = content.match(/```ya?ml\r?\n([\s\S]*?)\r?\n```/);
-      
+
       if (!yamlMatch) {
         console.warn('[OutputFormatter] No YAML block found in agent file');
         this.personaProfile = this._getNeutralProfile();
@@ -67,7 +67,7 @@ class PersonalizedOutputFormatter {
 
       const agentConfig = yaml.load(yamlMatch[1]);
       this.personaProfile = agentConfig.persona_profile || this._getNeutralProfile();
-      
+
       // Cache vocabulary for performance
       if (this.personaProfile.communication?.vocabulary) {
         this.vocabularyCache.set(this.agent.id, this.personaProfile.communication.vocabulary);
@@ -106,7 +106,7 @@ class PersonalizedOutputFormatter {
    */
   format() {
     const startTime = process.hrtime.bigint();
-    
+
     try {
       const header = this.buildFixedHeader();
       const status = this.buildPersonalizedStatus();
@@ -131,7 +131,9 @@ class PersonalizedOutputFormatter {
 
       const duration = Number(process.hrtime.bigint() - startTime) / 1000000; // Convert to ms
       if (duration > 100) {
-        console.warn(`[OutputFormatter] Performance warning: ${duration.toFixed(2)}ms (target: <50ms)`);
+        console.warn(
+          `[OutputFormatter] Performance warning: ${duration.toFixed(2)}ms (target: <50ms)`
+        );
       }
 
       return formatted;
@@ -188,8 +190,9 @@ ${statusIcon} ${message}`;
    * @returns {string} Output section markdown
    */
   buildOutput() {
-    const outputContent = this.results?.output || this.results?.content || 'Task completed successfully.';
-    
+    const outputContent =
+      this.results?.output || this.results?.content || 'Task completed successfully.';
+
     return `### Output
 ${outputContent}`;
   }
@@ -241,20 +244,20 @@ ${outputContent}`;
    */
   generateSuccessMessage(tone, verb) {
     const verbPast = this._getPastTense(verb);
-    
+
     switch (tone) {
       case 'pragmatic':
         return `Tá pronto! ${this._capitalize(verbPast)} com sucesso.`;
-      
+
       case 'empathetic':
         return `${this._capitalize(verbPast)} com cuidado e atenção aos detalhes.`;
-      
+
       case 'analytical':
         return `${this._capitalize(verbPast)} rigorosamente. Todos os critérios validados.`;
-      
+
       case 'collaborative':
         return `${this._capitalize(verbPast)} e harmonizado. Todos os aspectos alinhados.`;
-      
+
       case 'neutral':
       default:
         return `Task ${verbPast} successfully.`;
@@ -294,4 +297,3 @@ ${outputContent}`;
 }
 
 module.exports = PersonalizedOutputFormatter;
-

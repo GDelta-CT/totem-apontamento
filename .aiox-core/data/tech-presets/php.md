@@ -246,16 +246,16 @@ $command = PlaceOrderData::fromArray([
 
 ## Tech Stack
 
-| Category | Technology | Version | Purpose |
-| -------- | ---------- | ------- | ------- |
-| Language | PHP | 8.3+ | Runtime principal |
-| Framework | Laravel | 11+ | API, DI, eventos |
-| ORM | Eloquent | 11+ | Persistencia |
-| Validation | Form Request | built-in | Validacao de entrada |
-| Queues | Laravel Queue | 11+ | Processamento async |
-| Unit/Feature Test | Pest/PHPUnit | latest | Testes automatizados |
-| Style | Laravel Pint | latest | Padrao de codigo |
-| Static Analysis | PHPStan | latest | Analise estatica |
+| Category          | Technology    | Version  | Purpose              |
+| ----------------- | ------------- | -------- | -------------------- |
+| Language          | PHP           | 8.3+     | Runtime principal    |
+| Framework         | Laravel       | 11+      | API, DI, eventos     |
+| ORM               | Eloquent      | 11+      | Persistencia         |
+| Validation        | Form Request  | built-in | Validacao de entrada |
+| Queues            | Laravel Queue | 11+      | Processamento async  |
+| Unit/Feature Test | Pest/PHPUnit  | latest   | Testes automatizados |
+| Style             | Laravel Pint  | latest   | Padrao de codigo     |
+| Static Analysis   | PHPStan       | latest   | Analise estatica     |
 
 ### Required Dependencies
 
@@ -274,13 +274,13 @@ composer require --dev laravel/pint
 
 ### Naming Conventions
 
-| Element | Convention | Example |
-| ------- | ---------- | ------- |
-| Classes | PascalCase | `PlaceOrderAction` |
-| Interfaces | Suffix `Contract` | `OrderRepositoryContract` |
-| Files | Match class name | `PlaceOrderAction.php` |
-| Methods | camelCase | `findById` |
-| Config keys | snake_case | `queue_connection` |
+| Element         | Convention           | Example                                     |
+| --------------- | -------------------- | ------------------------------------------- |
+| Classes         | PascalCase           | `PlaceOrderAction`                          |
+| Interfaces      | Suffix `Contract`    | `OrderRepositoryContract`                   |
+| Files           | Match class name     | `PlaceOrderAction.php`                      |
+| Methods         | camelCase            | `findById`                                  |
+| Config keys     | snake_case           | `queue_connection`                          |
 | Migration files | timestamp_snake_case | `2026_02_19_000000_create_orders_table.php` |
 
 ### Critical Rules
@@ -379,12 +379,12 @@ Definir endpoints e asserts antes da implementacao.
 
 ## Bug Prevention Stack
 
-| Layer | Catches | Implementation |
-| ----- | ------- | -------------- |
-| Form Request validation | 30% | Regras na borda HTTP |
-| Domain/action tests | 40% | Unit + feature tests |
-| Static analysis | 20% | PHPStan |
-| Smoke e2e | 10% | Fluxos de negocio |
+| Layer                   | Catches | Implementation       |
+| ----------------------- | ------- | -------------------- |
+| Form Request validation | 30%     | Regras na borda HTTP |
+| Domain/action tests     | 40%     | Unit + feature tests |
+| Static analysis         | 20%     | PHPStan              |
+| Smoke e2e               | 10%     | Fluxos de negocio    |
 
 ---
 
@@ -475,8 +475,8 @@ final class OrdersController
 
 ## Changelog
 
-| Date       | Version | Changes |
-| ---------- | ------- | ------- |
+| Date       | Version | Changes            |
+| ---------- | ------- | ------------------ |
 | 2026-02-19 | 1.0.0   | Initial PHP preset |
 
 ---

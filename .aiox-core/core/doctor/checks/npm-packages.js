@@ -70,7 +70,9 @@ async function run(context) {
   return {
     check: name,
     status: 'PASS',
-    message: 'node_modules present' + (fs.existsSync(aioxCoreNodeModules) ? ', .aiox-core deps complete' : ''),
+    message:
+      'node_modules present' +
+      (fs.existsSync(aioxCoreNodeModules) ? ', .aiox-core deps complete' : ''),
     fixCommand: null,
   };
 }

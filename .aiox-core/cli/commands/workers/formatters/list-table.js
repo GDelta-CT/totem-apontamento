@@ -37,10 +37,19 @@ function formatTable(workers, options = {}) {
   }
 
   // Calculate dynamic column widths based on content
-  const idWidth = Math.min(35, Math.max(COLUMNS.id.width, ...workers.map(w => w.id.length)));
-  const nameWidth = Math.min(35, Math.max(COLUMNS.name.width, ...workers.map(w => w.name.length)));
-  const categoryWidth = Math.min(15, Math.max(COLUMNS.category.width, ...workers.map(w => (w.category || '').length)));
-  const subcategoryWidth = Math.min(15, Math.max(COLUMNS.subcategory.width, ...workers.map(w => (w.subcategory || '').length)));
+  const idWidth = Math.min(35, Math.max(COLUMNS.id.width, ...workers.map((w) => w.id.length)));
+  const nameWidth = Math.min(
+    35,
+    Math.max(COLUMNS.name.width, ...workers.map((w) => w.name.length))
+  );
+  const categoryWidth = Math.min(
+    15,
+    Math.max(COLUMNS.category.width, ...workers.map((w) => (w.category || '').length))
+  );
+  const subcategoryWidth = Math.min(
+    15,
+    Math.max(COLUMNS.subcategory.width, ...workers.map((w) => (w.subcategory || '').length))
+  );
 
   let output = '';
 
@@ -67,7 +76,9 @@ function formatTable(workers, options = {}) {
     const id = truncate(worker.id, idWidth).padEnd(idWidth);
     const name = truncate(worker.name, nameWidth).padEnd(nameWidth);
     const category = truncate(worker.category || '', categoryWidth).padEnd(categoryWidth);
-    const subcategory = truncate(worker.subcategory || '', subcategoryWidth).padEnd(subcategoryWidth);
+    const subcategory = truncate(worker.subcategory || '', subcategoryWidth).padEnd(
+      subcategoryWidth
+    );
 
     output += `${num}  ${id}  ${name}  ${category}  ${subcategory}\n`;
   });
@@ -99,7 +110,7 @@ function formatTable(workers, options = {}) {
 function formatJSON(workers, options = {}) {
   const { pagination } = options;
 
-  const output = workers.map(worker => ({
+  const output = workers.map((worker) => ({
     id: worker.id,
     name: worker.name,
     category: worker.category,
@@ -109,15 +120,19 @@ function formatJSON(workers, options = {}) {
   }));
 
   if (pagination) {
-    return JSON.stringify({
-      data: output,
-      pagination: {
-        page: pagination.page,
-        limit: pagination.limit,
-        totalItems: pagination.totalItems,
-        totalPages: pagination.totalPages,
+    return JSON.stringify(
+      {
+        data: output,
+        pagination: {
+          page: pagination.page,
+          limit: pagination.limit,
+          totalItems: pagination.totalItems,
+          totalPages: pagination.totalPages,
+        },
       },
-    }, null, 2);
+      null,
+      2
+    );
   }
 
   return JSON.stringify(output, null, 2);
@@ -133,7 +148,7 @@ function formatJSON(workers, options = {}) {
 function formatYAML(workers, options = {}) {
   const { pagination } = options;
 
-  const output = workers.map(worker => ({
+  const output = workers.map((worker) => ({
     id: worker.id,
     name: worker.name,
     category: worker.category,
@@ -143,19 +158,22 @@ function formatYAML(workers, options = {}) {
   }));
 
   if (pagination) {
-    return yaml.dump({
-      data: output,
-      pagination: {
-        page: pagination.page,
-        limit: pagination.limit,
-        totalItems: pagination.totalItems,
-        totalPages: pagination.totalPages,
+    return yaml.dump(
+      {
+        data: output,
+        pagination: {
+          page: pagination.page,
+          limit: pagination.limit,
+          totalItems: pagination.totalItems,
+          totalPages: pagination.totalPages,
+        },
       },
-    }, {
-      indent: 2,
-      lineWidth: 120,
-      noRefs: true,
-    });
+      {
+        indent: 2,
+        lineWidth: 120,
+        noRefs: true,
+      }
+    );
   }
 
   return yaml.dump(output, {
@@ -178,8 +196,7 @@ function formatCount(categories, totalWorkers, options = {}) {
   let output = `Total: ${totalWorkers} workers\n\n`;
 
   // Sort categories by count descending
-  const sorted = Object.entries(categories)
-    .sort((a, b) => b[1].count - a[1].count);
+  const sorted = Object.entries(categories).sort((a, b) => b[1].count - a[1].count);
 
   for (const [name, data] of sorted) {
     output += `${name.toUpperCase().padEnd(15)} ${data.count.toString().padStart(4)} workers\n`;

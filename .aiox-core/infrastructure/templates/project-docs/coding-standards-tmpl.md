@@ -11,6 +11,7 @@ This document defines the coding standards and conventions for **{{PROJECT_NAME}
 ---
 
 {{#if IS_NODE}}
+
 ## JavaScript/TypeScript Standards
 
 ### Language Version
@@ -21,13 +22,13 @@ This document defines the coding standards and conventions for **{{PROJECT_NAME}
 
 ### Formatting
 
-| Rule | Value |
-|------|-------|
-| Indentation | 2 spaces |
-| Quotes | Single quotes `'` |
-| Semicolons | {{SEMICOLONS}} |
-| Max line length | 100 characters |
-| Trailing commas | ES5 compatible |
+| Rule            | Value             |
+| --------------- | ----------------- |
+| Indentation     | 2 spaces          |
+| Quotes          | Single quotes `'` |
+| Semicolons      | {{SEMICOLONS}}    |
+| Max line length | 100 characters    |
+| Trailing commas | ES5 compatible    |
 
 ### ESLint Configuration
 
@@ -73,14 +74,14 @@ module.exports = {
 
 ### Naming Conventions
 
-| Type | Convention | Example |
-|------|------------|---------|
-| Variables | camelCase | `userName` |
-| Constants | SCREAMING_SNAKE | `MAX_RETRIES` |
-| Functions | camelCase | `getUserById()` |
-| Classes | PascalCase | `UserService` |
-| Files | kebab-case | `user-service.js` |
-| React Components | PascalCase | `UserProfile.tsx` |
+| Type             | Convention      | Example           |
+| ---------------- | --------------- | ----------------- |
+| Variables        | camelCase       | `userName`        |
+| Constants        | SCREAMING_SNAKE | `MAX_RETRIES`     |
+| Functions        | camelCase       | `getUserById()`   |
+| Classes          | PascalCase      | `UserService`     |
+| Files            | kebab-case      | `user-service.js` |
+| React Components | PascalCase      | `UserProfile.tsx` |
 
 ### Function Guidelines
 
@@ -122,9 +123,11 @@ const { UserService } = require('@/services/user');
 // 4. Relative
 const { helper } = require('./utils');
 ```
+
 {{/if}}
 
 {{#if IS_PYTHON}}
+
 ## Python Standards
 
 ### Language Version
@@ -134,12 +137,12 @@ const { helper } = require('./utils');
 
 ### Formatting
 
-| Rule | Value |
-|------|-------|
-| Indentation | 4 spaces |
+| Rule            | Value                         |
+| --------------- | ----------------------------- |
+| Indentation     | 4 spaces                      |
 | Max line length | 88 characters (Black default) |
-| Quotes | Double quotes `"` |
-| Docstring style | Google style |
+| Quotes          | Double quotes `"`             |
+| Docstring style | Google style                  |
 
 ### Black Configuration
 
@@ -163,14 +166,14 @@ exclude = .git,__pycache__,build,dist
 
 ### Naming Conventions
 
-| Type | Convention | Example |
-|------|------------|---------|
-| Variables | snake_case | `user_name` |
-| Constants | SCREAMING_SNAKE | `MAX_RETRIES` |
-| Functions | snake_case | `get_user_by_id()` |
-| Classes | PascalCase | `UserService` |
-| Files | snake_case | `user_service.py` |
-| Private | Leading underscore | `_internal_method()` |
+| Type      | Convention         | Example              |
+| --------- | ------------------ | -------------------- |
+| Variables | snake_case         | `user_name`          |
+| Constants | SCREAMING_SNAKE    | `MAX_RETRIES`        |
+| Functions | snake_case         | `get_user_by_id()`   |
+| Classes   | PascalCase         | `UserService`        |
+| Files     | snake_case         | `user_service.py`    |
+| Private   | Leading underscore | `_internal_method()` |
 
 ### Function Guidelines
 
@@ -212,9 +215,11 @@ from fastapi import FastAPI
 from {{PYTHON_PACKAGE_NAME}}.config import settings
 from {{PYTHON_PACKAGE_NAME}}.services.user import UserService
 ```
+
 {{/if}}
 
 {{#if IS_GO}}
+
 ## Go Standards
 
 ### Language Version
@@ -228,14 +233,14 @@ from {{PYTHON_PACKAGE_NAME}}.services.user import UserService
 
 ### Naming Conventions
 
-| Type | Convention | Example |
-|------|------------|---------|
-| Variables | camelCase | `userName` |
-| Constants | PascalCase or camelCase | `MaxRetries` |
-| Functions (exported) | PascalCase | `GetUserByID` |
-| Functions (private) | camelCase | `getUserByID` |
-| Packages | lowercase | `userservice` |
-| Files | snake_case | `user_service.go` |
+| Type                 | Convention              | Example           |
+| -------------------- | ----------------------- | ----------------- |
+| Variables            | camelCase               | `userName`        |
+| Constants            | PascalCase or camelCase | `MaxRetries`      |
+| Functions (exported) | PascalCase              | `GetUserByID`     |
+| Functions (private)  | camelCase               | `getUserByID`     |
+| Packages             | lowercase               | `userservice`     |
+| Files                | snake_case              | `user_service.go` |
 
 ### Function Guidelines
 
@@ -268,6 +273,7 @@ import (
     "{{GO_MODULE}}/internal/services"
 )
 ```
+
 {{/if}}
 
 ---
@@ -303,6 +309,7 @@ Follow conventional commits:
 Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
 
 Example:
+
 ```
 feat(auth): add OAuth2 login support
 
@@ -329,6 +336,7 @@ Closes #123
 ### Pre-commit Hooks
 
 The project uses pre-commit hooks for:
+
 - Linting
 - Formatting
 - Type checking (if applicable)
@@ -337,10 +345,11 @@ The project uses pre-commit hooks for:
 
 All PRs must pass:
 {{#each QUALITY_GATES}}
+
 - [ ] {{this}}
-{{/each}}
+      {{/each}}
 
 ---
 
-*Generated by AIOX Documentation Integrity System*
-*Template Version: 1.0.0*
+_Generated by AIOX Documentation Integrity System_
+_Template Version: 1.0.0_

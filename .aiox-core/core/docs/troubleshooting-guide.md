@@ -21,22 +21,27 @@ This guide helps diagnose and resolve common issues when using the Synkra AIOX m
 ### Issue: "Component already exists"
 
 **Symptoms:**
+
 ```
 ❌ Error: Agent 'data-analyst' already exists at /aiox-core/agents/data-analyst.md
 ```
 
 **Causes:**
+
 - Component with same name already created
 - Previous creation attempt partially succeeded
 
 **Solutions:**
+
 1. Choose a different name:
+
    ```bash
    *create-agent
    ? Agent name: data-analyst-v2
    ```
 
 2. Check existing components:
+
    ```bash
    ls aiox-core/agents/
    ```
@@ -51,16 +56,19 @@ This guide helps diagnose and resolve common issues when using the Synkra AIOX m
 ### Issue: "Invalid name format"
 
 **Symptoms:**
+
 ```
 ❌ Name must be lowercase with hyphens only
 ```
 
 **Causes:**
+
 - Using uppercase letters
 - Spaces or underscores in name
 - Starting with number
 
 **Solutions:**
+
 1. Follow naming conventions:
    - ✅ Good: `data-analyst`, `api-tester`, `log-monitor`
    - ❌ Bad: `DataAnalyst`, `api_tester`, `log monitor`, `2-analyzer`
@@ -78,23 +86,28 @@ This guide helps diagnose and resolve common issues when using the Synkra AIOX m
 ### Issue: "Template not found"
 
 **Symptoms:**
+
 ```
 ❌ Error: Template not found: agent-template.yaml
 ```
 
 **Causes:**
+
 - Missing template files
 - Incorrect installation
 - Wrong working directory
 
 **Solutions:**
+
 1. Verify template location:
+
    ```bash
    ls aiox-core/templates/
    # Should see: agent-template.yaml, task-template.md, workflow-template.yaml
    ```
 
 2. Reinstall templates:
+
    ```bash
    # From project root
    npm run setup:templates
@@ -111,22 +124,27 @@ This guide helps diagnose and resolve common issues when using the Synkra AIOX m
 ### Issue: Variables not replaced
 
 **Symptoms:**
+
 ```
 Generated content contains: {{AGENT_NAME}} instead of actual value
 ```
 
 **Causes:**
+
 - Missing variables in elicitation
 - Typo in variable names
 - Template syntax errors
 
 **Solutions:**
+
 1. Enable debug mode:
+
    ```bash
    DEBUG_TEMPLATES=true *create-agent
    ```
 
 2. Check variable mapping:
+
    ```javascript
    // Common variable mappings
    {
@@ -144,17 +162,21 @@ Generated content contains: {{AGENT_NAME}} instead of actual value
 ### Issue: Malformed output
 
 **Symptoms:**
+
 - Broken YAML structure
 - Missing sections
 - Incorrect indentation
 
 **Causes:**
+
 - Template indentation issues
 - Conditional logic errors
 - Special characters in input
 
 **Solutions:**
+
 1. Check template indentation:
+
    ```yaml
    {{#IF_COMMANDS}}
    commands:
@@ -166,9 +188,7 @@ Generated content contains: {{AGENT_NAME}} instead of actual value
 
 2. Escape special characters:
    ```javascript
-   const escaped = input
-     .replace(/"/g, '\\"')
-     .replace(/\n/g, '\\n');
+   const escaped = input.replace(/"/g, '\\"').replace(/\n/g, '\\n');
    ```
 
 ## Elicitation Workflow Issues
@@ -176,22 +196,27 @@ Generated content contains: {{AGENT_NAME}} instead of actual value
 ### Issue: Prompts not appearing
 
 **Symptoms:**
+
 - Command exits immediately
 - No interactive prompts shown
 
 **Causes:**
+
 - Non-interactive terminal
 - Mock mode enabled
 - Input stream issues
 
 **Solutions:**
+
 1. Ensure interactive terminal:
+
    ```bash
    # Force interactive mode
    *create-agent --interactive
    ```
 
 2. Check mock mode:
+
    ```javascript
    // In elicitation-engine.js
    if (this.mockMode) {
@@ -208,22 +233,27 @@ Generated content contains: {{AGENT_NAME}} instead of actual value
 ### Issue: Session not saving
 
 **Symptoms:**
+
 ```
 ⚠️ Warning: Failed to save elicitation session
 ```
 
 **Causes:**
+
 - Missing session directory
 - Permissions issues
 - Disk space
 
 **Solutions:**
+
 1. Create session directory:
+
    ```bash
    mkdir -p aiox-core/.sessions
    ```
 
 2. Check permissions:
+
    ```bash
    chmod 755 aiox-core/.sessions
    ```
@@ -238,21 +268,25 @@ Generated content contains: {{AGENT_NAME}} instead of actual value
 ### Issue: "Security check failed"
 
 **Symptoms:**
+
 ```
 ❌ Security check failed: Potential code injection detected
 ```
 
 **Causes:**
+
 - Script tags in input
 - Executable code patterns
 - Suspicious file paths
 
 **Solutions:**
+
 1. Avoid code in descriptions:
    - ❌ Bad: `Executes <script>alert('hi')</script>`
    - ✅ Good: `Processes user alerts`
 
 2. Use plain text:
+
    ```
    ? Description: Analyzes log files for errors
    # Not: Runs `grep -E "error|fail" *.log`
@@ -261,34 +295,33 @@ Generated content contains: {{AGENT_NAME}} instead of actual value
 3. Check security rules:
    ```javascript
    // In security-checker.js
-   const forbidden = [
-     /<script/i,
-     /eval\(/,
-     /require\(['"]\./,
-     /\.\.\//
-   ];
+   const forbidden = [/<script/i, /eval\(/, /require\(['"]\./, /\.\.\//];
    ```
 
 ### Issue: "Path traversal detected"
 
 **Symptoms:**
+
 ```
 ❌ Security: Path traversal attempt detected
 ```
 
 **Causes:**
+
 - Using `../` in paths
 - Absolute paths outside project
 - Symbolic link attempts
 
 **Solutions:**
+
 1. Use relative paths within project:
+
    ```javascript
    // Good
-   path.join(this.rootPath, 'agents', 'my-agent.md')
-   
+   path.join(this.rootPath, 'agents', 'my-agent.md');
+
    // Bad
-   path.join('../../../', 'agents', 'my-agent.md')
+   path.join('../../../', 'agents', 'my-agent.md');
    ```
 
 2. Validate paths:
@@ -304,22 +337,27 @@ Generated content contains: {{AGENT_NAME}} instead of actual value
 ### Issue: "No transaction to rollback"
 
 **Symptoms:**
+
 ```
 ⚠️ No transactions found to rollback
 ```
 
 **Causes:**
+
 - Transaction already rolled back
 - Transaction logs deleted
 - No recent operations
 
 **Solutions:**
+
 1. List available transactions:
+
    ```bash
    *list-transactions
    ```
 
 2. Check transaction directory:
+
    ```bash
    ls aiox-core/logs/transactions/
    ```
@@ -332,6 +370,7 @@ Generated content contains: {{AGENT_NAME}} instead of actual value
 ### Issue: Partial rollback failure
 
 **Symptoms:**
+
 ```
 ✅ Successful: 3
 ❌ Failed: 2
@@ -340,21 +379,25 @@ Generated content contains: {{AGENT_NAME}} instead of actual value
 ```
 
 **Causes:**
+
 - Files modified after creation
 - Missing backup files
 - Permission changes
 
 **Solutions:**
+
 1. Manual cleanup:
+
    ```bash
    # Check failed files
    ls -la aiox-core/agents/file1.md
-   
+
    # Remove manually if needed
    rm aiox-core/agents/file1.md
    ```
 
 2. Force rollback:
+
    ```bash
    *undo-last --force --continue-on-error
    ```
@@ -370,17 +413,21 @@ Generated content contains: {{AGENT_NAME}} instead of actual value
 ### Issue: "Circular dependency detected"
 
 **Symptoms:**
+
 ```
 ❌ Circular dependency detected: A → B → C → A
 ```
 
 **Causes:**
+
 - Tasks depending on each other
 - Workflow referencing itself
 - Complex dependency chains
 
 **Solutions:**
+
 1. Review dependencies:
+
    ```javascript
    // Check dependency graph
    {
@@ -403,24 +450,29 @@ Generated content contains: {{AGENT_NAME}} instead of actual value
 ### Issue: Batch creation partially fails
 
 **Symptoms:**
+
 ```
 📦 Creating components [████████░░░░░░░░░░] 45% 5/11
 ❌ Some components failed to create
 ```
 
 **Causes:**
+
 - Individual component errors
 - Dependency not met
 - Resource constraints
 
 **Solutions:**
+
 1. Check failure details:
+
    ```bash
    # Review transaction log
    cat aiox-core/logs/transactions/latest.json
    ```
 
 2. Rollback and retry:
+
    ```bash
    *undo-last
    # Fix issues
@@ -439,22 +491,27 @@ Generated content contains: {{AGENT_NAME}} instead of actual value
 ### Issue: "Missing dependencies"
 
 **Symptoms:**
+
 ```
 ⚠️ Task 'analyze-data' requires agent 'data-analyst' which doesn't exist
 ```
 
 **Causes:**
+
 - Creating task before agent
 - Typo in agent name
 - Deleted dependencies
 
 **Solutions:**
+
 1. Check existing components:
+
    ```bash
    *list-components --type=agent
    ```
 
 2. Create missing dependencies:
+
    ```bash
    *create-agent
    ? Agent name: data-analyst
@@ -471,17 +528,21 @@ Generated content contains: {{AGENT_NAME}} instead of actual value
 ### Issue: Slow component creation
 
 **Symptoms:**
+
 - Creation takes > 30 seconds
 - Terminal freezes
 - High CPU usage
 
 **Causes:**
+
 - Large template files
 - Complex validation
 - Disk I/O issues
 
 **Solutions:**
+
 1. Profile performance:
+
    ```bash
    DEBUG=perf:* *create-agent
    ```
@@ -492,10 +553,11 @@ Generated content contains: {{AGENT_NAME}} instead of actual value
    - Cache processed templates
 
 3. Check system resources:
+
    ```bash
    # CPU usage
    top
-   
+
    # Disk I/O
    iostat -x 1
    ```
@@ -503,22 +565,27 @@ Generated content contains: {{AGENT_NAME}} instead of actual value
 ### Issue: Memory usage high
 
 **Symptoms:**
+
 ```
 FATAL ERROR: JavaScript heap out of memory
 ```
 
 **Causes:**
+
 - Large batch operations
 - Memory leaks
 - Circular references
 
 **Solutions:**
+
 1. Increase Node memory:
+
    ```bash
    NODE_OPTIONS="--max-old-space-size=4096" *create-suite
    ```
 
 2. Reduce batch size:
+
    ```javascript
    // In batch-creator.js
    options.batchSize = 5; // Instead of 50
@@ -609,11 +676,13 @@ grep ERROR aiox-core/logs/*.log
 If all else fails:
 
 1. **Backup current state**:
+
    ```bash
    tar -czf aiox-backup.tar.gz aiox-core/
    ```
 
 2. **Reset to clean state**:
+
    ```bash
    git checkout -- aiox-core/
    npm run setup

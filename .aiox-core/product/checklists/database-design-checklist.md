@@ -25,7 +25,6 @@ Design for correctness first, then optimize.]]
 1. **Domain Model Alignment:**
 
    [[LLM: Schema should reflect business requirements]]
-
    - [ ] All required entities from domain model are represented
    - [ ] Entity relationships match business logic
    - [ ] Cardinality (1:1, 1:N, M:N) correctly implemented
@@ -35,7 +34,6 @@ Design for correctness first, then optimize.]]
 2. **Table Design:**
 
    [[LLM: Tables are the foundation. Get them right]]
-
    - [ ] Every table has a primary key (preferably UUID)
    - [ ] created_at and updated_at timestamps on all tables
    - [ ] Soft delete (deleted_at) where audit trail needed
@@ -45,7 +43,6 @@ Design for correctness first, then optimize.]]
 3. **Relationships & Constraints:**
 
    [[LLM: Constraints protect data integrity]]
-
    - [ ] Foreign keys defined for all relationships
    - [ ] ON DELETE behavior specified (CASCADE, SET NULL, RESTRICT)
    - [ ] Unique constraints on business keys
@@ -55,7 +52,6 @@ Design for correctness first, then optimize.]]
 4. **Indexing Strategy:**
 
    [[LLM: Indexes enable performance. Plan them carefully]]
-
    - [ ] Primary key automatically indexed
    - [ ] Foreign keys have indexes
    - [ ] Frequently queried columns indexed
@@ -65,7 +61,6 @@ Design for correctness first, then optimize.]]
 5. **Normalization & Denormalization:**
 
    [[LLM: Balance normalization with practical needs]]
-
    - [ ] At minimum 3NF (Third Normal Form) achieved
    - [ ] Denormalization decisions documented with justification
    - [ ] No data redundancy without explicit reason
@@ -75,7 +70,6 @@ Design for correctness first, then optimize.]]
 6. **Security Design:**
 
    [[LLM: Security must be built in, not bolted on]]
-
    - [ ] Tables categorized by sensitivity level
    - [ ] RLS policy strategy defined for each table
    - [ ] Sensitive columns identified (PII, credentials)
@@ -85,7 +79,6 @@ Design for correctness first, then optimize.]]
 7. **Performance Considerations:**
 
    [[LLM: Design for expected scale and access patterns]]
-
    - [ ] Expected data volumes estimated
    - [ ] Query patterns identified and optimized for
    - [ ] Partitioning strategy considered (if large tables)
@@ -95,7 +88,6 @@ Design for correctness first, then optimize.]]
 8. **Documentation:**
 
    [[LLM: Others need to understand your design]]
-
    - [ ] Entity-Relationship Diagram (ERD) created
    - [ ] Each table purpose documented
    - [ ] Complex relationships explained

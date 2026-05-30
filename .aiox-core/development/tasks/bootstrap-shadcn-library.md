@@ -9,16 +9,19 @@
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -186,6 +189,7 @@ token_usage: ~800-2,500 tokens
 ```
 
 **Optimization Notes:**
+
 - Validate configuration early; use atomic writes; implement rollback checkpoints
 
 ---
@@ -205,7 +209,6 @@ updated_at: 2025-11-17
 
 ---
 
-
 ## Description
 
 Install and curate a Shadcn UI component library leveraging Tailwind v4, Radix primitives, and project design tokens. Establish shared utilities (`cn`, `cva`), Spinner/loading patterns, and documentation scaffold.
@@ -220,16 +223,20 @@ Install and curate a Shadcn UI component library leveraging Tailwind v4, Radix p
 ## Workflow
 
 1. **Initialize Shadcn CLI**
+
    ```bash
    npx shadcn@latest init
    ```
+
    - Configure paths (`components`, `lib/utils.ts`)
    - Enable TypeScript + Tailwind + Radix defaults
 
 2. **Install Core Utilities**
+
    ```bash
    npx shadcn@latest add button input card textarea badge skeleton spinner
    ```
+
    - Ensure `cn` helper uses `clsx` + `tailwind-merge`
    - Add `Spinner` component for loading states (if not provided by template)
 

@@ -144,9 +144,16 @@ class SessionContextLoader {
     if (previousAgent) {
       const agentName = previousAgent.agentName || previousAgent.agentId;
       const minutesAgo = Math.floor((Date.now() - previousAgent.activatedAt) / 60000);
-      const timeAgo = minutesAgo < 1 ? 'just now' : minutesAgo === 1 ? '1 minute ago' : `${minutesAgo} minutes ago`;
+      const timeAgo =
+        minutesAgo < 1
+          ? 'just now'
+          : minutesAgo === 1
+            ? '1 minute ago'
+            : `${minutesAgo} minutes ago`;
 
-      parts.push(`📍 **Session Context**: Continuing from @${previousAgent.agentId} (${agentName}) activated ${timeAgo}`);
+      parts.push(
+        `📍 **Session Context**: Continuing from @${previousAgent.agentId} (${agentName}) activated ${timeAgo}`
+      );
 
       if (previousAgent.lastCommand) {
         parts.push(`   Last action: *${previousAgent.lastCommand}`);
@@ -357,7 +364,7 @@ class SessionContextLoader {
     const stateMap = {
       'validate-story-draft': { workflow: 'story_development', state: 'validated' },
       'validate-next-story': { workflow: 'story_development', state: 'validated' },
-      'develop': { workflow: 'story_development', state: 'in_development' },
+      develop: { workflow: 'story_development', state: 'in_development' },
       'develop-yolo': { workflow: 'story_development', state: 'in_development' },
       'develop-interactive': { workflow: 'story_development', state: 'in_development' },
       'review-qa': { workflow: 'story_development', state: 'qa_reviewed' },

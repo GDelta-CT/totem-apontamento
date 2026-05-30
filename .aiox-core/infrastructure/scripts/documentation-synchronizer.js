@@ -1,6 +1,6 @@
 /**
  * AIOX Documentation Synchronizer
- * 
+ *
  * Automatically synchronizes documentation with code changes,
  * ensuring documentation stays up-to-date with implementation.
  */
@@ -30,10 +30,10 @@ class DocumentationSynchronizer extends EventEmitter {
       syncStrategies: options.syncStrategies || ['jsdoc', 'markdown', 'schema', 'api', 'examples'],
       ...options,
     };
-    
+
     this.syncStrategies = new Map();
     this.initializeSyncStrategies();
-    
+
     if (this.options.autoSync) {
       this.startAutoSync();
     }
@@ -90,15 +90,14 @@ class DocumentationSynchronizer extends EventEmitter {
     try {
       // Build documentation index
       await this.buildDocumentationIndex();
-      
+
       // Analyze code-documentation relationships
       await this.analyzeRelationships();
-      
+
       this.emit('initialized', {
         documentationFiles: this.documentationIndex.size,
         syncedComponents: this.syncedComponents.size,
       });
-      
     } catch (error) {
       this.emit('error', { phase: 'initialization', error });
       throw error;
@@ -107,12 +106,12 @@ class DocumentationSynchronizer extends EventEmitter {
 
   async buildDocumentationIndex() {
     const docFiles = await this.findDocumentationFiles();
-    
+
     for (const docFile of docFiles) {
       try {
         const content = await fs.readFile(docFile, 'utf-8');
         const metadata = await this.extractDocumentationMetadata(docFile, content);
-        
+
         this.documentationIndex.set(docFile, {
           path: docFile,
           content,
@@ -130,27 +129,27 @@ class DocumentationSynchronizer extends EventEmitter {
     const files = [];
     const docsDir = path.join(this.rootPath, 'docs');
     const readmeFiles = ['README.md', 'readme.md', 'README.MD'];
-    
+
     // Find documentation in docs directory
     if (await this.exists(docsDir)) {
       await this.scanDirectory(docsDir, files);
     }
-    
+
     // Find README files throughout the project
     await this.scanForReadme(this.rootPath, files, readmeFiles);
-    
+
     // Find inline documentation (markdown in code directories)
     await this.scanForInlineDocs(this.rootPath, files);
-    
+
     return files;
   }
 
   async scanDirectory(dir, files) {
     const entries = await fs.readdir(dir, { withFileTypes: true });
-    
+
     for (const entry of entries) {
       const fullPath = path.join(dir, entry.name);
-      
+
       if (entry.isDirectory() && !entry.name.startsWith('.')) {
         await this.scanDirectory(fullPath, files);
       } else if (entry.isFile()) {
@@ -172,19 +171,19 @@ class DocumentationSynchronizer extends EventEmitter {
       apis: [],
       lastModified: null,
     };
-    
+
     const ext = path.extname(filePath);
-    
+
     if (ext === '.md') {
       // Extract markdown metadata
       const lines = content.split('\n');
-      
+
       // Find title
-      const titleMatch = lines.find(line => line.startsWith('# '));
+      const titleMatch = lines.find((line) => line.startsWith('# '));
       if (titleMatch) {
         metadata.title = titleMatch.substring(2).trim();
       }
-      
+
       // Find code blocks
       const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
       let match;
@@ -196,7 +195,7 @@ class DocumentationSynchronizer extends EventEmitter {
           endIndex: match.index + match[0].length,
         });
       }
-      
+
       // Find file references
       const fileRefRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
       while ((match = fileRefRegex.exec(content)) !== null) {
@@ -218,11 +217,11 @@ class DocumentationSynchronizer extends EventEmitter {
         console.warn(`Failed to parse YAML: ${filePath}`, error);
       }
     }
-    
+
     // Get file stats
     const stats = await fs.stat(filePath);
     metadata.lastModified = stats.mtime;
-    
+
     return metadata;
   }
 
@@ -230,7 +229,7 @@ class DocumentationSynchronizer extends EventEmitter {
     // Find relationships between code and documentation
     for (const [docPath, docInfo] of this.documentationIndex) {
       const relationships = await this.findCodeRelationships(docPath, docInfo);
-      
+
       for (const relationship of relationships) {
         this.syncedComponents.set(relationship.codePath, {
           codePath: relationship.codePath,
@@ -239,7 +238,7 @@ class DocumentationSynchronizer extends EventEmitter {
           lastSync: null,
           syncStrategies: relationship.strategies,
         });
-        
+
         docInfo.linkedComponents.push(relationship.codePath);
       }
     }
@@ -249,7 +248,7 @@ class DocumentationSynchronizer extends EventEmitter {
     const relationships = [];
     const docDir = path.dirname(docPath);
     const docName = path.basename(docPath, path.extname(docPath));
-    
+
     // Strategy 1: Same directory, same name
     const codeExtensions = ['.js', '.jsx', '.ts', '.tsx'];
     for (const ext of codeExtensions) {
@@ -262,7 +261,7 @@ class DocumentationSynchronizer extends EventEmitter {
         });
       }
     }
-    
+
     // Strategy 2: Referenced files in documentation
     for (const linkedFile of docInfo.metadata.linkedFiles) {
       const codePath = path.resolve(docDir, linkedFile.path);
@@ -274,12 +273,15 @@ class DocumentationSynchronizer extends EventEmitter {
         });
       }
     }
-    
+
     // Strategy 3: Agent/Task/Workflow documentation
     if (docPath.includes('agents') || docPath.includes('tasks') || docPath.includes('workflows')) {
-      const componentType = docPath.includes('agents') ? 'agent' :
-        docPath.includes('tasks') ? 'task' : 'workflow';
-      
+      const componentType = docPath.includes('agents')
+        ? 'agent'
+        : docPath.includes('tasks')
+          ? 'task'
+          : 'workflow';
+
       // Find manifest file
       const manifestPath = path.join(docDir, 'manifest.yaml');
       if (await this.exists(manifestPath)) {
@@ -290,7 +292,7 @@ class DocumentationSynchronizer extends EventEmitter {
         });
       }
     }
-    
+
     return relationships;
   }
 
@@ -299,32 +301,32 @@ class DocumentationSynchronizer extends EventEmitter {
     if (!component) {
       throw new Error(`Component not found in sync registry: ${componentPath}`);
     }
-    
+
     const doc = this.documentationIndex.get(component.docPath);
     if (!doc) {
       throw new Error(`Documentation not found: ${component.docPath}`);
     }
-    
+
     const changes = [];
     const strategies = options.strategies || component.syncStrategies;
-    
+
     for (const strategyName of strategies) {
       const strategy = this.syncStrategies.get(strategyName);
       if (!strategy) continue;
-      
+
       try {
         // Detect changes
         const detected = await strategy.detector(componentPath, component.docPath);
-        
+
         if (detected && detected.length > 0) {
           // Apply synchronization
           const result = await strategy.synchronizer(
             componentPath,
             component.docPath,
             detected,
-            options,
+            options
           );
-          
+
           changes.push({
             strategy: strategyName,
             changes: result.changes,
@@ -339,47 +341,43 @@ class DocumentationSynchronizer extends EventEmitter {
         });
       }
     }
-    
+
     // Update sync metadata
     component.lastSync = new Date().toISOString();
     doc.lastSync = new Date().toISOString();
-    
+
     // Record in history
     this.syncHistory.push({
       timestamp: new Date().toISOString(),
       componentPath,
       docPath: component.docPath,
       changes,
-      success: changes.every(c => c.success),
+      success: changes.every((c) => c.success),
     });
-    
+
     this.emit('synchronized', {
       componentPath,
       docPath: component.docPath,
       changes,
     });
-    
+
     return changes;
   }
 
   async detectJSDocChanges(codePath, docPath) {
     const changes = [];
-    
+
     try {
       const codeContent = await fs.readFile(codePath, 'utf-8');
       const docContent = await fs.readFile(docPath, 'utf-8');
-      
+
       // Parse code for JSDoc comments
       const jsdocComments = await this.extractJSDocComments(codeContent);
-      
+
       // Find corresponding sections in documentation
       for (const jsdoc of jsdocComments) {
-        const docSection = this.findDocumentationSection(
-          docContent,
-          jsdoc.name,
-          jsdoc.type,
-        );
-        
+        const docSection = this.findDocumentationSection(docContent, jsdoc.name, jsdoc.type);
+
         if (docSection) {
           // Compare and detect changes
           const diff = this.compareJSDocWithDoc(jsdoc, docSection);
@@ -404,20 +402,20 @@ class DocumentationSynchronizer extends EventEmitter {
     } catch (error) {
       console.error(`Error detecting JSDoc changes: ${error.message}`);
     }
-    
+
     return changes;
   }
 
   async extractJSDocComments(codeContent) {
     const comments = [];
-    
+
     try {
       const ast = parser.parse(codeContent, {
         sourceType: 'module',
         plugins: ['jsx', 'typescript'],
         attachComment: true,
       });
-      
+
       traverse(ast, {
         enter(path) {
           if (path.node.leadingComments) {
@@ -433,7 +431,7 @@ class DocumentationSynchronizer extends EventEmitter {
                     jsdoc.name = path.node.id?.name;
                     jsdoc.type = 'VariableDeclarator';
                   }
-                  
+
                   if (jsdoc.name) {
                     comments.push(jsdoc);
                   }
@@ -446,7 +444,7 @@ class DocumentationSynchronizer extends EventEmitter {
     } catch (error) {
       console.error(`Error parsing code: ${error.message}`);
     }
-    
+
     return comments;
   }
 
@@ -458,14 +456,12 @@ class DocumentationSynchronizer extends EventEmitter {
       examples: [],
       tags: {},
     };
-    
-    const lines = commentText.split('\n').map(line => 
-      line.trim().replace(/^\* ?/, ''),
-    );
-    
+
+    const lines = commentText.split('\n').map((line) => line.trim().replace(/^\* ?/, ''));
+
     let currentSection = 'description';
     let currentParam = null;
-    
+
     for (const line of lines) {
       if (line.startsWith('@param')) {
         const paramMatch = line.match(/@param\s+(?:\{([^}]+)\}\s+)?(\w+)(?:\s+-\s+(.*))?/);
@@ -510,7 +506,7 @@ class DocumentationSynchronizer extends EventEmitter {
         }
       }
     }
-    
+
     return jsdoc;
   }
 
@@ -519,11 +515,11 @@ class DocumentationSynchronizer extends EventEmitter {
       changes: [],
       success: true,
     };
-    
+
     try {
       let docContent = await fs.readFile(docPath, 'utf-8');
       const backup = docContent; // Keep backup for rollback
-      
+
       for (const change of changes) {
         if (change.type === 'jsdoc-update') {
           // Update existing documentation section
@@ -531,9 +527,9 @@ class DocumentationSynchronizer extends EventEmitter {
             docContent,
             change.name,
             change.jsdoc,
-            change.docSection,
+            change.docSection
           );
-          
+
           result.changes.push({
             type: 'updated',
             name: change.name,
@@ -541,11 +537,8 @@ class DocumentationSynchronizer extends EventEmitter {
           });
         } else if (change.type === 'jsdoc-new') {
           // Add new documentation section
-          docContent = this.addDocumentationSection(
-            docContent,
-            change.jsdoc,
-          );
-          
+          docContent = this.addDocumentationSection(docContent, change.jsdoc);
+
           result.changes.push({
             type: 'added',
             name: change.name,
@@ -553,17 +546,16 @@ class DocumentationSynchronizer extends EventEmitter {
           });
         }
       }
-      
+
       // Write updated documentation
       if (docContent !== backup) {
         await fs.writeFile(docPath, docContent);
       }
-      
     } catch (error) {
       result.success = false;
       result.error = error.message;
     }
-    
+
     return result;
   }
 
@@ -575,21 +567,21 @@ class DocumentationSynchronizer extends EventEmitter {
       new RegExp(`^#+\\s*class\\s+${name}`, 'gm'),
       new RegExp(`^#+\\s*function\\s+${name}`, 'gm'),
     ];
-    
+
     for (const pattern of patterns) {
       const match = pattern.exec(docContent);
       if (match) {
         // Extract section content
         const startIndex = match.index;
         const headerLevel = match[0].match(/^#+/)[0].length;
-        
+
         // Find end of section (next header of same or higher level)
         const endPattern = new RegExp(`^#{1,${headerLevel}}\\s`, 'gm');
         endPattern.lastIndex = startIndex + match[0].length;
-        
+
         const endMatch = endPattern.exec(docContent);
         const endIndex = endMatch ? endMatch.index : docContent.length;
-        
+
         return {
           startIndex,
           endIndex,
@@ -598,40 +590,45 @@ class DocumentationSynchronizer extends EventEmitter {
         };
       }
     }
-    
+
     return null;
   }
 
   updateDocumentationSection(docContent, name, jsdoc, docSection) {
     // Generate updated documentation
     const updatedSection = this.generateDocumentationSection(jsdoc, docSection.headerLevel);
-    
+
     // Replace the section
-    return docContent.substring(0, docSection.startIndex) +
-           updatedSection +
-           docContent.substring(docSection.endIndex);
+    return (
+      docContent.substring(0, docSection.startIndex) +
+      updatedSection +
+      docContent.substring(docSection.endIndex)
+    );
   }
 
   addDocumentationSection(docContent, jsdoc) {
     // Find appropriate place to add the new section
     const sectionHeader = this.generateDocumentationSection(jsdoc, 3);
-    
+
     // Try to find a suitable location (e.g., after "## API" or "## Functions")
     const apiMatch = /^##\s*(API|Functions|Methods)/gm.exec(docContent);
-    
+
     if (apiMatch) {
       // Find the end of the API section
       const nextSectionMatch = /^#{1,2}\s/gm.exec(
-        docContent.substring(apiMatch.index + apiMatch[0].length),
+        docContent.substring(apiMatch.index + apiMatch[0].length)
       );
-      
-      const insertIndex = nextSectionMatch ? 
-        apiMatch.index + apiMatch[0].length + nextSectionMatch.index :
-        docContent.length;
-      
-      return docContent.substring(0, insertIndex) +
-             '\n\n' + sectionHeader +
-             docContent.substring(insertIndex);
+
+      const insertIndex = nextSectionMatch
+        ? apiMatch.index + apiMatch[0].length + nextSectionMatch.index
+        : docContent.length;
+
+      return (
+        docContent.substring(0, insertIndex) +
+        '\n\n' +
+        sectionHeader +
+        docContent.substring(insertIndex)
+      );
     } else {
       // Append to end
       return docContent + '\n\n## API\n\n' + sectionHeader;
@@ -641,11 +638,11 @@ class DocumentationSynchronizer extends EventEmitter {
   generateDocumentationSection(jsdoc, headerLevel = 3) {
     const header = '#'.repeat(headerLevel);
     let section = `${header} ${jsdoc.name}\n\n`;
-    
+
     if (jsdoc.description) {
       section += `${jsdoc.description}\n\n`;
     }
-    
+
     if (jsdoc.params.length > 0) {
       section += '**Parameters:**\n';
       for (const param of jsdoc.params) {
@@ -656,13 +653,13 @@ class DocumentationSynchronizer extends EventEmitter {
       }
       section += '\n';
     }
-    
+
     if (jsdoc.returns) {
       section += '**Returns:**\n';
       if (jsdoc.returns.type) section += `_{${jsdoc.returns.type}}_ `;
       section += jsdoc.returns.description + '\n\n';
     }
-    
+
     if (jsdoc.examples.length > 0) {
       section += '**Examples:**\n';
       for (const example of jsdoc.examples) {
@@ -671,23 +668,23 @@ class DocumentationSynchronizer extends EventEmitter {
         section += '```\n\n';
       }
     }
-    
+
     return section;
   }
 
   async detectMarkdownChanges(codePath, docPath) {
     // Detect changes that affect markdown documentation
     const changes = [];
-    
+
     try {
       const codeContent = await fs.readFile(codePath, 'utf-8');
       const docContent = await fs.readFile(docPath, 'utf-8');
-      
+
       // Check for command pattern changes in tasks
       if (codePath.endsWith('.md') && codePath.includes('tasks')) {
         const commandPattern = this.extractCommandPattern(codeContent);
         const docCommandPattern = this.extractCommandPattern(docContent);
-        
+
         if (commandPattern && docCommandPattern && commandPattern !== docCommandPattern) {
           changes.push({
             type: 'command-pattern',
@@ -696,7 +693,7 @@ class DocumentationSynchronizer extends EventEmitter {
           });
         }
       }
-      
+
       // Check for implementation changes
       const codeBlocks = this.extractCodeBlocks(docContent);
       for (const block of codeBlocks) {
@@ -715,7 +712,7 @@ class DocumentationSynchronizer extends EventEmitter {
     } catch (error) {
       console.error(`Error detecting markdown changes: ${error.message}`);
     }
-    
+
     return changes;
   }
 
@@ -724,47 +721,39 @@ class DocumentationSynchronizer extends EventEmitter {
       changes: [],
       success: true,
     };
-    
+
     try {
       let docContent = await fs.readFile(docPath, 'utf-8');
       const backup = docContent;
-      
+
       for (const change of changes) {
         if (change.type === 'command-pattern') {
           // Update command pattern
-          docContent = docContent.replace(
-            change.oldPattern,
-            change.newPattern,
-          );
-          
+          docContent = docContent.replace(change.oldPattern, change.newPattern);
+
           result.changes.push({
             type: 'command-pattern',
             description: 'Updated command pattern',
           });
         } else if (change.type === 'code-block') {
           // Update code block
-          docContent = this.updateCodeBlock(
-            docContent,
-            change.block,
-            change.referenced.newCode,
-          );
-          
+          docContent = this.updateCodeBlock(docContent, change.block, change.referenced.newCode);
+
           result.changes.push({
             type: 'code-block',
             description: 'Updated code example',
           });
         }
       }
-      
+
       if (docContent !== backup) {
         await fs.writeFile(docPath, docContent);
       }
-      
     } catch (error) {
       result.success = false;
       result.error = error.message;
     }
-    
+
     return result;
   }
 
@@ -777,7 +766,7 @@ class DocumentationSynchronizer extends EventEmitter {
     const blocks = [];
     const regex = /```(\w+)?\n([\s\S]*?)```/g;
     let match;
-    
+
     while ((match = regex.exec(content)) !== null) {
       blocks.push({
         language: match[1] || 'text',
@@ -787,44 +776,44 @@ class DocumentationSynchronizer extends EventEmitter {
         fullMatch: match[0],
       });
     }
-    
+
     return blocks;
   }
 
   updateCodeBlock(docContent, block, newCode) {
     const newBlock = '```' + block.language + '\n' + newCode + '\n```';
-    
-    return docContent.substring(0, block.startIndex) +
-           newBlock +
-           docContent.substring(block.endIndex);
+
+    return (
+      docContent.substring(0, block.startIndex) + newBlock + docContent.substring(block.endIndex)
+    );
   }
 
   async detectSchemaChanges(codePath, docPath) {
     // Detect changes in YAML/JSON schemas
     const changes = [];
-    
+
     if (!codePath.endsWith('.yaml') && !codePath.endsWith('.yml') && !codePath.endsWith('.json')) {
       return changes;
     }
-    
+
     try {
       const schemaContent = await fs.readFile(codePath, 'utf-8');
       const docContent = await fs.readFile(docPath, 'utf-8');
-      
+
       // Parse schema
-      const schema = codePath.endsWith('.json') ? 
-        JSON.parse(schemaContent) :
-        yaml.load(schemaContent);
-      
+      const schema = codePath.endsWith('.json')
+        ? JSON.parse(schemaContent)
+        : yaml.load(schemaContent);
+
       // Find schema documentation
       if (docPath.endsWith('.md')) {
         // Look for schema tables or descriptions in markdown
         const schemaTables = this.extractSchemaTables(docContent);
         const schemaFields = this.extractSchemaFields(schema);
-        
+
         // Compare fields
         for (const field of schemaFields) {
-          const documented = schemaTables.find(t => t.fields.includes(field.name));
+          const documented = schemaTables.find((t) => t.fields.includes(field.name));
           if (!documented) {
             changes.push({
               type: 'schema-field-new',
@@ -836,7 +825,7 @@ class DocumentationSynchronizer extends EventEmitter {
     } catch (error) {
       console.error(`Error detecting schema changes: ${error.message}`);
     }
-    
+
     return changes;
   }
 
@@ -845,42 +834,41 @@ class DocumentationSynchronizer extends EventEmitter {
       changes: [],
       success: true,
     };
-    
+
     try {
       let docContent = await fs.readFile(docPath, 'utf-8');
       const backup = docContent;
-      
+
       for (const change of changes) {
         if (change.type === 'schema-field-new') {
           // Add new field to documentation
           docContent = this.addSchemaFieldDoc(docContent, change.field);
-          
+
           result.changes.push({
             type: 'schema-field',
             description: `Added documentation for field: ${change.field.name}`,
           });
         }
       }
-      
+
       if (docContent !== backup) {
         await fs.writeFile(docPath, docContent);
       }
-      
     } catch (error) {
       result.success = false;
       result.error = error.message;
     }
-    
+
     return result;
   }
 
   extractSchemaFields(schema, prefix = '') {
     const fields = [];
-    
+
     function traverse(obj, path) {
       for (const [key, value] of Object.entries(obj)) {
         const fieldPath = path ? `${path}.${key}` : key;
-        
+
         fields.push({
           name: key,
           path: fieldPath,
@@ -888,7 +876,7 @@ class DocumentationSynchronizer extends EventEmitter {
           required: obj.required?.includes(key),
           description: value.description || '',
         });
-        
+
         if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
           if (!value.type || value.properties) {
             traverse(value.properties || value, fieldPath);
@@ -896,7 +884,7 @@ class DocumentationSynchronizer extends EventEmitter {
         }
       }
     }
-    
+
     traverse(schema.properties || schema, prefix);
     return fields;
   }
@@ -904,23 +892,23 @@ class DocumentationSynchronizer extends EventEmitter {
   async detectAPIChanges(codePath, docPath) {
     // Detect API endpoint changes
     const changes = [];
-    
+
     try {
       const codeContent = await fs.readFile(codePath, 'utf-8');
-      
+
       // Look for Express/Koa route definitions
       const routes = this.extractAPIRoutes(codeContent);
-      
+
       if (routes.length > 0) {
         const docContent = await fs.readFile(docPath, 'utf-8');
         const documentedRoutes = this.extractDocumentedRoutes(docContent);
-        
+
         // Compare routes
         for (const route of routes) {
           const documented = documentedRoutes.find(
-            r => r.method === route.method && r.path === route.path,
+            (r) => r.method === route.method && r.path === route.path
           );
-          
+
           if (!documented) {
             changes.push({
               type: 'api-route-new',
@@ -938,17 +926,17 @@ class DocumentationSynchronizer extends EventEmitter {
     } catch (error) {
       console.error(`Error detecting API changes: ${error.message}`);
     }
-    
+
     return changes;
   }
 
   extractAPIRoutes(codeContent) {
     const routes = [];
-    
+
     // Express pattern: app.get('/path', ...)
     const expressPattern = /app\.(get|post|put|delete|patch)\s*\(\s*['"`]([^'"`]+)['"`]/g;
     let match;
-    
+
     while ((match = expressPattern.exec(codeContent)) !== null) {
       routes.push({
         method: match[1].toUpperCase(),
@@ -956,10 +944,10 @@ class DocumentationSynchronizer extends EventEmitter {
         lineNumber: codeContent.substring(0, match.index).split('\n').length,
       });
     }
-    
+
     // Router pattern: router.get('/path', ...)
     const routerPattern = /router\.(get|post|put|delete|patch)\s*\(\s*['"`]([^'"`]+)['"`]/g;
-    
+
     while ((match = routerPattern.exec(codeContent)) !== null) {
       routes.push({
         method: match[1].toUpperCase(),
@@ -967,7 +955,7 @@ class DocumentationSynchronizer extends EventEmitter {
         lineNumber: codeContent.substring(0, match.index).split('\n').length,
       });
     }
-    
+
     return routes;
   }
 
@@ -976,60 +964,55 @@ class DocumentationSynchronizer extends EventEmitter {
       changes: [],
       success: true,
     };
-    
+
     try {
       let docContent = await fs.readFile(docPath, 'utf-8');
       const backup = docContent;
-      
+
       for (const change of changes) {
         if (change.type === 'api-route-new') {
           // Add new route documentation
           docContent = this.addAPIRouteDoc(docContent, change.route);
-          
+
           result.changes.push({
             type: 'api-route',
             description: `Added documentation for ${change.route.method} ${change.route.path}`,
           });
         } else if (change.type === 'api-route-update') {
           // Update existing route documentation
-          docContent = this.updateAPIRouteDoc(
-            docContent,
-            change.route,
-            change.documented,
-          );
-          
+          docContent = this.updateAPIRouteDoc(docContent, change.route, change.documented);
+
           result.changes.push({
             type: 'api-route',
             description: `Updated documentation for ${change.route.method} ${change.route.path}`,
           });
         }
       }
-      
+
       if (docContent !== backup) {
         await fs.writeFile(docPath, docContent);
       }
-      
     } catch (error) {
       result.success = false;
       result.error = error.message;
     }
-    
+
     return result;
   }
 
   async detectExampleChanges(codePath, docPath) {
     // Detect changes in code examples
     const changes = [];
-    
+
     try {
       const docContent = await fs.readFile(docPath, 'utf-8');
       const codeBlocks = this.extractCodeBlocks(docContent);
-      
+
       for (const block of codeBlocks) {
         if (block.code.includes('// Example') || block.code.includes('// Usage')) {
           // Check if example is still valid
           const validation = await this.validateExample(block.code, codePath);
-          
+
           if (!validation.valid) {
             changes.push({
               type: 'example-invalid',
@@ -1042,7 +1025,7 @@ class DocumentationSynchronizer extends EventEmitter {
     } catch (error) {
       console.error(`Error detecting example changes: ${error.message}`);
     }
-    
+
     return changes;
   }
 
@@ -1051,26 +1034,19 @@ class DocumentationSynchronizer extends EventEmitter {
       changes: [],
       success: true,
     };
-    
+
     try {
       let docContent = await fs.readFile(docPath, 'utf-8');
       const backup = docContent;
-      
+
       for (const change of changes) {
         if (change.type === 'example-invalid') {
           // Update invalid example
-          const updatedExample = await this.updateExample(
-            change.block.code,
-            change.validation,
-          );
-          
+          const updatedExample = await this.updateExample(change.block.code, change.validation);
+
           if (updatedExample) {
-            docContent = this.updateCodeBlock(
-              docContent,
-              change.block,
-              updatedExample,
-            );
-            
+            docContent = this.updateCodeBlock(docContent, change.block, updatedExample);
+
             result.changes.push({
               type: 'example',
               description: 'Updated code example',
@@ -1078,16 +1054,15 @@ class DocumentationSynchronizer extends EventEmitter {
           }
         }
       }
-      
+
       if (docContent !== backup) {
         await fs.writeFile(docPath, docContent);
       }
-      
     } catch (error) {
       result.success = false;
       result.error = error.message;
     }
-    
+
     return result;
   }
 
@@ -1097,7 +1072,7 @@ class DocumentationSynchronizer extends EventEmitter {
       errors: [],
       warnings: [],
     };
-    
+
     try {
       // Parse the example
       const ast = parser.parse(exampleCode, {
@@ -1105,14 +1080,14 @@ class DocumentationSynchronizer extends EventEmitter {
         plugins: ['jsx', 'typescript'],
         errorRecovery: true,
       });
-      
+
       // Check for undefined references
       const referencedCode = await fs.readFile(referencedFile, 'utf-8');
-      
+
       traverse(ast, {
         Identifier(path) {
           const name = path.node.name;
-          
+
           // Check if identifier exists in referenced file
           if (!referencedCode.includes(name)) {
             validation.warnings.push({
@@ -1123,11 +1098,10 @@ class DocumentationSynchronizer extends EventEmitter {
           }
         },
       });
-      
+
       if (validation.errors.length > 0) {
         validation.valid = false;
       }
-      
     } catch (error) {
       validation.valid = false;
       validation.errors.push({
@@ -1135,7 +1109,7 @@ class DocumentationSynchronizer extends EventEmitter {
         message: error.message,
       });
     }
-    
+
     return validation;
   }
 
@@ -1151,16 +1125,16 @@ class DocumentationSynchronizer extends EventEmitter {
 
   async checkForChanges() {
     const changes = [];
-    
+
     for (const [componentPath, component] of this.syncedComponents) {
       try {
         const stats = await fs.stat(componentPath);
         const lastModified = stats.mtime.toISOString();
-        
+
         if (!component.lastSync || lastModified > component.lastSync) {
           // Component changed since last sync
           const syncResult = await this.synchronizeComponent(componentPath);
-          
+
           if (syncResult.length > 0) {
             changes.push({
               componentPath,
@@ -1172,7 +1146,7 @@ class DocumentationSynchronizer extends EventEmitter {
         console.warn(`Failed to check component: ${componentPath}`, error);
       }
     }
-    
+
     if (changes.length > 0) {
       this.emit('auto-sync', { changes });
     }
@@ -1191,7 +1165,7 @@ class DocumentationSynchronizer extends EventEmitter {
       documentation: [],
       recentSync: this.syncHistory.slice(-10),
     };
-    
+
     // Component details
     for (const [path, component] of this.syncedComponents) {
       report.components.push({
@@ -1202,7 +1176,7 @@ class DocumentationSynchronizer extends EventEmitter {
         strategies: component.syncStrategies,
       });
     }
-    
+
     // Documentation details
     for (const [path, doc] of this.documentationIndex) {
       report.documentation.push({
@@ -1212,7 +1186,7 @@ class DocumentationSynchronizer extends EventEmitter {
         lastSync: doc.lastSync,
       });
     }
-    
+
     return report;
   }
 
@@ -1229,10 +1203,10 @@ class DocumentationSynchronizer extends EventEmitter {
     // Simple comparison - could be made more sophisticated
     const docText = docSection.content.toLowerCase();
     const jsdocText = JSON.stringify(jsdoc).toLowerCase();
-    
+
     // Check if key information is missing
     const differences = [];
-    
+
     if (jsdoc.params.length > 0) {
       for (const param of jsdoc.params) {
         if (!docText.includes(param.name.toLowerCase())) {
@@ -1240,11 +1214,11 @@ class DocumentationSynchronizer extends EventEmitter {
         }
       }
     }
-    
+
     if (jsdoc.returns && !docText.includes('return')) {
       differences.push({ type: 'missing-returns' });
     }
-    
+
     return differences.length > 0 ? differences : null;
   }
 
@@ -1252,23 +1226,23 @@ class DocumentationSynchronizer extends EventEmitter {
     // Try to find the code block in the actual implementation
     const normalizedBlock = codeBlock.replace(/\s+/g, ' ').trim();
     const normalizedActual = actualCode.replace(/\s+/g, ' ');
-    
+
     if (normalizedActual.includes(normalizedBlock)) {
       return { changed: false };
     }
-    
+
     // Try to find similar code (this is simplified)
-    const blockLines = codeBlock.split('\n').filter(l => l.trim());
+    const blockLines = codeBlock.split('\n').filter((l) => l.trim());
     let matchCount = 0;
-    
+
     for (const line of blockLines) {
       if (actualCode.includes(line.trim())) {
         matchCount++;
       }
     }
-    
+
     const matchRatio = matchCount / blockLines.length;
-    
+
     if (matchRatio < 0.8) {
       return {
         changed: true,
@@ -1276,7 +1250,7 @@ class DocumentationSynchronizer extends EventEmitter {
         newCode: this.findSimilarCode(codeBlock, actualCode),
       };
     }
-    
+
     return { changed: false };
   }
 
@@ -1288,7 +1262,7 @@ class DocumentationSynchronizer extends EventEmitter {
   extractSchemaTables(markdown) {
     const tables = [];
     const tableRegex = /\|(.+)\|[\s\S]+?\|(.+)\|/g;
-    
+
     let match;
     while ((match = tableRegex.exec(markdown)) !== null) {
       // Simple table extraction - could be improved
@@ -1297,36 +1271,41 @@ class DocumentationSynchronizer extends EventEmitter {
         fields: [], // Would need to parse table properly
       });
     }
-    
+
     return tables;
   }
 
   addSchemaFieldDoc(docContent, field) {
     // Find schema documentation section
     const schemaSection = /^##\s*Schema/m.exec(docContent);
-    
+
     if (schemaSection) {
       // Add to existing schema section
       const insertion = `\n- \`${field.name}\` _(${field.type})_ - ${field.description || 'No description'}${field.required ? ' **Required**' : ''}`;
-      
-      return docContent.substring(0, schemaSection.index + schemaSection[0].length) +
-             insertion +
-             docContent.substring(schemaSection.index + schemaSection[0].length);
+
+      return (
+        docContent.substring(0, schemaSection.index + schemaSection[0].length) +
+        insertion +
+        docContent.substring(schemaSection.index + schemaSection[0].length)
+      );
     } else {
       // Add new schema section
-      return docContent + '\n\n## Schema\n\n' +
-             `- \`${field.name}\` _(${field.type})_ - ${field.description || 'No description'}${field.required ? ' **Required**' : ''}`;
+      return (
+        docContent +
+        '\n\n## Schema\n\n' +
+        `- \`${field.name}\` _(${field.type})_ - ${field.description || 'No description'}${field.required ? ' **Required**' : ''}`
+      );
     }
   }
 
   extractDocumentedRoutes(docContent) {
     const routes = [];
-    
+
     // Look for API documentation patterns
     // Example: ### GET /api/users
     const routePattern = /^###\s*(GET|POST|PUT|DELETE|PATCH)\s+([^\s]+)/gm;
     let match;
-    
+
     while ((match = routePattern.exec(docContent)) !== null) {
       routes.push({
         method: match[1],
@@ -1334,7 +1313,7 @@ class DocumentationSynchronizer extends EventEmitter {
         startIndex: match.index,
       });
     }
-    
+
     return routes;
   }
 
@@ -1346,27 +1325,26 @@ class DocumentationSynchronizer extends EventEmitter {
   addAPIRouteDoc(docContent, route) {
     // Find API section
     const apiSection = /^##\s*API/m.exec(docContent);
-    
-    const routeDoc = `\n\n### ${route.method} ${route.path}\n\n` +
-                    'Description of the endpoint.\n\n' +
-                    '**Parameters:**\n' +
-                    '- None\n\n' +
-                    '**Response:**\n' +
-                    '```json\n{\n  // Response structure\n}\n```\n';
-    
+
+    const routeDoc =
+      `\n\n### ${route.method} ${route.path}\n\n` +
+      'Description of the endpoint.\n\n' +
+      '**Parameters:**\n' +
+      '- None\n\n' +
+      '**Response:**\n' +
+      '```json\n{\n  // Response structure\n}\n```\n';
+
     if (apiSection) {
       // Find insertion point
       const nextSection = /^##\s/m.exec(
-        docContent.substring(apiSection.index + apiSection[0].length),
+        docContent.substring(apiSection.index + apiSection[0].length)
       );
-      
-      const insertIndex = nextSection ? 
-        apiSection.index + apiSection[0].length + nextSection.index :
-        docContent.length;
-      
-      return docContent.substring(0, insertIndex) +
-             routeDoc +
-             docContent.substring(insertIndex);
+
+      const insertIndex = nextSection
+        ? apiSection.index + apiSection[0].length + nextSection.index
+        : docContent.length;
+
+      return docContent.substring(0, insertIndex) + routeDoc + docContent.substring(insertIndex);
     } else {
       // Add API section
       return docContent + '\n\n## API\n' + routeDoc;
@@ -1388,13 +1366,17 @@ class DocumentationSynchronizer extends EventEmitter {
   async scanForReadme(dir, files, readmeNames) {
     try {
       const entries = await fs.readdir(dir, { withFileTypes: true });
-      
+
       for (const entry of entries) {
         const fullPath = path.join(dir, entry.name);
-        
+
         if (entry.isFile() && readmeNames.includes(entry.name)) {
           files.push(fullPath);
-        } else if (entry.isDirectory() && !entry.name.startsWith('.') && entry.name !== 'node_modules') {
+        } else if (
+          entry.isDirectory() &&
+          !entry.name.startsWith('.') &&
+          entry.name !== 'node_modules'
+        ) {
           await this.scanForReadme(fullPath, files, readmeNames);
         }
       }
@@ -1406,13 +1388,22 @@ class DocumentationSynchronizer extends EventEmitter {
   async scanForInlineDocs(dir, files) {
     try {
       const entries = await fs.readdir(dir, { withFileTypes: true });
-      
+
       for (const entry of entries) {
         const fullPath = path.join(dir, entry.name);
-        
-        if (entry.isDirectory() && !entry.name.startsWith('.') && entry.name !== 'node_modules' && entry.name !== 'docs') {
+
+        if (
+          entry.isDirectory() &&
+          !entry.name.startsWith('.') &&
+          entry.name !== 'node_modules' &&
+          entry.name !== 'docs'
+        ) {
           await this.scanForInlineDocs(fullPath, files);
-        } else if (entry.isFile() && entry.name.endsWith('.md') && !entry.name.toLowerCase().startsWith('readme')) {
+        } else if (
+          entry.isFile() &&
+          entry.name.endsWith('.md') &&
+          !entry.name.toLowerCase().startsWith('readme')
+        ) {
           files.push(fullPath);
         }
       }

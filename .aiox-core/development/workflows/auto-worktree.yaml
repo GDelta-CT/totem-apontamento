@@ -1,7 +1,7 @@
 workflow:
   id: auto-worktree
   name: Auto-Worktree - Automatic Isolated Development Environment
-  version: "1.0"
+  version: '1.0'
   description: >-
     Automatically creates and manages isolated worktrees for story development.
     Triggered when @dev starts working on a story, ensuring parallel development
@@ -34,7 +34,7 @@ workflow:
 
     # Manual trigger: Explicit command
     - event: command
-      command: "*auto-worktree"
+      command: '*auto-worktree'
       action: interactive_flow
 
   # ═══════════════════════════════════════════════════════════════════════════════════
@@ -75,19 +75,19 @@ workflow:
         description: Verify git repository
         command: git rev-parse --is-inside-work-tree
         blocking: true
-        error: "Not a git repository. Auto-worktree requires git."
+        error: 'Not a git repository. Auto-worktree requires git.'
 
       - id: worktree_support
         description: Verify git worktree support
         command: git worktree list
         blocking: true
-        error: "Git worktree not supported. Requires git >= 2.5."
+        error: 'Git worktree not supported. Requires git >= 2.5.'
 
       - id: worktree_manager
         description: Verify WorktreeManager available
         file_exists: .aiox-core/infrastructure/scripts/worktree-manager.js
         blocking: true
-        error: "WorktreeManager not found. AIOX infrastructure incomplete."
+        error: 'WorktreeManager not found. AIOX infrastructure incomplete.'
 
       - id: check_limit
         description: Check worktree limit not exceeded
@@ -97,21 +97,20 @@ workflow:
           const count = await manager.getCount();
           return count.total < manager.maxWorktrees;
         blocking: false
-        warning: "Approaching worktree limit. Consider cleanup."
+        warning: 'Approaching worktree limit. Consider cleanup.'
 
   # ═══════════════════════════════════════════════════════════════════════════════════
   #                              WORKFLOW SEQUENCE
   # ═══════════════════════════════════════════════════════════════════════════════════
 
   sequence:
-
     # ═════════════════════════════════════════════════════════════════════════════════
     # STEP 1: EXTRACT STORY CONTEXT
     # ═════════════════════════════════════════════════════════════════════════════════
 
     - step: extract_story_context
       phase: 1
-      phase_name: "Extract Context"
+      phase_name: 'Extract Context'
       action: extract_story_info
 
       description: >-
@@ -157,7 +156,7 @@ workflow:
 
     - step: check_existing
       phase: 2
-      phase_name: "Check Existing"
+      phase_name: 'Check Existing'
       action: check_worktree_exists
 
       description: >-
@@ -186,7 +185,7 @@ workflow:
         - action
 
       on_exists:
-        log: "Worktree already exists for story {storyId}"
+        log: 'Worktree already exists for story {storyId}'
         skip_to: switch_worktree
 
     # ═════════════════════════════════════════════════════════════════════════════════
@@ -195,7 +194,7 @@ workflow:
 
     - step: auto_cleanup
       phase: 3
-      phase_name: "Auto Cleanup"
+      phase_name: 'Auto Cleanup'
       action: cleanup_stale_worktrees
       condition: config.autoCleanup === true
 
@@ -218,7 +217,7 @@ workflow:
         - removedIds
 
       on_cleanup:
-        log: "Cleaned up {cleaned} stale worktrees"
+        log: 'Cleaned up {cleaned} stale worktrees'
 
     # ═════════════════════════════════════════════════════════════════════════════════
     # STEP 4: CREATE WORKTREE
@@ -226,7 +225,7 @@ workflow:
 
     - step: create_worktree
       phase: 4
-      phase_name: "Create Worktree"
+      phase_name: 'Create Worktree'
       action: create_isolated_worktree
 
       description: >-
@@ -236,7 +235,7 @@ workflow:
       task: create-worktree.md
 
       inputs:
-        story_id: "{storyId}"
+        story_id: '{storyId}'
 
       script: |
         const WorktreeManager = require('./.aiox-core/infrastructure/scripts/worktree-manager.js');
@@ -265,11 +264,11 @@ workflow:
         - error
 
       on_success:
-        log: "Created worktree at {path}"
+        log: 'Created worktree at {path}'
 
       on_failure:
         action: halt
-        error: "Failed to create worktree: {error}"
+        error: 'Failed to create worktree: {error}'
 
     # ═════════════════════════════════════════════════════════════════════════════════
     # STEP 5: SWITCH TO WORKTREE (OPTIONAL)
@@ -277,7 +276,7 @@ workflow:
 
     - step: switch_worktree
       phase: 5
-      phase_name: "Switch Context"
+      phase_name: 'Switch Context'
       action: switch_to_worktree
       condition: config.autoSwitch === true
 
@@ -313,7 +312,7 @@ workflow:
 
     - step: display_summary
       phase: 6
-      phase_name: "Summary"
+      phase_name: 'Summary'
       action: show_summary
       condition: config.verbose === true
 
@@ -348,7 +347,7 @@ workflow:
   # ═══════════════════════════════════════════════════════════════════════════════════
 
   completion:
-    success_message: "Worktree ready for story {storyId}"
+    success_message: 'Worktree ready for story {storyId}'
 
     outputs:
       - storyId
@@ -357,9 +356,9 @@ workflow:
       - branch
 
     next_steps:
-      - "Navigate to worktree: cd {path}"
-      - "Start development in isolation"
-      - "When done: *merge-worktree {storyId}"
+      - 'Navigate to worktree: cd {path}'
+      - 'Start development in isolation'
+      - 'When done: *merge-worktree {storyId}'
 
   # ═══════════════════════════════════════════════════════════════════════════════════
   #                              ERROR HANDLING
@@ -367,18 +366,18 @@ workflow:
 
   error_handling:
     max_worktrees_reached:
-      message: "Maximum worktrees limit ({maxWorktrees}) reached"
-      suggestion: "Run *cleanup-worktrees to remove stale worktrees"
+      message: 'Maximum worktrees limit ({maxWorktrees}) reached'
+      suggestion: 'Run *cleanup-worktrees to remove stale worktrees'
       action: halt
 
     worktree_creation_failed:
-      message: "Failed to create worktree"
-      suggestion: "Check git status and try again"
+      message: 'Failed to create worktree'
+      suggestion: 'Check git status and try again'
       action: halt
 
     story_id_not_found:
-      message: "Could not determine story ID"
-      suggestion: "Provide story ID explicitly: *auto-worktree STORY-42"
+      message: 'Could not determine story ID'
+      suggestion: 'Provide story ID explicitly: *auto-worktree STORY-42'
       action: prompt
 
   # ═══════════════════════════════════════════════════════════════════════════════════
@@ -407,10 +406,10 @@ workflow:
   # ═══════════════════════════════════════════════════════════════════════════════════
 
   metadata:
-    story: "1.4"
-    epic: "Epic 1 - Worktree Manager"
-    created: "2026-01-28"
-    author: "@architect (Aria)"
+    story: '1.4'
+    epic: 'Epic 1 - Worktree Manager'
+    created: '2026-01-28'
+    author: '@architect (Aria)'
     dependencies:
       - worktree-manager.js
       - create-worktree.md

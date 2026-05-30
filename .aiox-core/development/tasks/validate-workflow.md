@@ -207,6 +207,7 @@ token_usage: ~500-1,500 tokens
 ```
 
 **Optimization Notes:**
+
 - Validate files in parallel when --all is used
 - Cache agent file existence checks across validations
 
@@ -256,15 +257,18 @@ The following inputs are collected before execution:
 Based on inputs, resolve which workflow files to validate:
 
 **Single file by path:**
+
 - Use `workflow_path` directly
 
 **Single file by name:**
+
 - Resolve based on target_context:
   - `core` → `.aiox-core/development/workflows/{workflow_name}.yaml`
   - `squad` → `squads/{squad_name}/workflows/{workflow_name}.yaml`
   - `hybrid` → `squads/{squad_name}/workflows/{workflow_name}.yaml`
 
 **All workflows (--all flag):**
+
 - Scan directory based on target_context:
   - `core` → all `.yaml` files in `.aiox-core/development/workflows/`
   - `squad` → all `.yaml` files in `squads/{squad_name}/workflows/`
@@ -273,6 +277,7 @@ Based on inputs, resolve which workflow files to validate:
 ### 2. Run Validation
 
 For each resolved workflow file:
+
 1. Instantiate `WorkflowValidator` with options `{ strict, verbose }`
    - For `hybrid` context: also pass `squadAgentsPath: squads/{squad_name}/agents/`
 2. Call `validator.validate(workflowPath)`
@@ -281,6 +286,7 @@ For each resolved workflow file:
 ### 3. Consolidate Results
 
 When validating multiple files:
+
 - Merge all errors, warnings, and suggestions
 - Track per-file results for detailed reporting
 - Overall valid = all files valid

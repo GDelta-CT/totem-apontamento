@@ -13,6 +13,7 @@
 Configure Docker MCP Toolkit as the primary MCP infrastructure for AIOX, using **HTTP transport** instead of stdio to avoid timeout issues during gateway initialization.
 
 **Key Changes in v2.0:**
+
 - Uses HTTP/SSE transport (fixes 30s timeout issue)
 - Gateway runs as persistent Docker Compose service
 - Presets: `minimal` (no API keys) and `full` (with API keys)
@@ -21,17 +22,19 @@ Configure Docker MCP Toolkit as the primary MCP infrastructure for AIOX, using *
 
 ## AIOX Default MCPs
 
-| Preset | MCPs | API Key Required | Tokens |
-|--------|------|------------------|--------|
-| **minimal** | context7, desktop-commander, playwright | No | ~10-15k |
-| **full** | minimal + exa | Yes (EXA_API_KEY) | ~20-25k |
+| Preset      | MCPs                                    | API Key Required  | Tokens  |
+| ----------- | --------------------------------------- | ----------------- | ------- |
+| **minimal** | context7, desktop-commander, playwright | No                | ~10-15k |
+| **full**    | minimal + exa                           | Yes (EXA_API_KEY) | ~20-25k |
 
 **Minimal Preset MCPs:**
+
 - **context7** - Library documentation lookups
 - **desktop-commander** - File management + terminal commands
 - **playwright** - Browser automation for testing
 
 **Full Preset Adds:**
+
 - **exa** - AI-powered web search (requires `EXA_API_KEY`)
 
 ---
@@ -41,16 +44,19 @@ Configure Docker MCP Toolkit as the primary MCP infrastructure for AIOX, using *
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Installs `minimal` preset automatically
 - **Best for:** Experienced users with Docker already configured
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Choose between minimal/full presets
 - **Best for:** First-time setup, understanding the architecture
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Production environments, team-wide deployment
@@ -188,6 +194,7 @@ acceptance-criteria:
 ## Purpose
 
 Configure Docker MCP Toolkit as the primary MCP infrastructure for AIOX, replacing 1MCP with the containerized gateway approach. This enables:
+
 - **98.7% token reduction** via Code Mode
 - **Dynamic MCP loading** (mcp-find, mcp-add, mcp-remove)
 - **Sandbox execution** for workflows
@@ -346,6 +353,7 @@ docker mcp gateway run --port 8080 --transport sse --watch
 ```
 
 **Wait for gateway to be ready:**
+
 ```bash
 # Health check (retry until success)
 curl -s http://localhost:8080/health || echo "Gateway starting..."
@@ -397,10 +405,12 @@ apify-mcp-server:
 ```
 
 **Security Note:** This exposes credentials in a local file. Ensure:
+
 1. `~/.docker/mcp/catalogs/` is not committed to any repo
 2. File permissions restrict access to current user only
 
 **Alternative config.yaml (works for some MCPs like EXA):**
+
 ```yaml
 # ~/.docker/mcp/config.yaml
 exa:
@@ -427,6 +437,7 @@ See `*add-mcp` task (Step 3.1) for detailed instructions.
 ```
 
 **Why HTTP instead of stdio?**
+
 - stdio: Claude Code spawns gateway → 30s timeout before init completes
 - HTTP: Gateway already running → instant connection
 
@@ -449,6 +460,7 @@ docker mcp config read
 ### 7. Test in Claude Code
 
 After restarting Claude Code:
+
 ```
 /mcp
 # Should show: docker-gateway (connected)
@@ -460,11 +472,13 @@ After restarting Claude Code:
 If migrating from 1MCP:
 
 ### Step 1: Backup Current Config
+
 ```bash
 cp ~/.claude.json ~/.claude.json.backup-pre-docker-mcp
 ```
 
 ### Step 2: Stop 1MCP Server
+
 ```bash
 # Kill 1MCP process
 pkill -f "1mcp serve"
@@ -474,6 +488,7 @@ sudo systemctl stop 1mcp
 ```
 
 ### Step 3: Remove 1MCP from Claude Config
+
 ```json
 // ~/.claude.json - REMOVE these entries
 {
@@ -485,6 +500,7 @@ sudo systemctl stop 1mcp
 ```
 
 ### Step 4: Start Gateway Service
+
 ```bash
 # Start gateway as persistent service
 docker compose -f .docker/mcp/gateway-service.yml up -d
@@ -495,6 +511,7 @@ curl http://localhost:8080/health
 ```
 
 ### Step 5: Add Docker Gateway (HTTP Transport)
+
 ```json
 // ~/.claude.json - ADD this entry (HTTP, NOT stdio!)
 {
@@ -520,12 +537,14 @@ curl http://localhost:8080/health
 ## Error Handling
 
 ### Error: Docker Not Found
+
 ```
 Resolution: Install Docker Desktop from https://docker.com/desktop
 Minimum version: 4.50.0
 ```
 
 ### Error: MCP Toolkit Not Available
+
 ```
 Resolution:
 1. Open Docker Desktop
@@ -535,6 +554,7 @@ Resolution:
 ```
 
 ### Error: Gateway Failed to Start
+
 ```
 Resolution:
 1. Check port 8080 is available: netstat -an | grep 8080
@@ -543,6 +563,7 @@ Resolution:
 ```
 
 ### Error: Permission Denied on Volumes
+
 ```
 Resolution:
 1. Check Docker has access to project directory

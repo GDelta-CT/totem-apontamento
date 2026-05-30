@@ -4,18 +4,18 @@ bundle:
   description: Quality-focused team that orchestrates code review, testing, and deployment validation using CodeRabbit integration. Ideal for pre-PR reviews, deployment gates, and comprehensive quality assurance.
 
 agents:
-  - dev                # Pre-commit CodeRabbit reviews, development quality
-  - qa                 # Automated and manual QA, story validation
-  - github-devops      # PR quality gates, deployment safety checks
+  - dev # Pre-commit CodeRabbit reviews, development quality
+  - qa # Automated and manual QA, story validation
+  - github-devops # PR quality gates, deployment safety checks
 
 workflows:
-  - code-quality-gate.yaml          # Unified quality validation (lint, tests, CodeRabbit)
-  - pr-validation.yaml              # Comprehensive PR validation before creation
-  - deployment-safety-check.yaml    # Pre-deployment security and quality scan
+  - code-quality-gate.yaml # Unified quality validation (lint, tests, CodeRabbit)
+  - pr-validation.yaml # Comprehensive PR validation before creation
+  - deployment-safety-check.yaml # Pre-deployment security and quality scan
 
 tasks:
-  - run-tests.md                    # Test execution with CodeRabbit integration
-  - github-pr-automation.md         # PR automation with quality gates
+  - run-tests.md # Test execution with CodeRabbit integration
+  - github-pr-automation.md # PR automation with quality gates
 
 purpose: |
   This team ensures code quality throughout the development lifecycle:
@@ -95,10 +95,10 @@ coderabbit_integration:
   version: 0.3.4
 
   severity_thresholds:
-    CRITICAL: 0      # Block at all gates
-    HIGH: 10         # Warn at development, block at deployment (≤3 for production)
-    MEDIUM: tracked  # Technical debt, does not block
-    LOW: optional    # Improvements, does not block
+    CRITICAL: 0 # Block at all gates
+    HIGH: 10 # Warn at development, block at deployment (≤3 for production)
+    MEDIUM: tracked # Technical debt, does not block
+    LOW: optional # Improvements, does not block
 
   workflows_with_integration:
     - code-quality-gate.yaml

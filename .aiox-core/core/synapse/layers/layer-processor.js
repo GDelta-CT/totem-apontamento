@@ -69,7 +69,9 @@ class LayerProcessor {
       const result = this.process(context);
       const elapsed = Date.now() - start;
       if (elapsed > this.timeout) {
-        console.warn(`[synapse:${this.name}] Warning: Layer exceeded timeout (${elapsed}ms > ${this.timeout}ms)`);
+        console.warn(
+          `[synapse:${this.name}] Warning: Layer exceeded timeout (${elapsed}ms > ${this.timeout}ms)`
+        );
       }
       return result;
     } catch (error) {

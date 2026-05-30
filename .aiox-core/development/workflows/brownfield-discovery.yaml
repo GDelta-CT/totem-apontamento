@@ -1,7 +1,7 @@
 workflow:
   id: brownfield-discovery
   name: Brownfield Discovery - Complete Technical Debt Assessment
-  version: "2.0"
+  version: '2.0'
   description: >-
     Comprehensive multi-agent discovery workflow for existing projects.
     Includes specialist validation cycles and executive awareness report.
@@ -18,28 +18,27 @@ workflow:
     elicit: true
     confirmation_required: true
     action_types:
-      task-reference: "Action references an existing task file in .aiox-core/development/tasks/"
-      agent-command: "Action references an agent-level command (e.g., *create-front-end-spec)"
-      workflow-action: "Action is a workflow orchestration step executed via manual prompt"
+      task-reference: 'Action references an existing task file in .aiox-core/development/tasks/'
+      agent-command: 'Action references an agent-level command (e.g., *create-front-end-spec)'
+      workflow-action: 'Action is a workflow orchestration step executed via manual prompt'
 
   # ═══════════════════════════════════════════════════════════════════════════════════════
   #                              WORKFLOW SEQUENCE
   # ═══════════════════════════════════════════════════════════════════════════════════════
 
   sequence:
-
     # ═════════════════════════════════════════════════════════════════════════════════════
     # FASE 1-3: COLETA DE DADOS (pode ser paralelo)
     # ═════════════════════════════════════════════════════════════════════════════════════
 
     - step: system_documentation
       phase: 1
-      phase_name: "Coleta: Sistema"
+      phase_name: 'Coleta: Sistema'
       agent: architect
       action: document-project
       creates: docs/architecture/system-architecture.md
       elicit: true
-      duration_estimate: "30-60 min"
+      duration_estimate: '30-60 min'
       notes: |
         @architect analisa e documenta o sistema completo:
 
@@ -64,15 +63,15 @@ workflow:
 
     - step: database_documentation
       phase: 2
-      phase_name: "Coleta: Database"
+      phase_name: 'Coleta: Database'
       agent: data-engineer
-      action: db-schema-audit  # task-reference: db-schema-audit.md + security-audit.md
+      action: db-schema-audit # task-reference: db-schema-audit.md + security-audit.md
       creates:
         - supabase/docs/SCHEMA.md
         - supabase/docs/DB-AUDIT.md
       condition: project_has_database
       elicit: true
-      duration_estimate: "20-40 min"
+      duration_estimate: '20-40 min'
       notes: |
         @data-engineer analisa o banco de dados:
 
@@ -104,12 +103,12 @@ workflow:
 
     - step: frontend_documentation
       phase: 3
-      phase_name: "Coleta: Frontend/UX"
+      phase_name: 'Coleta: Frontend/UX'
       agent: ux-design-expert
-      action: create-front-end-spec  # agent-command: @ux-design-expert → *create-front-end-spec
+      action: create-front-end-spec # agent-command: @ux-design-expert → *create-front-end-spec
       creates: docs/frontend/frontend-spec.md
       elicit: true
-      duration_estimate: "30-45 min"
+      duration_estimate: '30-45 min'
       notes: |
         @ux-design-expert analisa o frontend:
 
@@ -142,9 +141,9 @@ workflow:
 
     - step: initial_consolidation
       phase: 4
-      phase_name: "Consolidação Inicial"
+      phase_name: 'Consolidação Inicial'
       agent: architect
-      action: consolidate_findings_draft  # workflow-action: manual prompt
+      action: consolidate_findings_draft # workflow-action: manual prompt
       creates: docs/prd/technical-debt-DRAFT.md
       requires:
         - docs/architecture/system-architecture.md
@@ -152,7 +151,7 @@ workflow:
         - supabase/docs/DB-AUDIT.md (if exists)
         - docs/frontend/frontend-spec.md
       elicit: true
-      duration_estimate: "30-45 min"
+      duration_estimate: '30-45 min'
       notes: |
         @architect consolida TODOS os débitos identificados em DRAFT:
 
@@ -206,13 +205,13 @@ workflow:
 
     - step: database_specialist_review
       phase: 5
-      phase_name: "Validação: Database"
+      phase_name: 'Validação: Database'
       agent: data-engineer
-      action: review_and_validate  # workflow-action: manual prompt
+      action: review_and_validate # workflow-action: manual prompt
       creates: docs/reviews/db-specialist-review.md
       requires: docs/prd/technical-debt-DRAFT.md
       elicit: true
-      duration_estimate: "20-30 min"
+      duration_estimate: '20-30 min'
       notes: |
         @data-engineer revisa a seção de Database do DRAFT:
 
@@ -272,13 +271,13 @@ workflow:
 
     - step: ux_specialist_review
       phase: 6
-      phase_name: "Validação: UX/Frontend"
+      phase_name: 'Validação: UX/Frontend'
       agent: ux-design-expert
-      action: review_and_validate  # workflow-action: manual prompt
+      action: review_and_validate # workflow-action: manual prompt
       creates: docs/reviews/ux-specialist-review.md
       requires: docs/prd/technical-debt-DRAFT.md
       elicit: true
-      duration_estimate: "20-30 min"
+      duration_estimate: '20-30 min'
       notes: |
         @ux-design-expert revisa a seção de Frontend/UX do DRAFT:
 
@@ -338,16 +337,16 @@ workflow:
 
     - step: qa_general_review
       phase: 7
-      phase_name: "Validação: QA Review"
+      phase_name: 'Validação: QA Review'
       agent: qa
-      action: review_assessment  # workflow-action: manual prompt
+      action: review_assessment # workflow-action: manual prompt
       creates: docs/reviews/qa-review.md
       requires:
         - docs/prd/technical-debt-DRAFT.md
         - docs/reviews/db-specialist-review.md
         - docs/reviews/ux-specialist-review.md
       elicit: true
-      duration_estimate: "30-45 min"
+      duration_estimate: '30-45 min'
       notes: |
         @qa faz review geral de qualidade do assessment:
 
@@ -424,9 +423,9 @@ workflow:
 
     - step: final_assessment
       phase: 8
-      phase_name: "Assessment Final"
+      phase_name: 'Assessment Final'
       agent: architect
-      action: finalize_assessment  # workflow-action: manual prompt
+      action: finalize_assessment # workflow-action: manual prompt
       creates: docs/prd/technical-debt-assessment.md
       requires:
         - docs/prd/technical-debt-DRAFT.md
@@ -435,7 +434,7 @@ workflow:
         - docs/reviews/qa-review.md
       condition: qa_review_approved
       elicit: true
-      duration_estimate: "30-45 min"
+      duration_estimate: '30-45 min'
       notes: |
         @architect finaliza o assessment incorporando TODOS os inputs:
 
@@ -489,13 +488,13 @@ workflow:
 
     - step: executive_awareness_report
       phase: 9
-      phase_name: "Relatório Executivo"
+      phase_name: 'Relatório Executivo'
       agent: analyst
-      action: create_awareness_report  # workflow-action: manual prompt
+      action: create_awareness_report # workflow-action: manual prompt
       creates: docs/reports/TECHNICAL-DEBT-REPORT.md
       requires: docs/prd/technical-debt-assessment.md
       elicit: true
-      duration_estimate: "30-45 min"
+      duration_estimate: '30-45 min'
       notes: |
         @analyst cria relatório executivo para awareness:
 
@@ -649,15 +648,15 @@ workflow:
 
     - step: epic_creation
       phase: 10
-      phase_name: "Planning: Epic"
+      phase_name: 'Planning: Epic'
       agent: pm
-      action: brownfield-create-epic  # task-reference: brownfield-create-epic.md
+      action: brownfield-create-epic # task-reference: brownfield-create-epic.md
       creates: docs/stories/epic-technical-debt.md
       requires:
         - docs/prd/technical-debt-assessment.md
         - docs/reports/TECHNICAL-DEBT-REPORT.md
       elicit: true
-      duration_estimate: "20-30 min"
+      duration_estimate: '20-30 min'
       notes: |
         @pm cria epic baseado no assessment validado:
 
@@ -677,14 +676,14 @@ workflow:
 
     - step: story_creation
       phase: 10
-      phase_name: "Planning: Stories"
+      phase_name: 'Planning: Stories'
       agent: pm
-      action: brownfield-create-story  # task-reference: brownfield-create-story.md
+      action: brownfield-create-story # task-reference: brownfield-create-story.md
       creates: docs/stories/story-X.X-*.md
       requires: docs/stories/epic-technical-debt.md
       repeats: for_each_prioritized_debt
       elicit: true
-      duration_estimate: "15-20 min por story"
+      duration_estimate: '15-20 min por story'
       notes: |
         @pm cria stories para cada débito/grupo de débitos:
 
@@ -805,70 +804,70 @@ workflow:
 
   quick_reference:
     fase_1:
-      name: "Coleta: Sistema"
-      agent: "@architect"
-      command: "*document-project"
-      output: "docs/architecture/system-architecture.md"
-      duration: "30-60 min"
+      name: 'Coleta: Sistema'
+      agent: '@architect'
+      command: '*document-project'
+      output: 'docs/architecture/system-architecture.md'
+      duration: '30-60 min'
     fase_2:
-      name: "Coleta: Database"
-      agent: "@data-engineer"
-      command: "*db-schema-audit + *security-audit"
-      output: "supabase/docs/SCHEMA.md, DB-AUDIT.md"
-      duration: "20-40 min"
+      name: 'Coleta: Database'
+      agent: '@data-engineer'
+      command: '*db-schema-audit + *security-audit'
+      output: 'supabase/docs/SCHEMA.md, DB-AUDIT.md'
+      duration: '20-40 min'
     fase_3:
-      name: "Coleta: Frontend"
-      agent: "@ux-design-expert"
-      command: "*create-front-end-spec"
-      output: "docs/frontend/frontend-spec.md"
-      duration: "30-45 min"
+      name: 'Coleta: Frontend'
+      agent: '@ux-design-expert'
+      command: '*create-front-end-spec'
+      output: 'docs/frontend/frontend-spec.md'
+      duration: '30-45 min'
     fase_4:
-      name: "Consolidação Inicial"
-      agent: "@architect"
-      command: "(manual prompt)"
-      output: "docs/prd/technical-debt-DRAFT.md"
-      duration: "30-45 min"
+      name: 'Consolidação Inicial'
+      agent: '@architect'
+      command: '(manual prompt)'
+      output: 'docs/prd/technical-debt-DRAFT.md'
+      duration: '30-45 min'
     fase_5:
-      name: "Validação DB"
-      agent: "@data-engineer"
-      command: "(manual review)"
-      output: "docs/reviews/db-specialist-review.md"
-      duration: "20-30 min"
+      name: 'Validação DB'
+      agent: '@data-engineer'
+      command: '(manual review)'
+      output: 'docs/reviews/db-specialist-review.md'
+      duration: '20-30 min'
     fase_6:
-      name: "Validação UX"
-      agent: "@ux-design-expert"
-      command: "(manual review)"
-      output: "docs/reviews/ux-specialist-review.md"
-      duration: "20-30 min"
+      name: 'Validação UX'
+      agent: '@ux-design-expert'
+      command: '(manual review)'
+      output: 'docs/reviews/ux-specialist-review.md'
+      duration: '20-30 min'
     fase_7:
-      name: "QA Review"
-      agent: "@qa"
-      command: "(manual review)"
-      output: "docs/reviews/qa-review.md"
-      duration: "30-45 min"
+      name: 'QA Review'
+      agent: '@qa'
+      command: '(manual review)'
+      output: 'docs/reviews/qa-review.md'
+      duration: '30-45 min'
     fase_8:
-      name: "Assessment Final"
-      agent: "@architect"
-      command: "(manual consolidation)"
-      output: "docs/prd/technical-debt-assessment.md"
-      duration: "30-45 min"
+      name: 'Assessment Final'
+      agent: '@architect'
+      command: '(manual consolidation)'
+      output: 'docs/prd/technical-debt-assessment.md'
+      duration: '30-45 min'
     fase_9:
-      name: "Relatório Executivo"
-      agent: "@analyst"
-      command: "(manual report)"
-      output: "docs/reports/TECHNICAL-DEBT-REPORT.md"
-      duration: "30-45 min"
+      name: 'Relatório Executivo'
+      agent: '@analyst'
+      command: '(manual report)'
+      output: 'docs/reports/TECHNICAL-DEBT-REPORT.md'
+      duration: '30-45 min'
     fase_10:
-      name: "Planning"
-      agent: "@pm"
-      command: "*brownfield-create-epic + *brownfield-create-story"
-      output: "docs/stories/epic-*.md, story-*.md"
-      duration: "30-60 min"
+      name: 'Planning'
+      agent: '@pm'
+      command: '*brownfield-create-epic + *brownfield-create-story'
+      output: 'docs/stories/epic-*.md, story-*.md'
+      duration: '30-60 min'
 
   time_estimate:
-    minimum: "4 horas"
-    typical: "5-6 horas"
-    complex_project: "8 horas"
+    minimum: '4 horas'
+    typical: '5-6 horas'
+    complex_project: '8 horas'
 
   decision_guidance:
     when_to_use:

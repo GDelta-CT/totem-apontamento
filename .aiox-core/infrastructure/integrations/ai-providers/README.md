@@ -35,7 +35,7 @@ const { getProviderForTask } = require('./ai-providers');
 
 // Get optimal provider for task type
 const provider = getProviderForTask('code_generation'); // Returns Gemini (faster)
-const provider = getProviderForTask('security');        // Returns Claude (deeper reasoning)
+const provider = getProviderForTask('security'); // Returns Claude (deeper reasoning)
 ```
 
 ### Direct Provider Access
@@ -88,12 +88,12 @@ gemini:
 
 ## Provider Comparison
 
-| Feature | Claude | Gemini |
-|---------|--------|--------|
-| Best for | Complex reasoning, security | Speed, cost efficiency |
-| JSON output | Manual parsing | Native `--output-format json` |
-| Cost | Higher | ~4x cheaper (Flash) |
-| SWE-bench | ~70% | 78% (Flash) |
+| Feature     | Claude                      | Gemini                        |
+| ----------- | --------------------------- | ----------------------------- |
+| Best for    | Complex reasoning, security | Speed, cost efficiency        |
+| JSON output | Manual parsing              | Native `--output-format json` |
+| Cost        | Higher                      | ~4x cheaper (Flash)           |
+| SWE-bench   | ~70%                        | 78% (Flash)                   |
 
 ## Epic Reference
 

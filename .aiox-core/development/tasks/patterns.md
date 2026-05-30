@@ -8,7 +8,7 @@ View, manage, and review learned workflow patterns captured by the Workflow Inte
 
 ```yaml
 task: patterns()
-agent: "@dev"
+agent: '@dev'
 responsável: Dex (Developer)
 responsavel_type: Agente
 atomic_layer: Workflow
@@ -77,6 +77,7 @@ pre-conditions:
 ## Implementation Steps
 
 ### Step 1: Check Help Flag
+
 ```javascript
 if (args.help) {
   displayHelp();
@@ -85,6 +86,7 @@ if (args.help) {
 ```
 
 ### Step 2: Load Learning Module
+
 ```javascript
 const learning = require('.aiox-core/workflow-intelligence/learning');
 const store = learning.getDefaultStore();
@@ -93,6 +95,7 @@ const store = learning.getDefaultStore();
 ### Step 3: Execute Subcommand
 
 #### List Patterns
+
 ```javascript
 if (args.subcommand === 'list' || !args.subcommand) {
   const data = store.load();
@@ -100,7 +103,7 @@ if (args.subcommand === 'list' || !args.subcommand) {
 
   // Filter by status if provided
   if (args.status) {
-    patterns = patterns.filter(p => p.status === args.status);
+    patterns = patterns.filter((p) => p.status === args.status);
   }
 
   // Sort by occurrences (descending)
@@ -114,6 +117,7 @@ if (args.subcommand === 'list' || !args.subcommand) {
 ```
 
 #### Show Stats
+
 ```javascript
 if (args.subcommand === 'stats') {
   const stats = store.getStats();
@@ -122,6 +126,7 @@ if (args.subcommand === 'stats') {
 ```
 
 #### Prune Patterns
+
 ```javascript
 if (args.subcommand === 'prune') {
   const result = store.prune();
@@ -130,6 +135,7 @@ if (args.subcommand === 'prune') {
 ```
 
 #### Review Patterns
+
 ```javascript
 if (args.subcommand === 'review') {
   const pendingPatterns = store.getByStatus('pending');
@@ -189,6 +195,7 @@ Pattern Lifecycle:
 ## Output Formats
 
 ### List Output
+
 ```text
 Learned Patterns (15 total)
 ═══════════════════════════
@@ -210,6 +217,7 @@ Showing 3 of 15 patterns. Use --limit to see more.
 ```
 
 ### Stats Output
+
 ```text
 Pattern Learning Statistics
 ═══════════════════════════
@@ -234,6 +242,7 @@ Last updated: 2025-12-26T10:30:00Z
 ```
 
 ### Review Output
+
 ```text
 *patterns review
 
@@ -280,14 +289,15 @@ post-conditions:
 
 ## Error Handling
 
-| Error | Cause | Resolution |
-|-------|-------|------------|
-| Learning module not found | Missing dependency | Show error message |
-| Storage file corrupt | Invalid YAML | Reset to empty, show warning |
-| No patterns found | Empty storage | Show "no patterns" message |
-| Review cancelled | User quit | Save any changes made |
+| Error                     | Cause              | Resolution                   |
+| ------------------------- | ------------------ | ---------------------------- |
+| Learning module not found | Missing dependency | Show error message           |
+| Storage file corrupt      | Invalid YAML       | Reset to empty, show warning |
+| No patterns found         | Empty storage      | Show "no patterns" message   |
+| Review cancelled          | User quit          | Save any changes made        |
 
 **Error Recovery Strategy:**
+
 ```javascript
 try {
   const stats = store.getStats();
@@ -321,7 +331,7 @@ optimizations:
 story: WIS-5
 version: 1.0.0
 created: 2025-12-26
-author: "@dev (Dex)"
+author: '@dev (Dex)'
 dependencies:
   modules:
     - workflow-intelligence/learning

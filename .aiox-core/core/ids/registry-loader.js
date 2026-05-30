@@ -30,7 +30,9 @@ class RegistryLoader {
     this._keywordIndex = null;
 
     if (!fs.existsSync(this._registryPath)) {
-      console.info(`[IDS] Registry file not found at ${this._registryPath}. Returning empty registry.`);
+      console.info(
+        `[IDS] Registry file not found at ${this._registryPath}. Returning empty registry.`
+      );
       this._registry = structuredClone(EMPTY_REGISTRY);
       return this._registry;
     }
@@ -156,7 +158,7 @@ class RegistryLoader {
     }
 
     const result = this._getAllEntities().filter(
-      (e) => e.type && e.type.toLowerCase() === type.toLowerCase(),
+      (e) => e.type && e.type.toLowerCase() === type.toLowerCase()
     );
 
     this._cache.set(cacheKey, result);
@@ -171,9 +173,7 @@ class RegistryLoader {
     this._ensureLoaded();
 
     const lower = pathPattern.toLowerCase();
-    return this._getAllEntities().filter(
-      (e) => e.path && e.path.toLowerCase().includes(lower),
-    );
+    return this._getAllEntities().filter((e) => e.path && e.path.toLowerCase().includes(lower));
   }
 
   /**
@@ -185,7 +185,7 @@ class RegistryLoader {
 
     const lower = purposeText.toLowerCase();
     return this._getAllEntities().filter(
-      (e) => e.purpose && e.purpose.toLowerCase().includes(lower),
+      (e) => e.purpose && e.purpose.toLowerCase().includes(lower)
     );
   }
 
@@ -256,9 +256,7 @@ class RegistryLoader {
   findByKeyword(keywords, options = {}) {
     const results = this.queryByKeywords(keywords);
     if (!options.role) return results;
-    return results.filter(
-      (e) => e.codeIntelMetadata && e.codeIntelMetadata.role === options.role,
-    );
+    return results.filter((e) => e.codeIntelMetadata && e.codeIntelMetadata.role === options.role);
   }
 
   /**

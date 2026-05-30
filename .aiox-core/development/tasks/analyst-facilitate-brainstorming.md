@@ -1,7 +1,7 @@
 ---
 # No checklists needed - this task facilitates brainstorming sessions, validation is through user interaction
 docOutputLocation: docs/brainstorming-session-results.md
-template: ".aiox-core/product/templates/brainstorming-output-tmpl.yaml"
+template: '.aiox-core/product/templates/brainstorming-output-tmpl.yaml'
 tools:
   - github-cli
 ---
@@ -15,16 +15,19 @@ Facilitate interactive brainstorming sessions with users. Be creative and adapti
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -192,6 +195,7 @@ token_usage: ~2,000-8,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Iterative analysis with depth limits; cache intermediate results; batch similar operations
 
 ---
@@ -210,7 +214,6 @@ updated_at: 2025-11-17
 ```
 
 ---
-
 
 ## Process
 
@@ -248,7 +251,7 @@ If user selects Option 1, present numbered list of techniques from the brainstor
 1. Apply selected technique according to data file description
 2. Keep engaging with technique until user indicates they want to:
    - Choose a different technique
-   - Apply current ideas to a new technique  
+   - Apply current ideas to a new technique
    - Move to convergent phase
    - End session
 
@@ -339,4 +342,3 @@ Generate structured document with these sections:
 - Always ask before switching techniques: "Ready to try a different approach?"
 - Offer options: "Should we explore this idea deeper or generate more alternatives?"
 - Respect their process and timing
- 

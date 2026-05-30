@@ -11,16 +11,19 @@
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -188,6 +191,7 @@ token_usage: ~2,000-8,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Iterative analysis with depth limits; cache intermediate results; batch similar operations
 
 ---
@@ -206,7 +210,6 @@ updated_at: 2025-11-17
 ```
 
 ---
-
 
 ## Process
 
@@ -232,8 +235,8 @@ SELECT
     'qual', qual,
     'with_check', with_check
   ))
-   FROM pg_policies p 
-   WHERE p.tablename=t.tablename 
+   FROM pg_policies p
+   WHERE p.tablename=t.tablename
    AND p.schemaname='public') AS policies
 FROM t
 ORDER BY rowsecurity DESC, tablename;
@@ -241,26 +244,26 @@ ORDER BY rowsecurity DESC, tablename;
 \echo ''
 \echo '=== Summary ==='
 
-SELECT 
+SELECT
   COUNT(*) AS total_tables,
   COUNT(*) FILTER (WHERE rowsecurity) AS rls_enabled,
   COUNT(*) FILTER (WHERE NOT rowsecurity) AS rls_disabled
-FROM pg_tables 
+FROM pg_tables
 WHERE schemaname='public';
 
 \echo ''
 \echo '=== Tables Without RLS (Security Risk) ==='
 
-SELECT tablename 
-FROM pg_tables 
-WHERE schemaname='public' 
+SELECT tablename
+FROM pg_tables
+WHERE schemaname='public'
 AND rowsecurity = false
 ORDER BY tablename;
 
 \echo ''
 \echo '=== Policy Coverage ==='
 
-SELECT 
+SELECT
   t.tablename,
   COUNT(p.policyname) AS policy_count,
   ARRAY_AGG(p.cmd) AS commands_covered
@@ -286,14 +289,17 @@ SQL
 ### Policy Coverage
 
 **Good coverage:**
+
 - 1 policy with `FOR ALL` (KISS approach), OR
 - 4 policies covering SELECT, INSERT, UPDATE, DELETE (granular)
 
 **Incomplete coverage:**
+
 - Enabled RLS but 0 policies = nobody can access
 - 1-3 policies (granular) = some operations not covered
 
 **No coverage:**
+
 - RLS disabled = full access without restrictions
 
 ---
@@ -341,6 +347,7 @@ ALTER TABLE table_name ENABLE ROW LEVEL SECURITY;
 ## Recommended Actions
 
 ### For Public Data
+
 Tables that should be publicly readable:
 
 ```sql
@@ -357,6 +364,7 @@ WITH CHECK (auth.uid() = user_id);
 ```
 
 ### For User-Owned Data
+
 Use KISS policy:
 
 ```bash
@@ -364,6 +372,7 @@ Use KISS policy:
 ```
 
 ### For Multi-Tenant Data
+
 Organization-scoped access:
 
 ```sql
@@ -405,6 +414,7 @@ After fixing issues, test with:
 ## Integration with Workflow
 
 Run RLS audit:
+
 1. After migrations: `*smoke-test` → `*rls-audit`
 2. Before production deploy: `*rls-audit`
 3. Regular security reviews: `*rls-audit`

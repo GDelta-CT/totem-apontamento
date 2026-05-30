@@ -4,9 +4,9 @@ const { getEnricher, getClient, isCodeIntelAvailable } = require('../index');
 
 // Risk level thresholds based on blast radius (reference count)
 const RISK_THRESHOLDS = {
-  LOW_MAX: 4,       // 0-4 refs = LOW
-  MEDIUM_MAX: 15,   // 5-15 refs = MEDIUM
-                     // >15 refs = HIGH
+  LOW_MAX: 4, // 0-4 refs = LOW
+  MEDIUM_MAX: 15, // 5-15 refs = MEDIUM
+  // >15 refs = HIGH
 };
 
 // Minimum references to suggest REUSE (>threshold = REUSE, <=threshold = ADAPT)
@@ -40,8 +40,8 @@ async function checkBeforeWriting(fileName, description) {
     const client = getClient();
     const nameRefs = await client.findReferences(fileName);
 
-    const hasMatches = (dupes && dupes.matches && dupes.matches.length > 0) ||
-      (nameRefs && nameRefs.length > 0);
+    const hasMatches =
+      (dupes && dupes.matches && dupes.matches.length > 0) || (nameRefs && nameRefs.length > 0);
 
     if (!hasMatches) {
       return null;
@@ -85,8 +85,8 @@ async function suggestReuse(symbol) {
     const suggestion = refCount > REUSE_MIN_REFS ? 'REUSE' : 'ADAPT';
 
     return {
-      file: definition ? definition.file : (refs[0] ? refs[0].file : null),
-      line: definition ? definition.line : (refs[0] ? refs[0].line : null),
+      file: definition ? definition.file : refs[0] ? refs[0].file : null,
+      line: definition ? definition.line : refs[0] ? refs[0].line : null,
       references: refCount,
       suggestion,
     };

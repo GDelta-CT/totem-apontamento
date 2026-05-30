@@ -16,7 +16,11 @@ const TOOLS = ['Edit', 'Write'];
  */
 function validateBoundaryPath(p) {
   const segments = p.replace(/\\/g, '/').split('/');
-  if (segments.some(function(s) { return s === '..'; })) {
+  if (
+    segments.some(function (s) {
+      return s === '..';
+    })
+  ) {
     throw new Error('Path traversal detected in boundary config: ' + p);
   }
   if (path.isAbsolute(p)) {
@@ -49,8 +53,12 @@ function readBoundaryConfig(projectRoot) {
     exceptions: Array.isArray(boundary.exceptions) ? boundary.exceptions : [],
   };
 
-  for (const p of result.protected) { validateBoundaryPath(p); }
-  for (const p of result.exceptions) { validateBoundaryPath(p); }
+  for (const p of result.protected) {
+    validateBoundaryPath(p);
+  }
+  for (const p of result.exceptions) {
+    validateBoundaryPath(p);
+  }
 
   return result;
 }
@@ -124,7 +132,7 @@ function expandSubdirWithExceptions(subdirPath, exceptions, projectRoot) {
     const entryRelative = subdirPath + '/' + entry.name;
     const entryGlob = entry.isDirectory() ? entryRelative + '/**' : entryRelative;
 
-    const isCoveredByException = exceptions.some(function(exc) {
+    const isCoveredByException = exceptions.some(function (exc) {
       return exc === entryGlob || exc === entryRelative;
     });
 
@@ -157,7 +165,7 @@ function expandProtectedPaths(protectedPaths, exceptions, projectRoot) {
       const specialDirEntries = [];
 
       for (const dir of dirs) {
-        const relevantExceptions = exceptions.filter(function(exc) {
+        const relevantExceptions = exceptions.filter(function (exc) {
           return isChildOf(exc, dir);
         });
 
@@ -261,7 +269,13 @@ function writeSettingsJson(projectRoot, permissions) {
   }
 
   fs.writeFileSync(fullSettingsPath, newContent, 'utf8');
-  console.log('PASS: settings.json updated with ' + permissions.deny.length + ' deny rules and ' + permissions.allow.length + ' allow rules.');
+  console.log(
+    'PASS: settings.json updated with ' +
+      permissions.deny.length +
+      ' deny rules and ' +
+      permissions.allow.length +
+      ' allow rules.'
+  );
 }
 
 /**

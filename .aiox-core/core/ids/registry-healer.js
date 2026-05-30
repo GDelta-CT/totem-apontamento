@@ -23,12 +23,9 @@ const yaml = require('js-yaml');
 const crypto = require('crypto');
 
 const { RegistryLoader } = require(path.resolve(__dirname, 'registry-loader.js'));
-const {
-  computeChecksum,
-  extractKeywords,
-  REPO_ROOT,
-  REGISTRY_PATH,
-} = require(path.resolve(__dirname, '../../development/scripts/populate-entity-registry.js'));
+const { computeChecksum, extractKeywords, REPO_ROOT, REGISTRY_PATH } = require(
+  path.resolve(__dirname, '../../development/scripts/populate-entity-registry.js')
+);
 
 // ─── Constants ─────────────────────────────────────────────────────
 
@@ -149,7 +146,7 @@ class RegistryHealer {
     }
     try {
       const { NotificationManager } = require(
-        path.resolve(__dirname, '../quality-gates/notification-manager.js'),
+        path.resolve(__dirname, '../quality-gates/notification-manager.js')
       );
       this._notificationManager = new NotificationManager({
         channels: ['console', 'file'],
@@ -181,10 +178,12 @@ class RegistryHealer {
 
       // Rule: missing-file (CRITICAL)
       if (!fs.existsSync(absPath)) {
-        issues.push(this._createIssue('missing-file', entityId, entity, {
-          path: entity.path,
-          absPath,
-        }));
+        issues.push(
+          this._createIssue('missing-file', entityId, entity, {
+            path: entity.path,
+            absPath,
+          })
+        );
         // Skip further checks for missing files
         continue;
       }
@@ -193,10 +192,12 @@ class RegistryHealer {
       try {
         const currentChecksum = computeChecksum(absPath);
         if (entity.checksum && currentChecksum !== entity.checksum) {
-          issues.push(this._createIssue('checksum-mismatch', entityId, entity, {
-            expected: entity.checksum,
-            actual: currentChecksum,
-          }));
+          issues.push(
+            this._createIssue('checksum-mismatch', entityId, entity, {
+              expected: entity.checksum,
+              actual: currentChecksum,
+            })
+          );
         }
       } catch {
         // File read error during checksum — treat as warning, not issue
@@ -206,10 +207,12 @@ class RegistryHealer {
       if (Array.isArray(entity.usedBy)) {
         const orphanedUsedBy = entity.usedBy.filter((ref) => !entityIndex.has(ref));
         if (orphanedUsedBy.length > 0) {
-          issues.push(this._createIssue('orphaned-usedBy', entityId, entity, {
-            orphanedRefs: orphanedUsedBy,
-            totalRefs: entity.usedBy.length,
-          }));
+          issues.push(
+            this._createIssue('orphaned-usedBy', entityId, entity, {
+              orphanedRefs: orphanedUsedBy,
+              totalRefs: entity.usedBy.length,
+            })
+          );
         }
       }
 
@@ -217,26 +220,32 @@ class RegistryHealer {
       if (Array.isArray(entity.dependencies)) {
         const orphanedDeps = entity.dependencies.filter((ref) => !entityIndex.has(ref));
         if (orphanedDeps.length > 0) {
-          issues.push(this._createIssue('orphaned-dependency', entityId, entity, {
-            orphanedRefs: orphanedDeps,
-            totalRefs: entity.dependencies.length,
-          }));
+          issues.push(
+            this._createIssue('orphaned-dependency', entityId, entity, {
+              orphanedRefs: orphanedDeps,
+              totalRefs: entity.dependencies.length,
+            })
+          );
         }
       }
 
       // Rule: missing-keywords (LOW)
       if (!entity.keywords || !Array.isArray(entity.keywords) || entity.keywords.length === 0) {
-        issues.push(this._createIssue('missing-keywords', entityId, entity, {
-          path: entity.path,
-        }));
+        issues.push(
+          this._createIssue('missing-keywords', entityId, entity, {
+            path: entity.path,
+          })
+        );
       }
 
       // Rule: stale-verification (LOW)
       if (daysSince(entity.lastVerified) > STALE_DAYS_THRESHOLD) {
-        issues.push(this._createIssue('stale-verification', entityId, entity, {
-          lastVerified: entity.lastVerified || 'never',
-          daysSince: Math.floor(daysSince(entity.lastVerified)),
-        }));
+        issues.push(
+          this._createIssue('stale-verification', entityId, entity, {
+            lastVerified: entity.lastVerified || 'never',
+            daysSince: Math.floor(daysSince(entity.lastVerified)),
+          })
+        );
       }
     }
 
@@ -299,9 +308,7 @@ class RegistryHealer {
       bySeverity,
       autoHealable,
       needsManual,
-      autoHealableRate: issues.length > 0
-        ? Math.round((autoHealable / issues.length) * 100)
-        : 100,
+      autoHealableRate: issues.length > 0 ? Math.round((autoHealable / issues.length) * 100) : 100,
     };
   }
 
@@ -330,17 +337,15 @@ class RegistryHealer {
     const errors = [];
 
     // Filter issues
-    const toHeal = autoOnly
-      ? issues.filter((i) => i.autoHealable)
-      : issues;
-    const toSkip = autoOnly
-      ? issues.filter((i) => !i.autoHealable)
-      : [];
+    const toHeal = autoOnly ? issues.filter((i) => i.autoHealable) : issues;
+    const toSkip = autoOnly ? issues.filter((i) => !i.autoHealable) : [];
 
-    skipped.push(...toSkip.map((i) => ({
-      ...i,
-      reason: 'Not auto-healable (requires manual intervention)',
-    })));
+    skipped.push(
+      ...toSkip.map((i) => ({
+        ...i,
+        reason: 'Not auto-healable (requires manual intervention)',
+      }))
+    );
 
     if (toHeal.length === 0) {
       return { healed, skipped, errors, batchId, backupPath: null };
@@ -654,7 +659,7 @@ class RegistryHealer {
       default:
         return [
           'Review the issue details and apply appropriate fix',
-          'Run \'aiox ids:health --fix\' after resolving',
+          "Run 'aiox ids:health --fix' after resolving",
         ];
     }
   }
@@ -720,7 +725,8 @@ class RegistryHealer {
   _pruneBackups() {
     if (!fs.existsSync(this._backupDir)) return;
 
-    const files = fs.readdirSync(this._backupDir)
+    const files = fs
+      .readdirSync(this._backupDir)
       .filter((f) => f.endsWith('.yaml'))
       .map((f) => ({
         name: f,
@@ -804,18 +810,17 @@ class RegistryHealer {
   queryHealingLog(filter = {}) {
     if (!fs.existsSync(this._healingLogPath)) return [];
 
-    const lines = fs.readFileSync(this._healingLogPath, 'utf8')
-      .trim()
-      .split('\n')
-      .filter(Boolean);
+    const lines = fs.readFileSync(this._healingLogPath, 'utf8').trim().split('\n').filter(Boolean);
 
-    let entries = lines.map((line) => {
-      try {
-        return JSON.parse(line);
-      } catch {
-        return null;
-      }
-    }).filter(Boolean);
+    let entries = lines
+      .map((line) => {
+        try {
+          return JSON.parse(line);
+        } catch {
+          return null;
+        }
+      })
+      .filter(Boolean);
 
     if (filter.batchId) {
       entries = entries.filter((e) => e.batchId === filter.batchId);

@@ -58,7 +58,6 @@ async function generateGreeting(agentId) {
     }
 
     return result.greeting;
-
   } catch (error) {
     console.error('[generate-greeting] Error:', {
       agentId,
@@ -95,11 +94,11 @@ if (require.main === module) {
   }
 
   generateGreeting(agentId)
-    .then(greeting => {
+    .then((greeting) => {
       console.log(greeting);
       process.exit(0);
     })
-    .catch(error => {
+    .catch((error) => {
       console.error('Fatal error:', error.message);
       console.log(generateFallbackGreeting(agentId));
       process.exit(1);

@@ -21,11 +21,7 @@ const {
   createGlobalStructure,
   createGlobalConfig,
 } = require('../../../core/mcp/global-config-manager');
-const {
-  getGlobalMcpDir,
-  getLinkType,
-  isWindows,
-} = require('../../../core/mcp/os-detector');
+const { getGlobalMcpDir, getLinkType, isWindows } = require('../../../core/mcp/os-detector');
 const {
   analyzeMigration,
   executeMigration,

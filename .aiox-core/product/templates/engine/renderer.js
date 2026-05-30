@@ -25,12 +25,12 @@ function registerDefaultHelpers(handlebars) {
     const d = date instanceof Date ? date : new Date(date);
 
     const patterns = {
-      'YYYY': d.getFullYear(),
-      'MM': String(d.getMonth() + 1).padStart(2, '0'),
-      'DD': String(d.getDate()).padStart(2, '0'),
-      'HH': String(d.getHours()).padStart(2, '0'),
-      'mm': String(d.getMinutes()).padStart(2, '0'),
-      'ss': String(d.getSeconds()).padStart(2, '0'),
+      YYYY: d.getFullYear(),
+      MM: String(d.getMonth() + 1).padStart(2, '0'),
+      DD: String(d.getDate()).padStart(2, '0'),
+      HH: String(d.getHours()).padStart(2, '0'),
+      mm: String(d.getMinutes()).padStart(2, '0'),
+      ss: String(d.getSeconds()).padStart(2, '0'),
     };
 
     let result = format;
@@ -107,7 +107,7 @@ function registerDefaultHelpers(handlebars) {
     if (!str) return '';
     return String(str)
       .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(' ');
   });
 
@@ -162,12 +162,12 @@ function registerDefaultHelpers(handlebars) {
   });
 
   // Conditional block based on equality
-  handlebars.registerHelper('ifEqual', function(a, b, options) {
+  handlebars.registerHelper('ifEqual', function (a, b, options) {
     return a === b ? options.fn(this) : options.inverse(this);
   });
 
   // Conditional block based on inequality
-  handlebars.registerHelper('unlessEqual', function(a, b, options) {
+  handlebars.registerHelper('unlessEqual', function (a, b, options) {
     return a !== b ? options.fn(this) : options.inverse(this);
   });
 
@@ -319,12 +319,43 @@ class TemplateRenderer {
    * @returns {boolean} True if helper exists
    */
   isHelper(name) {
-    return this.customHelpers.has(name) ||
-      ['padNumber', 'formatDate', 'add', 'subtract', 'eq', 'ne', 'gt', 'lt',
-        'gte', 'lte', 'and', 'or', 'not', 'uppercase', 'lowercase', 'capitalize',
-        'titlecase', 'join', 'length', 'includes', 'first', 'last', 'default',
-        'json', 'times', 'ifEqual', 'unlessEqual', 'slug', 'truncate', 'now',
-        'multiply', 'divide'].includes(name);
+    return (
+      this.customHelpers.has(name) ||
+      [
+        'padNumber',
+        'formatDate',
+        'add',
+        'subtract',
+        'eq',
+        'ne',
+        'gt',
+        'lt',
+        'gte',
+        'lte',
+        'and',
+        'or',
+        'not',
+        'uppercase',
+        'lowercase',
+        'capitalize',
+        'titlecase',
+        'join',
+        'length',
+        'includes',
+        'first',
+        'last',
+        'default',
+        'json',
+        'times',
+        'ifEqual',
+        'unlessEqual',
+        'slug',
+        'truncate',
+        'now',
+        'multiply',
+        'divide',
+      ].includes(name)
+    );
   }
 
   /**

@@ -95,19 +95,20 @@ Issue received
 
 ## Priority Guidelines
 
-| Signal | Priority |
-|--------|----------|
-| Blocks installation/usage for all users | P1 |
-| Breaks core functionality, no workaround | P1 |
-| Significant bug with workaround | P2 |
-| Feature highly requested by community | P2 |
-| Minor bug, edge case | P3 |
-| Nice-to-have improvement | P3 |
-| Cosmetic, low impact | P4 |
+| Signal                                   | Priority |
+| ---------------------------------------- | -------- |
+| Blocks installation/usage for all users  | P1       |
+| Breaks core functionality, no workaround | P1       |
+| Significant bug with workaround          | P2       |
+| Feature highly requested by community    | P2       |
+| Minor bug, edge case                     | P3       |
+| Nice-to-have improvement                 | P3       |
+| Cosmetic, low impact                     | P4       |
 
 ## Command Integration
 
 This task is invocable via @devops:
+
 - `*triage` — Start interactive triage session
 - `*triage --batch` — Run batch triage with script
 

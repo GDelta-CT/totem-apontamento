@@ -217,7 +217,7 @@ const WORKFLOW_META = {
   name: '{workflow_name}',
   version: '1.0.0',
   description: '{workflow_description}',
-  mcps_required: [{mcp_list}],
+  mcps_required: [{ mcp_list }],
 };
 
 async function runWorkflow(params) {
@@ -238,7 +238,6 @@ async function runWorkflow(params) {
       // Minimal output fields
       processingTime: `${Date.now() - startTime}ms`,
     };
-
   } catch (error) {
     return {
       success: false,
@@ -287,6 +286,7 @@ docker mcp exec ./scripts/mcp-workflows/{workflow_name}.js --param value
 \`\`\`
 
 **Parameters:**
+
 - `param1` - Description (required/optional)
 - `param2` - Description (required/optional)
 ```
@@ -407,11 +407,11 @@ async function syncData(params) {
 
 ## Token Savings Comparison
 
-| Approach | Tokens | Processing |
-|----------|--------|------------|
-| Direct LLM | ~10,000 | LLM context |
-| MCP Tool Calls | ~5,000 | Tool overhead |
-| **Code Mode** | ~130 | **Sandbox** |
+| Approach       | Tokens  | Processing    |
+| -------------- | ------- | ------------- |
+| Direct LLM     | ~10,000 | LLM context   |
+| MCP Tool Calls | ~5,000  | Tool overhead |
+| **Code Mode**  | ~130    | **Sandbox**   |
 
 **Savings: ~98.7%**
 

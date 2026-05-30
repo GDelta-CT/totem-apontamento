@@ -3,9 +3,9 @@
 > {{DESCRIPTION}}
 > Squad: {{SQUADNAME}}
 > Created: {{CREATEDAT}}
-{{#IF STORYID}}
+> {{#IF STORYID}}
 > Story: {{STORYID}}
-{{/IF}}
+> {{/IF}}
 
 ---
 
@@ -23,27 +23,27 @@ Before starting, verify:
 
 ### Category 1: Setup
 
-| # | Item | Status | Notes |
-|---|------|--------|-------|
-| 1.1 | Item description | [ ] | |
-| 1.2 | Item description | [ ] | |
-| 1.3 | Item description | [ ] | |
+| #   | Item             | Status | Notes |
+| --- | ---------------- | ------ | ----- |
+| 1.1 | Item description | [ ]    |       |
+| 1.2 | Item description | [ ]    |       |
+| 1.3 | Item description | [ ]    |       |
 
 ### Category 2: Implementation
 
-| # | Item | Status | Notes |
-|---|------|--------|-------|
-| 2.1 | Item description | [ ] | |
-| 2.2 | Item description | [ ] | |
-| 2.3 | Item description | [ ] | |
+| #   | Item             | Status | Notes |
+| --- | ---------------- | ------ | ----- |
+| 2.1 | Item description | [ ]    |       |
+| 2.2 | Item description | [ ]    |       |
+| 2.3 | Item description | [ ]    |       |
 
 ### Category 3: Validation
 
-| # | Item | Status | Notes |
-|---|------|--------|-------|
-| 3.1 | Item description | [ ] | |
-| 3.2 | Item description | [ ] | |
-| 3.3 | Item description | [ ] | |
+| #   | Item             | Status | Notes |
+| --- | ---------------- | ------ | ----- |
+| 3.1 | Item description | [ ]    |       |
+| 3.2 | Item description | [ ]    |       |
+| 3.3 | Item description | [ ]    |       |
 
 ---
 
@@ -59,11 +59,11 @@ After completion, verify:
 
 ## Sign-off
 
-| Role | Name | Date | Signature |
-|------|------|------|-----------|
-| Creator | | | |
-| Reviewer | | | |
-| Approver | | | |
+| Role     | Name | Date | Signature |
+| -------- | ---- | ---- | --------- |
+| Creator  |      |      |           |
+| Reviewer |      |      |           |
+| Approver |      |      |           |
 
 ---
 
@@ -79,4 +79,4 @@ checklist: {{COMPONENTNAME}}.md
 
 ---
 
-*Checklist created by squad-creator*
+_Checklist created by squad-creator_

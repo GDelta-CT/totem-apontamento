@@ -150,10 +150,7 @@ function analyzeTechStack(targetDir, analysis) {
       analysis.configs.requirements = 'requirements.txt';
 
       try {
-        const requirements = fs.readFileSync(
-          path.join(targetDir, 'requirements.txt'),
-          'utf8',
-        );
+        const requirements = fs.readFileSync(path.join(targetDir, 'requirements.txt'), 'utf8');
 
         if (requirements.includes('django')) analysis.frameworks.push('Django');
         if (requirements.includes('flask')) analysis.frameworks.push('Flask');
@@ -267,7 +264,7 @@ function analyzeWorkflows(targetDir, analysis) {
       const workflows = fs.readdirSync(githubWorkflowsDir);
       if (workflows.length > 0) {
         analysis.manualReviewItems.push(
-          `Review ${workflows.length} existing GitHub workflow(s) for potential conflicts`,
+          `Review ${workflows.length} existing GitHub workflow(s) for potential conflicts`
         );
       }
     } catch {
@@ -327,7 +324,7 @@ function analyzeDirectoryStructure(targetDir, analysis) {
     const archDir = path.join(targetDir, 'docs', 'architecture');
     if (fs.existsSync(archDir)) {
       analysis.conflicts.push(
-        'docs/architecture/ already exists - AIOX docs may need different location',
+        'docs/architecture/ already exists - AIOX docs may need different location'
       );
     }
   }
@@ -342,7 +339,7 @@ function generateRecommendations(analysis) {
   // Linting recommendations
   if (analysis.linting !== 'none') {
     analysis.recommendations.push(
-      `Preserve existing ${analysis.linting} configuration - AIOX will adapt`,
+      `Preserve existing ${analysis.linting} configuration - AIOX will adapt`
     );
   } else {
     analysis.recommendations.push('Consider adding ESLint/Flake8 for code quality');
@@ -351,7 +348,7 @@ function generateRecommendations(analysis) {
   // Formatting recommendations
   if (analysis.formatting !== 'none') {
     analysis.recommendations.push(
-      `Keep existing ${analysis.formatting} settings - AIOX coding-standards.md will document them`,
+      `Keep existing ${analysis.formatting} settings - AIOX coding-standards.md will document them`
     );
   }
 
@@ -438,7 +435,7 @@ function formatMigrationReport(analysis) {
   // Workflows
   lines.push(`║${''.padEnd(width)}║`);
   lines.push(
-    `║  Existing Workflows: ${(analysis.hasExistingWorkflows ? 'Yes' : 'No').padEnd(width - 24)}║`,
+    `║  Existing Workflows: ${(analysis.hasExistingWorkflows ? 'Yes' : 'No').padEnd(width - 24)}║`
   );
   lines.push(`║  Merge Strategy: ${analysis.mergeStrategy.padEnd(width - 20)}║`);
 

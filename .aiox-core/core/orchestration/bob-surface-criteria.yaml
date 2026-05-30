@@ -11,8 +11,8 @@
 # @author @dev (Dex) for Story 11.4
 # ============================================
 
-version: "1.0.0"
-description: "Codified criteria for when Bob should surface to ask human"
+version: '1.0.0'
+description: 'Codified criteria for when Bob should surface to ask human'
 
 # ============================================
 # CRITERIA DEFINITIONS
@@ -32,16 +32,16 @@ criteria:
   # AC2: estimated_cost > $5 → confirm before proceed
   # ----------------------------------------
   cost_threshold:
-    id: "C001"
-    name: "Cost Threshold"
-    condition: "estimated_cost > 5"
-    unit: "USD"
-    action: "confirm_before_proceed"
+    id: 'C001'
+    name: 'Cost Threshold'
+    condition: 'estimated_cost > 5'
+    unit: 'USD'
+    action: 'confirm_before_proceed'
     message: |
       💰 Esta operação tem custo estimado de $${estimated_cost}.
 
       Deseja continuar? [SIM/NÃO]
-    severity: "warning"
+    severity: 'warning'
     bypass: true
 
   # ----------------------------------------
@@ -49,17 +49,17 @@ criteria:
   # AC3: risk_level == HIGH → present risks and ask GO/NO-GO
   # ----------------------------------------
   risk_threshold:
-    id: "C002"
-    name: "Risk Threshold"
+    id: 'C002'
+    name: 'Risk Threshold'
     condition: "risk_level == 'HIGH'"
-    action: "present_and_ask_go_nogo"
+    action: 'present_and_ask_go_nogo'
     message: |
       ⚠️ Esta operação tem risco ALTO:
 
       ${risk_details}
 
       Deseja prosseguir? [GO/NO-GO]
-    severity: "critical"
+    severity: 'critical'
     bypass: true
 
   # ----------------------------------------
@@ -67,17 +67,17 @@ criteria:
   # AC4: 2+ valid options → present options with trade-offs
   # ----------------------------------------
   multiple_options:
-    id: "C003"
-    name: "Multiple Options"
-    condition: "valid_options_count >= 2"
-    action: "present_options_with_tradeoffs"
+    id: 'C003'
+    name: 'Multiple Options'
+    condition: 'valid_options_count >= 2'
+    action: 'present_options_with_tradeoffs'
     message: |
       🔀 Encontrei ${valid_options_count} opções válidas:
 
       ${options_with_tradeoffs}
 
       Qual você prefere? [1-${valid_options_count}]
-    severity: "info"
+    severity: 'info'
     bypass: false
 
   # ----------------------------------------
@@ -85,10 +85,10 @@ criteria:
   # AC5: errors >= 2 in same task → pause and ask for help
   # ----------------------------------------
   consecutive_errors:
-    id: "C004"
-    name: "Consecutive Errors"
-    condition: "errors_in_task >= 2"
-    action: "pause_and_ask_help"
+    id: 'C004'
+    name: 'Consecutive Errors'
+    condition: 'errors_in_task >= 2'
+    action: 'pause_and_ask_help'
     message: |
       ❌ Encontrei ${errors_in_task} erros consecutivos na mesma task:
 
@@ -98,7 +98,7 @@ criteria:
       [1] Tentar abordagem diferente
       [2] Pular esta task
       [3] Parar execução
-    severity: "error"
+    severity: 'error'
     bypass: false
 
   # ----------------------------------------
@@ -106,10 +106,10 @@ criteria:
   # AC6: destructive action → ALWAYS confirm (cannot bypass)
   # ----------------------------------------
   destructive_action:
-    id: "C005"
-    name: "Destructive Action"
-    condition: "action_type IN destructive_actions"
-    action: "always_confirm"
+    id: 'C005'
+    name: 'Destructive Action'
+    condition: 'action_type IN destructive_actions'
+    action: 'always_confirm'
     message: |
       ⛔ AÇÃO DESTRUTIVA DETECTADA
 
@@ -120,30 +120,30 @@ criteria:
       Esta ação NÃO pode ser desfeita facilmente.
 
       Tem CERTEZA que deseja continuar? [SIM para confirmar]
-    severity: "critical"
-    bypass: false  # NEVER bypass destructive actions, even in YOLO mode
+    severity: 'critical'
+    bypass: false # NEVER bypass destructive actions, even in YOLO mode
 
   # Destructive actions list
   destructive_actions:
-    - "delete_files"
-    - "drop_table"
-    - "drop_database"
-    - "force_push"
-    - "rm_rf"
-    - "truncate"
-    - "reset_hard"
-    - "clean_f"
-    - "format_disk"
+    - 'delete_files'
+    - 'drop_table'
+    - 'drop_database'
+    - 'force_push'
+    - 'rm_rf'
+    - 'truncate'
+    - 'reset_hard'
+    - 'clean_f'
+    - 'format_disk'
 
   # ----------------------------------------
   # C006: Scope Change
   # AC7: scope_change → confirm scope expansion
   # ----------------------------------------
   scope_change:
-    id: "C006"
-    name: "Scope Change"
-    condition: "requested_scope > approved_scope"
-    action: "confirm_scope_expansion"
+    id: 'C006'
+    name: 'Scope Change'
+    condition: 'requested_scope > approved_scope'
+    action: 'confirm_scope_expansion'
     message: |
       📐 O escopo solicitado excede o aprovado:
 
@@ -154,7 +154,7 @@ criteria:
       └─────────────────────────────────────────┘
 
       Confirmar expansão de escopo? [SIM/NÃO]
-    severity: "warning"
+    severity: 'warning'
     bypass: true
 
   # ----------------------------------------
@@ -162,17 +162,17 @@ criteria:
   # Requires API key, payment, or external service
   # ----------------------------------------
   external_dependency:
-    id: "C007"
-    name: "External Dependency"
-    condition: "requires_api_key OR requires_payment OR requires_external_service"
-    action: "confirm_before_proceed"
+    id: 'C007'
+    name: 'External Dependency'
+    condition: 'requires_api_key OR requires_payment OR requires_external_service'
+    action: 'confirm_before_proceed'
     message: |
       🔗 Esta operação requer dependência externa:
 
       ${dependency_description}
 
       Deseja prosseguir? [SIM/NÃO]
-    severity: "info"
+    severity: 'info'
     bypass: true
 
 # ============================================
@@ -184,59 +184,59 @@ criteria:
 
 actions:
   confirm_before_proceed:
-    type: "yes_no"
-    prompt_type: "confirm"
-    default: "no"
+    type: 'yes_no'
+    prompt_type: 'confirm'
+    default: 'no'
     timeout_seconds: 300
-    on_timeout: "no"
+    on_timeout: 'no'
 
   present_and_ask_go_nogo:
-    type: "go_nogo"
-    prompt_type: "select"
+    type: 'go_nogo'
+    prompt_type: 'select'
     options:
-      - value: "go"
-        label: "GO - Prosseguir"
-      - value: "nogo"
-        label: "NO-GO - Cancelar"
-    default: "nogo"
+      - value: 'go'
+        label: 'GO - Prosseguir'
+      - value: 'nogo'
+        label: 'NO-GO - Cancelar'
+    default: 'nogo'
     timeout_seconds: 300
-    on_timeout: "nogo"
+    on_timeout: 'nogo'
 
   present_options_with_tradeoffs:
-    type: "multiple_choice"
-    prompt_type: "select"
-    default: null  # User must choose
+    type: 'multiple_choice'
+    prompt_type: 'select'
+    default: null # User must choose
     timeout_seconds: 600
-    on_timeout: "abort"
+    on_timeout: 'abort'
 
   pause_and_ask_help:
-    type: "help_request"
-    prompt_type: "select"
+    type: 'help_request'
+    prompt_type: 'select'
     options:
-      - value: "retry_different"
-        label: "Tentar abordagem diferente"
-      - value: "skip"
-        label: "Pular esta task"
-      - value: "abort"
-        label: "Parar execução"
-    default: "abort"
+      - value: 'retry_different'
+        label: 'Tentar abordagem diferente'
+      - value: 'skip'
+        label: 'Pular esta task'
+      - value: 'abort'
+        label: 'Parar execução'
+    default: 'abort'
     timeout_seconds: 600
-    on_timeout: "abort"
+    on_timeout: 'abort'
 
   always_confirm:
-    type: "explicit_confirm"
-    prompt_type: "text"
-    required_input: "SIM"  # Must type exactly "SIM" to proceed
-    default: "no"
+    type: 'explicit_confirm'
+    prompt_type: 'text'
+    required_input: 'SIM' # Must type exactly "SIM" to proceed
+    default: 'no'
     timeout_seconds: 300
-    on_timeout: "no"
+    on_timeout: 'no'
 
   confirm_scope_expansion:
-    type: "yes_no"
-    prompt_type: "confirm"
-    default: "no"
+    type: 'yes_no'
+    prompt_type: 'confirm'
+    default: 'no'
     timeout_seconds: 300
-    on_timeout: "no"
+    on_timeout: 'no'
 
 # ============================================
 # EVALUATION ORDER
@@ -246,24 +246,24 @@ actions:
 # ============================================
 
 evaluation_order:
-  - destructive_action   # C005 - Always check first (most critical)
-  - risk_threshold       # C002 - High risk operations
-  - consecutive_errors   # C004 - Error recovery
-  - cost_threshold       # C001 - Cost confirmation
-  - scope_change         # C006 - Scope expansion
-  - multiple_options     # C003 - User choice needed
-  - external_dependency  # C007 - External dependencies
+  - destructive_action # C005 - Always check first (most critical)
+  - risk_threshold # C002 - High risk operations
+  - consecutive_errors # C004 - Error recovery
+  - cost_threshold # C001 - Cost confirmation
+  - scope_change # C006 - Scope expansion
+  - multiple_options # C003 - User choice needed
+  - external_dependency # C007 - External dependencies
 
 # ============================================
 # METADATA
 # ============================================
 
 metadata:
-  author: "@dev (Dex)"
-  story: "11.4"
-  epic: "11 - Projeto Bob"
-  created_date: "2026-02-05"
-  prd_reference: "PRD AIOX v2.0 - Seção 3.6 (Critérios de Subir à Superfície)"
+  author: '@dev (Dex)'
+  story: '11.4'
+  epic: '11 - Projeto Bob'
+  created_date: '2026-02-05'
+  prd_reference: 'PRD AIOX v2.0 - Seção 3.6 (Critérios de Subir à Superfície)'
   tags:
     - projeto-bob
     - surface-criteria

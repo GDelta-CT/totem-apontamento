@@ -11,6 +11,7 @@
 ### 1️⃣ Descompacta este zip dentro do seu projeto GDelta
 
 Os arquivos vão se misturar com os existentes — **não sobrescreve nada importante**, apenas adiciona:
+
 - Pastas: `.github/workflows/`, `supabase/migrations/`, `docs/`, `prompts/`
 - Arquivo: `CONTROLE.md` na raiz
 
@@ -38,28 +39,36 @@ Esta é a única ação manual realmente importante esta semana. Fecha o vazamen
 ## 📂 O que cada coisa faz
 
 ### `CONTROLE.md` (raiz)
+
 **O único arquivo que você precisa abrir pra saber o estado do projeto.** Tudo de relevante está lá. Atualizado por todas as IAs sempre que algo muda.
 
 ### `docs/DECISOES.md`
+
 Log de TODAS as decisões técnicas tomadas. Quem decidiu, quando, por quê. Se você discordar de alguma, marque `[REVISAR]` e nos avise.
 
 ### `docs/PROXIMOS-PASSOS.md`
+
 Checklist viva. 19 tarefas mapeadas até a primeira venda. Cada uma com complexidade, agente recomendado, tempo estimado.
 
 ### `prompts/`
+
 Prompts prontos pra colar no Antigravity. Você nem precisa pensar — só copiar e colar.
 
 ### `.github/workflows/ci.yml`
+
 GitHub Actions que roda automaticamente:
+
 - Type-check do TypeScript
 - Build do Next.js
 - Audit de dependências
 - Scan de secrets vazadas
 
 ### `.github/workflows/backup.yml`
+
 Backup automático do banco Supabase TODA NOITE às 3h. Retém 30 dias. Grátis.
 
 ### `supabase/migrations/`
+
 Migrations versionadas. Cada arquivo numerado em ordem. Roda em qualquer ambiente (dev/staging/prod) e sempre traz o banco pro mesmo estado.
 
 ---
@@ -100,19 +109,19 @@ Migrations versionadas. Cada arquivo numerado em ordem. Roda em qualquer ambient
 
 ## ⏰ Cronograma realista (10-16 semanas)
 
-| Semana | Foco | Você gasta |
-|---|---|---|
-| 1 | Fundação de segurança (RLS, backup) | 1-2h |
-| 2 | Multi-tenant + audit log | 2-3h |
-| 3 | API Routes (blindar frontend) | 3-4h |
-| 4 | Auth do admin + login | 3-4h |
-| 5 | PIN do operário + middleware | 2-3h |
-| 6 | Refactor totem/page.tsx | 3-4h |
-| 7 | Dashboard `/admin` home + layout | 3-4h |
-| 8 | Páginas de produção + pessoas | 4-5h |
-| 9 | Integração Asaas (cobrança) | 4-6h |
-| 10 | LGPD + Política + CNPJ | 2-3h |
-| 11-12 | Polimento + primeiro cliente | 8-10h |
+| Semana | Foco                                | Você gasta |
+| ------ | ----------------------------------- | ---------- |
+| 1      | Fundação de segurança (RLS, backup) | 1-2h       |
+| 2      | Multi-tenant + audit log            | 2-3h       |
+| 3      | API Routes (blindar frontend)       | 3-4h       |
+| 4      | Auth do admin + login               | 3-4h       |
+| 5      | PIN do operário + middleware        | 2-3h       |
+| 6      | Refactor totem/page.tsx             | 3-4h       |
+| 7      | Dashboard `/admin` home + layout    | 3-4h       |
+| 8      | Páginas de produção + pessoas       | 4-5h       |
+| 9      | Integração Asaas (cobrança)         | 4-6h       |
+| 10     | LGPD + Política + CNPJ              | 2-3h       |
+| 11-12  | Polimento + primeiro cliente        | 8-10h      |
 
 **Total estimado:** 35-50h ao longo de 12 semanas. Cabe em 10-20h/semana com folga.
 
@@ -130,13 +139,13 @@ Migrations versionadas. Cada arquivo numerado em ordem. Roda em qualquer ambient
 
 ## 📞 Quando precisar de mim ou da outra Claude
 
-| Situação | Quem chamar |
-|---|---|
-| Dúvida sobre decisão técnica | Claude (app — outra conversa) |
+| Situação                             | Quem chamar                        |
+| ------------------------------------ | ---------------------------------- |
+| Dúvida sobre decisão técnica         | Claude (app — outra conversa)      |
 | Dúvida sobre modelo financeiro / KPI | Claude (dashboard — esta conversa) |
-| Dúvida sobre LGPD/legal | Advogado externo (futuro) |
-| Bug que ninguém entende | Cola erro pra mim aqui |
-| Quer adicionar feature nova | Discutir com Claude (app) primeiro |
+| Dúvida sobre LGPD/legal              | Advogado externo (futuro)          |
+| Bug que ninguém entende              | Cola erro pra mim aqui             |
+| Quer adicionar feature nova          | Discutir com Claude (app) primeiro |
 
 ---
 

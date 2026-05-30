@@ -366,7 +366,7 @@ tool:
       - id: format-oauth-scopes
         language: javascript
         runtime: isolated_vm
-        description: "Format OAuth scopes for Google Workspace services"
+        description: 'Format OAuth scopes for Google Workspace services'
         function: |
           (function() {
             const { services } = args;
@@ -393,7 +393,7 @@ tool:
       - id: parse-drive-file-id
         language: javascript
         runtime: isolated_vm
-        description: "Extract file ID from Drive URL or return ID directly"
+        description: 'Extract file ID from Drive URL or return ID directly'
         function: |
           (function() {
             const { input } = args;
@@ -416,7 +416,7 @@ tool:
       - id: format-calendar-datetime
         language: javascript
         runtime: isolated_vm
-        description: "Convert natural language time to RFC3339 format"
+        description: 'Convert natural language time to RFC3339 format'
         function: |
           (function() {
             const { date, time, datetime, timezone, allDay } = args;
@@ -453,7 +453,7 @@ tool:
       - id: build-gmail-query
         language: javascript
         runtime: isolated_vm
-        description: "Build Gmail search query from parameters"
+        description: 'Build Gmail search query from parameters'
         function: |
           (function() {
             const { from, to, subject, after, before, hasAttachment, isUnread, label, or } = args;
@@ -494,7 +494,7 @@ tool:
       - id: parse-sheet-range
         language: javascript
         runtime: isolated_vm
-        description: "Parse Sheet range notation into components"
+        description: 'Parse Sheet range notation into components'
         function: |
           (function() {
             const { range } = args;
@@ -574,7 +574,7 @@ tool:
       - id: validate-permission-level
         language: javascript
         runtime: isolated_vm
-        description: "Validate Drive permission level"
+        description: 'Validate Drive permission level'
         function: |
           (function() {
             const { permission } = args;
@@ -585,7 +585,7 @@ tool:
       - id: format-email-attachment
         language: javascript
         runtime: isolated_vm
-        description: "Format file attachment for Gmail"
+        description: 'Format file attachment for Gmail'
         function: |
           (function() {
             const { filename, data, mimeType, driveUrl, driveFileId } = args;
@@ -696,100 +696,100 @@ tool:
   api_complexity:
     multi_service_integration:
       - service: Drive
-        description: "File storage and sharing"
+        description: 'File storage and sharing'
         common_operations:
           - create_file
           - search_files
           - share_file
           - get_file_content
-        authentication: "OAuth 2.0 with drive scopes"
+        authentication: 'OAuth 2.0 with drive scopes'
 
       - service: Docs
-        description: "Document creation and editing"
+        description: 'Document creation and editing'
         common_operations:
           - create_document
           - get_document
           - update_document
-        authentication: "OAuth 2.0 with docs scopes"
+        authentication: 'OAuth 2.0 with docs scopes'
 
       - service: Sheets
-        description: "Spreadsheet operations"
+        description: 'Spreadsheet operations'
         common_operations:
           - create_spreadsheet
           - read_range
           - update_range
-        authentication: "OAuth 2.0 with sheets scopes"
+        authentication: 'OAuth 2.0 with sheets scopes'
 
       - service: Calendar
-        description: "Calendar event management"
+        description: 'Calendar event management'
         common_operations:
           - create_event
           - list_events
           - update_event
           - delete_event
-        authentication: "OAuth 2.0 with calendar scopes"
+        authentication: 'OAuth 2.0 with calendar scopes'
 
       - service: Gmail
-        description: "Email operations"
+        description: 'Email operations'
         common_operations:
           - send_email
           - search_messages
           - get_message
-        authentication: "OAuth 2.0 with gmail scopes"
+        authentication: 'OAuth 2.0 with gmail scopes'
 
     oauth_scopes:
       drive:
-        full_access: "https://www.googleapis.com/auth/drive"
-        file_access: "https://www.googleapis.com/auth/drive.file"
-        readonly: "https://www.googleapis.com/auth/drive.readonly"
+        full_access: 'https://www.googleapis.com/auth/drive'
+        file_access: 'https://www.googleapis.com/auth/drive.file'
+        readonly: 'https://www.googleapis.com/auth/drive.readonly'
 
       docs:
-        full_access: "https://www.googleapis.com/auth/documents"
-        readonly: "https://www.googleapis.com/auth/documents.readonly"
+        full_access: 'https://www.googleapis.com/auth/documents'
+        readonly: 'https://www.googleapis.com/auth/documents.readonly'
 
       sheets:
-        full_access: "https://www.googleapis.com/auth/spreadsheets"
-        readonly: "https://www.googleapis.com/auth/spreadsheets.readonly"
+        full_access: 'https://www.googleapis.com/auth/spreadsheets'
+        readonly: 'https://www.googleapis.com/auth/spreadsheets.readonly'
 
       calendar:
-        full_access: "https://www.googleapis.com/auth/calendar"
-        readonly: "https://www.googleapis.com/auth/calendar.readonly"
-        events: "https://www.googleapis.com/auth/calendar.events"
+        full_access: 'https://www.googleapis.com/auth/calendar'
+        readonly: 'https://www.googleapis.com/auth/calendar.readonly'
+        events: 'https://www.googleapis.com/auth/calendar.events'
 
       gmail:
-        send: "https://www.googleapis.com/auth/gmail.send"
-        readonly: "https://www.googleapis.com/auth/gmail.readonly"
-        modify: "https://www.googleapis.com/auth/gmail.modify"
+        send: 'https://www.googleapis.com/auth/gmail.send'
+        readonly: 'https://www.googleapis.com/auth/gmail.readonly'
+        modify: 'https://www.googleapis.com/auth/gmail.modify'
 
     api_quirks:
       - quirk: oauth_token_expiry
-        description: "Access tokens expire after 1 hour, refresh tokens must be used"
-        impact: "API calls fail with 401 after token expiry"
-        mitigation: "Implement automatic token refresh before expiry, use refresh_token grant type"
+        description: 'Access tokens expire after 1 hour, refresh tokens must be used'
+        impact: 'API calls fail with 401 after token expiry'
+        mitigation: 'Implement automatic token refresh before expiry, use refresh_token grant type'
 
       - quirk: quota_limits_per_service
-        description: "Each service has different quota limits (Drive: 1000 requests/100s, Gmail: 250 requests/user/second)"
-        impact: "429 Too Many Requests errors during burst operations"
-        mitigation: "Implement exponential backoff, cache responses, batch operations where possible"
+        description: 'Each service has different quota limits (Drive: 1000 requests/100s, Gmail: 250 requests/user/second)'
+        impact: '429 Too Many Requests errors during burst operations'
+        mitigation: 'Implement exponential backoff, cache responses, batch operations where possible'
 
       - quirk: drive_file_permissions
         description: "Changing file owner requires 'writer' role first, then 'owner' transfer"
-        impact: "Direct owner transfer fails with permission error"
-        mitigation: "Two-step process: grant writer access, then transfer ownership"
+        impact: 'Direct owner transfer fails with permission error'
+        mitigation: 'Two-step process: grant writer access, then transfer ownership'
 
       - quirk: calendar_timezone_handling
-        description: "All-day events use date-only format, timed events require timezone"
-        impact: "Incorrect event times if timezone not specified"
-        mitigation: "Always include timezone for timed events, use date-only for all-day events"
+        description: 'All-day events use date-only format, timed events require timezone'
+        impact: 'Incorrect event times if timezone not specified'
+        mitigation: 'Always include timezone for timed events, use date-only for all-day events'
 
       - quirk: gmail_attachment_size
-        description: "Email attachments limited to 25MB, large files require Drive links"
-        impact: "Send fails silently or with generic error for large attachments"
-        mitigation: "Upload large files to Drive first, include sharing link in email"
+        description: 'Email attachments limited to 25MB, large files require Drive links'
+        impact: 'Send fails silently or with generic error for large attachments'
+        mitigation: 'Upload large files to Drive first, include sharing link in email'
 
   anti_patterns:
     - pattern: missing_oauth_scopes
-      description: "Attempting operations without required OAuth scopes"
+      description: 'Attempting operations without required OAuth scopes'
       category: authentication
       severity: high
       wrong: |
@@ -805,10 +805,10 @@ tool:
           'https://www.googleapis.com/auth/gmail.send',
           'https://www.googleapis.com/auth/calendar'
         ]
-      rationale: "OAuth scope changes require re-authentication. Request all needed scopes initially."
+      rationale: 'OAuth scope changes require re-authentication. Request all needed scopes initially.'
 
     - pattern: ignoring_quota_limits
-      description: "Making rapid sequential API calls without rate limiting"
+      description: 'Making rapid sequential API calls without rate limiting'
       category: api_reliability
       severity: medium
       wrong: |
@@ -823,10 +823,10 @@ tool:
           await Promise.all(batch.map(f => create_file(f)));
           await sleep(1000);  // ✅ Respect quota limits
         }
-      rationale: "Google Workspace APIs have strict per-user, per-100s quotas. Batch and delay operations."
+      rationale: 'Google Workspace APIs have strict per-user, per-100s quotas. Batch and delay operations.'
 
     - pattern: hardcoded_file_ids
-      description: "Using hardcoded file IDs instead of searching or storing dynamically"
+      description: 'Using hardcoded file IDs instead of searching or storing dynamically'
       category: data_management
       severity: medium
       wrong: |
@@ -838,50 +838,50 @@ tool:
         const files = await search_files({ query: 'name="config.json"' });
         const fileId = files[0].id;  // ✅ Works across environments
         await update_file({ fileId, ... });
-      rationale: "File IDs are environment-specific. Always search or store IDs in config/database."
+      rationale: 'File IDs are environment-specific. Always search or store IDs in config/database.'
 
   examples:
     create_file:
       - scenario: success
-        description: "Create text file in Drive"
+        description: 'Create text file in Drive'
         input:
-          name: "Project Notes"
-          content: "Meeting notes from 2024"
-          mimeType: "text/plain"
-          folderId: "root"
+          name: 'Project Notes'
+          content: 'Meeting notes from 2024'
+          mimeType: 'text/plain'
+          folderId: 'root'
         output:
-          id: "1abc123def456"
-          name: "Project Notes"
-          webViewLink: "https://drive.google.com/file/d/1abc123def456/view"
+          id: '1abc123def456'
+          name: 'Project Notes'
+          webViewLink: 'https://drive.google.com/file/d/1abc123def456/view'
 
       - scenario: failure_invalid_param
-        description: "Missing required name field"
+        description: 'Missing required name field'
         input:
-          content: "Some content"
+          content: 'Some content'
         error:
           code: VALIDATION_ERROR
-          message: "name is required for create_file"
+          message: 'name is required for create_file'
           validator: validate-drive-operations
 
     create_event:
       - scenario: success
-        description: "Create Calendar event with attendees"
+        description: 'Create Calendar event with attendees'
         input:
-          summary: "Team Meeting"
-          startTime: "2024-01-15T10:00:00-08:00"
-          endTime: "2024-01-15T11:00:00-08:00"
-          attendees: ["user1@example.com", "user2@example.com"]
+          summary: 'Team Meeting'
+          startTime: '2024-01-15T10:00:00-08:00'
+          endTime: '2024-01-15T11:00:00-08:00'
+          attendees: ['user1@example.com', 'user2@example.com']
         output:
-          id: "event123"
-          status: "confirmed"
-          htmlLink: "https://calendar.google.com/event?eid=event123"
+          id: 'event123'
+          status: 'confirmed'
+          htmlLink: 'https://calendar.google.com/event?eid=event123'
 
       - scenario: failure_invalid_param
-        description: "Invalid datetime format"
+        description: 'Invalid datetime format'
         input:
-          summary: "Meeting"
-          startTime: "2024-01-15 10:00"
-          endTime: "2024-01-15 11:00"
+          summary: 'Meeting'
+          startTime: '2024-01-15 10:00'
+          endTime: '2024-01-15 11:00'
         error:
           code: VALIDATION_ERROR
           message: "startTime must be in RFC3339 format (e.g., '2024-01-01T10:00:00-07:00')"
@@ -889,42 +889,42 @@ tool:
 
     send_email:
       - scenario: success
-        description: "Send email with Gmail"
+        description: 'Send email with Gmail'
         input:
-          to: "recipient@example.com"
-          subject: "Project Update"
+          to: 'recipient@example.com'
+          subject: 'Project Update'
           body: "Here's the latest update..."
         output:
-          id: "msg123"
-          threadId: "thread456"
-          labelIds: ["SENT"]
+          id: 'msg123'
+          threadId: 'thread456'
+          labelIds: ['SENT']
 
       - scenario: failure_invalid_param
-        description: "Invalid email address"
+        description: 'Invalid email address'
         input:
-          to: "invalid-email"
-          subject: "Test"
-          body: "Test message"
+          to: 'invalid-email'
+          subject: 'Test'
+          body: 'Test message'
         error:
           code: VALIDATION_ERROR
-          message: "to must be a valid email address"
+          message: 'to must be a valid email address'
           validator: validate-gmail-operations
 
   mcp_specific:
-    server_command: "npx -y @modelcontextprotocol/server-google-workspace"
+    server_command: 'npx -y @modelcontextprotocol/server-google-workspace'
     transport: stdio
     environment_variables:
       - name: GOOGLE_WORKSPACE_OAUTH_CLIENT_ID
         required: true
-        description: "OAuth 2.0 Client ID from Google Cloud Console"
+        description: 'OAuth 2.0 Client ID from Google Cloud Console'
       - name: GOOGLE_WORKSPACE_OAUTH_CLIENT_SECRET
         required: true
-        description: "OAuth 2.0 Client Secret"
+        description: 'OAuth 2.0 Client Secret'
       - name: GOOGLE_WORKSPACE_REFRESH_TOKEN
         required: false
-        description: "Refresh token for automatic re-authentication"
+        description: 'Refresh token for automatic re-authentication'
     health_check:
       method: tool_call
       command: list_files
-      expected_response: "Array of file objects or empty array"
+      expected_response: 'Array of file objects or empty array'
       timeout_ms: 5000

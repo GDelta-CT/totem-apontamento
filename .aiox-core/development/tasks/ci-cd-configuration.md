@@ -5,8 +5,8 @@ agent: github-devops
 category: devops
 complexity: high
 tools:
-  - github-cli       # Manage workflows and repository settings
-  - coderabbit-free  # Automated code review (FREE tier)
+  - github-cli # Manage workflows and repository settings
+  - coderabbit-free # Automated code review (FREE tier)
 checklists:
   - github-devops-checklist.md
 ---
@@ -133,14 +133,15 @@ To set up a complete, production-ready CI/CD pipeline for a repository, includin
 
 5. **Create CodeRabbit Configuration**
    - Generate `.coderabbit.yaml`:
+
      ```yaml
      # CodeRabbit Free Configuration
      # 🆓 FREE for public repositories - No costs, no limits
-     
-     language: "en-US"
-     
+
+     language: 'en-US'
+
      reviews:
-       profile: "chill"  # balanced review depth
+       profile: 'chill' # balanced review depth
        request_changes_workflow: false
        high_level_summary: true
        poem: false
@@ -149,12 +150,12 @@ To set up a complete, production-ready CI/CD pipeline for a repository, includin
        auto_review:
          enabled: true
          ignore_title_keywords:
-           - "WIP"
-           - "DO NOT REVIEW"
-       
+           - 'WIP'
+           - 'DO NOT REVIEW'
+
      chat:
        auto_reply: true
-     
+
      # Focus areas (adjust based on project type)
      focus:
        - security
@@ -162,43 +163,51 @@ To set up a complete, production-ready CI/CD pipeline for a repository, includin
        - best_practices
        - testing
        - documentation
-     
+
      # Ignore patterns
      ignore:
-       - "**/*.min.js"
-       - "**/*.min.css"
-       - "**/dist/**"
-       - "**/build/**"
-       - "**/.next/**"
-       - "**/node_modules/**"
-       - "**/.git/**"
+       - '**/*.min.js'
+       - '**/*.min.css'
+       - '**/dist/**'
+       - '**/build/**'
+       - '**/.next/**'
+       - '**/node_modules/**'
+       - '**/.git/**'
      ```
+
    - Commit and push `.coderabbit.yaml`
    - Log: "✅ CodeRabbit Free configured (Focus: security, performance, best practices)"
 
 6. **Add CodeRabbit Commands to README**
    - Document available commands:
-     ```markdown
+
+     ````markdown
      ## Code Review (CodeRabbit Free 🆓)
-     
+
      **Automatic Reviews**: CodeRabbit automatically reviews all PRs
-     
+
      **Manual Commands** (comment on PR):
+
      - `@coderabbitai review` - Request full review
      - `@coderabbitai summary` - Get PR summary
      - `@coderabbitai resolve` - Mark suggestions as resolved
      - `@coderabbitai help` - Show available commands
-     
+
      **Local Pre-Commit Check** (optional):
+
      ```bash
      # Install CodeRabbit CLI (optional, for local checks)
      npm install -g @coderabbitai/cli
-     
+
      # Run pre-commit review
      coderabbit --prompt-only -t uncommitted
      ```
-     
+     ````
+
      [CodeRabbit Docs](https://docs.coderabbit.ai)
+
+     ```
+
      ```
 
 ### Phase 3: GitHub Actions Workflow Creation (5 min)
@@ -208,72 +217,72 @@ To set up a complete, production-ready CI/CD pipeline for a repository, includin
 
      ```yaml
      name: CI Pipeline
-     
+
      on:
        push:
-         branches: [ main, develop ]
+         branches: [main, develop]
        pull_request:
-         branches: [ main, develop ]
-     
+         branches: [main, develop]
+
      jobs:
        lint:
          runs-on: ubuntu-latest
          steps:
            - uses: actions/checkout@v4
-           
+
            - name: Setup Node.js
              uses: actions/setup-node@v4
              with:
                node-version: '20'
                cache: 'npm'
-           
+
            - name: Install dependencies
              run: npm ci
-           
+
            - name: Run linter
              run: npm run lint
-       
+
        test:
          runs-on: ubuntu-latest
          needs: lint
          steps:
            - uses: actions/checkout@v4
-           
+
            - name: Setup Node.js
              uses: actions/setup-node@v4
              with:
                node-version: '20'
                cache: 'npm'
-           
+
            - name: Install dependencies
              run: npm ci
-           
+
            - name: Run tests
              run: npm test -- --coverage
-           
+
            - name: Upload coverage
              uses: codecov/codecov-action@v3
              with:
                files: ./coverage/coverage-final.json
-       
+
        build:
          runs-on: ubuntu-latest
          needs: test
          steps:
            - uses: actions/checkout@v4
-           
+
            - name: Setup Node.js
              uses: actions/setup-node@v4
              with:
                node-version: '20'
                cache: 'npm'
-           
+
            - name: Install dependencies
              run: npm ci
-           
+
            - name: Build project
              run: npm run build
-           
+
            - name: Upload build artifacts
              uses: actions/upload-artifact@v3
              with:
@@ -286,33 +295,33 @@ To set up a complete, production-ready CI/CD pipeline for a repository, includin
 
      ```yaml
      name: Deploy
-     
+
      on:
        push:
-         branches: [ main ]
+         branches: [main]
        workflow_dispatch:
-     
+
      jobs:
        deploy:
          runs-on: ubuntu-latest
          environment: production
          steps:
            - uses: actions/checkout@v4
-           
+
            - name: Setup Node.js
              uses: actions/setup-node@v4
              with:
                node-version: '20'
                cache: 'npm'
-           
+
            - name: Install dependencies
              run: npm ci
-           
+
            - name: Build
              run: npm run build
-           
+
            - name: Deploy to {deployment_target}
-             uses: {deployment_action}
+             uses: { deployment_action }
              with:
                token: ${{ secrets.DEPLOY_TOKEN }}
      ```
@@ -436,11 +445,12 @@ This repository uses automated CI/CD with {ci_provider}.
 1. **Lint**: ESLint + Prettier
 2. **Test**: {testing_framework} with coverage
 3. **Build**: Production build
-{4. **Deploy**: Automatic deployment to {deployment_target} (main branch only) if applicable}
+   {4. **Deploy**: Automatic deployment to {deployment_target} (main branch only) if applicable}
 
 ### Code Review (CodeRabbit Free 🆓)
 
 Every PR is automatically reviewed by [CodeRabbit](https://github.com/apps/coderabbitai):
+
 - Security vulnerabilities
 - Performance issues
 - Best practices
@@ -448,6 +458,7 @@ Every PR is automatically reviewed by [CodeRabbit](https://github.com/apps/coder
 - Documentation
 
 **Commands** (comment on PR):
+
 - `@coderabbitai review` - Request review
 - `@coderabbitai summary` - Get summary
 - `@coderabbitai resolve` - Mark as resolved
@@ -528,16 +539,19 @@ Every PR is automatically reviewed by [CodeRabbit](https://github.com/apps/coder
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -691,10 +705,10 @@ token_usage: ~3,000-10,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Break into smaller workflows; implement checkpointing; use async processing where possible
 
 ---
-
 
 ## Usage Examples
 
@@ -750,6 +764,7 @@ aiox ci-cd setup \
 7. **Interactive**: Chat with CodeRabbit about suggestions
 
 **Why CodeRabbit Free?**
+
 - Competitor (Copilot, CodeGuru) costs $10-19/month/user
 - CodeRabbit Free: $0 for open-source
 - Better security coverage than most paid tools
@@ -758,7 +773,7 @@ aiox ci-cd setup \
 ---
 
 **Related Tasks:**
+
 - `release-management` - Automate releases after CI passes
 - `pr-automation` - Help users create PRs with proper format
 - `setup-repository` - Initialize repository with best practices
-

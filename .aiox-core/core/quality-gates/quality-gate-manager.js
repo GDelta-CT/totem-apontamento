@@ -245,8 +245,7 @@ class QualityGateManager {
 
     if (verbose) {
       console.log('\n━'.repeat(50));
-      const icon = status === 'passed' ? '✅' :
-        status === 'pending' ? '⏳' : '❌';
+      const icon = status === 'passed' ? '✅' : status === 'pending' ? '⏳' : '❌';
       console.log(`Result: ${icon} ${status.toUpperCase()}`);
       console.log(`Duration: ${this.formatDuration(this.getDuration())}`);
     }
@@ -443,9 +442,14 @@ class QualityGateManager {
     if (!l1Result.pass) {
       this.endTime = Date.now();
       const blockResult = this.humanReviewOrchestrator.block(
-        { pass: false, layer: 'Layer 1', issues: this.extractIssues(l1Result), reason: 'Layer 1 failed' },
+        {
+          pass: false,
+          layer: 'Layer 1',
+          issues: this.extractIssues(l1Result),
+          reason: 'Layer 1 failed',
+        },
         'layer1',
-        this.startTime,
+        this.startTime
       );
 
       if (verbose) {
@@ -473,9 +477,14 @@ class QualityGateManager {
     if (!l2Result.pass) {
       this.endTime = Date.now();
       const blockResult = this.humanReviewOrchestrator.block(
-        { pass: false, layer: 'Layer 2', issues: this.extractIssues(l2Result), reason: 'Layer 2 failed' },
+        {
+          pass: false,
+          layer: 'Layer 2',
+          issues: this.extractIssues(l2Result),
+          reason: 'Layer 2 failed',
+        },
         'layer2',
-        this.startTime,
+        this.startTime
       );
 
       if (verbose) {
@@ -504,7 +513,7 @@ class QualityGateManager {
     const orchestrationResult = await this.humanReviewOrchestrator.orchestrateReview(
       { ...prContext, changedFiles },
       l1Result,
-      l2Result,
+      l2Result
     );
 
     // Run Layer 3 setup
@@ -523,9 +532,15 @@ class QualityGateManager {
       console.log('━'.repeat(50));
       console.log('✅ Layer 1: PASSED');
       console.log('✅ Layer 2: PASSED');
-      console.log(`⏳ Layer 3: ${orchestrationResult.reviewRequest ? 'HUMAN REVIEW REQUESTED' : 'PENDING'}`);
-      console.log(`\n📬 Review assigned to: ${orchestrationResult.reviewRequest?.reviewer || 'TBD'}`);
-      console.log(`⏱️ Estimated review time: ~${orchestrationResult.reviewRequest?.estimatedTime || 30} minutes`);
+      console.log(
+        `⏳ Layer 3: ${orchestrationResult.reviewRequest ? 'HUMAN REVIEW REQUESTED' : 'PENDING'}`
+      );
+      console.log(
+        `\n📬 Review assigned to: ${orchestrationResult.reviewRequest?.reviewer || 'TBD'}`
+      );
+      console.log(
+        `⏱️ Estimated review time: ~${orchestrationResult.reviewRequest?.estimatedTime || 30} minutes`
+      );
 
       if (orchestrationResult.reviewRequest?.focusAreas?.primary?.length > 0) {
         console.log('\n🎯 Focus Areas:');
@@ -534,7 +549,9 @@ class QualityGateManager {
         });
       }
 
-      console.log(`\n⏭️ Skip: ${orchestrationResult.reviewRequest?.skipAreas?.join(', ') || 'syntax, formatting'}`);
+      console.log(
+        `\n⏭️ Skip: ${orchestrationResult.reviewRequest?.skipAreas?.join(', ') || 'syntax, formatting'}`
+      );
       console.log('\nTotal Duration: ' + this.formatDuration(this.getDuration()));
     }
 
@@ -581,7 +598,7 @@ class QualityGateManager {
   async completeHumanReview(requestId, reviewResult) {
     const completedRequest = await this.humanReviewOrchestrator.completeReview(
       requestId,
-      reviewResult,
+      reviewResult
     );
 
     await this.notificationManager.sendCompletionNotification(completedRequest);

@@ -5,23 +5,27 @@ You are working with Synkra AIOX, an AI-Orchestrated System for Full Stack Devel
 ## Core Development Rules
 
 ### Agent Integration
+
 - Recognize AIOX agent activations: @dev, @qa, @architect, @pm, @po, @sm, @analyst
-- Agent commands use * prefix: *help, *create-story, *task, *exit
+- Agent commands use * prefix: *help, *create-story, *task, \*exit
 - Follow agent-specific workflows and patterns
 
 ### Story-Driven Development
+
 1. **Always work from a story file** in docs/stories/
 2. **Update story checkboxes** as you complete tasks: [ ] → [x]
 3. **Maintain the File List** section with all created/modified files
 4. **Follow acceptance criteria** exactly as written
 
 ### Code Quality Standards
+
 - Write clean, maintainable code following project conventions
 - Include comprehensive error handling
 - Add unit tests for all new functionality
 - Follow existing patterns in the codebase
 
 ### Testing Protocol
+
 - Run all tests before marking tasks complete
 - Ensure linting passes: `npm run lint`
 - Verify type checking: `npm run typecheck`
@@ -54,18 +58,21 @@ docs/
 ## Best Practices
 
 ### When implementing:
+
 - Check existing patterns first
 - Reuse components and utilities
 - Follow naming conventions
 - Keep functions focused and small
 
 ### When testing:
+
 - Write tests alongside implementation
 - Test edge cases
 - Verify error handling
 - Run full test suite
 
 ### When documenting:
+
 - Update README for new features
 - Document API changes
 - Add inline comments for complex logic
@@ -81,6 +88,7 @@ docs/
 ## Common Patterns
 
 ### Error Handling
+
 ```javascript
 try {
   // Operation
@@ -91,6 +99,7 @@ try {
 ```
 
 ### File Operations
+
 ```javascript
 const fs = require('fs-extra');
 const path = require('path');
@@ -100,6 +109,7 @@ const filePath = path.join(__dirname, 'relative/path');
 ```
 
 ### Async/Await
+
 ```javascript
 async function operation() {
   try {
@@ -112,4 +122,5 @@ async function operation() {
 ```
 
 ---
-*Synkra AIOX AntiGravity Configuration v1.0*
+
+_Synkra AIOX AntiGravity Configuration v1.0_

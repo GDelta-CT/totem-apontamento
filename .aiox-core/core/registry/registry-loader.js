@@ -41,12 +41,13 @@ class ServiceRegistry {
     const now = Date.now();
 
     // Return cached if valid
-    if (!force && this.cache && (now - this.cacheTimestamp) < this.cacheTTL) {
+    if (!force && this.cache && now - this.cacheTimestamp < this.cacheTTL) {
       return this.cache;
     }
 
     // Determine registry path
-    const registryPath = this.registryPath ||
+    const registryPath =
+      this.registryPath ||
       path.join(process.cwd(), '.aiox-core/core/registry/service-registry.json');
 
     const startTime = Date.now();
@@ -150,9 +151,9 @@ class ServiceRegistry {
 
     // Get workers with first tag, then filter by rest
     const candidates = this._byTag.get(tags[0]) || [];
-    return candidates.filter(worker => {
+    return candidates.filter((worker) => {
       const workerTags = new Set(worker.tags || []);
-      return tags.every(tag => workerTags.has(tag));
+      return tags.every((tag) => workerTags.has(tag));
     });
   }
 
@@ -178,36 +179,33 @@ class ServiceRegistry {
     const queryLower = query.toLowerCase();
     const { category, maxResults = 20 } = options;
 
-    let results = this.cache.workers.filter(worker => {
+    let results = this.cache.workers.filter((worker) => {
       // Filter by category if specified
       if (category && worker.category !== category) {
         return false;
       }
 
       // Search in ID, name, description, tags
-      const searchText = [
-        worker.id,
-        worker.name,
-        worker.description,
-        ...(worker.tags || []),
-      ].join(' ').toLowerCase();
+      const searchText = [worker.id, worker.name, worker.description, ...(worker.tags || [])]
+        .join(' ')
+        .toLowerCase();
 
       return searchText.includes(queryLower);
     });
 
     // Score and sort by relevance
-    results = results.map(worker => {
+    results = results.map((worker) => {
       let score = 0;
       if (worker.id.includes(queryLower)) score += 10;
       if (worker.name.toLowerCase().includes(queryLower)) score += 8;
-      if ((worker.tags || []).some(t => t.includes(queryLower))) score += 5;
+      if ((worker.tags || []).some((t) => t.includes(queryLower))) score += 5;
       if (worker.description.toLowerCase().includes(queryLower)) score += 2;
       return { worker, score };
     });
 
     results.sort((a, b) => b.score - a.score);
 
-    return results.slice(0, maxResults).map(r => r.worker);
+    return results.slice(0, maxResults).map((r) => r.worker);
   }
 
   /**

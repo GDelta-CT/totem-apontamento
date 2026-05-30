@@ -43,42 +43,50 @@ infrastructure/ ← core/ ← development/ ← product/
 ## Key Components
 
 ### Git Integration
+
 - `GitWrapper` - Git CLI wrapper for all git operations
 - `GitConfigDetector` - Detects git configuration status
 - `BranchManager` - Branch management utilities
 - `CommitMessageGenerator` - Generates commit messages
 
 ### PM Integration
+
 - `getPMAdapter()` - Factory for PM tool adapters
 - `PMAdapter` - Base adapter class
 - Adapters: ClickUp, GitHub Projects, Jira, Local (standalone)
 
 ### Template & Generation
+
 - `TemplateEngine` - Template rendering
 - `ComponentGenerator` - AIOX component generation
 - `BatchCreator` - Batch operations
 
 ### Validation
+
 - `AioxValidator` - AIOX component validation
 - `TemplateValidator` - Template validation
 - `SpotCheckValidator` - Spot check validation
 
 ### Analysis
+
 - `DependencyAnalyzer` - Dependency analysis
 - `SecurityChecker` - Security validation
 - `CapabilityAnalyzer` - Capability analysis
 
 ### Testing
+
 - `TestGenerator` - Test file generation
 - `CoverageAnalyzer` - Coverage analysis
 - `SandboxTester` - Sandbox testing
 
 ### Performance
+
 - `PerformanceAnalyzer` - Performance analysis
 - `PerformanceTracker` - Performance tracking
 - `PerformanceOptimizer` - Performance optimization
 
 ### Quality
+
 - `CodeQualityImprover` - Code quality improvements
 - `RefactoringSuggester` - Refactoring suggestions
 - `ImprovementEngine` - General improvements
@@ -91,7 +99,7 @@ const {
   GitWrapper,
   getPMAdapter,
   TemplateEngine,
-  resolveTool
+  resolveTool,
 } = require('.aiox-core/infrastructure');
 
 // Or import directly from scripts

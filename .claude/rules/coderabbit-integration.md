@@ -1,9 +1,9 @@
 ---
 paths:
-  - ".aiox-core/**"
-  - "tests/**"
-  - "packages/**"
-  - "bin/**"
+  - '.aiox-core/**'
+  - 'tests/**'
+  - 'packages/**'
+  - 'bin/**'
 ---
 
 # CodeRabbit Integration — Detailed Rules
@@ -25,6 +25,7 @@ behavior:
 ```
 
 **Flow:**
+
 ```
 RUN CodeRabbit → CRITICAL found?
   YES → auto-fix (iteration < 2) → Re-run
@@ -47,6 +48,7 @@ behavior:
 ```
 
 **Flow:**
+
 1. Pre-commit review scan
 2. Self-healing loop (max 3 iterations)
 3. Manual QA analysis (architectural, traceability, NFR)
@@ -54,12 +56,12 @@ behavior:
 
 ## Severity Handling Summary
 
-| Severity | Dev Phase | QA Phase |
-|----------|-----------|----------|
+| Severity | Dev Phase                   | QA Phase                    |
+| -------- | --------------------------- | --------------------------- |
 | CRITICAL | auto_fix, block if persists | auto_fix, block if persists |
-| HIGH | auto_fix, document if fails | auto_fix, document if fails |
-| MEDIUM | document_as_tech_debt | document_as_tech_debt |
-| LOW | ignore | ignore |
+| HIGH     | auto_fix, document if fails | auto_fix, document if fails |
+| MEDIUM   | document_as_tech_debt       | document_as_tech_debt       |
+| LOW      | ignore                      | ignore                      |
 
 ## WSL Execution (Windows)
 
@@ -76,21 +78,21 @@ wsl bash -c 'cd /mnt/c/.../aiox-core && ~/.local/bin/coderabbit --prompt-only -t
 
 ## Integration Points
 
-| Workflow | Phase | Trigger | Agent |
-|----------|-------|---------|-------|
-| Story Development Cycle | 3 (Implement) | After task completion | @dev |
-| QA Loop | 1 (Review) | At review start | @qa |
-| Standalone | Any | `*coderabbit-review` command | Any |
+| Workflow                | Phase         | Trigger                      | Agent |
+| ----------------------- | ------------- | ---------------------------- | ----- |
+| Story Development Cycle | 3 (Implement) | After task completion        | @dev  |
+| QA Loop                 | 1 (Review)    | At review start              | @qa   |
+| Standalone              | Any           | `*coderabbit-review` command | Any   |
 
 ## Focus Areas by Story Type
 
-| Story Type | Primary Focus |
-|-----------|--------------|
-| Feature | Code patterns, test coverage, API design |
-| Bug Fix | Regression risk, root cause coverage |
-| Refactor | Breaking changes, interface stability |
-| Documentation | Markdown quality, reference validity |
-| Database | SQL injection, RLS coverage, migration safety |
+| Story Type    | Primary Focus                                 |
+| ------------- | --------------------------------------------- |
+| Feature       | Code patterns, test coverage, API design      |
+| Bug Fix       | Regression risk, root cause coverage          |
+| Refactor      | Breaking changes, interface stability         |
+| Documentation | Markdown quality, reference validity          |
+| Database      | SQL injection, RLS coverage, migration safety |
 
 ## Report Location
 

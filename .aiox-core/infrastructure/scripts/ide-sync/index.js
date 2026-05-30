@@ -307,7 +307,10 @@ async function commandSync(options) {
   }
 
   // Summary
-  const totalFiles = results.reduce((sum, r) => sum + r.files.length + (r.commandFiles || []).length, 0);
+  const totalFiles = results.reduce(
+    (sum, r) => sum + r.files.length + (r.commandFiles || []).length,
+    0
+  );
   const totalRedirects =
     Object.keys(config.redirects).length * targetIdes.filter(([, c]) => c.enabled).length;
   const totalErrors = results.reduce((sum, r) => sum + r.errors.length, 0);
@@ -365,7 +368,6 @@ async function commandValidate(options) {
   }
 
   for (const [ideName, ideConfig] of targetIdes) {
-
     const transformer = getTransformer(ideConfig.format);
     const expectedFiles = [];
 

@@ -1,8 +1,8 @@
 # Spec Pipeline: Research Dependencies
 
 ---
-execution_mode: programmatic  # TOK-3: PTC-eligible (Bash batch) — multi-search + filter in single block
----
+
+## execution_mode: programmatic # TOK-3: PTC-eligible (Bash batch) — multi-search + filter in single block
 
 > **Phase:** 3 - Research
 > **Owner Agent:** @analyst

@@ -90,7 +90,9 @@ class Layer1PreCommit extends BaseLayer {
     if (verbose) {
       const summary = this.getSummary();
       const icon = summary.pass ? '✅' : '❌';
-      console.log(`\n${icon} Layer 1 ${summary.pass ? 'PASSED' : 'FAILED'} (${this.formatDuration(summary.duration)})`);
+      console.log(
+        `\n${icon} Layer 1 ${summary.pass ? 'PASSED' : 'FAILED'} (${this.formatDuration(summary.duration)})`
+      );
     }
 
     return this.getSummary();
@@ -118,13 +120,15 @@ class Layer1PreCommit extends BaseLayer {
       const hasWarnings = result.stdout.includes('warning') || result.stderr.includes('warning');
 
       // Parse error and warning counts
-      const errorMatch = result.stdout.match(/(\d+)\s+error/i) || result.stderr.match(/(\d+)\s+error/i);
-      const warningMatch = result.stdout.match(/(\d+)\s+warning/i) || result.stderr.match(/(\d+)\s+warning/i);
+      const errorMatch =
+        result.stdout.match(/(\d+)\s+error/i) || result.stderr.match(/(\d+)\s+error/i);
+      const warningMatch =
+        result.stdout.match(/(\d+)\s+warning/i) || result.stderr.match(/(\d+)\s+warning/i);
 
-      const errorCount = errorMatch ? parseInt(errorMatch[1]) : (hasErrors ? 1 : 0);
+      const errorCount = errorMatch ? parseInt(errorMatch[1]) : hasErrors ? 1 : 0;
       const warningCount = warningMatch ? parseInt(warningMatch[1]) : 0;
 
-      const pass = failOn === 'error' ? !hasErrors : (!hasErrors && !hasWarnings);
+      const pass = failOn === 'error' ? !hasErrors : !hasErrors && !hasWarnings;
 
       const lintResult = {
         check: 'lint',
@@ -249,8 +253,9 @@ class Layer1PreCommit extends BaseLayer {
       const result = await this.runCommand(command, timeout);
 
       // Parse type errors
-      const errorMatch = result.stderr.match(/(\d+)\s+error/i) || result.stdout.match(/(\d+)\s+error/i);
-      const errorCount = errorMatch ? parseInt(errorMatch[1]) : (result.exitCode !== 0 ? 1 : 0);
+      const errorMatch =
+        result.stderr.match(/(\d+)\s+error/i) || result.stdout.match(/(\d+)\s+error/i);
+      const errorCount = errorMatch ? parseInt(errorMatch[1]) : result.exitCode !== 0 ? 1 : 0;
 
       const pass = result.exitCode === 0;
 

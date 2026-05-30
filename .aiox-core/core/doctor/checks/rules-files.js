@@ -34,9 +34,7 @@ async function run(context) {
     };
   }
 
-  const missing = EXPECTED_RULES.filter(
-    (file) => !fs.existsSync(path.join(rulesDir, file)),
-  );
+  const missing = EXPECTED_RULES.filter((file) => !fs.existsSync(path.join(rulesDir, file)));
 
   if (missing.length === 0) {
     return {

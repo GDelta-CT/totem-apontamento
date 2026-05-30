@@ -303,15 +303,15 @@ codeIntelligence:
   definitions:
     - symbol: '{symbol}'
       file: '{definition.file}'
-      line: {definition.line}
+      line: { definition.line }
   dependencies:
     - symbol: '{symbol}'
-      deps: {dependency graph}
+      deps: { dependency graph }
   relatedTests:
     - symbol: '{symbol}'
       tests:
         - file: '{test.file}'
-          line: {test.line}
+          line: { test.line }
 ```
 
 > **Note:** Partial results are accepted — if findDefinition succeeds but analyzeDependencies fails for a symbol, the definition is still included.

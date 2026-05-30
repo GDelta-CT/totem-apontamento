@@ -3,7 +3,17 @@
   "title": "PMDR Template Variables",
   "description": "Schema for Product Management Decision Record template variables",
   "type": "object",
-  "required": ["number", "title", "status", "owner", "stakeholders", "context", "decision", "businessImpact", "successMetrics"],
+  "required": [
+    "number",
+    "title",
+    "status",
+    "owner",
+    "stakeholders",
+    "context",
+    "decision",
+    "businessImpact",
+    "successMetrics"
+  ],
   "properties": {
     "number": {
       "type": "integer",

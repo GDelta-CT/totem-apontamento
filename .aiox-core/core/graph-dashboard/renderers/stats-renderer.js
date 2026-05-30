@@ -41,8 +41,7 @@ function renderStats(registryData, metricsData, options = {}) {
 function _renderEntityTable(data, isTTY) {
   const lines = [];
   const categories = data.categories || {};
-  const sortedCategories = Object.entries(categories)
-    .sort((a, b) => b[1].count - a[1].count);
+  const sortedCategories = Object.entries(categories).sort((a, b) => b[1].count - a[1].count);
 
   if (isTTY) {
     lines.push('Entity Statistics');
@@ -52,11 +51,15 @@ function _renderEntityTable(data, isTTY) {
 
     for (const [name, stats] of sortedCategories) {
       const pctStr = `${stats.pct.toFixed(1)}%`;
-      lines.push(` ${name.padEnd(13)}\u2502 ${String(stats.count).padStart(5)} \u2502 ${pctStr.padStart(6)}`);
+      lines.push(
+        ` ${name.padEnd(13)}\u2502 ${String(stats.count).padStart(5)} \u2502 ${pctStr.padStart(6)}`
+      );
     }
 
     lines.push(`${'\u2500'.repeat(14)}\u253C${'\u2500'.repeat(7)}\u253C${'\u2500'.repeat(8)}`);
-    lines.push(` ${'TOTAL'.padEnd(13)}\u2502 ${String(data.totalEntities).padStart(5)} \u2502 ${'100%'.padStart(6)}`);
+    lines.push(
+      ` ${'TOTAL'.padEnd(13)}\u2502 ${String(data.totalEntities).padStart(5)} \u2502 ${'100%'.padStart(6)}`
+    );
   } else {
     lines.push('Entity Statistics');
     lines.push('-'.repeat(37));
@@ -69,7 +72,9 @@ function _renderEntityTable(data, isTTY) {
     }
 
     lines.push(`${'-'.repeat(14)}+${'-'.repeat(7)}+${'-'.repeat(8)}`);
-    lines.push(` ${'TOTAL'.padEnd(13)}| ${String(data.totalEntities).padStart(5)} | ${'100%'.padStart(6)}`);
+    lines.push(
+      ` ${'TOTAL'.padEnd(13)}| ${String(data.totalEntities).padStart(5)} | ${'100%'.padStart(6)}`
+    );
   }
 
   return lines;

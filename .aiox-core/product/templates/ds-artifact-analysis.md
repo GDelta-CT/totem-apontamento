@@ -1,4 +1,5 @@
 # Artifact Analysis Report #{{ARTIFACT_ID}}
+
 ## {{ARTIFACT_NAME}}
 
 **Artifact ID**: {{ARTIFACT_ID}}
@@ -20,6 +21,7 @@
 ## 🎨 Color System
 
 ### Colors Extracted
+
 ```yaml
 colors:
 {{COLORS_LIST}}
@@ -30,6 +32,7 @@ colors:
 ## 🔤 Typography System
 
 ### Fonts and Scales
+
 ```yaml
 typography:
 {{TYPOGRAPHY_DATA}}
@@ -51,11 +54,11 @@ typography:
 
 ## 📊 Metrics Summary
 
-| Metric | Value |
-|--------|-------|
-| Colors | {{COLORS_COUNT}} |
+| Metric     | Value                |
+| ---------- | -------------------- |
+| Colors     | {{COLORS_COUNT}}     |
 | Components | {{COMPONENTS_COUNT}} |
-| Patterns | {{PATTERNS_COUNT}} |
+| Patterns   | {{PATTERNS_COUNT}}   |
 
 ---
 
@@ -65,6 +68,6 @@ typography:
 
 ---
 
-*Analysis completed: {{TIMESTAMP}}*
-*Report version: 1.0*
-*Design System Agent*
+_Analysis completed: {{TIMESTAMP}}_
+_Report version: 1.0_
+_Design System Agent_

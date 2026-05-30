@@ -623,8 +623,10 @@ This task is complete when:
 ```
 
 ## Handoff
+
 next_agent: @dev
-next_command: *fix-qa-issues
+next_command: \*fix-qa-issues
 condition: QA_FIX_REQUEST.md generated
 alternatives:
-  - agent: @dev, command: *apply-qa-fixes, condition: Simple fixes, no structured request needed
+
+- agent: @dev, command: \*apply-qa-fixes, condition: Simple fixes, no structured request needed

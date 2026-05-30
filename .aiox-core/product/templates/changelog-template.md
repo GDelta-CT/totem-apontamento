@@ -8,46 +8,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
 -
 
 ### Changed
+
 -
 
 ### Deprecated
+
 -
 
 ### Removed
+
 -
 
 ### Fixed
+
 -
 
 ### Security
--
 
----
+- ***
 
 ## [X.Y.Z] - YYYY-MM-DD
 
 ### Added
+
 - New feature description ([#issue](link))
 - Another new feature
 
 ### Changed
+
 - Description of change
 - Updated dependency X to version Y
 
 ### Deprecated
+
 - Feature X is deprecated and will be removed in vX.X.X
 
 ### Removed
+
 - Removed feature Y (deprecated in vX.X.X)
 
 ### Fixed
+
 - Fixed bug description ([#issue](link))
 - Another bug fix
 
 ### Security
+
 - Fixed security vulnerability in X ([CVE-XXXX-XXXX](link))
 
 ---
@@ -58,21 +68,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [X.Y.Z] - YYYY-MM-DD
 
 ### Added
+
 - New features that were added
 
 ### Changed
+
 - Changes in existing functionality
 
 ### Deprecated
+
 - Features that will be removed in upcoming releases
 
 ### Removed
+
 - Features that were removed
 
 ### Fixed
+
 - Bug fixes
 
 ### Security
+
 - Security vulnerability fixes
 ```
 
@@ -87,18 +103,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Examples
 
 **MAJOR version bump:**
+
 - Removing or renaming public API methods
 - Changing function signatures
 - Dropping support for Node.js version
 - Database schema changes that require migration
 
 **MINOR version bump:**
+
 - Adding new API endpoints
 - Adding new optional parameters
 - New features that don't affect existing code
 - Performance improvements
 
 **PATCH version bump:**
+
 - Bug fixes
 - Security patches
 - Documentation updates
@@ -119,6 +138,7 @@ This project uses [Conventional Commits](https://www.conventionalcommits.org/):
 ```
 
 **Types:**
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation only

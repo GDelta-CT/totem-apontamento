@@ -685,8 +685,10 @@ metadata:
 ```
 
 ## Handoff
+
 next_agent: @qa
-next_command: *review {story-id}
+next_command: \*review {story-id}
 condition: All QA_FIX_REQUEST issues resolved
 alternatives:
-  - agent: @dev, command: *run-tests, condition: Verify fixes pass before re-review
+
+- agent: @dev, command: \*run-tests, condition: Verify fixes pass before re-review

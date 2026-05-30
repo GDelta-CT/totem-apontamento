@@ -36,9 +36,8 @@ async function initializeDecisionLogging(agentId, storyPath, options = {}) {
     console.warn('Warning: Could not load core-config.yaml:', error.message);
   }
 
-  const enabled = options.enabled !== undefined
-    ? options.enabled
-    : (config.decisionLogging?.enabled !== false);
+  const enabled =
+    options.enabled !== undefined ? options.enabled : config.decisionLogging?.enabled !== false;
 
   if (!enabled) {
     console.log('Decision logging disabled by configuration');
@@ -64,7 +63,9 @@ async function initializeDecisionLogging(agentId, storyPath, options = {}) {
  */
 function recordDecision(decision) {
   if (!globalContext) {
-    console.warn('Warning: Decision logging not initialized, call initializeDecisionLogging() first');
+    console.warn(
+      'Warning: Decision logging not initialized, call initializeDecisionLogging() first'
+    );
     return null;
   }
 
@@ -124,7 +125,9 @@ async function completeDecisionLogging(storyId, status = 'completed') {
     console.log('\n📊 Decision Log Summary:');
     console.log(`  Decisions: ${summary.decisionsCount}`);
     console.log(`  Files Modified: ${summary.filesModifiedCount}`);
-    console.log(`  Tests Run: ${summary.testsRunCount} (${summary.testsPassed} passed, ${summary.testsFailed} failed)`);
+    console.log(
+      `  Tests Run: ${summary.testsRunCount} (${summary.testsPassed} passed, ${summary.testsFailed} failed)`
+    );
     console.log(`  Duration: ${(summary.duration / 1000).toFixed(1)}s`);
     console.log(`  Status: ${summary.status}`);
     console.log(`  Log: ${logPath}\n`);

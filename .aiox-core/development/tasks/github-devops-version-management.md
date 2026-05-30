@@ -11,16 +11,19 @@
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -188,6 +191,7 @@ token_usage: ~3,000-10,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Break into smaller workflows; implement checkpointing; use async processing where possible
 
 ---
@@ -207,8 +211,8 @@ updated_at: 2025-11-17
 
 ---
 
-
 ## Prerequisites
+
 - Git repository with commit history
 - package.json with current version
 - Understanding of semantic versioning (MAJOR.MINOR.PATCH)
@@ -222,6 +226,7 @@ updated_at: 2025-11-17
 ## Keywords for Detection
 
 **Breaking Changes** (MAJOR):
+
 - `BREAKING CHANGE:`
 - `BREAKING:`
 - `!` in commit type (e.g., `feat!:`)
@@ -230,12 +235,14 @@ updated_at: 2025-11-17
 - Incompatible changes
 
 **New Features** (MINOR):
+
 - `feat:`
 - `feature:`
 - New capability
 - Enhancement
 
 **Bug Fixes** (PATCH):
+
 - `fix:`
 - `bugfix:`
 - `hotfix:`
@@ -272,6 +279,7 @@ git log <last-tag>..HEAD --oneline
 ```
 
 Parse each commit message:
+
 - Count breaking changes
 - Count features
 - Count fixes
@@ -279,6 +287,7 @@ Parse each commit message:
 ### Step 4: Recommend Version Bump
 
 **Logic**:
+
 1. If `breakingChanges > 0` → MAJOR bump
 2. Else if `features > 0` → MINOR bump
 3. Else if `fixes > 0` → PATCH bump
@@ -333,11 +342,13 @@ Extract commits since last tag and format:
 ## [4.32.0] - 2025-10-25
 
 ### Added
+
 - New feature A
 - New feature B
 - New feature C
 
 ### Fixed
+
 - Bug fix 1
 - Bug fix 2
 ```
@@ -368,8 +379,10 @@ async function manageVersion() {
   let lastTag;
   try {
     lastTag = execSync('git describe --tags --abbrev=0', {
-      cwd: context.projectRoot
-    }).toString().trim();
+      cwd: context.projectRoot,
+    })
+      .toString()
+      .trim();
   } catch (error) {
     lastTag = 'v0.0.0';
     console.log('⚠️  No tags found, using v0.0.0 as baseline');
@@ -379,8 +392,12 @@ async function manageVersion() {
 
   // Step 3: Analyze commits
   const commits = execSync(`git log ${lastTag}..HEAD --oneline`, {
-    cwd: context.projectRoot
-  }).toString().trim().split('\n').filter(Boolean);
+    cwd: context.projectRoot,
+  })
+    .toString()
+    .trim()
+    .split('\n')
+    .filter(Boolean);
 
   let breakingChanges = 0;
   let features = 0;
@@ -390,7 +407,7 @@ async function manageVersion() {
   const featurePattern = /^feat:|^feature:/;
   const fixPattern = /^fix:|^bugfix:|^hotfix:/;
 
-  commits.forEach(commit => {
+  commits.forEach((commit) => {
     if (breakingPattern.test(commit)) breakingChanges++;
     else if (featurePattern.test(commit)) features++;
     else if (fixPattern.test(commit)) fixes++;
@@ -432,8 +449,8 @@ async function manageVersion() {
       type: 'confirm',
       name: 'confirm',
       message: `Proceed with version v${newVersion}?`,
-      default: true
-    }
+      default: true,
+    },
   ]);
 
   if (!confirm) {
@@ -450,7 +467,7 @@ async function manageVersion() {
 
   // Step 7: Create git tag
   execSync(`git tag -a v${newVersion} -m "Release v${newVersion}"`, {
-    cwd: context.projectRoot
+    cwd: context.projectRoot,
   });
   console.log(`✓ Created git tag v${newVersion}`);
 
@@ -480,4 +497,4 @@ Called by `@github-devops` agent via `*version-check` command.
 - Works with ANY repository (framework or project)
 - Respects conventional commits format
 - User always has final approval
-- Does NOT push to remote (that's done by *push command)
+- Does NOT push to remote (that's done by \*push command)

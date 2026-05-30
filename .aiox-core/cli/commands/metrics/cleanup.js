@@ -33,9 +33,7 @@ function createCleanupCommand() {
         const cutoffDate = new Date(cutoff).toISOString();
 
         // Count records that would be removed
-        const toRemove = metrics.history.filter(
-          (r) => new Date(r.timestamp).getTime() <= cutoff,
-        );
+        const toRemove = metrics.history.filter((r) => new Date(r.timestamp).getTime() <= cutoff);
 
         if (options.dryRun) {
           console.log('\n🔍 Cleanup Dry Run');

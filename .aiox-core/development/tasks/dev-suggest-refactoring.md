@@ -182,6 +182,7 @@ token_usage: ~2,000-8,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Iterative analysis with depth limits; cache intermediate results; batch similar operations
 
 ---
@@ -202,24 +203,30 @@ updated_at: 2025-11-17
 ---
 
 checklists:
-  - dev-master-checklist.md
+
+- dev-master-checklist.md
+
 ---
 
 # Suggest Refactoring - AIOX Developer Task
 
 ## Purpose
+
 Analyze code and suggest automated refactoring opportunities to improve code quality, maintainability, and performance.
 
 ## Command Pattern
+
 ```
 *suggest-refactoring <path> [options]
 ```
 
 ## Parameters
+
 - `path`: File or directory path to analyze
 - `options`: Refactoring analysis configuration
 
 ### Options
+
 - `--patterns <types>`: Comma-separated refactoring patterns to check
 - `--threshold <level>`: Minimum impact threshold (1-10, default: 3)
 - `--limit <count>`: Maximum suggestions per file (default: 10)
@@ -227,10 +234,11 @@ Analyze code and suggest automated refactoring opportunities to improve code qua
 - `--apply-all`: Apply all suggestions with confirmation
 - `--export <file>`: Export suggestions to file
 - `--recursive`: Analyze directories recursively
-- `--exclude <patterns>`: Exclude file patterns (e.g., "*.test.js")
+- `--exclude <patterns>`: Exclude file patterns (e.g., "\*.test.js")
 - `--dry-run`: Show what would be changed without applying
 
 ## Refactoring Patterns
+
 - `extract_method`: Extract long methods into smaller ones
 - `extract_variable`: Extract complex expressions
 - `introduce_parameter_object`: Group related parameters
@@ -243,6 +251,7 @@ Analyze code and suggest automated refactoring opportunities to improve code qua
 - `decompose_class`: Split large classes
 
 ## Examples
+
 ```bash
 # Analyze single file
 *suggest-refactoring aiox-core/scripts/complex-utility.js
@@ -286,13 +295,13 @@ class SuggestRefactoringTask {
 
       // Parse parameters
       const config = await this.parseParameters(params);
-      
+
       // Initialize dependencies
       await this.initializeDependencies();
 
       // Get files to analyze
       const files = await this.getFilesToAnalyze(config);
-      
+
       if (files.length === 0) {
         console.log(chalk.yellow('No files found to analyze'));
         return { success: true, suggestions: [] };
@@ -323,9 +332,8 @@ class SuggestRefactoringTask {
         success: true,
         filesAnalyzed: files.length,
         totalSuggestions: this.suggestions.length,
-        appliedRefactorings: this.appliedRefactorings.length
+        appliedRefactorings: this.appliedRefactorings.length,
       };
-
     } catch (error) {
       console.error(chalk.red(`\n❌ Refactoring analysis failed: ${error.message}`));
       throw error;
@@ -347,13 +355,13 @@ class SuggestRefactoringTask {
       export: null,
       recursive: false,
       exclude: [],
-      dryRun: false
+      dryRun: false,
     };
 
     // Parse options
     for (let i = 1; i < params.length; i++) {
       const param = params[i];
-      
+
       if (param === '--recursive') {
         config.recursive = true;
       } else if (param === '--apply-all') {
@@ -361,7 +369,7 @@ class SuggestRefactoringTask {
       } else if (param === '--dry-run') {
         config.dryRun = true;
       } else if (param.startsWith('--patterns') && params[i + 1]) {
-        config.patterns = params[++i].split(',').map(p => p.trim());
+        config.patterns = params[++i].split(',').map((p) => p.trim());
       } else if (param.startsWith('--threshold') && params[i + 1]) {
         config.threshold = parseInt(params[++i]);
       } else if (param.startsWith('--limit') && params[i + 1]) {
@@ -371,7 +379,7 @@ class SuggestRefactoringTask {
       } else if (param.startsWith('--export') && params[i + 1]) {
         config.export = params[++i];
       } else if (param.startsWith('--exclude') && params[i + 1]) {
-        config.exclude = params[++i].split(',').map(e => e.trim());
+        config.exclude = params[++i].split(',').map((e) => e.trim());
       }
     }
 
@@ -387,7 +395,6 @@ class SuggestRefactoringTask {
     try {
       const RefactoringSuggester = require('../scripts/refactoring-suggester');
       this.refactoringSuggester = new RefactoringSuggester({ rootPath: this.rootPath });
-
     } catch (error) {
       throw new Error(`Failed to initialize dependencies: ${error.message}`);
     }
@@ -399,7 +406,7 @@ class SuggestRefactoringTask {
 
     try {
       const stats = await fs.stat(targetPath);
-      
+
       if (stats.isFile()) {
         // Single file
         if (this.shouldAnalyzeFile(targetPath, config)) {
@@ -409,12 +416,12 @@ class SuggestRefactoringTask {
         // Directory
         const pattern = config.recursive ? '**/*.{js,jsx,ts,tsx}' : '*.{js,jsx,ts,tsx}';
         const globPattern = path.join(targetPath, pattern);
-        
+
         const matches = await glob(globPattern, {
-          ignore: config.exclude.map(e => path.join(targetPath, '**', e)),
-          nodir: true
+          ignore: config.exclude.map((e) => path.join(targetPath, '**', e)),
+          nodir: true,
         });
-        
+
         for (const match of matches) {
           if (this.shouldAnalyzeFile(match, config)) {
             files.push(match);
@@ -433,17 +440,17 @@ class SuggestRefactoringTask {
     if (filePath.includes('.test.') || filePath.includes('.spec.')) {
       return false;
     }
-    
+
     // Skip minified files
     if (filePath.includes('.min.')) {
       return false;
     }
-    
+
     // Skip node_modules
     if (filePath.includes('node_modules')) {
       return false;
     }
-    
+
     // Check file extension
     const ext = path.extname(filePath);
     return ['.js', '.jsx', '.ts', '.tsx'].includes(ext);
@@ -451,23 +458,23 @@ class SuggestRefactoringTask {
 
   async analyzeFiles(files, config) {
     console.log(chalk.blue('🔍 Analyzing files...'));
-    
+
     const progressInterval = Math.max(1, Math.floor(files.length / 20));
-    
+
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      
+
       try {
         const result = await this.refactoringSuggester.analyzeCode(file, {
-          patterns: config.patterns
+          patterns: config.patterns,
         });
-        
+
         if (result.suggestions && result.suggestions.length > 0) {
           // Filter by threshold and limit
           const filteredSuggestions = result.suggestions
-            .filter(s => s.impact >= config.threshold)
+            .filter((s) => s.impact >= config.threshold)
             .slice(0, config.limit);
-          
+
           // Add to global suggestions with unique IDs
           for (const suggestion of filteredSuggestions) {
             suggestion.id = `ref-${this.suggestions.length + 1}`;
@@ -475,18 +482,17 @@ class SuggestRefactoringTask {
             this.suggestions.push(suggestion);
           }
         }
-        
+
         // Show progress
         if (i % progressInterval === 0) {
           const progress = Math.floor((i / files.length) * 100);
           process.stdout.write(`\rProgress: ${progress}%`);
         }
-        
       } catch (error) {
         console.warn(chalk.yellow(`\nFailed to analyze ${file}: ${error.message}`));
       }
     }
-    
+
     console.log('\rProgress: 100%\n');
   }
 
@@ -511,7 +517,7 @@ class SuggestRefactoringTask {
     for (const [file, suggestions] of Object.entries(byFile)) {
       console.log(chalk.blue(`\n📄 ${file}`));
       console.log(chalk.gray('─'.repeat(50)));
-      
+
       for (const suggestion of suggestions) {
         this.displaySuggestion(suggestion);
       }
@@ -523,26 +529,34 @@ class SuggestRefactoringTask {
     // Show next steps
     console.log(chalk.blue('\n📌 Next Steps:'));
     console.log('1. Review suggestions carefully');
-    console.log(`2. Apply specific suggestion: *suggest-refactoring ${config.targetPath} --apply <id>`);
+    console.log(
+      `2. Apply specific suggestion: *suggest-refactoring ${config.targetPath} --apply <id>`
+    );
     console.log(`3. Apply all suggestions: *suggest-refactoring ${config.targetPath} --apply-all`);
-    console.log(`4. Export for team review: *suggest-refactoring ${config.targetPath} --export report.json`);
+    console.log(
+      `4. Export for team review: *suggest-refactoring ${config.targetPath} --export report.json`
+    );
   }
 
   displaySuggestion(suggestion) {
     const priorityColors = {
       high: chalk.red,
       medium: chalk.yellow,
-      low: chalk.gray
+      low: chalk.gray,
     };
-    
+
     const priorityColor = priorityColors[suggestion.priority] || chalk.gray;
-    
-    console.log(`\n${chalk.gray(suggestion.id)} ${priorityColor(`[${suggestion.priority.toUpperCase()}]`)} ${suggestion.description}`);
-    console.log(`   ${chalk.gray('Location:')} Lines ${suggestion.location.start}-${suggestion.location.end}`);
+
+    console.log(
+      `\n${chalk.gray(suggestion.id)} ${priorityColor(`[${suggestion.priority.toUpperCase()}]`)} ${suggestion.description}`
+    );
+    console.log(
+      `   ${chalk.gray('Location:')} Lines ${suggestion.location.start}-${suggestion.location.end}`
+    );
     console.log(`   ${chalk.gray('Impact:')} ${this.formatImpact(suggestion.impact)}`);
     console.log(`   ${chalk.gray('Type:')} ${suggestion.pattern}`);
     console.log(`   ${chalk.gray('Details:')} ${suggestion.details}`);
-    
+
     if (suggestion.suggestedRefactoring && suggestion.suggestedRefactoring.action) {
       console.log(`   ${chalk.gray('Action:')} ${suggestion.suggestedRefactoring.action}`);
     }
@@ -550,7 +564,7 @@ class SuggestRefactoringTask {
 
   formatImpact(impact) {
     const bar = '█'.repeat(impact) + '░'.repeat(10 - impact);
-    
+
     if (impact >= 8) {
       return chalk.red(bar) + ` (${impact}/10)`;
     } else if (impact >= 5) {
@@ -561,8 +575,8 @@ class SuggestRefactoringTask {
   }
 
   async applySuggestion(suggestionId, config) {
-    const suggestion = this.suggestions.find(s => s.id === suggestionId);
-    
+    const suggestion = this.suggestions.find((s) => s.id === suggestionId);
+
     if (!suggestion) {
       // Try to load from previous analysis
       const loaded = await this.loadSuggestion(suggestionId);
@@ -583,12 +597,14 @@ class SuggestRefactoringTask {
     }
 
     // Confirm application
-    const { confirm } = await inquirer.prompt([{
-      type: 'confirm',
-      name: 'confirm',
-      message: 'Apply this refactoring?',
-      default: true
-    }]);
+    const { confirm } = await inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'confirm',
+        message: 'Apply this refactoring?',
+        default: true,
+      },
+    ]);
 
     if (!confirm) {
       console.log(chalk.gray('Refactoring cancelled'));
@@ -598,15 +614,15 @@ class SuggestRefactoringTask {
     // Apply the refactoring
     try {
       const result = await this.refactoringSuggester.applySuggestion(suggestion);
-      
+
       if (result.success) {
         console.log(chalk.green('✅ Refactoring applied successfully'));
         this.appliedRefactorings.push({
           suggestion,
           result,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
-        
+
         // Show changes
         for (const change of result.changes) {
           console.log(chalk.gray(`   - ${change.description}`));
@@ -626,7 +642,7 @@ class SuggestRefactoringTask {
     }
 
     console.log(chalk.blue(`\n🔧 Applying ${this.suggestions.length} refactorings`));
-    
+
     // Group by type for better user experience
     const byType = {};
     for (const suggestion of this.suggestions) {
@@ -648,12 +664,14 @@ class SuggestRefactoringTask {
     }
 
     // Confirm batch application
-    const { confirmAll } = await inquirer.prompt([{
-      type: 'confirm',
-      name: 'confirmAll',
-      message: `Apply all ${this.suggestions.length} refactorings?`,
-      default: false
-    }]);
+    const { confirmAll } = await inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'confirmAll',
+        message: `Apply all ${this.suggestions.length} refactorings?`,
+        default: false,
+      },
+    ]);
 
     if (!confirmAll) {
       // Ask for individual confirmation
@@ -668,15 +686,15 @@ class SuggestRefactoringTask {
     for (const suggestion of this.suggestions) {
       try {
         console.log(chalk.gray(`\nApplying ${suggestion.id}: ${suggestion.description}`));
-        
+
         const result = await this.refactoringSuggester.applySuggestion(suggestion);
-        
+
         if (result.success) {
           applied++;
           this.appliedRefactorings.push({
             suggestion,
             result,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           });
         } else {
           failed++;
@@ -696,19 +714,21 @@ class SuggestRefactoringTask {
   }
 
   async applySelectiveSuggestions(config) {
-    const choices = this.suggestions.map(s => ({
+    const choices = this.suggestions.map((s) => ({
       name: `${s.id} - ${s.description} (${s.file})`,
       value: s.id,
-      checked: s.impact >= 7 // Pre-check high impact
+      checked: s.impact >= 7, // Pre-check high impact
     }));
 
-    const { selected } = await inquirer.prompt([{
-      type: 'checkbox',
-      name: 'selected',
-      message: 'Select refactorings to apply:',
-      choices,
-      pageSize: 15
-    }]);
+    const { selected } = await inquirer.prompt([
+      {
+        type: 'checkbox',
+        name: 'selected',
+        message: 'Select refactorings to apply:',
+        choices,
+        pageSize: 15,
+      },
+    ]);
 
     if (selected.length === 0) {
       console.log(chalk.gray('No refactorings selected'));
@@ -717,14 +737,14 @@ class SuggestRefactoringTask {
 
     // Apply selected suggestions
     for (const id of selected) {
-      const suggestion = this.suggestions.find(s => s.id === id);
+      const suggestion = this.suggestions.find((s) => s.id === id);
       await this.applySuggestion(id, config);
     }
   }
 
   async showRefactoringPreview(suggestion) {
     console.log(chalk.blue('\n📝 Refactoring Preview:'));
-    
+
     // This would show actual code changes
     // For now, show the refactoring plan
     if (suggestion.suggestedRefactoring) {
@@ -735,7 +755,7 @@ class SuggestRefactoringTask {
   async loadSuggestion(suggestionId) {
     // Try to load from cache or previous export
     const cacheFile = path.join(this.rootPath, '.aiox', 'refactoring', `${suggestionId}.json`);
-    
+
     try {
       const content = await fs.readFile(cacheFile, 'utf-8');
       return JSON.parse(content);
@@ -746,42 +766,44 @@ class SuggestRefactoringTask {
 
   async exportSuggestions(exportPath) {
     console.log(chalk.blue('\n📤 Exporting suggestions...'));
-    
+
     const exportData = {
       version: 1,
       exportDate: new Date().toISOString(),
       analysisPath: this.rootPath,
       totalSuggestions: this.suggestions.length,
       statistics: this.refactoringSuggester.getStatistics(),
-      suggestions: this.suggestions.map(s => ({
+      suggestions: this.suggestions.map((s) => ({
         ...s,
-        file: s.file || s.filePath
-      }))
+        file: s.file || s.filePath,
+      })),
     };
 
     await fs.writeFile(exportPath, JSON.stringify(exportData, null, 2));
-    console.log(chalk.green(`✅ Exported ${this.suggestions.length} suggestions to: ${exportPath}`));
+    console.log(
+      chalk.green(`✅ Exported ${this.suggestions.length} suggestions to: ${exportPath}`)
+    );
   }
 
   displayStatistics() {
     const stats = this.refactoringSuggester.getStatistics();
-    
+
     console.log(chalk.blue('\n📊 Refactoring Statistics:'));
     console.log(chalk.gray('─'.repeat(50)));
-    
+
     console.log(`Total suggestions: ${stats.totalSuggestions}`);
     console.log(`Average impact: ${stats.averageImpact}/10`);
-    
+
     console.log('\nBy priority:');
     for (const [priority, count] of Object.entries(stats.byPriority)) {
       console.log(`  ${priority}: ${count}`);
     }
-    
+
     console.log('\nBy type:');
     const sortedTypes = Object.entries(stats.byType)
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .slice(0, 5);
-    
+
     for (const [type, count] of sortedTypes) {
       console.log(`  ${type}: ${count}`);
     }
@@ -794,24 +816,28 @@ module.exports = SuggestRefactoringTask;
 ## Integration Points
 
 ### Refactoring Suggester
+
 - Core analysis engine
 - Pattern detection
 - Suggestion generation
 - Refactoring application
 
 ### AST Processing
+
 - Code parsing
 - Pattern matching
 - Code transformation
 - Generation
 
 ### Pattern Library
+
 - Refactoring patterns
 - Detection algorithms
 - Application strategies
 - Success metrics
 
 ### Code Metrics
+
 - Complexity analysis
 - Code quality metrics
 - Impact calculation
@@ -820,6 +846,7 @@ module.exports = SuggestRefactoringTask;
 ## Refactoring Workflow
 
 ### Analysis Phase
+
 1. Parse code into AST
 2. Calculate code metrics
 3. Run pattern detectors
@@ -833,6 +860,7 @@ module.exports = SuggestRefactoringTask;
    - If code intelligence not available: suggestions work as before (no blast radius shown)
 
 ### Review Phase
+
 1. Display suggestions
 2. Group by file/type
 3. Show impact analysis (including blast radius and risk level when available)
@@ -840,6 +868,7 @@ module.exports = SuggestRefactoringTask;
 5. Export for review
 
 ### Application Phase
+
 1. Confirm changes
 2. Create backup
 3. Apply transformation
@@ -849,6 +878,7 @@ module.exports = SuggestRefactoringTask;
 ## Best Practices
 
 ### Safe Refactoring
+
 - Always backup before changes
 - Validate syntax after refactoring
 - Run tests after changes
@@ -856,6 +886,7 @@ module.exports = SuggestRefactoringTask;
 - Apply incrementally
 
 ### Pattern Selection
+
 - Start with high-impact patterns
 - Focus on code hotspots
 - Consider team preferences
@@ -863,6 +894,7 @@ module.exports = SuggestRefactoringTask;
 - Monitor effectiveness
 
 ### Continuous Improvement
+
 - Track refactoring success
 - Learn from applied patterns
 - Update pattern library
@@ -870,8 +902,9 @@ module.exports = SuggestRefactoringTask;
 - Measure code quality trends
 
 ## Security Considerations
+
 - Validate refactoring safety
 - Preserve functionality
 - Maintain security patterns
 - Audit changes
-- Test thoroughly 
+- Test thoroughly

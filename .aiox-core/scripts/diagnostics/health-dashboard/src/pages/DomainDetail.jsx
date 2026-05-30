@@ -9,15 +9,19 @@ const DOMAIN_LABELS = {
   local: 'Local Environment',
   repository: 'Repository Health',
   deployment: 'Deployment',
-  services: 'Service Integration'
+  services: 'Service Integration',
 };
 
 const DOMAIN_DESCRIPTIONS = {
-  project: 'Validates AIOX configuration files, task definitions, agent references, and template integrity.',
-  local: 'Checks development environment prerequisites including Node.js, Git, IDE configuration, and environment variables.',
-  repository: 'Monitors GitHub Actions, branch protection, dependencies, and security vulnerabilities.',
+  project:
+    'Validates AIOX configuration files, task definitions, agent references, and template integrity.',
+  local:
+    'Checks development environment prerequisites including Node.js, Git, IDE configuration, and environment variables.',
+  repository:
+    'Monitors GitHub Actions, branch protection, dependencies, and security vulnerabilities.',
   deployment: 'Verifies deployment configuration, environment variables, and service endpoints.',
-  services: 'Tests connectivity to external services including GitHub API, MCP servers, and the memory layer.'
+  services:
+    'Tests connectivity to external services including GitHub API, MCP servers, and the memory layer.',
 };
 
 /**
@@ -43,7 +47,9 @@ function DomainDetail() {
       <div className="domain-not-found">
         <h2>Domain not found</h2>
         <p>The domain "{domainId}" does not exist.</p>
-        <Link to="/" className="back-link">&larr; Back to Dashboard</Link>
+        <Link to="/" className="back-link">
+          &larr; Back to Dashboard
+        </Link>
       </div>
     );
   }
@@ -51,9 +57,9 @@ function DomainDetail() {
   const label = DOMAIN_LABELS[domainId] || domainId;
   const description = DOMAIN_DESCRIPTIONS[domainId] || '';
   const checks = domainData.checks || [];
-  const passedCount = checks.filter(c => c.status === 'passed').length;
-  const failedCount = checks.filter(c => c.status === 'failed').length;
-  const skippedCount = checks.filter(c => c.status === 'skipped').length;
+  const passedCount = checks.filter((c) => c.status === 'passed').length;
+  const failedCount = checks.filter((c) => c.status === 'failed').length;
+  const skippedCount = checks.filter((c) => c.status === 'skipped').length;
 
   return (
     <div className="domain-detail">
@@ -127,13 +133,9 @@ function DomainDetail() {
                       <span className="na">-</span>
                     )}
                   </td>
-                  <td className="check-duration">
-                    {check.duration || '-'}
-                  </td>
+                  <td className="check-duration">{check.duration || '-'}</td>
                   <td className="check-details">
-                    {check.message && (
-                      <span className="check-message">{check.message}</span>
-                    )}
+                    {check.message && <span className="check-message">{check.message}</span>}
                     {check.autoFix?.available && (
                       <span className="autofix-available">
                         Tier {check.autoFix.tier} fix available

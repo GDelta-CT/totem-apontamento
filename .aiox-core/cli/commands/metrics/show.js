@@ -90,9 +90,7 @@ function createShowCommand() {
         console.log(`Total History: ${metrics.history.length} records`);
 
         // Filter by layer if specified
-        const layers = options.layer
-          ? [`layer${options.layer}`]
-          : ['layer1', 'layer2', 'layer3'];
+        const layers = options.layer ? [`layer${options.layer}`] : ['layer1', 'layer2', 'layer3'];
 
         // Display layer metrics
         for (const layerKey of layers) {
@@ -112,8 +110,7 @@ function createShowCommand() {
             continue;
           }
 
-          const passIcon = layer.passRate >= 0.9 ? '🟢' :
-            layer.passRate >= 0.7 ? '🟡' : '🔴';
+          const passIcon = layer.passRate >= 0.9 ? '🟢' : layer.passRate >= 0.7 ? '🟡' : '🔴';
 
           console.log(`  Pass Rate:   ${passIcon} ${formatPercent(layer.passRate)}`);
           console.log(`  Avg Time:    ${formatDuration(layer.avgTimeMs)}`);
@@ -130,7 +127,9 @@ function createShowCommand() {
               console.log(`    Findings: ${cr.findingsCount}`);
               if (cr.severityBreakdown) {
                 const sb = cr.severityBreakdown;
-                console.log(`    Critical: ${sb.critical}, High: ${sb.high}, Medium: ${sb.medium}, Low: ${sb.low}`);
+                console.log(
+                  `    Critical: ${sb.critical}, High: ${sb.high}, Medium: ${sb.medium}, Low: ${sb.low}`
+                );
               }
             }
 
@@ -183,7 +182,9 @@ function createShowCommand() {
               const status = r.passed ? '✅ PASS' : '❌ FAIL';
               const time = r.timestamp.substring(0, 19).replace('T', ' ');
               const duration = formatDuration(r.durationMs).padEnd(8);
-              console.log(`  ${time}  L${r.layer}     ${status}  ${duration}  ${r.findingsCount || 0}`);
+              console.log(
+                `  ${time}  L${r.layer}     ${status}  ${duration}  ${r.findingsCount || 0}`
+              );
             });
           }
         }

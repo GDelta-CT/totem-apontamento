@@ -78,7 +78,7 @@ function generateDecisionsList(decisions) {
 
     if (decision.alternatives && decision.alternatives.length > 0) {
       markdown += '**Alternatives Considered:**\n';
-      decision.alternatives.forEach(alt => {
+      decision.alternatives.forEach((alt) => {
         markdown += `- ${alt}\n`;
       });
       markdown += '\n';
@@ -102,7 +102,7 @@ function generateFilesList(filesModified) {
   }
 
   let markdown = '';
-  filesModified.forEach(file => {
+  filesModified.forEach((file) => {
     const fileName = typeof file === 'string' ? file : file.path;
     const action = file.action || 'modified';
     markdown += `- \`${fileName}\` (${action})\n`;
@@ -123,7 +123,7 @@ function generateTestsList(testsRun) {
   }
 
   let markdown = '';
-  testsRun.forEach(test => {
+  testsRun.forEach((test) => {
     const status = test.passed ? '✅ PASS' : '❌ FAIL';
     markdown += `- ${status}: \`${test.name}\``;
 
@@ -153,7 +153,7 @@ function generateRollbackFilesList(filesModified) {
   }
 
   let markdown = '';
-  filesModified.forEach(file => {
+  filesModified.forEach((file) => {
     const fileName = typeof file === 'string' ? file : file.path;
     markdown += `- ${fileName}\n`;
   });
@@ -266,11 +266,15 @@ ${generateRollbackFilesList(context.filesModified)}
 
 ### Performance Impact
 
-${context.metrics ? `
+${
+  context.metrics
+    ? `
 - Agent Load Time: ${context.metrics.agentLoadTime || 'N/A'}ms
 - Task Execution Time: ${context.metrics.taskExecutionTime || 'N/A'}ms
 - Logging Overhead: Minimal (async, non-blocking)
-` : '*No performance metrics recorded.*'}
+`
+    : '*No performance metrics recorded.*'
+}
 
 ---
 

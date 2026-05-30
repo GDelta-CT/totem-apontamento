@@ -119,7 +119,9 @@ function validateConfig(level, data, filePath) {
 
     if (!isValid && validate.errors) {
       for (const err of validate.errors) {
-        const field = err.instancePath ? err.instancePath.replace(/^\//, '') : err.params?.missingProperty || 'unknown';
+        const field = err.instancePath
+          ? err.instancePath.replace(/^\//, '')
+          : err.params?.missingProperty || 'unknown';
         warnings.push(`${filePath} inválido: campo '${field}' ${err.message}`);
       }
     }
@@ -266,12 +268,12 @@ function loadLayeredConfig(projectRoot, options = {}) {
   if (l1.data) {
     const l1Lint = lintEnvPatterns(l1.data, CONFIG_FILES.framework);
     if (l1Lint.length > 0) {
-      warnings.push(...l1Lint.map(w => `[LINT] ${w}`));
+      warnings.push(...l1Lint.map((w) => `[LINT] ${w}`));
     }
     // Validate L1 against schema
     const l1Validation = validateConfig('framework', l1.data, CONFIG_FILES.framework);
     if (l1Validation.length > 0) {
-      warnings.push(...l1Validation.map(w => `[SCHEMA] ${w}`));
+      warnings.push(...l1Validation.map((w) => `[SCHEMA] ${w}`));
     }
   }
 
@@ -285,12 +287,12 @@ function loadLayeredConfig(projectRoot, options = {}) {
     // Lint L2 for env patterns
     const l2Lint = lintEnvPatterns(l2.data, CONFIG_FILES.project);
     if (l2Lint.length > 0) {
-      warnings.push(...l2Lint.map(w => `[LINT] ${w}`));
+      warnings.push(...l2Lint.map((w) => `[LINT] ${w}`));
     }
     // Validate L2 against schema
     const l2Validation = validateConfig('project', l2.data, CONFIG_FILES.project);
     if (l2Validation.length > 0) {
-      warnings.push(...l2Validation.map(w => `[SCHEMA] ${w}`));
+      warnings.push(...l2Validation.map((w) => `[SCHEMA] ${w}`));
     }
   }
 
@@ -325,7 +327,7 @@ function loadLayeredConfig(projectRoot, options = {}) {
     // Validate L4 against schema
     const l4Validation = validateConfig('local', l4.data, CONFIG_FILES.local);
     if (l4Validation.length > 0) {
-      warnings.push(...l4Validation.map(w => `[SCHEMA] ${w}`));
+      warnings.push(...l4Validation.map((w) => `[SCHEMA] ${w}`));
     }
   }
 
@@ -339,7 +341,7 @@ function loadLayeredConfig(projectRoot, options = {}) {
     // Validate L5 against schema
     const l5Validation = validateConfig('user', l5.data, CONFIG_FILES.user);
     if (l5Validation.length > 0) {
-      warnings.push(...l5Validation.map(w => `[SCHEMA] ${w}`));
+      warnings.push(...l5Validation.map((w) => `[SCHEMA] ${w}`));
     }
   }
 
@@ -362,15 +364,16 @@ function loadLegacyConfig(projectRoot) {
     throw new Error(`Legacy config file not found: ${CONFIG_FILES.legacy}`);
   }
 
-  const suppressDeprecation = process.env.AIOX_SUPPRESS_DEPRECATION === 'true'
-    || process.env.AIOX_SUPPRESS_DEPRECATION === '1';
+  const suppressDeprecation =
+    process.env.AIOX_SUPPRESS_DEPRECATION === 'true' ||
+    process.env.AIOX_SUPPRESS_DEPRECATION === '1';
 
   if (!suppressDeprecation) {
     warnings.push(
-      '[DEPRECATION] Monolithic core-config.yaml detected. '
-      + 'Run `aiox config migrate` to split into layered config files. '
-      + 'Monolithic format will be removed in v4.0.0. '
-      + 'Set AIOX_SUPPRESS_DEPRECATION=true to silence this warning.',
+      '[DEPRECATION] Monolithic core-config.yaml detected. ' +
+        'Run `aiox config migrate` to split into layered config files. ' +
+        'Monolithic format will be removed in v4.0.0. ' +
+        'Set AIOX_SUPPRESS_DEPRECATION=true to silence this warning.'
     );
   }
 
@@ -453,7 +456,7 @@ function resolveConfig(projectRoot, options = {}) {
   result.config = interpolateEnvVars(result.config, { warnings: envWarnings });
 
   if (envWarnings.length > 0) {
-    result.warnings.push(...envWarnings.map(w => `[ENV] ${w}`));
+    result.warnings.push(...envWarnings.map((w) => `[ENV] ${w}`));
   }
 
   // Cache the result
@@ -475,23 +478,34 @@ function getConfigAtLevel(projectRoot, level, options = {}) {
   let relativePath;
 
   switch (level) {
-    case 'framework': case '1': case 'L1':
+    case 'framework':
+    case '1':
+    case 'L1':
       relativePath = CONFIG_FILES.framework;
       break;
-    case 'project': case '2': case 'L2':
+    case 'project':
+    case '2':
+    case 'L2':
       relativePath = CONFIG_FILES.project;
       break;
-    case 'pro': case 'Pro':
+    case 'pro':
+    case 'Pro':
       relativePath = CONFIG_FILES.pro;
       break;
-    case 'app': case '3': case 'L3':
+    case 'app':
+    case '3':
+    case 'L3':
       if (!options.appDir) return null;
       relativePath = path.join(options.appDir, 'aiox-app.config.yaml');
       break;
-    case 'local': case '4': case 'L4':
+    case 'local':
+    case '4':
+    case 'L4':
       relativePath = CONFIG_FILES.local;
       break;
-    case 'user': case '5': case 'L5': {
+    case 'user':
+    case '5':
+    case 'L5': {
       const { data } = loadYamlAbsolute(CONFIG_FILES.user);
       return data;
     }

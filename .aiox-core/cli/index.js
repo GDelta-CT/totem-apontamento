@@ -45,7 +45,9 @@ function createProgram() {
     .name('aiox')
     .version(packageVersion)
     .description('AIOX-FullStack: AI-Orchestrated System for Full Stack Development')
-    .addHelpText('after', `
+    .addHelpText(
+      'after',
+      `
 Commands:
   workers           Manage and discover workers
   manifest          Manage manifest files (validate, regenerate)
@@ -95,7 +97,8 @@ Examples:
   $ aiox pro validate
   $ aiox install
   $ aiox doctor
-`);
+`
+    );
 
   // Add workers command
   program.addCommand(createWorkersCommand());

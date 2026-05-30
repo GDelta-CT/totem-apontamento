@@ -43,33 +43,33 @@ class PatternLearner extends EventEmitter {
       outcomes: {
         success: true,
         metrics: modification.metrics || {},
-        improvements: modification.improvements || []
+        improvements: modification.improvements || [],
       },
       metadata: {
         author: modification.author || process.env.USER || 'unknown',
         duration: modification.duration,
-        complexity: modification.complexity
-      }
+        complexity: modification.complexity,
+      },
     };
 
     // Add to history
     this.modificationHistory.push(record);
-    
+
     // Learn from this modification
     await this.learnFromModification(record);
-    
+
     // Save updated history
     await this.saveHistory();
-    
+
     // Emit event for real-time learning
     this.emit('modification_recorded', record);
-    
+
     console.log(chalk.green(`✅ Recorded successful modification: ${record.id}`));
-    
+
     return {
       recordId: record.id,
       patternsExtracted: record.patterns.length,
-      learningTriggered: await this.checkLearningThreshold(record.patterns)
+      learningTriggered: await this.checkLearningThreshold(record.patterns),
     };
   }
 
@@ -122,7 +122,7 @@ class PatternLearner extends EventEmitter {
           from: this.normalizeCode(change.before),
           to: this.normalizeCode(change.after),
           context: change.context,
-          benefits: change.benefits || []
+          benefits: change.benefits || [],
         });
       }
 
@@ -132,7 +132,7 @@ class PatternLearner extends EventEmitter {
           type: 'error_handling',
           subtype: change.handlingType,
           pattern: change.pattern,
-          improvement: change.improvement
+          improvement: change.improvement,
         });
       }
 
@@ -142,7 +142,7 @@ class PatternLearner extends EventEmitter {
           type: 'async_pattern',
           from: change.callbackPattern,
           to: change.asyncPattern,
-          complexity_reduction: change.complexityReduction
+          complexity_reduction: change.complexityReduction,
         });
       }
 
@@ -152,7 +152,7 @@ class PatternLearner extends EventEmitter {
           type: 'api_usage',
           oldPattern: change.oldUsage,
           newPattern: change.newUsage,
-          benefits: change.benefits
+          benefits: change.benefits,
         });
       }
     }
@@ -172,13 +172,13 @@ class PatternLearner extends EventEmitter {
         changeType: change.type,
         pattern: {
           before: change.beforeStructure,
-          after: change.afterStructure
+          after: change.afterStructure,
         },
         benefits: {
           modularity: change.modularityImprovement || 0,
           maintainability: change.maintainabilityImprovement || 0,
-          testability: change.testabilityImprovement || 0
-        }
+          testability: change.testabilityImprovement || 0,
+        },
       });
     }
 
@@ -197,7 +197,7 @@ class PatternLearner extends EventEmitter {
       triggers: modification.triggers || [],
       steps: modification.steps || [],
       validation: modification.validation || {},
-      benefits: modification.measuredBenefits || {}
+      benefits: modification.measuredBenefits || {},
     });
 
     return patterns;
@@ -215,7 +215,7 @@ class PatternLearner extends EventEmitter {
           type: 'dependency_consolidation',
           from: change.originalDependencies,
           to: change.consolidatedDependency,
-          reduction: change.dependencyReduction
+          reduction: change.dependencyReduction,
         });
       }
 
@@ -225,7 +225,7 @@ class PatternLearner extends EventEmitter {
           dependency: change.dependency,
           fromVersion: change.fromVersion,
           toVersion: change.toVersion,
-          migrationSteps: change.migrationSteps
+          migrationSteps: change.migrationSteps,
         });
       }
     }
@@ -247,9 +247,9 @@ class PatternLearner extends EventEmitter {
         metrics: {
           before: improvement.metricsBefore,
           after: improvement.metricsAfter,
-          improvement: improvement.percentageImprovement
+          improvement: improvement.percentageImprovement,
         },
-        applicableContexts: improvement.contexts || []
+        applicableContexts: improvement.contexts || [],
       });
     }
 
@@ -262,10 +262,10 @@ class PatternLearner extends EventEmitter {
   async learnFromModification(record) {
     for (const pattern of record.patterns) {
       const patternKey = this.generatePatternKey(pattern);
-      
+
       // Check if similar pattern exists
       const similarPattern = await this.findSimilarPattern(pattern);
-      
+
       if (similarPattern) {
         // Update existing pattern
         await this.updatePattern(similarPattern, pattern, record);
@@ -277,7 +277,7 @@ class PatternLearner extends EventEmitter {
 
     // Analyze cross-pattern relationships
     await this.analyzePatternRelationships(record.patterns);
-    
+
     // Update pattern rankings
     await this.updatePatternRankings();
   }
@@ -288,12 +288,12 @@ class PatternLearner extends EventEmitter {
   async findSimilarPattern(pattern) {
     for (const [key, existingPattern] of this.patterns) {
       const similarity = await this.calculatePatternSimilarity(pattern, existingPattern);
-      
+
       if (similarity >= this.similarityThreshold) {
         return { key, pattern: existingPattern, similarity };
       }
     }
-    
+
     return null;
   }
 
@@ -360,13 +360,13 @@ class PatternLearner extends EventEmitter {
    */
   tokenizeCode(code) {
     if (!code) return [];
-    
+
     // Simple tokenization - can be enhanced with proper AST parsing
     return code
       .replace(/\s+/g, ' ')
       .replace(/[{}();,]/g, ' $& ')
       .split(/\s+/)
-      .filter(token => token.length > 0);
+      .filter((token) => token.length > 0);
   }
 
   /**
@@ -375,10 +375,10 @@ class PatternLearner extends EventEmitter {
   calculateTokenSimilarity(tokens1, tokens2) {
     const set1 = new Set(tokens1);
     const set2 = new Set(tokens2);
-    
-    const intersection = new Set([...set1].filter(x => set2.has(x)));
+
+    const intersection = new Set([...set1].filter((x) => set2.has(x)));
     const union = new Set([...set1, ...set2]);
-    
+
     return union.size > 0 ? intersection.size / union.size : 0;
   }
 
@@ -387,14 +387,14 @@ class PatternLearner extends EventEmitter {
    */
   async updatePattern(similarPattern, newPattern, record) {
     const existingPattern = similarPattern.pattern;
-    
+
     // Update occurrence count
     existingPattern.occurrences = (existingPattern.occurrences || 0) + 1;
-    
+
     // Update success rate
     existingPattern.successCount = (existingPattern.successCount || 0) + 1;
     existingPattern.successRate = existingPattern.successCount / existingPattern.occurrences;
-    
+
     // Merge benefits/improvements
     if (newPattern.benefits) {
       existingPattern.aggregatedBenefits = this.aggregateBenefits(
@@ -402,7 +402,7 @@ class PatternLearner extends EventEmitter {
         newPattern.benefits
       );
     }
-    
+
     // Add to usage history
     if (!existingPattern.usageHistory) {
       existingPattern.usageHistory = [];
@@ -411,17 +411,17 @@ class PatternLearner extends EventEmitter {
       recordId: record.id,
       timestamp: record.timestamp,
       author: record.metadata.author,
-      outcomes: record.outcomes
+      outcomes: record.outcomes,
     });
-    
+
     // Update confidence score
     existingPattern.confidence = this.calculatePatternConfidence(existingPattern);
-    
+
     // Check if pattern should be promoted
     if (existingPattern.occurrences >= this.learningThreshold && existingPattern.confidence > 0.8) {
       existingPattern.status = 'learned';
       existingPattern.learnedAt = new Date().toISOString();
-      
+
       console.log(chalk.green(`✅ Pattern promoted to learned: ${similarPattern.key}`));
       this.emit('pattern_learned', existingPattern);
     }
@@ -441,16 +441,18 @@ class PatternLearner extends EventEmitter {
       lastSeen: record.timestamp,
       status: 'candidate',
       confidence: 0.3, // Initial low confidence
-      usageHistory: [{
-        recordId: record.id,
-        timestamp: record.timestamp,
-        author: record.metadata.author,
-        outcomes: record.outcomes
-      }]
+      usageHistory: [
+        {
+          recordId: record.id,
+          timestamp: record.timestamp,
+          author: record.metadata.author,
+          outcomes: record.outcomes,
+        },
+      ],
     };
-    
+
     this.patterns.set(key, newPattern);
-    
+
     console.log(chalk.gray(`New pattern candidate created: ${key}`));
   }
 
@@ -459,22 +461,22 @@ class PatternLearner extends EventEmitter {
    */
   calculatePatternConfidence(pattern) {
     let confidence = 0;
-    
+
     // Occurrence factor (up to 0.3)
     const occurrenceFactor = Math.min(pattern.occurrences / 10, 0.3);
     confidence += occurrenceFactor;
-    
+
     // Success rate factor (up to 0.4)
     confidence += pattern.successRate * 0.4;
-    
+
     // Consistency factor (up to 0.2)
     const consistencyFactor = this.calculateConsistencyFactor(pattern.usageHistory);
     confidence += consistencyFactor * 0.2;
-    
+
     // Recency factor (up to 0.1)
     const recencyFactor = this.calculateRecencyFactor(pattern.lastSeen);
     confidence += recencyFactor * 0.1;
-    
+
     return Math.min(confidence, 1.0);
   }
 
@@ -483,21 +485,23 @@ class PatternLearner extends EventEmitter {
    */
   async getPatternSuggestions(_context) {
     const suggestions = [];
-    
+
     // Filter applicable patterns
-    const applicablePatterns = Array.from(this.patterns.values()).filter(pattern => {
-      return pattern.status === 'learned' && 
-             this.isPatternApplicable(pattern, context) &&
-             pattern.confidence > 0.7;
+    const applicablePatterns = Array.from(this.patterns.values()).filter((pattern) => {
+      return (
+        pattern.status === 'learned' &&
+        this.isPatternApplicable(pattern, context) &&
+        pattern.confidence > 0.7
+      );
     });
-    
+
     // Sort by relevance and confidence
     applicablePatterns.sort((a, b) => {
       const relevanceA = this.calculateRelevance(a, context);
       const relevanceB = this.calculateRelevance(b, context);
-      return (relevanceB * b.confidence) - (relevanceA * a.confidence);
+      return relevanceB * b.confidence - relevanceA * a.confidence;
     });
-    
+
     // Create suggestions
     for (const pattern of applicablePatterns.slice(0, 5)) {
       suggestions.push({
@@ -506,10 +510,10 @@ class PatternLearner extends EventEmitter {
         confidence: pattern.confidence,
         expectedBenefits: pattern.aggregatedBenefits || {},
         applicationGuide: await this.generateApplicationGuide(pattern, context),
-        examples: this.getPatternExamples(pattern)
+        examples: this.getPatternExamples(pattern),
       });
     }
-    
+
     return suggestions;
   }
 
@@ -523,7 +527,7 @@ class PatternLearner extends EventEmitter {
         return false;
       }
     }
-    
+
     // Check context requirements
     if (pattern.requiredContext) {
       for (const requirement of pattern.requiredContext) {
@@ -532,14 +536,12 @@ class PatternLearner extends EventEmitter {
         }
       }
     }
-    
+
     // Check applicability conditions
     if (pattern.applicableContexts) {
-      return pattern.applicableContexts.some(ctx => 
-        this.matchesContext(_context, ctx)
-      );
+      return pattern.applicableContexts.some((ctx) => this.matchesContext(_context, ctx));
     }
-    
+
     return true;
   }
 
@@ -552,9 +554,9 @@ class PatternLearner extends EventEmitter {
       preconditions: [],
       expectedOutcome: {},
       risks: [],
-      alternatives: []
+      alternatives: [],
     };
-    
+
     // Generate steps based on pattern type
     switch (pattern.type) {
       case 'code_transformation':
@@ -569,12 +571,12 @@ class PatternLearner extends EventEmitter {
         guide.expectedOutcome = pattern.metrics;
         break;
     }
-    
+
     // Add general guidance
     guide.confidence = `${Math.round(pattern.confidence * 100)}%`;
     guide.successRate = `${Math.round(pattern.successRate * 100)}%`;
     guide.usageCount = pattern.occurrences;
-    
+
     return guide;
   }
 
@@ -584,7 +586,7 @@ class PatternLearner extends EventEmitter {
   async analyzePatternRelationships(patterns) {
     // Find patterns that commonly occur together
     const coOccurrences = new Map();
-    
+
     for (let i = 0; i < patterns.length; i++) {
       for (let j = i + 1; j < patterns.length; j++) {
         const key = this.generateRelationshipKey(patterns[i], patterns[j]);
@@ -594,7 +596,7 @@ class PatternLearner extends EventEmitter {
         coOccurrences.set(key, existing);
       }
     }
-    
+
     // Store significant relationships
     for (const [key, relationship] of coOccurrences) {
       if (relationship.count >= 2) {
@@ -614,9 +616,9 @@ class PatternLearner extends EventEmitter {
       patternsByType: {},
       topPatterns: [],
       recentTrends: [],
-      effectivenessMetrics: {}
+      effectivenessMetrics: {},
     };
-    
+
     // Count patterns by status and type
     for (const pattern of this.patterns.values()) {
       if (pattern.status === 'learned') {
@@ -624,29 +626,29 @@ class PatternLearner extends EventEmitter {
       } else {
         analytics.candidatePatterns++;
       }
-      
-      analytics.patternsByType[pattern.type] = 
-        (analytics.patternsByType[pattern.type] || 0) + 1;
+
+      analytics.patternsByType[pattern.type] = (analytics.patternsByType[pattern.type] || 0) + 1;
     }
-    
+
     // Get top patterns by usage
-    const sortedPatterns = Array.from(this.patterns.values())
-      .sort((a, b) => b.occurrences - a.occurrences);
-    
-    analytics.topPatterns = sortedPatterns.slice(0, 10).map(p => ({
+    const sortedPatterns = Array.from(this.patterns.values()).sort(
+      (a, b) => b.occurrences - a.occurrences
+    );
+
+    analytics.topPatterns = sortedPatterns.slice(0, 10).map((p) => ({
       key: p.key,
       type: p.type,
       occurrences: p.occurrences,
       successRate: p.successRate,
-      confidence: p.confidence
+      confidence: p.confidence,
     }));
-    
+
     // Calculate effectiveness metrics
     analytics.effectivenessMetrics = await this.calculateEffectivenessMetrics();
-    
+
     // Get recent trends
     analytics.recentTrends = await this.analyzeRecentTrends();
-    
+
     return analytics;
   }
 
@@ -658,34 +660,35 @@ class PatternLearner extends EventEmitter {
       averageSuccessRate: 0,
       averageConfidence: 0,
       patternCoverage: 0,
-      learningRate: 0
+      learningRate: 0,
     };
-    
-    const learnedPatterns = Array.from(this.patterns.values())
-      .filter(p => p.status === 'learned');
-    
+
+    const learnedPatterns = Array.from(this.patterns.values()).filter(
+      (p) => p.status === 'learned'
+    );
+
     if (learnedPatterns.length > 0) {
-      metrics.averageSuccessRate = learnedPatterns.reduce((sum, p) => 
-        sum + p.successRate, 0) / learnedPatterns.length;
-      
-      metrics.averageConfidence = learnedPatterns.reduce((sum, p) => 
-        sum + p.confidence, 0) / learnedPatterns.length;
+      metrics.averageSuccessRate =
+        learnedPatterns.reduce((sum, p) => sum + p.successRate, 0) / learnedPatterns.length;
+
+      metrics.averageConfidence =
+        learnedPatterns.reduce((sum, p) => sum + p.confidence, 0) / learnedPatterns.length;
     }
-    
+
     // Calculate pattern coverage
-    const modificationTypes = new Set(this.modificationHistory.map(m => m.modificationType));
-    const coveredTypes = new Set(learnedPatterns.map(p => p.type));
-    metrics.patternCoverage = modificationTypes.size > 0 ? 
-      coveredTypes.size / modificationTypes.size : 0;
-    
+    const modificationTypes = new Set(this.modificationHistory.map((m) => m.modificationType));
+    const coveredTypes = new Set(learnedPatterns.map((p) => p.type));
+    metrics.patternCoverage =
+      modificationTypes.size > 0 ? coveredTypes.size / modificationTypes.size : 0;
+
     // Calculate learning rate
     const recentHistory = this.modificationHistory.slice(-20);
-    const recentLearned = recentHistory.filter(m => 
-      m.patterns.some(p => this.patterns.get(this.generatePatternKey(p))?.status === 'learned')
+    const recentLearned = recentHistory.filter((m) =>
+      m.patterns.some((p) => this.patterns.get(this.generatePatternKey(p))?.status === 'learned')
     );
-    metrics.learningRate = recentHistory.length > 0 ? 
-      recentLearned.length / recentHistory.length : 0;
-    
+    metrics.learningRate =
+      recentHistory.length > 0 ? recentLearned.length / recentHistory.length : 0;
+
     return metrics;
   }
 
@@ -699,14 +702,16 @@ class PatternLearner extends EventEmitter {
   }
 
   generatePatternKey(pattern) {
-    return `${pattern.type}:${pattern.subtype || 'default'}:${
-      crypto.createHash('md5').update(JSON.stringify(pattern)).digest('hex').substr(0, 8)
-    }`;
+    return `${pattern.type}:${pattern.subtype || 'default'}:${crypto
+      .createHash('md5')
+      .update(JSON.stringify(pattern))
+      .digest('hex')
+      .substr(0, 8)}`;
   }
 
   aggregateBenefits(existing, newBenefits) {
     const aggregated = { ...existing };
-    
+
     for (const [key, value] of Object.entries(newBenefits)) {
       if (typeof value === 'number') {
         aggregated[key] = (aggregated[key] || 0) + value;
@@ -714,25 +719,27 @@ class PatternLearner extends EventEmitter {
         aggregated[`${key}_count`] = (aggregated[`${key}_count`] || 0) + 1;
       }
     }
-    
+
     return aggregated;
   }
 
   calculateConsistencyFactor(usageHistory) {
     if (usageHistory.length < 2) return 1.0;
-    
+
     // Check time intervals between uses
     const intervals = [];
     for (let i = 1; i < usageHistory.length; i++) {
-      const interval = new Date(usageHistory[i].timestamp) - new Date(usageHistory[i-1].timestamp);
+      const interval =
+        new Date(usageHistory[i].timestamp) - new Date(usageHistory[i - 1].timestamp);
       intervals.push(interval);
     }
-    
+
     // Calculate variance
     const avgInterval = intervals.reduce((sum, i) => sum + i, 0) / intervals.length;
-    const variance = intervals.reduce((sum, i) => sum + Math.pow(i - avgInterval, 2), 0) / intervals.length;
+    const variance =
+      intervals.reduce((sum, i) => sum + Math.pow(i - avgInterval, 2), 0) / intervals.length;
     const stdDev = Math.sqrt(variance);
-    
+
     // Lower variance = higher consistency
     return 1 / (1 + stdDev / avgInterval);
   }
@@ -744,39 +751,37 @@ class PatternLearner extends EventEmitter {
 
   calculateRelevance(pattern, context) {
     let relevance = 0;
-    
+
     // Type match
     if (pattern.type === context.modificationType) {
       relevance += 0.3;
     }
-    
+
     // Component type match
     if (pattern.componentType === context.componentType) {
       relevance += 0.2;
     }
-    
+
     // Context similarity
     if (pattern.context && context.currentContext) {
       relevance += this.calculateContextSimilarity(pattern.context, context.currentContext) * 0.3;
     }
-    
+
     // Goal alignment
     if (pattern.benefits && context.goals) {
       relevance += this.calculateGoalAlignment(pattern.benefits, context.goals) * 0.2;
     }
-    
+
     return relevance;
   }
 
   getPatternExamples(pattern) {
-    return pattern.usageHistory
-      .slice(-3)
-      .map(usage => ({
-        recordId: usage.recordId,
-        timestamp: usage.timestamp,
-        author: usage.author,
-        outcomes: usage.outcomes
-      }));
+    return pattern.usageHistory.slice(-3).map((usage) => ({
+      recordId: usage.recordId,
+      timestamp: usage.timestamp,
+      author: usage.author,
+      outcomes: usage.outcomes,
+    }));
   }
 
   /**
@@ -784,10 +789,7 @@ class PatternLearner extends EventEmitter {
    */
 
   async saveHistory() {
-    await fs.writeFile(
-      this.historyFile, 
-      JSON.stringify(this.modificationHistory, null, 2)
-    );
+    await fs.writeFile(this.historyFile, JSON.stringify(this.modificationHistory, null, 2));
   }
 
   async loadHistory() {
@@ -803,20 +805,17 @@ class PatternLearner extends EventEmitter {
   async savePatterns() {
     const patternsArray = Array.from(this.patterns.entries()).map(([key, pattern]) => ({
       key,
-      ...pattern
+      ...pattern,
     }));
-    
-    await fs.writeFile(
-      this.patternsFile,
-      JSON.stringify(patternsArray, null, 2)
-    );
+
+    await fs.writeFile(this.patternsFile, JSON.stringify(patternsArray, null, 2));
   }
 
   async loadPatterns() {
     try {
       const content = await fs.readFile(this.patternsFile, 'utf-8');
       const patternsArray = JSON.parse(content);
-      
+
       this.patterns.clear();
       for (const pattern of patternsArray) {
         this.patterns.set(pattern.key, pattern);
@@ -831,63 +830,63 @@ class PatternLearner extends EventEmitter {
    */
   async checkLearningThreshold(patterns) {
     let learnedCount = 0;
-    
+
     for (const pattern of patterns) {
       const key = this.generatePatternKey(pattern);
       const existing = this.patterns.get(key);
-      
+
       if (existing && existing.occurrences >= this.learningThreshold) {
         learnedCount++;
       }
     }
-    
+
     return learnedCount > 0;
   }
 
   calculateContextSimilarity(context1, context2) {
     // Simple context similarity - can be enhanced
     if (!context1 || !context2) return 0;
-    
+
     const keys1 = Object.keys(context1);
     const keys2 = Object.keys(context2);
-    const commonKeys = keys1.filter(k => keys2.includes(k));
-    
+    const commonKeys = keys1.filter((k) => keys2.includes(k));
+
     if (commonKeys.length === 0) return 0;
-    
+
     let similarity = commonKeys.length / Math.max(keys1.length, keys2.length);
-    
+
     // Check value similarity for common keys
     for (const key of commonKeys) {
       if (context1[key] === context2[key]) {
         similarity += 0.1;
       }
     }
-    
+
     return Math.min(similarity, 1.0);
   }
 
   calculateStructuralSimilarity(struct1, struct2) {
     // Compare structural patterns
     if (!struct1 || !struct2) return 0;
-    
+
     const before1 = JSON.stringify(struct1.before);
     const before2 = JSON.stringify(struct2.before);
     const after1 = JSON.stringify(struct1.after);
     const after2 = JSON.stringify(struct2.after);
-    
+
     const beforeSim = before1 === before2 ? 1 : 0.5;
     const afterSim = after1 === after2 ? 1 : 0.5;
-    
+
     return (beforeSim + afterSim) / 2;
   }
 
   calculateBenefitSimilarity(benefits1, benefits2) {
     if (!benefits1 || !benefits2) return 0;
-    
+
     const keys1 = Object.keys(benefits1);
     const keys2 = Object.keys(benefits2);
     const allKeys = new Set([...keys1, ...keys2]);
-    
+
     let similarity = 0;
     for (const key of allKeys) {
       if (benefits1[key] && benefits2[key]) {
@@ -895,50 +894,54 @@ class PatternLearner extends EventEmitter {
         similarity += 1;
       }
     }
-    
+
     return allKeys.size > 0 ? similarity / allKeys.size : 0;
   }
 
   calculateRefactoringSimilarity(refactor1, refactor2) {
     if (refactor1.refactoringType !== refactor2.refactoringType) return 0;
-    
+
     let similarity = 0.5; // Base similarity for same type
-    
+
     // Compare triggers
     if (refactor1.triggers && refactor2.triggers) {
-      const commonTriggers = refactor1.triggers.filter(t => 
-        refactor2.triggers.includes(t)
-      );
-      similarity += commonTriggers.length / Math.max(refactor1.triggers.length, refactor2.triggers.length) * 0.3;
+      const commonTriggers = refactor1.triggers.filter((t) => refactor2.triggers.includes(t));
+      similarity +=
+        (commonTriggers.length / Math.max(refactor1.triggers.length, refactor2.triggers.length)) *
+        0.3;
     }
-    
+
     // Compare steps
     if (refactor1.steps && refactor2.steps) {
-      const stepSimilarity = Math.min(refactor1.steps.length, refactor2.steps.length) / 
-                           Math.max(refactor1.steps.length, refactor2.steps.length);
+      const stepSimilarity =
+        Math.min(refactor1.steps.length, refactor2.steps.length) /
+        Math.max(refactor1.steps.length, refactor2.steps.length);
       similarity += stepSimilarity * 0.2;
     }
-    
+
     return similarity;
   }
 
   calculatePerformanceSimilarity(perf1, perf2) {
     if (perf1.optimizationType !== perf2.optimizationType) return 0;
-    
+
     let similarity = 0.4; // Base similarity for same type
-    
+
     if (perf1.technique === perf2.technique) {
       similarity += 0.3;
     }
-    
+
     // Compare applicable contexts
     if (perf1.applicableContexts && perf2.applicableContexts) {
-      const commonContexts = perf1.applicableContexts.filter(c => 
+      const commonContexts = perf1.applicableContexts.filter((c) =>
         perf2.applicableContexts.includes(c)
       );
-      similarity += commonContexts.length / Math.max(perf1.applicableContexts.length, perf2.applicableContexts.length) * 0.3;
+      similarity +=
+        (commonContexts.length /
+          Math.max(perf1.applicableContexts.length, perf2.applicableContexts.length)) *
+        0.3;
     }
-    
+
     return similarity;
   }
 
@@ -946,27 +949,27 @@ class PatternLearner extends EventEmitter {
     // Generic JSON similarity
     const json1 = JSON.stringify(pattern1);
     const json2 = JSON.stringify(pattern2);
-    
+
     if (json1 === json2) return 1.0;
-    
+
     // Calculate Levenshtein distance ratio
     const distance = this.levenshteinDistance(json1, json2);
     const maxLength = Math.max(json1.length, json2.length);
-    
-    return 1 - (distance / maxLength);
+
+    return 1 - distance / maxLength;
   }
 
   levenshteinDistance(str1, str2) {
     const matrix = [];
-    
+
     for (let i = 0; i <= str2.length; i++) {
       matrix[i] = [i];
     }
-    
+
     for (let j = 0; j <= str1.length; j++) {
       matrix[0][j] = j;
     }
-    
+
     for (let i = 1; i <= str2.length; i++) {
       for (let j = 1; j <= str1.length; j++) {
         if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
@@ -980,7 +983,7 @@ class PatternLearner extends EventEmitter {
         }
       }
     }
-    
+
     return matrix[str2.length][str1.length];
   }
 
@@ -989,16 +992,16 @@ class PatternLearner extends EventEmitter {
     if (requirement.type === 'has_property') {
       return context[requirement.property] !== undefined;
     }
-    
+
     if (requirement.type === 'property_value') {
       return context[requirement.property] === requirement.value;
     }
-    
+
     if (requirement.type === 'property_range') {
       const value = context[requirement.property];
       return value >= requirement.min && value <= requirement.max;
     }
-    
+
     return true;
   }
 
@@ -1014,71 +1017,71 @@ class PatternLearner extends EventEmitter {
 
   generateCodeTransformationSteps(pattern, context) {
     const steps = [];
-    
+
     steps.push({
       step: 1,
       action: 'Identify target code pattern',
       description: `Look for code matching: ${pattern.from}`,
-      validation: 'Ensure code structure matches the pattern'
+      validation: 'Ensure code structure matches the pattern',
     });
-    
+
     steps.push({
       step: 2,
       action: 'Apply transformation',
       description: `Transform to: ${pattern.to}`,
-      validation: 'Verify transformation preserves functionality'
+      validation: 'Verify transformation preserves functionality',
     });
-    
+
     if (pattern.context) {
       steps.push({
         step: 3,
         action: 'Validate context',
         description: 'Ensure transformation is appropriate for context',
-        validation: pattern.context
+        validation: pattern.context,
       });
     }
-    
+
     steps.push({
       step: 4,
       action: 'Test changes',
       description: 'Run tests to ensure no regression',
-      validation: 'All tests pass'
+      validation: 'All tests pass',
     });
-    
+
     return steps;
   }
 
   generatePerformanceOptimizationSteps(pattern, context) {
     const steps = [];
-    
+
     steps.push({
       step: 1,
       action: 'Measure baseline performance',
       description: 'Capture current performance metrics',
-      validation: 'Baseline metrics recorded'
+      validation: 'Baseline metrics recorded',
     });
-    
+
     steps.push({
       step: 2,
       action: `Apply ${pattern.technique} optimization`,
       description: pattern.description || 'Apply performance optimization technique',
-      validation: 'Optimization applied correctly'
+      validation: 'Optimization applied correctly',
     });
-    
+
     steps.push({
       step: 3,
       action: 'Measure improved performance',
       description: 'Capture post-optimization metrics',
-      validation: `Expected improvement: ${pattern.metrics.improvement}%`
+      validation: `Expected improvement: ${pattern.metrics.improvement}%`,
     });
-    
+
     steps.push({
       step: 4,
       action: 'Validate functionality',
-      description: 'Ensure optimization didn\'t break functionality',
-      validation: 'All tests pass'
+      description: "Ensure optimization didn't break functionality",
+      validation: 'All tests pass',
     });
-    
+
     return steps;
   }
 
@@ -1090,7 +1093,7 @@ class PatternLearner extends EventEmitter {
   async storePatternRelationship(key, relationship) {
     // Store pattern relationships for future analysis
     const relationshipsFile = path.join(this.patternsDir, 'relationships.json');
-    
+
     let relationships = {};
     try {
       const content = await fs.readFile(relationshipsFile, 'utf-8');
@@ -1098,9 +1101,9 @@ class PatternLearner extends EventEmitter {
     } catch (_error) {
       // No relationships file yet
     }
-    
+
     relationships[key] = relationship;
-    
+
     await fs.writeFile(relationshipsFile, JSON.stringify(relationships, null, 2));
   }
 
@@ -1109,85 +1112,85 @@ class PatternLearner extends EventEmitter {
     const trends = {
       emergingPatterns: [],
       decliningPatterns: [],
-      stablePatterns: []
+      stablePatterns: [],
     };
-    
+
     // Analyze pattern usage over time
     const patternUsage = new Map();
-    
+
     for (const mod of recentModifications) {
       for (const pattern of mod.patterns) {
         const key = this.generatePatternKey(pattern);
         const usage = patternUsage.get(key) || { count: 0, recent: 0 };
         usage.count++;
-        
+
         // Check if in last 10 modifications
         const modIndex = recentModifications.indexOf(mod);
         if (modIndex >= recentModifications.length - 10) {
           usage.recent++;
         }
-        
+
         patternUsage.set(key, usage);
       }
     }
-    
+
     // Classify patterns
     for (const [key, usage] of patternUsage) {
       const pattern = this.patterns.get(key);
       if (!pattern) continue;
-      
+
       const recentRatio = usage.recent / usage.count;
-      
+
       if (recentRatio > 0.6) {
         trends.emergingPatterns.push({
           key: key,
           type: pattern.type,
           trend: 'emerging',
-          usage: usage
+          usage: usage,
         });
       } else if (recentRatio < 0.2) {
         trends.decliningPatterns.push({
           key: key,
           type: pattern.type,
           trend: 'declining',
-          usage: usage
+          usage: usage,
         });
       } else {
         trends.stablePatterns.push({
           key: key,
           type: pattern.type,
           trend: 'stable',
-          usage: usage
+          usage: usage,
         });
       }
     }
-    
+
     return trends;
   }
 
   calculateGoalAlignment(benefits, goals) {
     if (!benefits || !goals) return 0;
-    
+
     let alignment = 0;
     let _matchedGoals = 0;
-    
+
     for (const goal of goals) {
       if (goal.type === 'performance' && benefits.performanceImprovement) {
         alignment += benefits.performanceImprovement > goal.target ? 1 : 0.5;
         matchedGoals++;
       }
-      
+
       if (goal.type === 'maintainability' && benefits.maintainability) {
         alignment += benefits.maintainability > goal.target ? 1 : 0.5;
         matchedGoals++;
       }
-      
+
       if (goal.type === 'testability' && benefits.testability) {
         alignment += benefits.testability > goal.target ? 1 : 0.5;
         matchedGoals++;
       }
     }
-    
+
     return goals.length > 0 ? alignment / goals.length : 0;
   }
 
@@ -1196,28 +1199,28 @@ class PatternLearner extends EventEmitter {
     for (const pattern of this.patterns.values()) {
       pattern.ranking = this.calculatePatternRanking(pattern);
     }
-    
+
     // Save updated patterns
     await this.savePatterns();
   }
 
   calculatePatternRanking(pattern) {
     let ranking = 0;
-    
+
     // Success rate (40%)
     ranking += pattern.successRate * 40;
-    
+
     // Usage frequency (30%)
     const usageScore = Math.min(pattern.occurrences / 20, 1);
     ranking += usageScore * 30;
-    
+
     // Confidence (20%)
     ranking += pattern.confidence * 20;
-    
+
     // Recency (10%)
     const recencyScore = this.calculateRecencyFactor(pattern.lastSeen);
     ranking += recencyScore * 10;
-    
+
     return ranking;
   }
 }

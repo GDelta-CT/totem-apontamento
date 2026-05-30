@@ -126,7 +126,7 @@ class LargeFilesCheck extends BaseCheck {
               veryLarge: veryLarge.slice(0, 5),
               large: justLarge.slice(0, 5),
             },
-          },
+          }
         );
       }
 

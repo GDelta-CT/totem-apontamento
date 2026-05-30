@@ -37,7 +37,7 @@ const _BOOT_TIME = process.hrtime.bigint();
  * @see generate-greeting.js - CLI wrapper (now thin wrapper around this pipeline)
  */
 
-'use strict';
+('use strict');
 
 const path = require('path');
 const fs = require('fs').promises;
@@ -86,7 +86,8 @@ const LOADER_TIERS = {
   bestEffort: {
     loaders: ['sessionContext'],
     timeout: 180,
-    description: 'Session awareness — greeting works fine without this. NOG-18: projectStatus removed (native gitStatus)',
+    description:
+      'Session awareness — greeting works fine without this. NOG-18: projectStatus removed (native gitStatus)',
   },
 };
 
@@ -102,9 +103,18 @@ const DEFAULT_PIPELINE_TIMEOUT_MS = 500;
  * @type {string[]}
  */
 const ALL_AGENT_IDS = [
-  'dev', 'qa', 'architect', 'pm', 'po', 'sm',
-  'analyst', 'data-engineer', 'ux-design-expert',
-  'devops', 'aiox-master', 'squad-creator',
+  'dev',
+  'qa',
+  'architect',
+  'pm',
+  'po',
+  'sm',
+  'analyst',
+  'data-engineer',
+  'ux-design-expert',
+  'devops',
+  'aiox-master',
+  'squad-creator',
 ];
 
 /**
@@ -171,7 +181,6 @@ class UnifiedActivationPipeline {
 
       result.duration = Date.now() - startTime;
       return result;
-
     } catch (error) {
       console.warn(`[UnifiedActivationPipeline] Activation failed for ${agentId}:`, error.message);
       const fallbackGreeting = this._generateFallbackGreeting(agentId);
@@ -254,7 +263,8 @@ class UnifiedActivationPipeline {
         if (MemoryLoader) {
           // Check feature gate for memory.extended
           const featureGate = loadProModule('license/feature-gate');
-          const isMemoryEnabled = featureGate?.featureGate?.isAvailable('pro.memory.extended') ?? false;
+          const isMemoryEnabled =
+            featureGate?.featureGate?.isAvailable('pro.memory.extended') ?? false;
 
           if (isMemoryEnabled) {
             const memoryBudget = agentComplete?.config?.memoryBudget || 2000;
@@ -376,10 +386,7 @@ class UnifiedActivationPipeline {
       const timeoutPromise = new Promise((_, reject) => {
         timer = setTimeout(() => reject(new Error(`${name} timeout (${timeoutMs}ms)`)), timeoutMs);
       });
-      const result = await Promise.race([
-        loaderFn(),
-        timeoutPromise,
-      ]);
+      const result = await Promise.race([loaderFn(), timeoutPromise]);
       clearTimeout(timer);
       const duration = Date.now() - start;
       metrics.loaders[name] = { duration, status: 'ok', start, end: start + duration };
@@ -388,7 +395,13 @@ class UnifiedActivationPipeline {
       clearTimeout(timer);
       const duration = Date.now() - start;
       const status = error.message.includes('timeout') ? 'timeout' : 'error';
-      metrics.loaders[name] = { duration, status, start, end: start + duration, error: error.message };
+      metrics.loaders[name] = {
+        duration,
+        status,
+        start,
+        end: start + duration,
+        error: error.message,
+      };
       console.warn(`[UnifiedActivationPipeline] ${name} ${status}: ${error.message}`);
       return null;
     }
@@ -415,7 +428,7 @@ class UnifiedActivationPipeline {
 
     // Check if any loader failed
     const allLoaderNames = Object.keys(loaders);
-    const failedLoaders = allLoaderNames.filter(name => loaders[name].status !== 'ok');
+    const failedLoaders = allLoaderNames.filter((name) => loaders[name].status !== 'ok');
 
     if (failedLoaders.length === 0) {
       return 'full';
@@ -511,9 +524,8 @@ class UnifiedActivationPipeline {
    */
   _resolvePreference(agentDefinition, userProfile) {
     // PM agent bypasses bob mode restriction (PM is primary interface in bob mode)
-    const effectiveProfile = (userProfile === 'bob' && agentDefinition.id === 'pm')
-      ? 'advanced'
-      : userProfile;
+    const effectiveProfile =
+      userProfile === 'bob' && agentDefinition.id === 'pm' ? 'advanced' : userProfile;
 
     return this.preferenceManager.getPreference(effectiveProfile);
   }
@@ -583,7 +595,9 @@ class UnifiedActivationPipeline {
     let timerId;
     const promise = new Promise((resolve) => {
       timerId = setTimeout(() => {
-        console.warn(`[UnifiedActivationPipeline] Pipeline timeout (${timeoutMs}ms) for ${agentId}`);
+        console.warn(
+          `[UnifiedActivationPipeline] Pipeline timeout (${timeoutMs}ms) for ${agentId}`
+        );
         resolve({
           greeting: this._generateFallbackGreeting(agentId),
           context: this._getDefaultContext(agentId),
@@ -617,16 +631,16 @@ class UnifiedActivationPipeline {
    */
   _getDefaultIcon(agentId) {
     const icons = {
-      'dev': '\uD83D\uDCBB',
-      'qa': '\uD83D\uDD0D',
-      'architect': '\uD83C\uDFD7\uFE0F',
-      'pm': '\uD83D\uDCCA',
-      'po': '\uD83D\uDCCB',
-      'sm': '\uD83C\uDFC3',
-      'analyst': '\uD83D\uDD2C',
+      dev: '\uD83D\uDCBB',
+      qa: '\uD83D\uDD0D',
+      architect: '\uD83C\uDFD7\uFE0F',
+      pm: '\uD83D\uDCCA',
+      po: '\uD83D\uDCCB',
+      sm: '\uD83C\uDFC3',
+      analyst: '\uD83D\uDD2C',
       'data-engineer': '\uD83D\uDDC4\uFE0F',
       'ux-design-expert': '\uD83C\uDFA8',
-      'devops': '\u2699\uFE0F',
+      devops: '\u2699\uFE0F',
       'aiox-master': '\uD83D\uDC51',
       'squad-creator': '\uD83D\uDC65',
     };
@@ -697,7 +711,12 @@ class UnifiedActivationPipeline {
       if (!fsSync.existsSync(path.join(this.projectRoot, '.synapse'))) {
         // .synapse/ does not exist — project may not have SYNAPSE installed
         const duration = Date.now() - start;
-        metrics.loaders.synapseSession = { duration, status: 'skipped', start, end: start + duration };
+        metrics.loaders.synapseSession = {
+          duration,
+          status: 'skipped',
+          start,
+          end: start + duration,
+        };
         return;
       }
 
@@ -719,7 +738,13 @@ class UnifiedActivationPipeline {
       metrics.loaders.synapseSession = { duration, status: 'ok', start, end: start + duration };
     } catch (error) {
       const duration = Date.now() - start;
-      metrics.loaders.synapseSession = { duration, status: 'error', start, end: start + duration, error: error.message };
+      metrics.loaders.synapseSession = {
+        duration,
+        status: 'error',
+        start,
+        end: start + duration,
+        error: error.message,
+      };
       console.warn(`[UnifiedActivationPipeline] SYNAPSE session write failed: ${error.message}`);
     }
   }
@@ -742,9 +767,8 @@ class UnifiedActivationPipeline {
       if (!fsSync.existsSync(metricsDir)) {
         fsSync.mkdirSync(metricsDir, { recursive: true });
       }
-      const requireChainMs = typeof _BOOT_TIME !== 'undefined'
-        ? Number(process.hrtime.bigint() - _BOOT_TIME) / 1e6
-        : 0;
+      const requireChainMs =
+        typeof _BOOT_TIME !== 'undefined' ? Number(process.hrtime.bigint() - _BOOT_TIME) / 1e6 : 0;
       const data = {
         agentId,
         quality,
@@ -759,10 +783,7 @@ class UnifiedActivationPipeline {
           status: info.status || 'unknown',
         };
       }
-      atomicWriteSync(
-        path.join(metricsDir, 'uap-metrics.json'),
-        JSON.stringify(data, null, 2),
-      );
+      atomicWriteSync(path.join(metricsDir, 'uap-metrics.json'), JSON.stringify(data, null, 2));
     } catch {
       // Fire-and-forget: never block the activation pipeline
     }
@@ -800,15 +821,17 @@ module.exports = {
 if (require.main === module) {
   const agentId = process.argv[2];
   if (!agentId || !ALL_AGENT_IDS.includes(agentId)) {
-    console.error(`Usage: node unified-activation-pipeline.js <agentId>\nValid agents: ${ALL_AGENT_IDS.join(', ')}`);
+    console.error(
+      `Usage: node unified-activation-pipeline.js <agentId>\nValid agents: ${ALL_AGENT_IDS.join(', ')}`
+    );
     process.exit(1);
   }
   UnifiedActivationPipeline.activate(agentId)
-    .then(result => {
+    .then((result) => {
       console.log(result.greeting);
       process.exit(0);
     })
-    .catch(err => {
+    .catch((err) => {
       console.error(`Activation error: ${err.message}`);
       process.exit(1);
     });

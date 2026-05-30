@@ -5,7 +5,7 @@ import './IssuesList.css';
 const TIER_LABELS = {
   1: 'Auto-Fix Available',
   2: 'Confirm to Fix',
-  3: 'Manual Guide'
+  3: 'Manual Guide',
 };
 
 /**
@@ -16,18 +16,17 @@ function IssuesList({ issues = {}, onAction, maxItems = 10 }) {
 
   // Flatten issues from severity groups
   const allIssues = [];
-  ['critical', 'high', 'medium', 'low'].forEach(severity => {
+  ['critical', 'high', 'medium', 'low'].forEach((severity) => {
     if (issues[severity]) {
-      issues[severity].forEach(issue => {
+      issues[severity].forEach((issue) => {
         allIssues.push({ ...issue, severity: severity.toUpperCase() });
       });
     }
   });
 
   // Filter issues
-  const filteredIssues = filter === 'all'
-    ? allIssues
-    : allIssues.filter(i => i.severity.toLowerCase() === filter);
+  const filteredIssues =
+    filter === 'all' ? allIssues : allIssues.filter((i) => i.severity.toLowerCase() === filter);
 
   // Limit display
   const displayedIssues = filteredIssues.slice(0, maxItems);
@@ -87,15 +86,11 @@ function IssuesList({ issues = {}, onAction, maxItems = 10 }) {
                 </div>
                 <div className="issue-meta">
                   <StatusBadge severity={issue.severity} size="sm" />
-                  {issue.domain && (
-                    <span className="issue-domain">{issue.domain}</span>
-                  )}
+                  {issue.domain && <span className="issue-domain">{issue.domain}</span>}
                 </div>
               </div>
 
-              {issue.message && issue.name && (
-                <p className="issue-message">{issue.message}</p>
-              )}
+              {issue.message && issue.name && <p className="issue-message">{issue.message}</p>}
 
               {issue.autoFix && (
                 <div className="issue-actions">

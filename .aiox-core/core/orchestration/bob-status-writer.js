@@ -187,7 +187,9 @@ class BobStatusWriter {
       await fs.move(tempPath, this.statusPath, { overwrite: true });
 
       this._status = state;
-      this._log(`Status written: stage=${state.pipeline.current_stage}, agent=${state.current_agent.id}`);
+      this._log(
+        `Status written: stage=${state.pipeline.current_stage}, agent=${state.current_agent.id}`
+      );
     } catch (error) {
       this._log(`Failed to write status: ${error.message}`);
       // Silent failure - never interrupt CLI (CLI First principle)
@@ -315,7 +317,9 @@ class BobStatusWriter {
    * @returns {Promise<void>}
    */
   async resolveSurfaceDecision(criteria) {
-    const decision = this._status.surface_decisions.find((d) => d.criteria === criteria && !d.resolved);
+    const decision = this._status.surface_decisions.find(
+      (d) => d.criteria === criteria && !d.resolved
+    );
     if (decision) {
       decision.resolved = true;
       decision.resolved_at = new Date().toISOString();

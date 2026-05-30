@@ -9,6 +9,7 @@
 ## MIGRATION PRINCIPLES
 
 ### Core Rules
+
 1. **Never modify existing migrations** - Create new ones
 2. **Always provide rollback** - Every up has a down
 3. **Test on production copy** - Before running in production
@@ -21,6 +22,7 @@
 ## SAFE OPERATIONS
 
 ### Adding Columns (Safe)
+
 ```sql
 -- ✅ Safe: Add nullable column
 ALTER TABLE users ADD COLUMN bio TEXT;
@@ -30,6 +32,7 @@ ALTER TABLE users ADD COLUMN is_active BOOLEAN DEFAULT true;
 ```
 
 ### Adding Indexes (Safe with CONCURRENTLY)
+
 ```sql
 -- ✅ Safe: Non-blocking index creation
 CREATE INDEX CONCURRENTLY idx_users_email ON users(email);
@@ -39,6 +42,7 @@ CREATE INDEX idx_users_email ON users(email);
 ```
 
 ### Creating Tables (Safe)
+
 ```sql
 -- ✅ Safe: New table doesn't affect existing data
 CREATE TABLE new_feature (
@@ -52,6 +56,7 @@ CREATE TABLE new_feature (
 ## DANGEROUS OPERATIONS
 
 ### Dropping Columns (Dangerous)
+
 ```sql
 -- ❌ DANGEROUS: Data loss
 ALTER TABLE users DROP COLUMN bio;
@@ -63,6 +68,7 @@ ALTER TABLE users DROP COLUMN bio;
 ```
 
 ### Renaming Columns (Dangerous)
+
 ```sql
 -- ❌ DANGEROUS: Breaks existing queries
 ALTER TABLE users RENAME COLUMN name TO full_name;
@@ -79,6 +85,7 @@ UPDATE users SET full_name = name WHERE full_name IS NULL;
 ```
 
 ### Changing Column Types (Dangerous)
+
 ```sql
 -- ❌ DANGEROUS: Can fail with existing data
 ALTER TABLE users ALTER COLUMN age TYPE INTEGER;
@@ -92,6 +99,7 @@ ALTER TABLE users RENAME COLUMN age_new TO age;
 ```
 
 ### Adding NOT NULL (Dangerous)
+
 ```sql
 -- ❌ DANGEROUS: Fails if nulls exist
 ALTER TABLE users ALTER COLUMN email SET NOT NULL;
@@ -110,6 +118,7 @@ ALTER TABLE users ALTER COLUMN email SET NOT NULL;
 ## LARGE TABLE MIGRATIONS
 
 ### Batch Updates
+
 ```sql
 -- ❌ DANGEROUS: Locks table for long time
 UPDATE large_table SET new_column = old_column;
@@ -142,6 +151,7 @@ END $$;
 ```
 
 ### Online Schema Changes (pt-online-schema-change pattern)
+
 ```sql
 -- For large table modifications:
 -- 1. Create new table with desired schema
@@ -171,6 +181,7 @@ ALTER TABLE users_new RENAME TO users;
 ## ROLLBACK STRATEGIES
 
 ### Schema Rollback Template
+
 ```sql
 -- migrations/00001_add_feature.up.sql
 ALTER TABLE users ADD COLUMN feature_enabled BOOLEAN DEFAULT false;
@@ -180,6 +191,7 @@ ALTER TABLE users DROP COLUMN feature_enabled;
 ```
 
 ### Data Rollback Template
+
 ```sql
 -- Before data migration, create backup
 CREATE TABLE users_backup_20240115 AS SELECT * FROM users;
@@ -198,6 +210,7 @@ DROP TABLE users_backup_20240115;
 ```
 
 ### Point-in-Time Recovery
+
 ```bash
 # Supabase: Restore to specific timestamp
 # Via Dashboard > Settings > Database > Point in Time Recovery
@@ -211,6 +224,7 @@ pg_restore --target-time="2024-01-15 10:30:00" -d mydb backup.dump
 ## MIGRATION WORKFLOW
 
 ### Pre-Migration Checklist
+
 - [ ] Migration tested on local database
 - [ ] Migration tested on staging with production copy
 - [ ] Rollback script exists and tested
@@ -220,6 +234,7 @@ pg_restore --target-time="2024-01-15 10:30:00" -d mydb backup.dump
 - [ ] Monitoring dashboards ready
 
 ### During Migration
+
 - [ ] Take fresh backup before starting
 - [ ] Run migration
 - [ ] Verify schema changes
@@ -228,6 +243,7 @@ pg_restore --target-time="2024-01-15 10:30:00" -d mydb backup.dump
 - [ ] Monitor error rates
 
 ### Post-Migration
+
 - [ ] Verify all features working
 - [ ] Check query performance
 - [ ] Monitor for 24 hours
@@ -239,6 +255,7 @@ pg_restore --target-time="2024-01-15 10:30:00" -d mydb backup.dump
 ## SUPABASE-SPECIFIC
 
 ### Using Supabase Migrations
+
 ```bash
 # Create new migration
 supabase migration new add_user_bio
@@ -254,6 +271,7 @@ supabase db push
 ```
 
 ### Handling RLS in Migrations
+
 ```sql
 -- migrations/00001_add_table_with_rls.sql
 
@@ -276,6 +294,7 @@ WITH CHECK (owner_id = auth.uid());
 ```
 
 ### Edge Function Dependencies
+
 ```sql
 -- If migration affects Edge Functions:
 -- 1. Deploy migration
@@ -290,6 +309,7 @@ WITH CHECK (owner_id = auth.uid());
 ## EMERGENCY PROCEDURES
 
 ### Migration Failed Mid-Way
+
 1. **Don't panic** - assess the state
 2. Check which statements succeeded
 3. If in transaction, it auto-rolled back
@@ -297,6 +317,7 @@ WITH CHECK (owner_id = auth.uid());
 5. Restore from backup if needed
 
 ### Production is Down
+
 1. Check application logs
 2. Check database connectivity
 3. Roll back if migration caused issue
@@ -304,6 +325,7 @@ WITH CHECK (owner_id = auth.uid());
 5. Communicate with stakeholders
 
 ### Data Corruption Detected
+
 1. Stop all writes immediately
 2. Take current state backup
 3. Identify affected records
@@ -314,16 +336,16 @@ WITH CHECK (owner_id = auth.uid());
 
 ## TESTING MATRIX
 
-| Operation | Local | Staging | Prod Copy | Low Traffic |
-|-----------|-------|---------|-----------|-------------|
-| Add column | ✅ | ✅ | - | - |
-| Add index | ✅ | ✅ | ✅ | ✅ |
-| Drop column | ✅ | ✅ | ✅ | ✅ |
-| Modify type | ✅ | ✅ | ✅ | ✅ |
-| Large update | ✅ | ✅ | ✅ | ✅ |
-| Table rename | ✅ | ✅ | ✅ | ✅ |
+| Operation    | Local | Staging | Prod Copy | Low Traffic |
+| ------------ | ----- | ------- | --------- | ----------- |
+| Add column   | ✅    | ✅      | -         | -           |
+| Add index    | ✅    | ✅      | ✅        | ✅          |
+| Drop column  | ✅    | ✅      | ✅        | ✅          |
+| Modify type  | ✅    | ✅      | ✅        | ✅          |
+| Large update | ✅    | ✅      | ✅        | ✅          |
+| Table rename | ✅    | ✅      | ✅        | ✅          |
 
 ---
 
-**Reviewer:** ________ **Date:** ________
+**Reviewer:** **\_\_\_\_** **Date:** **\_\_\_\_**
 **Safety Audit:** [ ] PASS [ ] NEEDS REVIEW

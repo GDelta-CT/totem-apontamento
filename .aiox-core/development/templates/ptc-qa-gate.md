@@ -1,10 +1,12 @@
 # PTC Template: QA Gate Batch
 
 ---
+
 execution_mode: programmatic
-ptc_type: bash-batch  # Fallback — true PTC not available in Claude Code CLI (ADR-7)
+ptc_type: bash-batch # Fallback — true PTC not available in Claude Code CLI (ADR-7)
 adr_reference: ADR-3 (PTC native ONLY — no MCP tools in batch blocks)
 story: TOK-3
+
 ---
 
 ## Purpose
@@ -86,11 +88,11 @@ fi
 
 ## Token Comparison
 
-| Approach | Tool Calls | Context Entries | Estimated Tokens |
-|----------|-----------|-----------------|-----------------|
-| Direct (3 calls) | 3 | 3 (each result) | ~3,000-9,000 |
-| Batch (1 call) | 1 | 1 (summary only) | ~1,500-3,000 |
-| **Reduction** | -67% calls | -67% entries | **~20-50%** |
+| Approach         | Tool Calls | Context Entries  | Estimated Tokens |
+| ---------------- | ---------- | ---------------- | ---------------- |
+| Direct (3 calls) | 3          | 3 (each result)  | ~3,000-9,000     |
+| Batch (1 call)   | 1          | 1 (summary only) | ~1,500-3,000     |
+| **Reduction**    | -67% calls | -67% entries     | **~20-50%**      |
 
 ## Notes
 

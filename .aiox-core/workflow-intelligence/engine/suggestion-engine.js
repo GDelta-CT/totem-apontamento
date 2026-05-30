@@ -191,10 +191,13 @@ class SuggestionEngine {
       const suggestions = wis.getSuggestions(context);
 
       if (!suggestions || suggestions.length === 0) {
-        return this._withRuntimeRecommendation({
-          ...defaultResult,
-          message: 'No matching workflow found for current context',
-        }, runtimeNext);
+        return this._withRuntimeRecommendation(
+          {
+            ...defaultResult,
+            message: 'No matching workflow found for current context',
+          },
+          runtimeNext
+        );
       }
 
       // Get workflow match info
@@ -272,7 +275,9 @@ class SuggestionEngine {
 
     const baseSignals = {
       story_status:
-        projectState.story_status || projectState.storyStatus || (projectState.activeStory ? 'in_progress' : 'unknown'),
+        projectState.story_status ||
+        projectState.storyStatus ||
+        (projectState.activeStory ? 'in_progress' : 'unknown'),
       qa_status: projectState.qa_status || projectState.qaStatus || 'unknown',
       ci_status:
         projectState.ci_status ||
@@ -339,9 +344,14 @@ class SuggestionEngine {
     };
 
     const existing = Array.isArray(result.suggestions) ? result.suggestions : [];
-    const normalizedRuntimeCommand = String(runtimeSuggestion.command || '').trim().toLowerCase();
+    const normalizedRuntimeCommand = String(runtimeSuggestion.command || '')
+      .trim()
+      .toLowerCase();
     const deduped = existing.filter(
-      (s) => String((s.command || '') + (s.args ? ` ${s.args}` : '')).trim().toLowerCase() !== normalizedRuntimeCommand,
+      (s) =>
+        String((s.command || '') + (s.args ? ` ${s.args}` : ''))
+          .trim()
+          .toLowerCase() !== normalizedRuntimeCommand
     );
 
     return {

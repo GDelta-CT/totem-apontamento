@@ -36,9 +36,10 @@ function formatReport(data) {
 
   if (data.pipeline) {
     const bracket = data.pipeline.bracket || 'UNKNOWN';
-    const contextPercent = typeof data.pipeline.contextPercent === 'number'
-      ? data.pipeline.contextPercent.toFixed(1)
-      : '?';
+    const contextPercent =
+      typeof data.pipeline.contextPercent === 'number'
+        ? data.pipeline.contextPercent.toFixed(1)
+        : '?';
     lines.push(`**Bracket:** ${bracket} (${contextPercent}% context remaining)`);
   }
 
@@ -82,12 +83,16 @@ function formatReport(data) {
     lines.push('| Domain | In Manifest | File Exists | Status |');
     lines.push('|--------|-------------|-------------|--------|');
     for (const entry of data.manifest.entries) {
-      lines.push(`| ${entry.domain} | ${entry.inManifest} | ${entry.fileExists ? 'yes' : 'no'} | ${entry.status} |`);
+      lines.push(
+        `| ${entry.domain} | ${entry.inManifest} | ${entry.fileExists ? 'yes' : 'no'} | ${entry.status} |`
+      );
     }
 
     if (data.manifest.orphanedFiles && data.manifest.orphanedFiles.length > 0) {
       lines.push('');
-      lines.push(`**Orphaned files** (in .synapse/ but not in manifest): ${data.manifest.orphanedFiles.join(', ')}`);
+      lines.push(
+        `**Orphaned files** (in .synapse/ but not in manifest): ${data.manifest.orphanedFiles.join(', ')}`
+      );
     }
   } else {
     lines.push('*No manifest data collected*');
@@ -127,7 +132,9 @@ function formatReport(data) {
 
   // Memory bridge is Pro-only, so always report current state
   lines.push('| Pro available | INFO | Check `pro/` submodule |');
-  lines.push(`| Bracket requires hints | ${_bracketNeedsMemory(data.pipeline?.bracket) ? 'YES' : 'NO'} | ${data.pipeline?.bracket || 'UNKNOWN'} bracket |`);
+  lines.push(
+    `| Bracket requires hints | ${_bracketNeedsMemory(data.pipeline?.bracket) ? 'YES' : 'NO'} | ${data.pipeline?.bracket || 'UNKNOWN'} bracket |`
+  );
   lines.push('');
 
   // Section 7: Gaps & Recommendations
@@ -303,7 +310,9 @@ function _formatTimingSection(lines, timing) {
   // UAP Timing
   if (timing.uap && timing.uap.available) {
     const staleTag = timing.uap.stale ? ' **[STALE]**' : '';
-    lines.push(`### UAP Activation Pipeline (${timing.uap.totalDuration}ms total, quality: ${timing.uap.quality})${staleTag}`);
+    lines.push(
+      `### UAP Activation Pipeline (${timing.uap.totalDuration}ms total, quality: ${timing.uap.quality})${staleTag}`
+    );
     lines.push('| Loader | Duration | Status | Tier |');
     lines.push('|--------|----------|--------|------|');
     for (const loader of timing.uap.loaders) {
@@ -319,8 +328,12 @@ function _formatTimingSection(lines, timing) {
   // Hook Timing
   if (timing.hook && timing.hook.available) {
     const staleTag = timing.hook.stale ? ' **[STALE]**' : '';
-    const bootInfo = timing.hook.hookBootMs ? ` boot: ${Math.round(timing.hook.hookBootMs)}ms,` : '';
-    lines.push(`### SYNAPSE Hook Pipeline (${timing.hook.totalDuration}ms total,${bootInfo} ${timing.hook.bracket} bracket)${staleTag}`);
+    const bootInfo = timing.hook.hookBootMs
+      ? ` boot: ${Math.round(timing.hook.hookBootMs)}ms,`
+      : '';
+    lines.push(
+      `### SYNAPSE Hook Pipeline (${timing.hook.totalDuration}ms total,${bootInfo} ${timing.hook.bracket} bracket)${staleTag}`
+    );
     lines.push('| Layer | Duration | Status | Rules |');
     lines.push('|-------|----------|--------|-------|');
     for (const layer of timing.hook.layers) {
@@ -368,7 +381,9 @@ function _formatQualitySection(lines, quality) {
     lines.push('| Loader | Score | Criticality | Impact |');
     lines.push('|--------|-------|-------------|--------|');
     for (const loader of quality.uap.loaders) {
-      lines.push(`| ${loader.name} | ${loader.score}/${loader.maxScore} | ${loader.criticality} | ${loader.impact} |`);
+      lines.push(
+        `| ${loader.name} | ${loader.score}/${loader.maxScore} | ${loader.criticality} | ${loader.impact} |`
+      );
     }
     lines.push('');
   }
@@ -379,7 +394,9 @@ function _formatQualitySection(lines, quality) {
     lines.push('| Layer | Score | Criticality | Rules | Impact |');
     lines.push('|-------|-------|-------------|-------|--------|');
     for (const layer of quality.hook.layers) {
-      lines.push(`| ${layer.name} | ${layer.score}/${layer.maxScore} | ${layer.criticality} | ${layer.rules || '-'} | ${layer.impact} |`);
+      lines.push(
+        `| ${layer.name} | ${layer.score}/${layer.maxScore} | ${layer.criticality} | ${layer.rules || '-'} | ${layer.impact} |`
+      );
     }
     lines.push('');
   }
@@ -422,7 +439,9 @@ function _formatOutputSection(lines, outputAnalysis) {
   }
 
   const s = outputAnalysis.summary;
-  lines.push(`**UAP:** ${s.uapHealthy}/${s.uapTotal} healthy | **Hook:** ${s.hookHealthy}/${s.hookTotal} healthy`);
+  lines.push(
+    `**UAP:** ${s.uapHealthy}/${s.uapTotal} healthy | **Hook:** ${s.hookHealthy}/${s.hookTotal} healthy`
+  );
   lines.push('');
 
   if (outputAnalysis.uapAnalysis && outputAnalysis.uapAnalysis.length > 0) {

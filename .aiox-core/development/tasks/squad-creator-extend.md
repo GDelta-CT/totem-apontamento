@@ -1,6 +1,6 @@
 ---
 task: extendSquad()
-responsavel: "@squad-creator"
+responsavel: '@squad-creator'
 responsavel_type: Agent
 atomic_layer: Task
 elicit: true
@@ -16,13 +16,13 @@ Entrada:
     tipo: string
     origem: User Input
     obrigatorio: true
-    validacao: "agent | task | workflow | checklist | template | tool | script | data"
+    validacao: 'agent | task | workflow | checklist | template | tool | script | data'
 
   - campo: component_name
     tipo: string
     origem: User Input
     obrigatorio: true
-    validacao: "kebab-case, no special characters"
+    validacao: 'kebab-case, no special characters'
 
   - campo: agent_id
     tipo: string
@@ -34,7 +34,7 @@ Entrada:
     tipo: string
     origem: User Input
     obrigatorio: false
-    validacao: "Format: SQS-XX (optional traceability)"
+    validacao: 'Format: SQS-XX (optional traceability)'
 
 Saida:
   - campo: created_file
@@ -53,13 +53,13 @@ Saida:
     persistido: false
 
 Checklist:
-  - "[ ] Validate squad exists"
-  - "[ ] Collect component type"
-  - "[ ] Collect component name and metadata"
-  - "[ ] Create file from template"
-  - "[ ] Update squad.yaml manifest"
-  - "[ ] Run validation"
-  - "[ ] Display result and next steps"
+  - '[ ] Validate squad exists'
+  - '[ ] Collect component type'
+  - '[ ] Collect component name and metadata'
+  - '[ ] Create file from template'
+  - '[ ] Update squad.yaml manifest'
+  - '[ ] Run validation'
+  - '[ ] Display result and next steps'
 ---
 
 # Extend Squad Task
@@ -201,7 +201,7 @@ const result = await extender.addComponent(squadPath, {
   name: componentName,
   agentId: agentId,
   storyId: storyId,
-  description: description
+  description: description,
 });
 
 // result = {
@@ -216,7 +216,7 @@ const result = await extender.addComponent(squadPath, {
 ```javascript
 const manifestUpdated = await extender.updateManifest(squadPath, {
   type: componentType,
-  file: result.fileName
+  file: result.fileName,
 });
 
 // Creates backup before updating
@@ -258,16 +258,16 @@ Next steps:
 
 Each component type uses a template from `.aiox-core/development/templates/squad/`:
 
-| Type | Template | Key Fields |
-|------|----------|------------|
-| agent | agent-template.md | name, id, role, commands |
-| task | task-template.md | responsavel, entrada, saida, checklist |
-| workflow | workflow-template.md | steps, conditions, triggers |
-| checklist | checklist-template.md | items, categories |
-| template | template-template.md | placeholders, structure |
-| tool | tool-template.js | functions, exports |
-| script | script-template.js | main, helpers |
-| data | data-template.yaml | schema, content |
+| Type      | Template              | Key Fields                             |
+| --------- | --------------------- | -------------------------------------- |
+| agent     | agent-template.md     | name, id, role, commands               |
+| task      | task-template.md      | responsavel, entrada, saida, checklist |
+| workflow  | workflow-template.md  | steps, conditions, triggers            |
+| checklist | checklist-template.md | items, categories                      |
+| template  | template-template.md  | placeholders, structure                |
+| tool      | tool-template.js      | functions, exports                     |
+| script    | script-template.js    | main, helpers                          |
+| data      | data-template.yaml    | schema, content                        |
 
 ## Error Handling
 
@@ -330,7 +330,12 @@ if (componentName.includes('/') || componentName.includes('\\') || componentName
 ### Overwrite Protection
 
 ```javascript
-if (await fs.access(targetPath).then(() => true).catch(() => false)) {
+if (
+  await fs
+    .access(targetPath)
+    .then(() => true)
+    .catch(() => false)
+) {
   if (!force) {
     throw new Error(`File already exists: ${targetPath}. Use --force to overwrite`);
   }
@@ -408,4 +413,4 @@ tags:
 
 ---
 
-*Task definition for *extend-squad command*
+*Task definition for *extend-squad command\*

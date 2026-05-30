@@ -20,8 +20,18 @@ const { safeReadJson } = require('./safe-read-json');
  * @type {Array<{ name: string, weight: number, criticality: string, impact: string }>}
  */
 const UAP_RUBRIC = [
-  { name: 'agentConfig', weight: 25, criticality: 'CRITICAL', impact: 'Agent identity and commands' },
-  { name: 'memories', weight: 20, criticality: 'HIGH', impact: 'Context from progressive retrieval' },
+  {
+    name: 'agentConfig',
+    weight: 25,
+    criticality: 'CRITICAL',
+    impact: 'Agent identity and commands',
+  },
+  {
+    name: 'memories',
+    weight: 20,
+    criticality: 'HIGH',
+    impact: 'Context from progressive retrieval',
+  },
   { name: 'sessionContext', weight: 15, criticality: 'MEDIUM', impact: 'Session continuity' },
   { name: 'projectStatus', weight: 12, criticality: 'MEDIUM', impact: 'Project status context' },
   { name: 'gitConfig', weight: 8, criticality: 'LOW', impact: 'Branch name context' },
@@ -60,8 +70,26 @@ const STALE_DEGRADATION_FACTOR = 0.5;
 
 const BRACKET_ACTIVE_LAYERS = {
   FRESH: ['constitution', 'global', 'agent', 'star-command'],
-  MODERATE: ['constitution', 'global', 'agent', 'workflow', 'task', 'squad', 'keyword', 'star-command'],
-  DEPLETED: ['constitution', 'global', 'agent', 'workflow', 'task', 'squad', 'keyword', 'star-command'],
+  MODERATE: [
+    'constitution',
+    'global',
+    'agent',
+    'workflow',
+    'task',
+    'squad',
+    'keyword',
+    'star-command',
+  ],
+  DEPLETED: [
+    'constitution',
+    'global',
+    'agent',
+    'workflow',
+    'task',
+    'squad',
+    'keyword',
+    'star-command',
+  ],
   CRITICAL: ['constitution', 'agent'],
 };
 
@@ -235,7 +263,7 @@ function _scoreHook(data) {
       criticality: rubric.criticality,
       impact: rubric.impact,
       status: layer ? layer.status : 'missing',
-      rules: layer ? (layer.rules || 0) : 0,
+      rules: layer ? layer.rules || 0 : 0,
     };
   });
 

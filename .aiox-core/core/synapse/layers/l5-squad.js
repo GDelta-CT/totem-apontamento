@@ -97,8 +97,11 @@ class L5SquadProcessor extends LayerProcessor {
     const squadNames = Object.keys(squadManifests);
     if (activeSquadName && squadManifests[activeSquadName]) {
       this._loadSquadDomains(
-        activeSquadName, squadManifests[activeSquadName],
-        squadsDir, allRules, domainsLoaded,
+        activeSquadName,
+        squadManifests[activeSquadName],
+        squadsDir,
+        allRules,
+        domainsLoaded
       );
     }
 
@@ -106,8 +109,11 @@ class L5SquadProcessor extends LayerProcessor {
     for (const squadName of squadNames) {
       if (squadName === activeSquadName) continue;
       this._loadSquadDomains(
-        squadName, squadManifests[squadName],
-        squadsDir, allRules, domainsLoaded,
+        squadName,
+        squadManifests[squadName],
+        squadsDir,
+        allRules,
+        domainsLoaded
       );
     }
 
@@ -142,8 +148,7 @@ class L5SquadProcessor extends LayerProcessor {
     // Check merge mode from {SQUAD}_EXTENDS key
     const extendsKey = `${squadUpper}_EXTENDS`;
     const mergeMode = manifest.domains?.[extendsKey]?.file || 'extend';
-    const resolvedMerge = ['extend', 'override', 'none'].includes(mergeMode)
-      ? mergeMode : 'extend';
+    const resolvedMerge = ['extend', 'override', 'none'].includes(mergeMode) ? mergeMode : 'extend';
 
     if (resolvedMerge === 'none') {
       return; // Squad opted out of rule injection
@@ -177,7 +182,7 @@ class L5SquadProcessor extends LayerProcessor {
     try {
       const raw = fs.readFileSync(cachePath, 'utf8');
       const cached = JSON.parse(raw);
-      if (cached.timestamp && (Date.now() - cached.timestamp) < CACHE_TTL_MS) {
+      if (cached.timestamp && Date.now() - cached.timestamp < CACHE_TTL_MS) {
         return cached;
       }
       return null; // Stale
@@ -199,10 +204,13 @@ class L5SquadProcessor extends LayerProcessor {
       if (!fs.existsSync(cacheDir)) {
         fs.mkdirSync(cacheDir, { recursive: true });
       }
-      fs.writeFileSync(cachePath, JSON.stringify({
-        timestamp: Date.now(),
-        manifests,
-      }));
+      fs.writeFileSync(
+        cachePath,
+        JSON.stringify({
+          timestamp: Date.now(),
+          manifests,
+        })
+      );
     } catch (_error) {
       // Graceful: cache write failure is non-fatal
     }

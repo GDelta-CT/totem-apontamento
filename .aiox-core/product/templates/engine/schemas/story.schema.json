@@ -3,7 +3,17 @@
   "title": "Story Template Variables",
   "description": "Schema for User Story template variables",
   "type": "object",
-  "required": ["id", "title", "epicRef", "sprint", "points", "priority", "status", "userStory", "acceptanceCriteria"],
+  "required": [
+    "id",
+    "title",
+    "epicRef",
+    "sprint",
+    "points",
+    "priority",
+    "status",
+    "userStory",
+    "acceptanceCriteria"
+  ],
   "properties": {
     "id": {
       "type": "string",

@@ -18,7 +18,8 @@ function getStaleSessionTTL(cwd) {
     const configPath = path.join(cwd, '.aiox-core', 'core-config.yaml');
     if (!fs.existsSync(configPath)) return DEFAULT_STALE_TTL_HOURS;
     const config = yaml.load(fs.readFileSync(configPath, 'utf8'));
-    const ttl = config && config.synapse && config.synapse.session && config.synapse.session.staleTTLHours;
+    const ttl =
+      config && config.synapse && config.synapse.session && config.synapse.session.staleTTLHours;
     return typeof ttl === 'number' && ttl > 0 ? ttl : DEFAULT_STALE_TTL_HOURS;
   } catch (_err) {
     return DEFAULT_STALE_TTL_HOURS;
@@ -47,11 +48,9 @@ function resolveHookRuntime(input) {
 
   try {
     const { loadSession, createSession, cleanStaleSessions } = require(
-      path.join(cwd, '.aiox-core', 'core', 'synapse', 'session', 'session-manager.js'),
+      path.join(cwd, '.aiox-core', 'core', 'synapse', 'session', 'session-manager.js')
     );
-    const { SynapseEngine } = require(
-      path.join(cwd, '.aiox-core', 'core', 'synapse', 'engine.js'),
-    );
+    const { SynapseEngine } = require(path.join(cwd, '.aiox-core', 'core', 'synapse', 'engine.js'));
 
     const sessionsDir = path.join(synapsePath, 'sessions');
 

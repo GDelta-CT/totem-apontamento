@@ -36,7 +36,7 @@ const TOOL_REGISTRY_FILE = path.resolve(ROOT, '.aiox-core', 'data', 'tool-regist
 // --- Default Thresholds (overridden by tool-registry.yaml) ---
 const DEFAULT_THRESHOLDS = {
   promote: { minUsesPerSession: 10, minSessions: 5 },
-  demote: { maxUsesPerNSessions: 1, sessionWindow: 5 }
+  demote: { maxUsesPerNSessions: 1, sessionWindow: 5 },
 };
 
 // --- Load Thresholds from tool-registry.yaml (AC 15) ---
@@ -48,13 +48,15 @@ function loadThresholds() {
       const t = registry.analytics.thresholds;
       return {
         promote: {
-          minUsesPerSession: t.promote?.minUsesPerSession ?? DEFAULT_THRESHOLDS.promote.minUsesPerSession,
-          minSessions: t.promote?.minSessions ?? DEFAULT_THRESHOLDS.promote.minSessions
+          minUsesPerSession:
+            t.promote?.minUsesPerSession ?? DEFAULT_THRESHOLDS.promote.minUsesPerSession,
+          minSessions: t.promote?.minSessions ?? DEFAULT_THRESHOLDS.promote.minSessions,
         },
         demote: {
-          maxUsesPerNSessions: t.demote?.maxUsesPerNSessions ?? DEFAULT_THRESHOLDS.demote.maxUsesPerNSessions,
-          sessionWindow: t.demote?.sessionWindow ?? DEFAULT_THRESHOLDS.demote.sessionWindow
-        }
+          maxUsesPerNSessions:
+            t.demote?.maxUsesPerNSessions ?? DEFAULT_THRESHOLDS.demote.maxUsesPerNSessions,
+          sessionWindow: t.demote?.sessionWindow ?? DEFAULT_THRESHOLDS.demote.sessionWindow,
+        },
       };
     }
   } catch {
@@ -116,7 +118,7 @@ function aggregateUsage(sessions) {
           total_token_cost_input: 0,
           total_token_cost_output: 0,
           sessions_used: 0,
-          invocations_per_session: []
+          invocations_per_session: [],
         };
       }
       const stat = toolStats[event.tool_name];
@@ -130,12 +132,15 @@ function aggregateUsage(sessions) {
 
   // Calculate averages
   for (const stat of Object.values(toolStats)) {
-    stat.avg_invocations_per_session = stat.invocations_per_session.length > 0
-      ? stat.invocations_per_session.reduce((a, b) => a + b, 0) / stat.invocations_per_session.length
-      : 0;
-    stat.avg_tokens_per_session = sessionCount > 0
-      ? (stat.total_token_cost_input + stat.total_token_cost_output) / sessionCount
-      : 0;
+    stat.avg_invocations_per_session =
+      stat.invocations_per_session.length > 0
+        ? stat.invocations_per_session.reduce((a, b) => a + b, 0) /
+          stat.invocations_per_session.length
+        : 0;
+    stat.avg_tokens_per_session =
+      sessionCount > 0
+        ? (stat.total_token_cost_input + stat.total_token_cost_output) / sessionCount
+        : 0;
   }
 
   return { toolStats, sessionCount };
@@ -178,15 +183,24 @@ function compareBaseline(baseline, usageData, registry) {
   } else {
     // Fallback: estimate from usage data (avg tokens / avg invocations = per-invocation cost)
     postOptSchemaOverhead = Object.values(toolStats).reduce((sum, t) => {
-      return sum + (t.avg_invocations_per_session > 0
-        ? Math.round((t.total_token_cost_input + t.total_token_cost_output) / t.total_invocations)
-        : 0);
+      return (
+        sum +
+        (t.avg_invocations_per_session > 0
+          ? Math.round((t.total_token_cost_input + t.total_token_cost_output) / t.total_invocations)
+          : 0)
+      );
     }, 0);
   }
 
   // --- Dynamic usage comparison ---
-  const postOptTokensInput = Object.values(toolStats).reduce((s, t) => s + t.total_token_cost_input, 0);
-  const postOptTokensOutput = Object.values(toolStats).reduce((s, t) => s + t.total_token_cost_output, 0);
+  const postOptTokensInput = Object.values(toolStats).reduce(
+    (s, t) => s + t.total_token_cost_input,
+    0
+  );
+  const postOptTokensOutput = Object.values(toolStats).reduce(
+    (s, t) => s + t.total_token_cost_output,
+    0
+  );
   const postOptTotal = postOptTokensInput + postOptTokensOutput;
   const avgPostOptPerSession = sessionCount > 0 ? postOptTotal / sessionCount : 0;
 
@@ -196,8 +210,9 @@ function compareBaseline(baseline, usageData, registry) {
   const workflowComparison = {};
   for (const [wfName, wfData] of Object.entries(baselineWorkflows)) {
     const baselineMedian = wfData.median?.totalTokens || 0;
-    const baselineOverheadPct = baseline.comparison?.aioxActual?.overheadPercentOfTypicalSession?.[wfName] || 0;
-    const baselineOverheadTokens = Math.round(baselineMedian * baselineOverheadPct / 100);
+    const baselineOverheadPct =
+      baseline.comparison?.aioxActual?.overheadPercentOfTypicalSession?.[wfName] || 0;
+    const baselineOverheadTokens = Math.round((baselineMedian * baselineOverheadPct) / 100);
 
     workflowComparison[wfName] = {
       baseline_median_total: baselineMedian,
@@ -205,15 +220,14 @@ function compareBaseline(baseline, usageData, registry) {
       baseline_overhead_pct: baselineOverheadPct,
       post_optimization_schema_overhead: postOptSchemaOverhead,
       post_optimization_avg_usage_per_session: Math.round(avgPostOptPerSession),
-      sessions_analyzed: sessionCount
+      sessions_analyzed: sessionCount,
     };
   }
 
   // Total reduction: compares static overhead (schema tokens loaded)
   const absoluteReduction = baselineOverhead - postOptSchemaOverhead;
-  const percentageReduction = baselineOverhead > 0
-    ? Math.round((absoluteReduction / baselineOverhead) * 1000) / 10
-    : 0;
+  const percentageReduction =
+    baselineOverhead > 0 ? Math.round((absoluteReduction / baselineOverhead) * 1000) / 10 : 0;
 
   // Target assessment (AC 6)
   let targetStatus;
@@ -227,7 +241,8 @@ function compareBaseline(baseline, usageData, registry) {
 
   return {
     available: true,
-    comparison_methodology: 'Static schema overhead: baseline frameworkOverhead vs post-opt tool schema costs from registry. Dynamic usage tracked separately.',
+    comparison_methodology:
+      'Static schema overhead: baseline frameworkOverhead vs post-opt tool schema costs from registry. Dynamic usage tracked separately.',
     baseline_overhead_tokens: baselineOverhead,
     post_optimization_overhead_tokens: postOptSchemaOverhead,
     absolute_reduction_tokens: absoluteReduction,
@@ -237,16 +252,18 @@ function compareBaseline(baseline, usageData, registry) {
     dynamic_usage: {
       avg_invocation_tokens_per_session: Math.round(avgPostOptPerSession),
       total_invocation_tokens: postOptTotal,
-      sessions_analyzed: sessionCount
+      sessions_analyzed: sessionCount,
     },
     workflow_comparison: workflowComparison,
-    per_tool_breakdown: Object.values(toolStats).map(t => ({
-      tool_name: t.tool_name,
-      total_invocations: t.total_invocations,
-      avg_invocations_per_session: Math.round(t.avg_invocations_per_session * 10) / 10,
-      total_tokens: t.total_token_cost_input + t.total_token_cost_output,
-      avg_tokens_per_session: Math.round(t.avg_tokens_per_session)
-    })).sort((a, b) => b.total_tokens - a.total_tokens)
+    per_tool_breakdown: Object.values(toolStats)
+      .map((t) => ({
+        tool_name: t.tool_name,
+        total_invocations: t.total_invocations,
+        avg_invocations_per_session: Math.round(t.avg_invocations_per_session * 10) / 10,
+        total_tokens: t.total_token_cost_input + t.total_token_cost_output,
+        avg_tokens_per_session: Math.round(t.avg_tokens_per_session),
+      }))
+      .sort((a, b) => b.total_tokens - a.total_tokens),
   };
 }
 
@@ -278,9 +295,9 @@ function generateRecommendations(usageData, registry, thresholds) {
           sessions_used: stat.sessions_used,
           total_sessions: sessionCount,
           threshold_invocations: thresholds.promote.minUsesPerSession,
-          threshold_sessions: thresholds.promote.minSessions
+          threshold_sessions: thresholds.promote.minSessions,
         },
-        rationale: `Tool used ${Math.round(stat.avg_invocations_per_session * 10) / 10} times/session across ${stat.sessions_used} sessions (threshold: >${thresholds.promote.minUsesPerSession}/session, ${thresholds.promote.minSessions}+ sessions)`
+        rationale: `Tool used ${Math.round(stat.avg_invocations_per_session * 10) / 10} times/session across ${stat.sessions_used} sessions (threshold: >${thresholds.promote.minUsesPerSession}/session, ${thresholds.promote.minSessions}+ sessions)`,
       });
     }
 
@@ -289,7 +306,8 @@ function generateRecommendations(usageData, registry, thresholds) {
     // of sessions where tool appeared. Compare against maxUsesPerNSessions/sessionWindow
     // meaning "less than 1 use per 5 sessions" = usage rate < 1/5 = 0.2
     const usageRate = sessionCount > 0 ? stat.sessions_used / sessionCount : 0;
-    const demoteThresholdRate = thresholds.demote.maxUsesPerNSessions / thresholds.demote.sessionWindow;
+    const demoteThresholdRate =
+      thresholds.demote.maxUsesPerNSessions / thresholds.demote.sessionWindow;
 
     if (
       usageRate < demoteThresholdRate &&
@@ -307,9 +325,9 @@ function generateRecommendations(usageData, registry, thresholds) {
           sessions_used: stat.sessions_used,
           total_sessions: sessionCount,
           threshold_max_uses: thresholds.demote.maxUsesPerNSessions,
-          threshold_session_window: thresholds.demote.sessionWindow
+          threshold_session_window: thresholds.demote.sessionWindow,
         },
-        rationale: `Tool used in ${stat.sessions_used}/${sessionCount} sessions (rate: ${Math.round(usageRate * 100)}%). Threshold: <${thresholds.demote.maxUsesPerNSessions} per ${thresholds.demote.sessionWindow} sessions (${Math.round(demoteThresholdRate * 100)}%)`
+        rationale: `Tool used in ${stat.sessions_used}/${sessionCount} sessions (rate: ${Math.round(usageRate * 100)}%). Threshold: <${thresholds.demote.maxUsesPerNSessions} per ${thresholds.demote.sessionWindow} sessions (${Math.round(demoteThresholdRate * 100)}%)`,
       });
     }
   }
@@ -326,9 +344,9 @@ function generateRecommendations(usageData, registry, thresholds) {
           evidence: {
             usage_rate: 0,
             sessions_used: 0,
-            total_sessions: sessionCount
+            total_sessions: sessionCount,
           },
-          rationale: `Tool never used in ${sessionCount} analyzed sessions. Consider demotion to Tier 3 (deferred).`
+          rationale: `Tool never used in ${sessionCount} analyzed sessions. Consider demotion to Tier 3 (deferred).`,
         });
       }
     }
@@ -346,7 +364,10 @@ function generateReport(comparison, recommendations, usageData, thresholds) {
   let periodStart = null;
   let periodEnd = null;
   if (sessionCount > 0) {
-    const timestamps = sessions.map(s => s.timestamp).filter(Boolean).sort();
+    const timestamps = sessions
+      .map((s) => s.timestamp)
+      .filter(Boolean)
+      .sort();
     periodStart = timestamps[0];
     periodEnd = timestamps[timestamps.length - 1];
   }
@@ -359,28 +380,31 @@ function generateReport(comparison, recommendations, usageData, thresholds) {
     measurement_period: {
       start: periodStart,
       end: periodEnd,
-      sessions_analyzed: sessionCount
+      sessions_analyzed: sessionCount,
     },
     baseline_comparison: comparison,
     total_tokens_saved: comparison.available ? comparison.absolute_reduction_tokens : 0,
     percentage_reduction: comparison.available ? comparison.percentage_reduction : 0,
     target_status: comparison.available ? comparison.target_25_45_pct : 'NO_DATA',
     recommendations_count: recommendations.length,
-    promote_count: recommendations.filter(r => r.action === 'promote').length,
-    demote_count: recommendations.filter(r => r.action === 'demote').length,
-    thresholds_used: thresholds
+    promote_count: recommendations.filter((r) => r.action === 'promote').length,
+    demote_count: recommendations.filter((r) => r.action === 'demote').length,
+    thresholds_used: thresholds,
   };
 }
 
 // --- Save Recommendations as YAML (AC 9) ---
 function saveRecommendations(recommendations, dryRun) {
-  const yamlContent = yaml.dump({
-    version: '1.0.0',
-    generated_at: new Date().toISOString(),
-    story: 'TOK-5',
-    recommendations_count: recommendations.length,
-    recommendations: recommendations
-  }, { lineWidth: 120, noRefs: true });
+  const yamlContent = yaml.dump(
+    {
+      version: '1.0.0',
+      generated_at: new Date().toISOString(),
+      story: 'TOK-5',
+      recommendations_count: recommendations.length,
+      recommendations: recommendations,
+    },
+    { lineWidth: 120, noRefs: true }
+  );
 
   if (!dryRun) {
     if (!fs.existsSync(ANALYTICS_DIR)) {
@@ -447,14 +471,18 @@ function main() {
   } else {
     console.log('=== TOK-5 Optimization Report ===');
     console.log(`Sessions analyzed: ${report.measurement_period.sessions_analyzed}`);
-    console.log(`Period: ${report.measurement_period.start || 'N/A'} → ${report.measurement_period.end || 'N/A'}`);
+    console.log(
+      `Period: ${report.measurement_period.start || 'N/A'} → ${report.measurement_period.end || 'N/A'}`
+    );
     console.log('');
 
     if (comparison.available) {
       console.log('--- Baseline Comparison ---');
       console.log(`Baseline overhead: ${comparison.baseline_overhead_tokens} tokens`);
       console.log(`Post-optimization: ${comparison.post_optimization_overhead_tokens} tokens`);
-      console.log(`Reduction: ${comparison.absolute_reduction_tokens} tokens (${comparison.percentage_reduction}%)`);
+      console.log(
+        `Reduction: ${comparison.absolute_reduction_tokens} tokens (${comparison.percentage_reduction}%)`
+      );
       console.log(`Target (25-45%): ${comparison.target_25_45_pct}`);
     } else {
       console.log(`Baseline comparison: ${comparison.reason}`);
@@ -462,11 +490,15 @@ function main() {
 
     console.log('');
     console.log('--- Recommendations ---');
-    console.log(`Total: ${recommendations.length} (${report.promote_count} promote, ${report.demote_count} demote)`);
+    console.log(
+      `Total: ${recommendations.length} (${report.promote_count} promote, ${report.demote_count} demote)`
+    );
 
     if (verbose && recommendations.length > 0) {
       for (const rec of recommendations) {
-        console.log(`  ${rec.action.toUpperCase()}: ${rec.tool_name} (${rec.current_tier} → ${rec.recommended_tier})`);
+        console.log(
+          `  ${rec.action.toUpperCase()}: ${rec.tool_name} (${rec.current_tier} → ${rec.recommended_tier})`
+        );
         console.log(`    Rationale: ${rec.rationale}`);
       }
     }
@@ -493,5 +525,5 @@ module.exports = {
   generateRecommendations,
   generateReport,
   aggregateUsage,
-  DEFAULT_THRESHOLDS
+  DEFAULT_THRESHOLDS,
 };

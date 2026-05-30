@@ -1,7 +1,7 @@
 ---
 # No templates needed - this task executes existing checklists, doesn't create document outputs
 tools:
-  - github-cli  # For document gathering
+  - github-cli # For document gathering
 ---
 
 # Checklist Validation Task
@@ -13,16 +13,19 @@ This task provides instructions for validating documentation against checklists.
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts) **[DEFAULT]**
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
-### 2. Interactive Mode - Balanced, Educational (5-10 prompts) 
+### 2. Interactive Mode - Balanced, Educational (5-10 prompts)
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -190,6 +193,7 @@ token_usage: ~3,000-10,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Break into smaller workflows; implement checkpointing; use async processing where possible
 
 ---
@@ -209,7 +213,6 @@ updated_at: 2025-11-17
 
 ---
 
-
 ## Available Checklists
 
 If the user asks or does not specify a specific checklist, list the checklists available to the agent persona. If the task is being run not with a specific agent, tell the user to check the .aiox-core/checklists folder to select the appropriate one to run.
@@ -217,7 +220,6 @@ If the user asks or does not specify a specific checklist, list the checklists a
 ## Instructions
 
 1. **Initial Assessment**
-
    - If user or the task being run provides a checklist name:
      - Try fuzzy matching (e.g. "architecture checklist" -> "architect-checklist")
      - If multiple matches found, ask user to clarify
@@ -230,14 +232,12 @@ If the user asks or does not specify a specific checklist, list the checklists a
      - All at once (YOLO mode - recommended for checklists, there will be a summary of sections at the end to discuss)
 
 2. **Document and Artifact Gathering**
-
    - Each checklist will specify its required documents/artifacts at the beginning
    - Follow the checklist's specific instructions for what to gather, generally a file can be resolved in the docs folder, if not or unsure, halt and ask or confirm with the user.
 
 3. **Checklist Processing**
 
    If in interactive mode:
-
    - Work through each section of the checklist one at a time
    - For each section:
      - Review all items in the section following instructions for that section embedded in the checklist
@@ -246,7 +246,6 @@ If the user asks or does not specify a specific checklist, list the checklists a
      - Get user confirmation before proceeding to next section or if any thing major do we need to halt and take corrective action
 
    If in YOLO mode:
-
    - Process all sections at once
    - Create a comprehensive report of all findings
    - Present the complete analysis to the user
@@ -254,7 +253,6 @@ If the user asks or does not specify a specific checklist, list the checklists a
 4. **Validation Approach**
 
    For each checklist item:
-
    - Read and understand the requirement
    - Look for evidence in the documentation that satisfies the requirement
    - Consider both explicit mentions and implicit coverage
@@ -268,7 +266,6 @@ If the user asks or does not specify a specific checklist, list the checklists a
 5. **Section Analysis**
 
    For each section:
-
    - think step by step to calculate pass rate
    - Identify common themes in failed items
    - Provide specific recommendations for improvement
@@ -278,7 +275,6 @@ If the user asks or does not specify a specific checklist, list the checklists a
 6. **Final Report**
 
    Prepare a summary that includes:
-
    - Overall checklist completion status
    - Pass rates by section
    - List of failed items with context
@@ -301,8 +297,10 @@ The LLM will:
 - Offer to provide detailed analysis of any section, especially those with warnings or failures
 
 ## Handoff
+
 next_agent: @qa
-next_command: *review {story-id}
+next_command: \*review {story-id}
 condition: Checklist completed with all items passing
 alternatives:
-  - agent: @dev, command: *develop {story-id}, condition: Checklist found blocking issues
+
+- agent: @dev, command: \*develop {story-id}, condition: Checklist found blocking issues

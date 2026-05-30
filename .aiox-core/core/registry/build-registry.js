@@ -116,7 +116,7 @@ function toKebabId(filename) {
 function toTitleCase(kebab) {
   return kebab
     .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
 }
 
@@ -134,11 +134,7 @@ async function extractMarkdownDescription(filePath, baseDir) {
       const trimmed = line.trim();
       if (trimmed && !trimmed.startsWith('#') && !trimmed.startsWith('---')) {
         // Clean up markdown formatting
-        return trimmed
-          .replace(/\*\*/g, '')
-          .replace(/\*/g, '')
-          .replace(/`/g, '')
-          .slice(0, 200);
+        return trimmed.replace(/\*\*/g, '').replace(/\*/g, '').replace(/`/g, '').slice(0, 200);
       }
     }
     return 'No description available';
@@ -162,12 +158,18 @@ async function extractJSDescription(filePath, baseDir) {
       // Extract description
       const descMatch = jsdoc.match(/@description\s+(.+?)(?=\n\s*\*\s*@|\*\/)/s);
       if (descMatch) {
-        return descMatch[1].replace(/\n\s*\*\s*/g, ' ').trim().slice(0, 200);
+        return descMatch[1]
+          .replace(/\n\s*\*\s*/g, ' ')
+          .trim()
+          .slice(0, 200);
       }
       // Get first paragraph after /**
       const firstPara = jsdoc.match(/\/\*\*\s*\n\s*\*\s*(.+?)(?=\n\s*\*\s*\n|\n\s*\*\s*@|\*\/)/s);
       if (firstPara) {
-        return firstPara[1].replace(/\n\s*\*\s*/g, ' ').trim().slice(0, 200);
+        return firstPara[1]
+          .replace(/\n\s*\*\s*/g, ' ')
+          .trim()
+          .slice(0, 200);
       }
     }
     return 'JavaScript utility script';
@@ -188,8 +190,8 @@ function extractTags(filePath, category, subcategory) {
   if (subcategory) tags.add(subcategory);
 
   // Extract words from filename
-  const words = filename.split(/[-_]/).filter(w => w.length > 2);
-  words.forEach(w => tags.add(w.toLowerCase()));
+  const words = filename.split(/[-_]/).filter((w) => w.length > 2);
+  words.forEach((w) => tags.add(w.toLowerCase()));
 
   // Add specific tags based on patterns
   if (filename.includes('qa') || filename.includes('test')) tags.add('testing');
@@ -239,12 +241,12 @@ function extractAgents(filePath) {
  */
 function getExecutorTypes(category) {
   const executorMap = {
-    'task': ['Agent', 'Worker'],
-    'template': ['Agent'],
-    'script': ['CLI', 'Script'],
-    'checklist': ['Agent'],
-    'workflow': ['Agent', 'Worker'],
-    'data': ['Agent'],
+    task: ['Agent', 'Worker'],
+    template: ['Agent'],
+    script: ['CLI', 'Script'],
+    checklist: ['Agent'],
+    workflow: ['Agent', 'Worker'],
+    data: ['Agent'],
   };
   return executorMap[category] || ['Agent'];
 }
@@ -254,12 +256,12 @@ function getExecutorTypes(category) {
  */
 function estimatePerformance(category) {
   const perfMap = {
-    'task': { avgDuration: '1m', cacheable: false, parallelizable: false },
-    'template': { avgDuration: '100ms', cacheable: true, parallelizable: true },
-    'script': { avgDuration: '500ms', cacheable: true, parallelizable: true },
-    'checklist': { avgDuration: '2m', cacheable: false, parallelizable: false },
-    'workflow': { avgDuration: '5m', cacheable: false, parallelizable: false },
-    'data': { avgDuration: '50ms', cacheable: true, parallelizable: true },
+    task: { avgDuration: '1m', cacheable: false, parallelizable: false },
+    template: { avgDuration: '100ms', cacheable: true, parallelizable: true },
+    script: { avgDuration: '500ms', cacheable: true, parallelizable: true },
+    checklist: { avgDuration: '2m', cacheable: false, parallelizable: false },
+    workflow: { avgDuration: '5m', cacheable: false, parallelizable: false },
+    data: { avgDuration: '50ms', cacheable: true, parallelizable: true },
   };
   return perfMap[category] || { avgDuration: '1s', cacheable: false, parallelizable: false };
 }
@@ -296,9 +298,14 @@ async function buildWorkerEntry(filePath, source, baseDir) {
     performance: estimatePerformance(source.category),
     agents: extractAgents(filePath),
     metadata: {
-      source: source.category === 'task' ? 'development' :
-        source.category === 'template' || source.category === 'checklist' ? 'product' :
-          source.category === 'script' ? 'infrastructure' : 'core',
+      source:
+        source.category === 'task'
+          ? 'development'
+          : source.category === 'template' || source.category === 'checklist'
+            ? 'product'
+            : source.category === 'script'
+              ? 'infrastructure'
+              : 'core',
       addedVersion: REGISTRY_VERSION,
     },
   };
@@ -337,12 +344,12 @@ function buildCategorySummary(workers) {
  */
 function getCategoryDescription(category) {
   const descriptions = {
-    'task': 'Executable task workflows for agents',
-    'template': 'Document and code templates',
-    'script': 'JavaScript utility scripts',
-    'checklist': 'Quality validation checklists',
-    'workflow': 'Multi-step workflow definitions',
-    'data': 'Knowledge base and configuration data',
+    task: 'Executable task workflows for agents',
+    template: 'Document and code templates',
+    script: 'JavaScript utility scripts',
+    checklist: 'Quality validation checklists',
+    workflow: 'Multi-step workflow definitions',
+    data: 'Knowledge base and configuration data',
   };
   return descriptions[category] || 'General category';
 }
@@ -421,7 +428,8 @@ async function saveRegistry(registry, outputPath) {
  */
 async function main() {
   const baseDir = process.argv[2] || process.cwd();
-  const outputPath = process.argv[3] || path.join(baseDir, '.aiox-core/core/registry/service-registry.json');
+  const outputPath =
+    process.argv[3] || path.join(baseDir, '.aiox-core/core/registry/service-registry.json');
 
   try {
     const registry = await buildRegistry(baseDir);

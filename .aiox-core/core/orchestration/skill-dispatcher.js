@@ -126,9 +126,7 @@ class SkillDispatcher {
    * @returns {Object} Persona with name and title
    */
   getAgentPersona(agentId) {
-    return (
-      this.agentPersonas[agentId] || { name: agentId, title: 'AIOX Agent' }
-    );
+    return this.agentPersonas[agentId] || { name: agentId, title: 'AIOX Agent' };
   }
 
   /**
@@ -194,9 +192,7 @@ class SkillDispatcher {
 
     // Add output path if present
     if (phase.creates) {
-      const output = Array.isArray(phase.creates)
-        ? phase.creates[0]
-        : phase.creates;
+      const output = Array.isArray(phase.creates) ? phase.creates[0] : phase.creates;
       args.push(`--output="${output}"`);
     }
 

@@ -11,16 +11,19 @@
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -188,6 +191,7 @@ token_usage: ~3,000-10,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Break into smaller workflows; implement checkpointing; use async processing where possible
 
 ---
@@ -206,7 +210,6 @@ updated_at: 2025-11-17
 ```
 
 ---
-
 
 ## Overview
 
@@ -676,6 +679,7 @@ supabase secrets list               # List secrets
 **Error:** `could not connect to server`
 
 **Fix:**
+
 1. Check database is running (Dashboard → Database → Connection info)
 2. Verify password in .env.local
 3. Check firewall allows port 5432/6543
@@ -687,6 +691,7 @@ supabase secrets list               # List secrets
 
 **Fix:**
 Add `?sslmode=require` to connection string:
+
 ```bash
 postgresql://postgres:password@db.ref.supabase.co:5432/postgres?sslmode=require
 ```
@@ -697,6 +702,7 @@ postgresql://postgres:password@db.ref.supabase.co:5432/postgres?sslmode=require
 
 **Fix:**
 Use service_role key for admin operations, or grant permissions:
+
 ```sql
 GRANT ALL ON SCHEMA public TO postgres;
 GRANT ALL ON ALL TABLES IN SCHEMA public TO postgres;

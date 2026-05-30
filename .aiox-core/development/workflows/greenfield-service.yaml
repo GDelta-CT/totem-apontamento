@@ -1,7 +1,7 @@
 workflow:
   id: greenfield-service
   name: Greenfield Service/API Development
-  version: "1.0"
+  version: '1.0'
   description: >-
     Agent workflow for building backend services from concept to development.
     Supports both comprehensive planning for complex services and rapid prototyping for simple APIs.
@@ -29,12 +29,12 @@ workflow:
     # ═══════════════════════════════════════════════════════════════════════════
     - phase: 1
       name: Discovery & Planning
-      description: "Create all planning artifacts (project brief, PRD, architecture)"
+      description: 'Create all planning artifacts (project brief, PRD, architecture)'
 
     - id: analyst-project-brief
       agent: analyst
       creates: project-brief.md
-      duration_estimate: "30-60 min"
+      duration_estimate: '30-60 min'
       optional_steps:
         - brainstorming-session
         - market-research-prompt
@@ -43,14 +43,14 @@ workflow:
     - id: pm-create-prd
       agent: pm
       creates: prd.md
-      duration_estimate: "30-60 min"
+      duration_estimate: '30-60 min'
       requires: project-brief.md
       notes: "Creates PRD from project brief using prd-tmpl, focused on API/service requirements. SAVE OUTPUT: Copy final prd.md to your project's docs/ folder."
 
     - id: architect-create-architecture
       agent: architect
       creates: architecture.md
-      duration_estimate: "30-60 min"
+      duration_estimate: '30-60 min'
       requires: prd.md
       optional_steps:
         - technical-research-prompt
@@ -59,41 +59,41 @@ workflow:
     - id: pm-update-prd
       agent: pm
       updates: prd.md
-      duration_estimate: "15-30 min"
+      duration_estimate: '15-30 min'
       requires: architecture.md
       condition: architecture_suggests_prd_changes
-      notes: "If architect suggests story changes, update PRD and re-export the complete unredacted prd.md to docs/ folder."
+      notes: 'If architect suggests story changes, update PRD and re-export the complete unredacted prd.md to docs/ folder.'
 
     - id: po-validate-artifacts
       agent: po
       validates: all_artifacts
       uses: po-master-checklist
-      duration_estimate: "15-30 min"
-      notes: "Validates all documents for consistency and completeness. May require updates to any document."
+      duration_estimate: '15-30 min'
+      notes: 'Validates all documents for consistency and completeness. May require updates to any document.'
 
     - id: po-delegate-fixes
       agent: po
       action: delegate_fixes
       delegates_to: [analyst, pm, architect]
       updates: any_flagged_documents
-      duration_estimate: "15-30 min"
+      duration_estimate: '15-30 min'
       condition: po_checklist_issues
       returns_to: po-validate-artifacts
-      notes: "If PO finds issues, PO delegates fixes to the relevant agent. After fixes are applied, returns to po-validate-artifacts for re-validation before proceeding to Phase 2."
+      notes: 'If PO finds issues, PO delegates fixes to the relevant agent. After fixes are applied, returns to po-validate-artifacts for re-validation before proceeding to Phase 2.'
 
     # ═══════════════════════════════════════════════════════════════════════════
     # PHASE 2: DOCUMENT SHARDING
     # ═══════════════════════════════════════════════════════════════════════════
     - phase: 2
       name: Document Sharding
-      description: "Break down PRD and architecture into development-ready chunks"
+      description: 'Break down PRD and architecture into development-ready chunks'
 
     - id: po-shard-documents
       agent: po
       action: shard_documents
       creates: sharded_docs
-      duration_estimate: "15-30 min"
-      requires:  # all validated artifacts must be saved in project docs/ folder
+      duration_estimate: '15-30 min'
+      requires: # all validated artifacts must be saved in project docs/ folder
         - prd.md
         - architecture.md
       notes: |
@@ -107,13 +107,13 @@ workflow:
     # ═══════════════════════════════════════════════════════════════════════════
     - phase: 3
       name: Development Cycle
-      description: "Iterative story implementation with QA review"
+      description: 'Iterative story implementation with QA review'
 
     - id: sm-create-story
       agent: sm
       action: create_story
       creates: story.md
-      duration_estimate: "15-30 min"
+      duration_estimate: '15-30 min'
       requires: sharded_docs
       repeats: for_each_epic
       notes: |
@@ -127,7 +127,7 @@ workflow:
       action: review_draft_story
       alternative_agent: analyst
       updates: story.md
-      duration_estimate: "10-20 min"
+      duration_estimate: '10-20 min'
       requires: story.md
       optional: true
       condition: user_wants_story_review
@@ -141,7 +141,7 @@ workflow:
       agent: dev
       action: implement_story
       creates: implementation_files
-      duration_estimate: "1-4 hours"
+      duration_estimate: '1-4 hours'
       requires: story.md
       notes: |
         Dev Agent (New Chat): @dev
@@ -153,7 +153,7 @@ workflow:
       agent: qa
       action: review_implementation
       updates: implementation_files
-      duration_estimate: "20-40 min"
+      duration_estimate: '20-40 min'
       requires: implementation_files
       optional: true
       notes: |
@@ -168,7 +168,7 @@ workflow:
       action: address_qa_feedback
       updates: implementation_files
       requires: implementation_files
-      duration_estimate: "30-60 min"
+      duration_estimate: '30-60 min'
       condition: qa_left_unchecked_items
       notes: |
         If QA left unchecked items:
@@ -186,7 +186,7 @@ workflow:
       agent: po
       action: epic_retrospective
       creates: epic-retrospective.md
-      duration_estimate: "15-30 min"
+      duration_estimate: '15-30 min'
       condition: epic_complete
       optional: true
       notes: |
@@ -267,10 +267,10 @@ workflow:
       - Technical debt assessment on existing project (use brownfield-discovery)
 
   handoff_prompts:
-    analyst_to_pm: "Project brief is complete. Save it as docs/project-brief.md in your project, then create the PRD."
-    pm_to_architect: "PRD is ready. Save it as docs/prd.md in your project, then create the service architecture."
-    architect_review: "Architecture complete. Save it as docs/architecture.md. Do you suggest any changes to the PRD stories or need new stories added?"
-    architect_to_pm: "Please update the PRD with the suggested story changes, then re-export the complete prd.md to docs/."
-    updated_to_po: "All documents ready in docs/ folder. Please validate all artifacts for consistency."
-    po_issues: "PO found issues with [document]. Please return to [agent] to fix and re-save the updated document."
-    complete: "All planning artifacts validated and saved in docs/ folder. Move to IDE environment to begin development."
+    analyst_to_pm: 'Project brief is complete. Save it as docs/project-brief.md in your project, then create the PRD.'
+    pm_to_architect: 'PRD is ready. Save it as docs/prd.md in your project, then create the service architecture.'
+    architect_review: 'Architecture complete. Save it as docs/architecture.md. Do you suggest any changes to the PRD stories or need new stories added?'
+    architect_to_pm: 'Please update the PRD with the suggested story changes, then re-export the complete prd.md to docs/.'
+    updated_to_po: 'All documents ready in docs/ folder. Please validate all artifacts for consistency.'
+    po_issues: 'PO found issues with [document]. Please return to [agent] to fix and re-save the updated document.'
+    complete: 'All planning artifacts validated and saved in docs/ folder. Move to IDE environment to begin development.'

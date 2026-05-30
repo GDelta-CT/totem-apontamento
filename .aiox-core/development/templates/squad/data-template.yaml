@@ -6,18 +6,18 @@
 # Created: {{CREATEDAT}}
 # Story: {{STORYID}}
 
-name: {{COMPONENTNAME}}
+name: { { COMPONENTNAME } }
 version: 1.0.0
-description: {{DESCRIPTION}}
+description: { { DESCRIPTION } }
 
 # Metadata
 metadata:
-  created: {{CREATEDAT}}
+  created: { { CREATEDAT } }
   author: squad-creator
-  squad: {{SQUADNAME}}
+  squad: { { SQUADNAME } }
   tags:
     - data
-    - {{SQUADNAME}}
+    - { { SQUADNAME } }
 
 # Data schema definition
 schema:
@@ -28,29 +28,29 @@ schema:
   properties:
     id:
       type: string
-      description: "Unique identifier"
-      pattern: "^[a-z][a-z0-9-]*$"
+      description: 'Unique identifier'
+      pattern: '^[a-z][a-z0-9-]*$'
     name:
       type: string
-      description: "Display name"
+      description: 'Display name'
       minLength: 1
       maxLength: 100
     description:
       type: string
-      description: "Optional description"
+      description: 'Optional description'
     enabled:
       type: boolean
-      description: "Whether this entry is enabled"
+      description: 'Whether this entry is enabled'
       default: true
     priority:
       type: integer
-      description: "Priority level (1-10)"
+      description: 'Priority level (1-10)'
       minimum: 1
       maximum: 10
       default: 5
     metadata:
       type: object
-      description: "Additional metadata"
+      description: 'Additional metadata'
       additionalProperties: true
 
 # Default values for new entries
@@ -61,24 +61,24 @@ defaults:
 
 # Validation rules
 validation:
-  - rule: "id must be unique"
-    check: "unique(entries.id)"
-  - rule: "name must not be empty"
-    check: "length(name) > 0"
+  - rule: 'id must be unique'
+    check: 'unique(entries.id)'
+  - rule: 'name must not be empty'
+    check: 'length(name) > 0'
 
 # Data entries
 entries:
   - id: example-1
-    name: "Example Entry 1"
-    description: "This is an example entry"
+    name: 'Example Entry 1'
+    description: 'This is an example entry'
     enabled: true
     priority: 5
     metadata:
       category: example
 
   - id: example-2
-    name: "Example Entry 2"
-    description: "Another example entry"
+    name: 'Example Entry 2'
+    description: 'Another example entry'
     enabled: true
     priority: 3
     metadata:

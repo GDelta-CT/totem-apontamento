@@ -50,10 +50,7 @@ function _safeId(id) {
  * @private
  */
 function _escapeMermaid(str) {
-  return String(str)
-    .replace(/"/g, '&quot;')
-    .replace(/\[/g, '&#91;')
-    .replace(/\]/g, '&#93;');
+  return String(str).replace(/"/g, '&quot;').replace(/\[/g, '&#91;').replace(/\]/g, '&#93;');
 }
 
 module.exports = { formatAsMermaid, _safeId, _escapeMermaid };

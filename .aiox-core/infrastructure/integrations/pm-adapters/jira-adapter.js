@@ -39,7 +39,7 @@ class JiraAdapter extends PMAdapter {
       throw new Error('Jira config requires: base_url, project_key');
     }
 
-    this.baseUrl = config.base_url.replace(/\/$/, '');  // Remove trailing slash
+    this.baseUrl = config.base_url.replace(/\/$/, ''); // Remove trailing slash
     this.projectKey = config.project_key;
     this.email = config.email || process.env.JIRA_EMAIL;
     this.apiToken = process.env.JIRA_API_TOKEN || config.api_token;
@@ -109,7 +109,6 @@ class JiraAdapter extends PMAdapter {
           url: issueUrl,
         };
       }
-
     } catch (error) {
       console.error('❌ Error syncing story to Jira:', error);
       return {
@@ -148,7 +147,7 @@ class JiraAdapter extends PMAdapter {
         'To Do': 'Draft',
         'In Progress': 'InProgress',
         'In Review': 'Review',
-        'Done': 'Done',
+        Done: 'Done',
       };
 
       const jiraStatus = issue.fields.status.name;
@@ -162,7 +161,6 @@ class JiraAdapter extends PMAdapter {
           status: mappedStatus,
         },
       };
-
     } catch (error) {
       console.error('❌ Error pulling story from Jira:', error);
       return {
@@ -191,7 +189,6 @@ class JiraAdapter extends PMAdapter {
         success: true,
         url: issueUrl,
       };
-
     } catch (error) {
       console.error('❌ Error creating story in Jira:', error);
       return {
@@ -223,10 +220,10 @@ class JiraAdapter extends PMAdapter {
 
       // Map AIOX status to Jira transition
       const transitionMapping = {
-        'Draft': 'To Do',
-        'InProgress': 'In Progress',
-        'Review': 'In Review',
-        'Done': 'Done',
+        Draft: 'To Do',
+        InProgress: 'In Progress',
+        Review: 'In Review',
+        Done: 'Done',
       };
 
       const jiraStatus = transitionMapping[status] || 'To Do';
@@ -237,7 +234,6 @@ class JiraAdapter extends PMAdapter {
       console.log(`✅ Story ${storyId} status updated to ${status}`);
 
       return { success: true };
-
     } catch (error) {
       console.error('❌ Error updating story status:', error);
       return {
@@ -278,7 +274,6 @@ class JiraAdapter extends PMAdapter {
       console.log('✅ Jira connection successful');
 
       return { success: true };
-
     } catch (error) {
       console.error('❌ Jira connection failed:', error);
       return {
@@ -307,9 +302,9 @@ class JiraAdapter extends PMAdapter {
         path: url.pathname + url.search,
         method: method,
         headers: {
-          'Authorization': `Basic ${auth}`,
+          Authorization: `Basic ${auth}`,
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
+          Accept: 'application/json',
         },
       };
 
@@ -352,7 +347,10 @@ class JiraAdapter extends PMAdapter {
   async _findIssueByStoryId(storyId) {
     try {
       const jql = `project = ${this.projectKey} AND labels = story-${storyId}`;
-      const result = await this._apiRequest('GET', `/rest/api/3/search?jql=${encodeURIComponent(jql)}&maxResults=1`);
+      const result = await this._apiRequest(
+        'GET',
+        `/rest/api/3/search?jql=${encodeURIComponent(jql)}&maxResults=1`
+      );
 
       if (result.issues && result.issues.length > 0) {
         return result.issues[0].key;
@@ -392,11 +390,7 @@ class JiraAdapter extends PMAdapter {
         issuetype: {
           name: 'Story',
         },
-        labels: [
-          'story',
-          `story-${story.id}`,
-          ...(story.epic ? [`epic-${story.epic}`] : []),
-        ],
+        labels: ['story', `story-${story.id}`, ...(story.epic ? [`epic-${story.epic}`] : [])],
       },
     };
 
@@ -432,7 +426,7 @@ class JiraAdapter extends PMAdapter {
     const transitions = await this._apiRequest('GET', `/rest/api/3/issue/${issueKey}/transitions`);
 
     // Find transition to target status
-    const transition = transitions.transitions.find(t => t.to.name === statusName);
+    const transition = transitions.transitions.find((t) => t.to.name === statusName);
 
     if (!transition) {
       throw new Error(`No transition available to status: ${statusName}`);

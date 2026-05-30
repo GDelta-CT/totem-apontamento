@@ -1,6 +1,6 @@
 ---
 task: Sync Squad to Synkra
-responsavel: "@squad-creator"
+responsavel: '@squad-creator'
 responsavel_type: agent
 atomic_layer: task
 status: active
@@ -18,14 +18,14 @@ Saida: |
   - squad_id: ID único do squad
   - checksum: Checksum do squad sincronizado
 Checklist:
-  - "[x] Validar squad localmente"
-  - "[x] Obter token de autenticação"
-  - "[x] Calcular checksum"
-  - "[x] Enviar para Synkra API"
-  - "[x] Exibir URL do marketplace"
+  - '[x] Validar squad localmente'
+  - '[x] Obter token de autenticação'
+  - '[x] Calcular checksum'
+  - '[x] Enviar para Synkra API'
+  - '[x] Exibir URL do marketplace'
 ---
 
-# *sync-squad-synkra
+# \*sync-squad-synkra
 
 Sincroniza um squad local para o Synkra API marketplace.
 
@@ -63,6 +63,7 @@ SYNKRA_API_TOKEN=seu-token
 ```
 
 Para obter um token:
+
 1. Acesse https://synkra.dev/settings/api-keys
 2. Crie uma nova API key com permissões de sync
 3. Configure a variável de ambiente
@@ -104,14 +105,14 @@ Next steps:
 
 ## Flags
 
-| Flag | Descrição | Default |
-|------|-----------|---------|
-| `--public` | Torna o squad visível no marketplace público | false |
-| `--private` | Mantém squad privado (apenas workspace) | true |
-| `--dry-run` | Preview sem enviar para API | false |
-| `--verbose` | Output detalhado | false |
-| `--official` | Marca como squad oficial (apenas SynkraAI team) | false |
-| `--force` | Ignora warnings e força sync | false |
+| Flag         | Descrição                                       | Default |
+| ------------ | ----------------------------------------------- | ------- |
+| `--public`   | Torna o squad visível no marketplace público    | false   |
+| `--private`  | Mantém squad privado (apenas workspace)         | true    |
+| `--dry-run`  | Preview sem enviar para API                     | false   |
+| `--verbose`  | Output detalhado                                | false   |
+| `--official` | Marca como squad oficial (apenas SynkraAI team) | false   |
+| `--force`    | Ignora warnings e força sync                    | false   |
 
 ## Workflow
 
@@ -222,9 +223,7 @@ const squadContent = fs.readFileSync(squadYamlPath, 'utf8');
 const squadData = parseYaml(squadContent);
 
 // 5. Calculate checksum
-const checksum = crypto.createHash('sha256')
-  .update(squadContent)
-  .digest('hex');
+const checksum = crypto.createHash('sha256').update(squadContent).digest('hex');
 
 // 6. Check authentication
 const apiToken = process.env.SYNKRA_API_TOKEN;
@@ -251,18 +250,18 @@ DRY RUN - Would sync:
 const response = await fetch(`${apiUrl}/squads/sync`, {
   method: 'POST',
   headers: {
-    'Authorization': `Bearer ${apiToken}`,
-    'Content-Type': 'application/json'
+    Authorization: `Bearer ${apiToken}`,
+    'Content-Type': 'application/json',
   },
   body: JSON.stringify({
     squadData: {
       ...squadData,
       checksum,
-      raw_content: squadContent
+      raw_content: squadContent,
     },
     isPublic: flags.public,
-    isOfficial: flags.official
-  })
+    isOfficial: flags.official,
+  }),
 });
 
 const result = await response.json();
@@ -287,14 +286,14 @@ if (result.success) {
 
 ## Error Handling
 
-| Error | Causa | Solução |
-|-------|-------|---------|
-| `squad.yaml not found` | Caminho inválido | Verifique o path do squad |
-| `Validation failed` | Squad não passa na validação | Execute `*validate-squad` primeiro |
-| `SYNKRA_API_TOKEN not set` | Token não configurado | Configure a variável de ambiente |
-| `401 Unauthorized` | Token inválido ou expirado | Gere novo token em synkra.dev |
-| `403 Forbidden` | Sem permissão para operação | Verifique permissões da API key |
-| `Squad not found or not owned` | Tentando atualizar squad de outro workspace | Verifique ownership |
+| Error                          | Causa                                       | Solução                            |
+| ------------------------------ | ------------------------------------------- | ---------------------------------- |
+| `squad.yaml not found`         | Caminho inválido                            | Verifique o path do squad          |
+| `Validation failed`            | Squad não passa na validação                | Execute `*validate-squad` primeiro |
+| `SYNKRA_API_TOKEN not set`     | Token não configurado                       | Configure a variável de ambiente   |
+| `401 Unauthorized`             | Token inválido ou expirado                  | Gere novo token em synkra.dev      |
+| `403 Forbidden`                | Sem permissão para operação                 | Verifique permissões da API key    |
+| `Squad not found or not owned` | Tentando atualizar squad de outro workspace | Verifique ownership                |
 
 ## Related Tasks
 
@@ -309,7 +308,7 @@ if (result.success) {
 
 ## Changelog
 
-| Version | Date | Description |
-|---------|------|-------------|
-| 1.0.0 | 2025-12-23 | Full implementation (Story SQS-5) |
-| 0.1.0 | 2025-12-18 | Initial placeholder |
+| Version | Date       | Description                       |
+| ------- | ---------- | --------------------------------- |
+| 1.0.0   | 2025-12-23 | Full implementation (Story SQS-5) |
+| 0.1.0   | 2025-12-18 | Initial placeholder               |

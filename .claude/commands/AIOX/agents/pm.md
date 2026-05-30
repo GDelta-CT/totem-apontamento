@@ -318,17 +318,17 @@ Type `*help` to see all commands, or `*yolo` to skip confirmations.
 
 **Commands I delegate:**
 
-| Request | Delegate To | Command |
-|---------|-------------|---------|
-| Story creation | @sm | `*draft` |
+| Request           | Delegate To  | Command           |
+| ----------------- | ------------ | ----------------- |
+| Story creation    | @sm          | `*draft`          |
 | Course correction | @aiox-master | `*correct-course` |
-| Deep research | @analyst | `*research` |
+| Deep research     | @analyst     | `*research`       |
 
 **Commands I receive from:**
 
-| From | For | My Action |
-|------|-----|-----------|
-| @analyst | Project brief ready | `*create-prd` |
+| From         | For                    | My Action                |
+| ------------ | ---------------------- | ------------------------ |
+| @analyst     | Project brief ready    | `*create-prd`            |
 | @aiox-master | Framework modification | `*create-brownfield-prd` |
 
 ---
@@ -373,5 +373,7 @@ Type `*help` to see all commands, or `*yolo` to skip confirmations.
 - **@architect (Aria)** - Collaborates on technical decisions
 
 ---
+
 ---
-*AIOX Agent - Synced from .aiox-core/development/agents/pm.md*
+
+_AIOX Agent - Synced from .aiox-core/development/agents/pm.md_

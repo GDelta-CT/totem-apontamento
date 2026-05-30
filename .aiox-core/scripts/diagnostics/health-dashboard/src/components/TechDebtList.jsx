@@ -39,23 +39,17 @@ function TechDebtList({ items = [], maxItems = 5 }) {
             <h4 className="tech-debt-name">{item.title}</h4>
 
             <div className="tech-debt-meta">
-              {item.domain && (
-                <span className="tech-debt-domain">{item.domain}</span>
-              )}
+              {item.domain && <span className="tech-debt-domain">{item.domain}</span>}
               {item.effort && (
                 <span className="tech-debt-effort">
                   <span className="effort-icon">\u23F1</span>
                   {item.effort}
                 </span>
               )}
-              {item.checkId && (
-                <span className="tech-debt-check">From: {item.checkId}</span>
-              )}
+              {item.checkId && <span className="tech-debt-check">From: {item.checkId}</span>}
             </div>
 
-            {item.description && (
-              <p className="tech-debt-description">{item.description}</p>
-            )}
+            {item.description && <p className="tech-debt-description">{item.description}</p>}
           </li>
         ))}
       </ul>

@@ -9,16 +9,19 @@
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Quick scan with default recommendations
 - Minimal user interaction
 - **Best for:** Quick assessments, familiar projects
 
 ### 2. Interactive Mode - Balanced, Educational (3-5 prompts) **[DEFAULT]**
+
 - Detailed analysis with explanation
 - User input on feature requirements
 - **Best for:** First-time analysis, new features
 
 ### 3. Comprehensive Mode - Full Analysis
+
 - Complete project scan
 - All patterns documented
 - **Best for:** Large projects, major features
@@ -37,39 +40,39 @@ atomic_layer: Analysis
 elicit: true
 
 inputs:
-- field: feature_description
-  type: string
-  source: User Input
-  required: true
-  validation: Non-empty string describing the feature to add
+  - field: feature_description
+    type: string
+    source: User Input
+    required: true
+    validation: Non-empty string describing the feature to add
 
-- field: project_path
-  type: string
-  source: User Input or cwd
-  required: false
-  validation: Valid directory path with .aiox-core/
+  - field: project_path
+    type: string
+    source: User Input or cwd
+    required: false
+    validation: Valid directory path with .aiox-core/
 
-- field: executionMode
-  type: string
-  source: User Input
-  required: false
-  validation: yolo|interactive|comprehensive
+  - field: executionMode
+    type: string
+    source: User Input
+    required: false
+    validation: yolo|interactive|comprehensive
 
 outputs:
-- field: project_analysis
-  type: markdown
-  destination: docs/architecture/project-analysis.md
-  persisted: true
+  - field: project_analysis
+    type: markdown
+    destination: docs/architecture/project-analysis.md
+    persisted: true
 
-- field: recommended_approach
-  type: markdown
-  destination: docs/architecture/recommended-approach.md
-  persisted: true
+  - field: recommended_approach
+    type: markdown
+    destination: docs/architecture/recommended-approach.md
+    persisted: true
 
-- field: service_inventory
-  type: array
-  destination: Memory
-  persisted: false
+  - field: service_inventory
+    type: array
+    destination: Memory
+    persisted: false
 ```
 
 ---
@@ -219,6 +222,7 @@ token_usage: ~500-1,500 tokens
 ```
 
 **Optimization Notes:**
+
 - Directory scans are O(n) for service directories
 - File reads are cached during analysis
 - Pattern detection uses efficient regex
@@ -280,11 +284,12 @@ const scanLocations = {
   squads: '.aiox-core/squads/',
   agents: '.aiox-core/development/agents/',
   tasks: '.aiox-core/development/tasks/',
-  data: '.aiox-core/data/'
+  data: '.aiox-core/data/',
 };
 ```
 
 **For each location, identify:**
+
 - Directory exists (boolean)
 - Files/subdirectories present
 - Key configuration files
@@ -292,9 +297,10 @@ const scanLocations = {
 **Service Inventory:**
 
 For each service in `infrastructure/services/`:
+
 1. Service name (directory name)
 2. Language (JS vs TS - check for .ts files)
-3. Has tests (check for __tests__/ or *.test.* files)
+3. Has tests (check for **tests**/ or _.test._ files)
 4. Has README (check for README.md)
 5. Entry point (index.ts or index.js)
 
@@ -305,12 +311,13 @@ For each service in `infrastructure/services/`:
 **Analyze the following patterns:**
 
 #### 3.1 Language Usage
+
 ```javascript
 // Count file extensions
 const languagePatterns = {
   typescript: glob('**/*.ts').length,
   javascript: glob('**/*.js').length,
-  ratio: typescript / (typescript + javascript)
+  ratio: typescript / (typescript + javascript),
 };
 
 // Determine primary language
@@ -318,14 +325,14 @@ const primaryLanguage = ratio > 0.5 ? 'TypeScript' : 'JavaScript';
 ```
 
 #### 3.2 Testing Approach
+
 ```javascript
 // Check for test frameworks
 const testingPatterns = {
   jest: exists('jest.config.js') || exists('jest.config.ts'),
   vitest: exists('vitest.config.ts'),
   mocha: exists('.mocharc.js'),
-  hasTests: glob('**/*.test.{ts,js}').length > 0 ||
-            glob('**/*.spec.{ts,js}').length > 0
+  hasTests: glob('**/*.test.{ts,js}').length > 0 || glob('**/*.spec.{ts,js}').length > 0,
 };
 
 // Determine testing framework
@@ -333,22 +340,24 @@ const testFramework = jest ? 'Jest' : vitest ? 'Vitest' : 'None detected';
 ```
 
 #### 3.3 Documentation Style
+
 ```javascript
 // Check documentation patterns
 const docPatterns = {
   hasReadmes: glob('**/README.md').length,
   hasJSDoc: grep('@param|@returns|@example', '**/*.{ts,js}').length > 0,
-  hasTypedoc: exists('typedoc.json')
+  hasTypedoc: exists('typedoc.json'),
 };
 ```
 
 #### 3.4 Configuration Patterns
+
 ```javascript
 // Check configuration approaches
 const configPatterns = {
   envVars: exists('.env.example') || exists('.env.local'),
   configFile: exists('aiox.config.js') || exists('.aiox-core/core-config.yaml'),
-  envPrefix: grep('process.env', '**/*.{ts,js}').length > 0
+  envPrefix: grep('process.env', '**/*.{ts,js}').length > 0,
 };
 ```
 
@@ -360,12 +369,12 @@ Based on elicitation responses and pattern analysis:
 
 #### 4.1 Service Type Recommendation
 
-| User Response | Detected Pattern | Recommendation |
-|---------------|------------------|----------------|
-| External API = Yes | Existing API services | **API Integration** |
-| External API = No, DB = Yes | Data services exist | **Utility Service** |
-| Unsure | No clear pattern | **Utility Service** (default) |
-| Agent tooling mentioned | Squads configured | **Agent Tool (MCP)** |
+| User Response               | Detected Pattern      | Recommendation                |
+| --------------------------- | --------------------- | ----------------------------- |
+| External API = Yes          | Existing API services | **API Integration**           |
+| External API = No, DB = Yes | Data services exist   | **Utility Service**           |
+| Unsure                      | No clear pattern      | **Utility Service** (default) |
+| Agent tooling mentioned     | Squads configured     | **Agent Tool (MCP)**          |
 
 #### 4.2 File Structure Suggestion
 
@@ -386,12 +395,12 @@ Based on existing service patterns, suggest structure:
 
 #### 4.3 Agent Assignment
 
-| Service Type | Primary Agent | Support Agent |
-|--------------|---------------|---------------|
-| API Integration | @dev | @qa |
-| Utility Service | @dev | @architect |
-| Agent Tool | @dev | @devops |
-| Database-heavy | @data-engineer | @dev |
+| Service Type    | Primary Agent  | Support Agent |
+| --------------- | -------------- | ------------- |
+| API Integration | @dev           | @qa           |
+| Utility Service | @dev           | @architect    |
+| Agent Tool      | @dev           | @devops       |
+| Database-heavy  | @data-engineer | @dev          |
 
 ---
 
@@ -412,20 +421,21 @@ Generate `docs/architecture/project-analysis.md`:
 
 ## Project Structure
 
-| Aspect | Value |
-|--------|-------|
-| Framework | AIOX-FullStack |
-| Primary Language | {primaryLanguage} |
-| Existing Services | {serviceCount} |
-| Testing Framework | {testFramework} |
-| Configuration | {configApproach} |
+| Aspect            | Value             |
+| ----------------- | ----------------- |
+| Framework         | AIOX-FullStack    |
+| Primary Language  | {primaryLanguage} |
+| Existing Services | {serviceCount}    |
+| Testing Framework | {testFramework}   |
+| Configuration     | {configApproach}  |
 
 ---
 
 ## Existing Services
 
 | Service | Type | Language | Tests | README |
-|---------|------|----------|-------|--------|
+| ------- | ---- | -------- | ----- | ------ |
+
 {for each service}
 | {name} | {type} | {language} | {hasTests} | {hasReadme} |
 {end for}
@@ -435,15 +445,18 @@ Generate `docs/architecture/project-analysis.md`:
 ## Pattern Summary
 
 ### Language Distribution
+
 - **TypeScript:** {tsCount} files ({tsPercent}%)
 - **JavaScript:** {jsCount} files ({jsPercent}%)
 
 ### Testing
+
 - **Framework:** {testFramework}
 - **Test Files:** {testFileCount}
 - **Coverage:** {coverageNote}
 
 ### Configuration
+
 - **Environment Variables:** {envVarsUsed}
 - **Config Files:** {configFilesUsed}
 
@@ -492,18 +505,19 @@ Generate `docs/architecture/recommended-approach.md`:
 ---
 
 ## Suggested Structure
-
 ```
+
 .aiox-core/infrastructure/services/{service_name}/
 ├── README.md
 ├── index.ts
-├── client.ts          {if apiIntegration}
+├── client.ts {if apiIntegration}
 ├── types.ts
 ├── errors.ts
-├── __tests__/
-│   └── index.test.ts
+├── **tests**/
+│ └── index.test.ts
 ├── package.json
 └── tsconfig.json
+
 ```
 
 ---
@@ -565,7 +579,10 @@ When code intelligence is available, enrich the analysis with real dependency an
 
 ```javascript
 const { isCodeIntelAvailable } = require('.aiox-core/core/code-intel');
-const { getDependencyGraph, getComplexityAnalysis } = require('.aiox-core/core/code-intel/helpers/planning-helper');
+const {
+  getDependencyGraph,
+  getComplexityAnalysis,
+} = require('.aiox-core/core/code-intel/helpers/planning-helper');
 
 if (isCodeIntelAvailable()) {
   const depGraph = await getDependencyGraph(projectPath);
@@ -583,17 +600,18 @@ if (isCodeIntelAvailable()) {
 
 **Dependency Graph (Code Intelligence):**
 
-| Metric | Value |
-|--------|-------|
+| Metric             | Value                          |
+| ------------------ | ------------------------------ |
 | Total Dependencies | {{depGraph.summary.totalDeps}} |
-| Dependency Depth | {{depGraph.summary.depth}} |
+| Dependency Depth   | {{depGraph.summary.depth}}     |
 
 {{depGraph.dependencies key relationships}}
 
 **Complexity Metrics (Code Intelligence):**
 
 | File | Complexity Score |
-|------|-----------------|
+| ---- | ---------------- |
+
 {{for each complexity.perFile}}
 | {{file}} | {{complexity.score}} |
 {{end for}}

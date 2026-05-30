@@ -57,14 +57,7 @@ class MessageFormatter {
    * @returns {string} Formatted message
    */
   formatActionResult(action, details = {}) {
-    const {
-      filesCreated = 0,
-      filesModified = 0,
-      reason,
-      steps,
-      agents,
-      tradeoffs,
-    } = details;
+    const { filesCreated = 0, filesModified = 0, reason, steps, agents, tradeoffs } = details;
 
     const totalFiles = filesCreated + filesModified;
 

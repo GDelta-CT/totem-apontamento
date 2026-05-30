@@ -105,10 +105,14 @@ class CloudRunAdapter extends EventEmitter {
 
     try {
       // Use execFileSync to avoid shell injection
-      const output = execFileSync('gcloud', ['run', 'services', 'describe', service, '--format=json'], {
-        encoding: 'utf8',
-        stdio: ['pipe', 'pipe', 'pipe'],
-      });
+      const output = execFileSync(
+        'gcloud',
+        ['run', 'services', 'describe', service, '--format=json'],
+        {
+          encoding: 'utf8',
+          stdio: ['pipe', 'pipe', 'pipe'],
+        }
+      );
       return JSON.parse(output);
     } catch {
       return null;

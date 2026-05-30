@@ -25,15 +25,15 @@ const USAGE_FILE = path.join(DATA_DIR, 'deepseek-usage.json');
 // Pricing per million tokens (as of Dec 2025)
 const PRICING = {
   'deepseek-chat': {
-    input: 0.07,   // $0.07 per 1M input tokens
-    output: 0.14,  // $0.14 per 1M output tokens
-    cached: 0.014  // $0.014 per 1M cached tokens
+    input: 0.07, // $0.07 per 1M input tokens
+    output: 0.14, // $0.14 per 1M output tokens
+    cached: 0.014, // $0.014 per 1M cached tokens
   },
   'deepseek-reasoner': {
-    input: 0.55,   // $0.55 per 1M input tokens
-    output: 2.19,  // $2.19 per 1M output tokens
-    cached: 0.14   // $0.14 per 1M cached tokens
-  }
+    input: 0.55, // $0.55 per 1M input tokens
+    output: 2.19, // $2.19 per 1M output tokens
+    cached: 0.14, // $0.14 per 1M cached tokens
+  },
 };
 
 /**
@@ -66,7 +66,7 @@ function loadUsageData() {
     aliases: {},
     totalRequests: 0,
     totalTokens: { input: 0, output: 0, cached: 0 },
-    totalCost: 0
+    totalCost: 0,
   };
 }
 
@@ -89,9 +89,9 @@ function saveUsageData(data) {
 function calculateCost(model, usage) {
   const pricing = PRICING[model] || PRICING['deepseek-chat'];
 
-  const inputCost = (usage.prompt_tokens || 0) / 1_000_000 * pricing.input;
-  const outputCost = (usage.completion_tokens || 0) / 1_000_000 * pricing.output;
-  const cachedCost = (usage.prompt_cache_hit_tokens || 0) / 1_000_000 * pricing.cached;
+  const inputCost = ((usage.prompt_tokens || 0) / 1_000_000) * pricing.input;
+  const outputCost = ((usage.completion_tokens || 0) / 1_000_000) * pricing.output;
+  const cachedCost = ((usage.prompt_cache_hit_tokens || 0) / 1_000_000) * pricing.cached;
 
   return inputCost + outputCost + cachedCost;
 }
@@ -113,7 +113,7 @@ function recordUsage(alias, request, response) {
       tokens: { input: 0, output: 0, cached: 0 },
       cost: 0,
       byModel: {},
-      byDay: {}
+      byDay: {},
     };
   }
 
@@ -158,7 +158,9 @@ function recordUsage(alias, request, response) {
   saveUsageData(data);
 
   // Log to console
-  console.log(`[${alias}] ${model}: ${usage.prompt_tokens || 0} in / ${usage.completion_tokens || 0} out = $${cost.toFixed(6)}`);
+  console.log(
+    `[${alias}] ${model}: ${usage.prompt_tokens || 0} in / ${usage.completion_tokens || 0} out = $${cost.toFixed(6)}`
+  );
 }
 
 /**
@@ -170,7 +172,7 @@ function recordUsage(alias, request, response) {
 function proxyRequest(req, res, alias) {
   let body = '';
 
-  req.on('data', chunk => {
+  req.on('data', (chunk) => {
     body += chunk.toString();
   });
 
@@ -193,8 +195,8 @@ function proxyRequest(req, res, alias) {
       method: req.method,
       headers: {
         ...req.headers,
-        host: DEEPSEEK_HOST
-      }
+        host: DEEPSEEK_HOST,
+      },
     };
 
     // Remove problematic headers
@@ -206,7 +208,7 @@ function proxyRequest(req, res, alias) {
     const proxyReq = https.request(options, (proxyRes) => {
       let responseBody = '';
 
-      proxyRes.on('data', chunk => {
+      proxyRes.on('data', (chunk) => {
         responseBody += chunk.toString();
         res.write(chunk);
       });
@@ -251,7 +253,7 @@ function proxyRequest(req, res, alias) {
 function proxyStreamingRequest(req, res, alias) {
   let body = '';
 
-  req.on('data', chunk => {
+  req.on('data', (chunk) => {
     body += chunk.toString();
   });
 
@@ -273,8 +275,8 @@ function proxyStreamingRequest(req, res, alias) {
       method: req.method,
       headers: {
         ...req.headers,
-        host: DEEPSEEK_HOST
-      }
+        host: DEEPSEEK_HOST,
+      },
     };
 
     delete options.headers['content-length'];
@@ -287,13 +289,13 @@ function proxyStreamingRequest(req, res, alias) {
       res.writeHead(proxyRes.statusCode, {
         ...proxyRes.headers,
         'cache-control': 'no-cache',
-        'connection': 'keep-alive'
+        connection: 'keep-alive',
       });
 
       let totalInputTokens = 0;
       let totalOutputTokens = 0;
 
-      proxyRes.on('data', chunk => {
+      proxyRes.on('data', (chunk) => {
         res.write(chunk);
 
         // Try to extract usage from SSE events
@@ -303,8 +305,10 @@ function proxyStreamingRequest(req, res, alias) {
             try {
               const data = JSON.parse(line.slice(6));
               if (data.usage) {
-                totalInputTokens = data.usage.input_tokens || data.usage.prompt_tokens || totalInputTokens;
-                totalOutputTokens = data.usage.output_tokens || data.usage.completion_tokens || totalOutputTokens;
+                totalInputTokens =
+                  data.usage.input_tokens || data.usage.prompt_tokens || totalInputTokens;
+                totalOutputTokens =
+                  data.usage.output_tokens || data.usage.completion_tokens || totalOutputTokens;
               }
             } catch (e) {
               // Not valid JSON
@@ -321,8 +325,8 @@ function proxyStreamingRequest(req, res, alias) {
           recordUsage(alias, requestData, {
             usage: {
               prompt_tokens: totalInputTokens,
-              completion_tokens: totalOutputTokens
-            }
+              completion_tokens: totalOutputTokens,
+            },
           });
         }
       });
@@ -382,8 +386,8 @@ function startServer(options = {}) {
     }
 
     // Check if streaming request
-    const isStreaming = req.headers['accept']?.includes('text/event-stream') ||
-                        req.url.includes('stream=true');
+    const isStreaming =
+      req.headers['accept']?.includes('text/event-stream') || req.url.includes('stream=true');
 
     if (isStreaming) {
       proxyStreamingRequest(req, res, alias);
@@ -456,14 +460,18 @@ function getUsageSummary(alias = null) {
     }
   } else {
     lines.push(`  Total Requests: ${data.totalRequests.toLocaleString()}`);
-    lines.push(`  Total Tokens:   ${(data.totalTokens.input + data.totalTokens.output).toLocaleString()}`);
+    lines.push(
+      `  Total Tokens:   ${(data.totalTokens.input + data.totalTokens.output).toLocaleString()}`
+    );
     lines.push(`  Total Cost:     $${data.totalCost.toFixed(4)}`);
     lines.push('');
     lines.push('  By Alias:');
     lines.push(`  ${'─'.repeat(56)}`);
 
     for (const [name, a] of Object.entries(data.aliases)) {
-      lines.push(`  ${name.padEnd(20)} ${a.requests.toString().padStart(8)} req  $${a.cost.toFixed(4)}`);
+      lines.push(
+        `  ${name.padEnd(20)} ${a.requests.toString().padStart(8)} req  $${a.cost.toFixed(4)}`
+      );
     }
   }
 
@@ -485,8 +493,9 @@ if (require.main === module) {
   switch (command) {
     case 'start':
     case 'serve': {
-      const port = parseInt(args.find(a => a.startsWith('--port='))?.split('=')[1]) || DEFAULT_PORT;
-      const alias = args.find(a => a.startsWith('--alias='))?.split('=')[1] || 'claude-free';
+      const port =
+        parseInt(args.find((a) => a.startsWith('--port='))?.split('=')[1]) || DEFAULT_PORT;
+      const alias = args.find((a) => a.startsWith('--alias='))?.split('=')[1] || 'claude-free';
       startServer({ port, alias });
       break;
     }
@@ -545,5 +554,5 @@ module.exports = {
   calculateCost,
   PRICING,
   DATA_DIR,
-  USAGE_FILE
+  USAGE_FILE,
 };

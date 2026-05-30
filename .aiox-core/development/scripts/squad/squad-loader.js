@@ -43,12 +43,9 @@ const ErrorCodes = {
 const ErrorSuggestions = {
   [ErrorCodes.SQUAD_NOT_FOUND]: (squadName) =>
     `Create squad with: @squad-creator *create-squad ${squadName}`,
-  [ErrorCodes.MANIFEST_NOT_FOUND]: () =>
-    'Create squad.yaml in squad directory',
-  [ErrorCodes.YAML_PARSE_ERROR]: () =>
-    'Check YAML syntax - use a YAML linter',
-  [ErrorCodes.PERMISSION_DENIED]: (filePath) =>
-    `Check file permissions: chmod 644 ${filePath}`,
+  [ErrorCodes.MANIFEST_NOT_FOUND]: () => 'Create squad.yaml in squad directory',
+  [ErrorCodes.YAML_PARSE_ERROR]: () => 'Check YAML syntax - use a YAML linter',
+  [ErrorCodes.PERMISSION_DENIED]: (filePath) => `Check file permissions: chmod 644 ${filePath}`,
 };
 
 /**
@@ -88,7 +85,7 @@ class SquadLoaderError extends Error {
       ErrorCodes.SQUAD_NOT_FOUND,
       `Squad "${squadName}" not found in ${squadsPath}/`,
       ErrorSuggestions[ErrorCodes.SQUAD_NOT_FOUND](squadName),
-      filePath,
+      filePath
     );
   }
 
@@ -102,7 +99,7 @@ class SquadLoaderError extends Error {
       ErrorCodes.MANIFEST_NOT_FOUND,
       `No manifest found in ${squadPath}/ (expected squad.yaml or config.yaml)`,
       ErrorSuggestions[ErrorCodes.MANIFEST_NOT_FOUND](),
-      squadPath,
+      squadPath
     );
   }
 
@@ -117,7 +114,7 @@ class SquadLoaderError extends Error {
       ErrorCodes.YAML_PARSE_ERROR,
       `Failed to parse YAML in ${filePath}: ${parseError.message}`,
       ErrorSuggestions[ErrorCodes.YAML_PARSE_ERROR](),
-      filePath,
+      filePath
     );
   }
 
@@ -132,7 +129,7 @@ class SquadLoaderError extends Error {
       ErrorCodes.PERMISSION_DENIED,
       `Permission denied accessing ${filePath}: ${originalError.message}`,
       ErrorSuggestions[ErrorCodes.PERMISSION_DENIED](filePath),
-      filePath,
+      filePath
     );
   }
 
@@ -239,7 +236,7 @@ class SquadLoader {
     const manifestFilename = path.basename(manifestPath);
     if (manifestFilename === 'config.yaml') {
       console.warn(
-        `\u26a0\ufe0f  DEPRECATED: ${manifestPath} uses legacy format. Rename to squad.yaml`,
+        `\u26a0\ufe0f  DEPRECATED: ${manifestPath} uses legacy format. Rename to squad.yaml`
       );
     }
 

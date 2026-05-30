@@ -18,7 +18,12 @@ const {
   createGlobalStructure,
   createGlobalConfig,
 } = require('./global-config-manager');
-const { getProjectMcpPath, checkLinkStatus, LINK_STATUS, createLink } = require('./symlink-manager');
+const {
+  getProjectMcpPath,
+  checkLinkStatus,
+  LINK_STATUS,
+  createLink,
+} = require('./symlink-manager');
 
 /**
  * Migration options
@@ -180,7 +185,11 @@ function mergeServers(existing = {}, incoming = {}, options = {}) {
  * @param {Object} options - Additional options
  * @returns {Object} Migration result
  */
-function executeMigration(projectRoot = process.cwd(), option = MIGRATION_OPTION.MIGRATE, options = {}) {
+function executeMigration(
+  projectRoot = process.cwd(),
+  option = MIGRATION_OPTION.MIGRATE,
+  options = {}
+) {
   const analysis = analyzeMigration(projectRoot);
 
   // Handle already linked
@@ -243,11 +252,9 @@ function executeMigration(projectRoot = process.cwd(), option = MIGRATION_OPTION
         ? analysis.projectConfig.config.servers || {}
         : {};
 
-      const mergeResult = mergeServers(
-        globalConfig.servers,
-        projectServers,
-        { overwrite: options.overwrite },
-      );
+      const mergeResult = mergeServers(globalConfig.servers, projectServers, {
+        overwrite: options.overwrite,
+      });
 
       globalConfig.servers = mergeResult.servers;
 

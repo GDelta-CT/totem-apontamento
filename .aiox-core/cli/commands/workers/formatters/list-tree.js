@@ -119,8 +119,8 @@ function formatTree(workers, options = {}) {
   }
 
   // Footer hints
-  output += '\nUse \'aiox workers info <id>\' for details.\n';
-  output += 'Use \'aiox workers search <query>\' to search.\n';
+  output += "\nUse 'aiox workers info <id>' for details.\n";
+  output += "Use 'aiox workers search <query>' to search.\n";
 
   // Verbose debug info
   if (verbose) {

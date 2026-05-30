@@ -79,13 +79,12 @@ async function validateStoryFile(storyPath) {
 
     if (errors.length > 0) {
       printError('Story file validation failed:');
-      errors.forEach(err => console.log(`  - ${err}`));
+      errors.forEach((err) => console.log(`  - ${err}`));
       return { success: false, errors };
     }
 
     printSuccess('Story file structure is valid');
     return { success: true, errors: [] };
-
   } catch (error) {
     printError(`Story file validation error: ${error.message}`);
     return { success: false, errors: [`Validation error: ${error.message}`] };
@@ -111,7 +110,6 @@ async function runESLint(files = []) {
 
     printSuccess('ESLint validation passed');
     return { success: true, errors: [] };
-
   } catch (error) {
     const output = error.stdout || error.stderr || '';
 
@@ -144,7 +142,6 @@ async function runTypeScript() {
 
     printSuccess('TypeScript validation passed');
     return { success: true, errors: [] };
-
   } catch (error) {
     const output = error.stdout || error.stderr || '';
 
@@ -168,9 +165,8 @@ async function validateYAML(files = []) {
   printHeader('YAML Validation');
 
   const errors = [];
-  const yamlFiles = files.length > 0
-    ? files.filter(f => f.endsWith('.yml') || f.endsWith('.yaml'))
-    : [];
+  const yamlFiles =
+    files.length > 0 ? files.filter((f) => f.endsWith('.yml') || f.endsWith('.yaml')) : [];
 
   if (yamlFiles.length === 0) {
     printInfo('No YAML files to validate');
@@ -195,11 +191,7 @@ async function validateYAML(files = []) {
  * Main validation orchestrator
  */
 async function validate(options = {}) {
-  const {
-    type = 'all',
-    files = [],
-    storyPath = null,
-  } = options;
+  const { type = 'all', files = [], storyPath = null } = options;
 
   printHeader(`AIOX-FullStack Validation: ${type}`);
 
@@ -254,12 +246,11 @@ async function validate(options = {}) {
     } else {
       printError(`Validation failed with ${results.errors.length} error(s)`);
       console.log('\nErrors:');
-      results.errors.forEach(err => console.log(`  - ${err}`));
+      results.errors.forEach((err) => console.log(`  - ${err}`));
     }
     console.log('='.repeat(60) + '\n');
 
     return results;
-
   } catch (error) {
     printError(`Validation system error: ${error.message}`);
     return {
@@ -276,10 +267,10 @@ if (require.main === module) {
   const files = args.slice(1);
 
   validate({ type, files })
-    .then(results => {
+    .then((results) => {
       process.exit(results.success ? 0 : 1);
     })
-    .catch(error => {
+    .catch((error) => {
       console.error('Fatal error:', error);
       process.exit(1);
     });

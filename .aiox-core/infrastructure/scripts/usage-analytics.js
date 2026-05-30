@@ -17,15 +17,8 @@ class UsageAnalytics {
         /import .* from ['"`]([^'"`]+)['"`]/g,
         /import\(['"`]([^'"`]+)['"`]\)/g,
       ],
-      taskCalls: [
-        /\*([a-zA-Z-]+)/g,
-        /executeTask\(['"`]([^'"`]+)['"`]\)/g,
-      ],
-      agentReferences: [
-        /aiox-developer/g,
-        /meta-agent/g,
-        /@agent\s+([a-zA-Z-]+)/g,
-      ],
+      taskCalls: [/\*([a-zA-Z-]+)/g, /executeTask\(['"`]([^'"`]+)['"`]\)/g],
+      agentReferences: [/aiox-developer/g, /meta-agent/g, /@agent\s+([a-zA-Z-]+)/g],
       utilCalls: [
         /require\(['"`]\.\.\/utils\/([^'"`]+)['"`]\)/g,
         /from ['"`]\.\.\/utils\/([^'"`]+)['"`]/g,
@@ -68,7 +61,6 @@ class UsageAnalytics {
 
       console.log(chalk.green(`✅ Analyzed usage for ${components.length} components`));
       return usage;
-
     } catch (error) {
       console.error(chalk.red(`Usage analysis failed: ${error.message}`));
       throw error;
@@ -80,7 +72,7 @@ class UsageAnalytics {
    */
   async analyzeComponentUsage(component) {
     const cacheKey = `${component.id}-${component.last_modified}`;
-    
+
     if (this.usageCache.has(cacheKey)) {
       const cached = this.usageCache.get(cacheKey);
       if (Date.now() - cached.timestamp < this.cacheTimeout) {
@@ -129,7 +121,6 @@ class UsageAnalytics {
       });
 
       return usage;
-
     } catch (error) {
       console.warn(chalk.yellow(`Failed to analyze usage for ${component.id}: ${error.message}`));
       return usage;
@@ -162,7 +153,6 @@ class UsageAnalytics {
           // Directory doesn't exist, skip
         }
       }
-
     } catch (error) {
       console.warn(`Direct reference search failed: ${error.message}`);
     }
@@ -225,8 +215,8 @@ class UsageAnalytics {
         if (!references.files.includes(relativePath)) {
           references.files.push(relativePath);
         }
-        
-        foundReferences.locations.forEach(loc => {
+
+        foundReferences.locations.forEach((loc) => {
           references.locations.push({
             file: relativePath,
             line: loc.line,
@@ -235,7 +225,6 @@ class UsageAnalytics {
           });
         });
       }
-
     } catch (error) {
       // File not readable, skip
     }
@@ -256,7 +245,7 @@ class UsageAnalytics {
     ];
 
     lines.forEach((line, index) => {
-      agentPatterns.forEach(pattern => {
+      agentPatterns.forEach((pattern) => {
         const matches = line.match(pattern);
         if (matches) {
           results.count += matches.length;
@@ -287,7 +276,7 @@ class UsageAnalytics {
     ];
 
     lines.forEach((line, index) => {
-      taskPatterns.forEach(pattern => {
+      taskPatterns.forEach((pattern) => {
         const matches = line.match(pattern);
         if (matches) {
           results.count += matches.length;
@@ -318,7 +307,7 @@ class UsageAnalytics {
     ];
 
     lines.forEach((line, index) => {
-      workflowPatterns.forEach(pattern => {
+      workflowPatterns.forEach((pattern) => {
         const matches = line.match(pattern);
         if (matches) {
           results.count += matches.length;
@@ -349,7 +338,7 @@ class UsageAnalytics {
     ];
 
     lines.forEach((line, index) => {
-      utilPatterns.forEach(pattern => {
+      utilPatterns.forEach((pattern) => {
         const matches = line.match(pattern);
         if (matches) {
           results.count += matches.length;
@@ -395,7 +384,7 @@ class UsageAnalytics {
    */
   async findIndirectReferences(component) {
     const indirectRefs = { count: 0, files: [] };
-    
+
     // This would analyze dependency chains to find indirect usage
     // For now, return basic implementation
     return indirectRefs;
@@ -407,11 +396,12 @@ class UsageAnalytics {
   async analyzeUsageContexts(component, referencingFiles) {
     const contexts = [];
 
-    for (const file of referencingFiles.slice(0, 10)) { // Limit analysis
+    for (const file of referencingFiles.slice(0, 10)) {
+      // Limit analysis
       try {
         const fullPath = path.join(this.rootPath, file);
         const content = await fs.readFile(fullPath, 'utf-8');
-        
+
         const context = this.extractUsageContext(content, component, file);
         if (context) {
           contexts.push(context);
@@ -443,12 +433,15 @@ class UsageAnalytics {
     const directWeight = 1.0;
     const indirectWeight = 0.3;
     const fileWeight = 0.1;
-    
-    return Math.round(
-      (usage.direct_references * directWeight +
-       usage.indirect_references * indirectWeight +
-       usage.referencing_files.length * fileWeight) * 10,
-    ) / 10;
+
+    return (
+      Math.round(
+        (usage.direct_references * directWeight +
+          usage.indirect_references * indirectWeight +
+          usage.referencing_files.length * fileWeight) *
+          10
+      ) / 10
+    );
   }
 
   /**
@@ -536,7 +529,7 @@ class UsageAnalytics {
    */
   async analyzeCrossReferences(components) {
     const crossRefs = {};
-    
+
     // This would analyze how components reference each other
     // For now, return basic structure
     return crossRefs;
@@ -549,7 +542,7 @@ class UsageAnalytics {
     const totalComponents = Object.keys(usage.component_usage).length;
     const usedComponents = totalComponents - usage.unused_components.length;
     const utilizationRate = usedComponents / totalComponents;
-    
+
     return Math.round(utilizationRate * 100);
   }
 
@@ -565,7 +558,7 @@ class UsageAnalytics {
         type: 'cleanup',
         priority: 'medium',
         message: `Consider reviewing ${usage.unused_components.length} unused components for potential removal`,
-        components: usage.unused_components.map(c => c.component_id),
+        components: usage.unused_components.map((c) => c.component_id),
       });
     }
 
@@ -603,7 +596,7 @@ class UsageAnalytics {
 
   isSearchableFile(name) {
     const extensions = ['.js', '.mjs', '.ts', '.md', '.yaml', '.yml', '.json'];
-    return extensions.some(ext => name.endsWith(ext));
+    return extensions.some((ext) => name.endsWith(ext));
   }
 
   determineContextType(filePath) {
@@ -627,7 +620,7 @@ class UsageAnalytics {
     // Simple complexity based on usage patterns
     const lines = content.split('\n').length;
     const mentions = (content.match(new RegExp(component.id, 'g')) || []).length;
-    return Math.min(5, Math.round(mentions / lines * 100));
+    return Math.min(5, Math.round((mentions / lines) * 100));
   }
 }
 

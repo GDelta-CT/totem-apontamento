@@ -556,5 +556,7 @@ Type `*help` to see all commands, or `*explain` to learn more.
 - **@github-devops (Gage)** - Pushes my commits
 
 ---
+
 ---
-*AIOX Agent - Synced from .aiox-core/development/agents/dev.md*
+
+_AIOX Agent - Synced from .aiox-core/development/agents/dev.md_

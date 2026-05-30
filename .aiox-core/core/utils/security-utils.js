@@ -229,7 +229,7 @@ class RateLimiter {
     }
 
     // Remove old requests outside the window
-    history = history.filter(timestamp => timestamp > windowStart);
+    history = history.filter((timestamp) => timestamp > windowStart);
     this.requests.set(key, history);
 
     // Check if limit exceeded
@@ -273,7 +273,7 @@ class RateLimiter {
     const windowStart = now - this.windowMs;
 
     for (const [key, history] of this.requests.entries()) {
-      const filtered = history.filter(timestamp => timestamp > windowStart);
+      const filtered = history.filter((timestamp) => timestamp > windowStart);
       if (filtered.length === 0) {
         this.requests.delete(key);
       } else {
@@ -316,12 +316,12 @@ function isSafeString(value) {
   const dangerousPatterns = [
     // eslint-disable-next-line no-control-regex
     /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/, // Control characters
-    /\.\.\//,  // Path traversal
-    /\$\{/,    // Template injection
-    /\0/,      // Null byte
+    /\.\.\//, // Path traversal
+    /\$\{/, // Template injection
+    /\0/, // Null byte
   ];
 
-  return !dangerousPatterns.some(pattern => pattern.test(value));
+  return !dangerousPatterns.some((pattern) => pattern.test(value));
 }
 
 module.exports = {

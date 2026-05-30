@@ -69,7 +69,14 @@ function collectTimingMetrics(projectRoot) {
  */
 function _buildUapTiming(data, now) {
   if (!data || !data.loaders) {
-    return { available: false, totalDuration: 0, quality: 'unknown', loaders: [], stale: false, ageMs: 0 };
+    return {
+      available: false,
+      totalDuration: 0,
+      quality: 'unknown',
+      loaders: [],
+      stale: false,
+      ageMs: 0,
+    };
   }
 
   const ageMs = data.timestamp ? now - new Date(data.timestamp).getTime() : 0;
@@ -99,7 +106,14 @@ function _buildUapTiming(data, now) {
  */
 function _buildHookTiming(data, now) {
   if (!data || !data.perLayer) {
-    return { available: false, totalDuration: 0, bracket: 'unknown', layers: [], stale: false, ageMs: 0 };
+    return {
+      available: false,
+      totalDuration: 0,
+      bracket: 'unknown',
+      layers: [],
+      stale: false,
+      ageMs: 0,
+    };
   }
 
   const ageMs = data.timestamp ? now - new Date(data.timestamp).getTime() : 0;

@@ -63,9 +63,9 @@ function collectOutputAnalysis(projectRoot) {
     uapAnalysis,
     hookAnalysis,
     summary: {
-      uapHealthy: uapAnalysis.filter(a => a.quality === 'good').length,
+      uapHealthy: uapAnalysis.filter((a) => a.quality === 'good').length,
       uapTotal: uapAnalysis.length,
-      hookHealthy: hookAnalysis.filter(a => a.quality === 'good').length,
+      hookHealthy: hookAnalysis.filter((a) => a.quality === 'good').length,
       hookTotal: hookAnalysis.length,
     },
   };
@@ -87,17 +87,32 @@ function _analyzeUapOutput(data) {
       return { name, status: 'missing', quality: 'none', detail };
     }
     if (loader.status === 'error') {
-      return { name, status: 'error', quality: 'bad', detail: `Error: ${loader.error || 'unknown'}` };
+      return {
+        name,
+        status: 'error',
+        quality: 'bad',
+        detail: `Error: ${loader.error || 'unknown'}`,
+      };
     }
     if (loader.status === 'timeout') {
-      return { name, status: 'timeout', quality: 'bad', detail: `Timeout after ${loader.duration || 0}ms` };
+      return {
+        name,
+        status: 'timeout',
+        quality: 'bad',
+        detail: `Timeout after ${loader.duration || 0}ms`,
+      };
     }
     if (loader.status === 'skipped') {
       return { name, status: 'skipped', quality: 'none', detail: 'Loader was skipped' };
     }
     // Status 'ok' — check duration for anomalies
     if (loader.duration > 200) {
-      return { name, status: 'ok', quality: 'degraded', detail: `Slow: ${loader.duration}ms (>200ms)` };
+      return {
+        name,
+        status: 'ok',
+        quality: 'degraded',
+        detail: `Slow: ${loader.duration}ms (>200ms)`,
+      };
     }
     return { name, status: 'ok', quality: 'good', detail: `${loader.duration}ms` };
   });
@@ -125,7 +140,13 @@ function _analyzeHookOutput(data) {
       return { name, status, rules, quality: 'empty', detail: 'Loaded but produced 0 rules' };
     }
     if (status === 'ok' && rules > 0) {
-      return { name, status, rules, quality: 'good', detail: `${rules} rules in ${info.duration || 0}ms` };
+      return {
+        name,
+        status,
+        rules,
+        quality: 'good',
+        detail: `${rules} rules in ${info.duration || 0}ms`,
+      };
     }
     return { name, status, rules, quality: 'unknown', detail: `Status: ${status}` };
   });

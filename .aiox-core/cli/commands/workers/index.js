@@ -22,9 +22,9 @@ const { createListCommand } = require('./list');
 function createWorkersCommand() {
   const workers = new Command('workers');
 
-  workers
-    .description('Manage and discover workers in the service registry')
-    .addHelpText('after', `
+  workers.description('Manage and discover workers in the service registry').addHelpText(
+    'after',
+    `
 Commands:
   search <query>    Search for workers matching a query
   list              List all workers grouped by category
@@ -37,7 +37,8 @@ Examples:
   $ aiox workers list --format=table --page=2
   $ aiox workers info json-csv-transformer
   $ aiox workers info architect-checklist --format=json
-`);
+`
+  );
 
   // Add search subcommand (Story 2.7)
   workers.addCommand(createSearchCommand());

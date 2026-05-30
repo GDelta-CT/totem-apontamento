@@ -138,7 +138,7 @@ function getSuggestions(context) {
       match,
       firstState,
       scorer,
-      context,
+      context
     );
   }
 

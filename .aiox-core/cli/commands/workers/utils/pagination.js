@@ -26,7 +26,7 @@ function paginate(items, options = {}) {
   const page = Math.max(1, parseInt(options.page, 10) || 1);
   const limit = Math.min(
     MAX_PAGE_SIZE,
-    Math.max(1, parseInt(options.limit, 10) || DEFAULT_PAGE_SIZE),
+    Math.max(1, parseInt(options.limit, 10) || DEFAULT_PAGE_SIZE)
   );
 
   const totalItems = items.length;

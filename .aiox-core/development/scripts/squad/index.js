@@ -21,11 +21,7 @@ const {
   ErrorCodes,
 } = require('./squad-loader');
 
-const {
-  SquadValidator,
-  ValidationErrorCodes,
-  TASK_REQUIRED_FIELDS,
-} = require('./squad-validator');
+const { SquadValidator, ValidationErrorCodes, TASK_REQUIRED_FIELDS } = require('./squad-validator');
 
 const {
   SquadGenerator,
@@ -40,17 +36,9 @@ const {
   getGitUserName,
 } = require('./squad-generator');
 
-const {
-  SquadDesigner,
-  SquadDesignerError,
-  DesignerErrorCodes,
-} = require('./squad-designer');
+const { SquadDesigner, SquadDesignerError, DesignerErrorCodes } = require('./squad-designer');
 
-const {
-  SquadMigrator,
-  SquadMigratorError,
-  MigratorErrorCodes,
-} = require('./squad-migrator');
+const { SquadMigrator, SquadMigratorError, MigratorErrorCodes } = require('./squad-migrator');
 
 const {
   SquadDownloader,

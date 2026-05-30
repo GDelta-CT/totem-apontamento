@@ -9,16 +9,19 @@
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -186,6 +189,7 @@ token_usage: ~1,000-3,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Parallelize independent operations; reuse atom results; implement early exits
 
 ---
@@ -205,14 +209,13 @@ updated_at: 2025-11-17
 
 ---
 
-
 ## Description
 
 Produce W3C Design Tokens (DTCG v2025.10) exports from the canonical YAML tokens file. Validates schema compliance, OKLCH color usage, and publishes artifacts for downstream platforms (web, iOS, Android, Flutter).
 
 ## Prerequisites
 
-- tokens.yaml generated via *tokenize (core/semantic/component layers present)
+- tokens.yaml generated via \*tokenize (core/semantic/component layers present)
 - Node.js ≥ 18 / Python ≥ 3.10 (for validation tools)
 - DTCG CLI or schema validator installed (`npm install -g @designtokens/cli` recommended)
 

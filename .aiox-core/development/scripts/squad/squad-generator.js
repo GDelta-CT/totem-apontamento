@@ -120,7 +120,7 @@ class SquadGeneratorError extends Error {
     return new SquadGeneratorError(
       GeneratorErrorCodes.INVALID_NAME,
       `Invalid squad name "${name}": must be kebab-case (lowercase letters, numbers, hyphens)`,
-      'Use format: my-squad-name (lowercase, hyphens only)',
+      'Use format: my-squad-name (lowercase, hyphens only)'
     );
   }
 
@@ -134,7 +134,7 @@ class SquadGeneratorError extends Error {
     return new SquadGeneratorError(
       GeneratorErrorCodes.SQUAD_EXISTS,
       `Squad "${name}" already exists at ${squadPath}`,
-      `Choose a different name or delete existing squad: rm -rf ${squadPath}`,
+      `Choose a different name or delete existing squad: rm -rf ${squadPath}`
     );
   }
 
@@ -147,7 +147,7 @@ class SquadGeneratorError extends Error {
     return new SquadGeneratorError(
       GeneratorErrorCodes.TEMPLATE_NOT_FOUND,
       `Template "${template}" not found`,
-      `Available templates: ${AVAILABLE_TEMPLATES.join(', ')}`,
+      `Available templates: ${AVAILABLE_TEMPLATES.join(', ')}`
     );
   }
 
@@ -160,7 +160,7 @@ class SquadGeneratorError extends Error {
     return new SquadGeneratorError(
       GeneratorErrorCodes.INVALID_CONFIG_MODE,
       `Invalid config mode "${mode}"`,
-      `Available modes: ${CONFIG_MODES.join(', ')}`,
+      `Available modes: ${CONFIG_MODES.join(', ')}`
     );
   }
 
@@ -173,7 +173,7 @@ class SquadGeneratorError extends Error {
     return new SquadGeneratorError(
       GeneratorErrorCodes.BLUEPRINT_NOT_FOUND,
       `Blueprint not found at "${blueprintPath}"`,
-      'Generate a blueprint first: *design-squad --docs ./your-docs.md',
+      'Generate a blueprint first: *design-squad --docs ./your-docs.md'
     );
   }
 
@@ -187,7 +187,7 @@ class SquadGeneratorError extends Error {
     return new SquadGeneratorError(
       GeneratorErrorCodes.BLUEPRINT_PARSE_ERROR,
       `Failed to parse blueprint at "${blueprintPath}": ${parseError}`,
-      'Ensure blueprint is valid YAML format',
+      'Ensure blueprint is valid YAML format'
     );
   }
 
@@ -200,7 +200,7 @@ class SquadGeneratorError extends Error {
     return new SquadGeneratorError(
       GeneratorErrorCodes.BLUEPRINT_INVALID,
       `Blueprint validation failed:\n  - ${validationErrors.join('\n  - ')}`,
-      'Fix the validation errors and try again',
+      'Fix the validation errors and try again'
     );
   }
 
@@ -213,7 +213,7 @@ class SquadGeneratorError extends Error {
     return new SquadGeneratorError(
       GeneratorErrorCodes.SCHEMA_NOT_FOUND,
       `Schema not found at "${schemaPath}"`,
-      'Ensure AIOX is properly installed',
+      'Ensure AIOX is properly installed'
     );
   }
 }
@@ -290,11 +290,7 @@ function generateSquadYaml(config) {
   // For etl template, add more components
   if (config.template === 'etl') {
     components.agents = ['data-extractor.md', 'data-transformer.md'];
-    components.tasks = [
-      'extract-data.md',
-      'transform-data.md',
-      'load-data.md',
-    ];
+    components.tasks = ['extract-data.md', 'transform-data.md', 'load-data.md'];
     components.scripts = ['utils.js'];
   }
 
@@ -312,7 +308,8 @@ function generateSquadYaml(config) {
     // Reference project-level config files
     configSection = {
       extends: config.configMode,
-      'coding-standards': config._projectConfigs['coding-standards'] || 'config/coding-standards.md',
+      'coding-standards':
+        config._projectConfigs['coding-standards'] || 'config/coding-standards.md',
       'tech-stack': config._projectConfigs['tech-stack'] || 'config/tech-stack.md',
       'source-tree': config._projectConfigs['source-tree'] || 'config/source-tree.md',
     };
@@ -347,14 +344,14 @@ components:
   scripts:${components.scripts.length ? '\n    - ' + components.scripts.join('\n    - ') : ' []'}
 
 config:${
-  config.configMode === 'none'
-    ? ' {}'
-    : `
+    config.configMode === 'none'
+      ? ' {}'
+      : `
   extends: ${configSection.extends}
   coding-standards: ${configSection['coding-standards']}
   tech-stack: ${configSection['tech-stack']}
   source-tree: ${configSection['source-tree']}`
-}
+  }
 
 dependencies:
   node: []
@@ -714,7 +711,7 @@ class SquadGenerator {
       throw new SquadGeneratorError(
         GeneratorErrorCodes.INVALID_NAME,
         'Squad name is required',
-        'Provide a name: *create-squad my-squad-name',
+        'Provide a name: *create-squad my-squad-name'
       );
     }
 
@@ -815,9 +812,15 @@ class SquadGenerator {
     // Generate config files (SQS-10: skip if using project configs)
     if (useProjectConfigs) {
       // Don't create local config files, just add .gitkeep to config directory
-      console.log('[squad-generator] Skipping local config file creation (using project-level configs)');
+      console.log(
+        '[squad-generator] Skipping local config file creation (using project-level configs)'
+      );
       const gitkeepPath = path.join(squadPath, 'config', '.gitkeep');
-      await fs.writeFile(gitkeepPath, '# Config files are referenced from project docs/framework/\n', 'utf-8');
+      await fs.writeFile(
+        gitkeepPath,
+        '# Config files are referenced from project docs/framework/\n',
+        'utf-8'
+      );
       files.push(gitkeepPath);
     } else {
       // Fallback: Create local config files (AC10.3)
@@ -838,8 +841,7 @@ class SquadGenerator {
     // Generate example agent if requested
     if (fullConfig.includeAgent) {
       const agentContent = generateExampleAgent(fullConfig);
-      const agentName =
-        fullConfig.template === 'etl' ? 'data-extractor.md' : 'example-agent.md';
+      const agentName = fullConfig.template === 'etl' ? 'data-extractor.md' : 'example-agent.md';
       const agentPath = path.join(squadPath, 'agents', agentName);
       await fs.writeFile(agentPath, agentContent, 'utf-8');
       files.push(agentPath);
@@ -878,8 +880,7 @@ class SquadGenerator {
     // Generate example task if requested
     if (fullConfig.includeTask && fullConfig.template !== 'agent-only') {
       const taskContent = generateExampleTask(fullConfig);
-      const taskName =
-        fullConfig.template === 'etl' ? 'extract-data.md' : 'example-agent-task.md';
+      const taskName = fullConfig.template === 'etl' ? 'extract-data.md' : 'example-agent-task.md';
       const taskPath = path.join(squadPath, 'tasks', taskName);
       await fs.writeFile(taskPath, taskContent, 'utf-8');
       files.push(taskPath);
@@ -1120,8 +1121,14 @@ module.exports = { formatData };
           if (!agent.role) {
             errors.push(`recommendations.agents[${idx}]: missing required field "role"`);
           }
-          if (typeof agent.confidence !== 'number' || agent.confidence < 0 || agent.confidence > 1) {
-            errors.push(`recommendations.agents[${idx}]: confidence must be a number between 0 and 1`);
+          if (
+            typeof agent.confidence !== 'number' ||
+            agent.confidence < 0 ||
+            agent.confidence > 1
+          ) {
+            errors.push(
+              `recommendations.agents[${idx}]: confidence must be a number between 0 and 1`
+            );
           }
         });
       }
@@ -1140,7 +1147,9 @@ module.exports = { formatData };
             errors.push(`recommendations.tasks[${idx}]: missing required field "agent"`);
           }
           if (typeof task.confidence !== 'number' || task.confidence < 0 || task.confidence > 1) {
-            errors.push(`recommendations.tasks[${idx}]: confidence must be a number between 0 and 1`);
+            errors.push(
+              `recommendations.tasks[${idx}]: confidence must be a number between 0 and 1`
+            );
           }
         });
       }
@@ -1188,7 +1197,7 @@ module.exports = { formatData };
    */
   generateAgentFromBlueprint(agent, squadName) {
     const commandsList = (agent.commands || [])
-      .map(cmd => `  - name: ${cmd}\n    description: "${cmd.replace(/-/g, ' ')} operation"`)
+      .map((cmd) => `  - name: ${cmd}\n    description: "${cmd.replace(/-/g, ' ')} operation"`)
       .join('\n');
 
     return `# ${agent.id}
@@ -1237,17 +1246,21 @@ ${agent.user_modified ? 'Modified by user during design refinement.' : ''}
    * @returns {string} Markdown content for task file
    */
   generateTaskFromBlueprint(task, squadName) {
-    const entradaList = (task.entrada || []).map(e => `  - ${e}`).join('\n');
-    const saidaList = (task.saida || []).map(s => `  - ${s}`).join('\n');
-    const checklistItems = (task.checklist || [
-      '[ ] Validate input parameters',
-      '[ ] Execute main logic',
-      '[ ] Format output',
-      '[ ] Return result',
-    ]).map(item => `  - "${item.startsWith('[') ? item : '[ ] ' + item}"`).join('\n');
+    const entradaList = (task.entrada || []).map((e) => `  - ${e}`).join('\n');
+    const saidaList = (task.saida || []).map((s) => `  - ${s}`).join('\n');
+    const checklistItems = (
+      task.checklist || [
+        '[ ] Validate input parameters',
+        '[ ] Execute main logic',
+        '[ ] Format output',
+        '[ ] Return result',
+      ]
+    )
+      .map((item) => `  - "${item.startsWith('[') ? item : '[ ] ' + item}"`)
+      .join('\n');
 
     return `---
-task: "${task.name.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}"
+task: "${task.name.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}"
 responsavel: "@${task.agent}"
 responsavel_type: agent
 atomic_layer: task
@@ -1274,11 +1287,11 @@ Task generated from squad design blueprint for ${squadName}.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-${(task.entrada || []).map(e => `| \`${e}\` | string | Yes | ${e.replace(/_/g, ' ')} |`).join('\n') || '| - | - | - | No parameters defined |'}
+${(task.entrada || []).map((e) => `| \`${e}\` | string | Yes | ${e.replace(/_/g, ' ')} |`).join('\n') || '| - | - | - | No parameters defined |'}
 
 ## Output
 
-${(task.saida || []).map(s => `- **${s}**: ${s.replace(/_/g, ' ')}`).join('\n') || '- No outputs defined'}
+${(task.saida || []).map((s) => `- **${s}**: ${s.replace(/_/g, ' ')}`).join('\n') || '- No outputs defined'}
 
 ## Origin
 
@@ -1367,10 +1380,12 @@ Confidence: ${Math.round(task.confidence * 100)}%
 
     // Update components
     squadManifest.components = squadManifest.components || {};
-    squadManifest.components.agents = (blueprint.recommendations.agents || [])
-      .map(a => `${a.id}.md`);
-    squadManifest.components.tasks = (blueprint.recommendations.tasks || [])
-      .map(t => `${t.name}.md`);
+    squadManifest.components.agents = (blueprint.recommendations.agents || []).map(
+      (a) => `${a.id}.md`
+    );
+    squadManifest.components.tasks = (blueprint.recommendations.tasks || []).map(
+      (t) => `${t.name}.md`
+    );
 
     // Add blueprint reference
     squadManifest.blueprint = {

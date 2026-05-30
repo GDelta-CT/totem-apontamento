@@ -98,13 +98,13 @@ elicit: true
 type: select
 options:
   - value: continue
-    label: "[1] Continuar de onde parou"
+    label: '[1] Continuar de onde parou'
   - value: review
-    label: "[2] Revisar o que foi feito"
+    label: '[2] Revisar o que foi feito'
   - value: restart
-    label: "[3] Recomeçar story do zero"
+    label: '[3] Recomeçar story do zero'
   - value: discard
-    label: "[4] Iniciar novo épico"
+    label: '[4] Iniciar novo épico'
 ```
 
 ### Step 5: Execute Selected Action
@@ -169,11 +169,11 @@ on_activation:
 
 ## Error Handling
 
-| Error | Recovery |
-|-------|----------|
-| Corrupted state file | Offer to discard and start fresh |
-| Invalid YAML | Parse error with file path, offer discard |
-| Missing required fields | Warn and offer partial recovery |
+| Error                   | Recovery                                  |
+| ----------------------- | ----------------------------------------- |
+| Corrupted state file    | Offer to discard and start fresh          |
+| Invalid YAML            | Parse error with file path, offer discard |
+| Missing required fields | Warn and offer partial recovery           |
 
 ---
 

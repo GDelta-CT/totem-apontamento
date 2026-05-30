@@ -4,7 +4,7 @@
  * Atomic Layer Classifier
  * Story: 6.1.7.1 - Task Content Completion
  * Purpose: Resolve {TODO: Atom|Molecule|Organism} placeholders in all 114 task files
- * 
+ *
  * Classification based on AIOX atomic design hierarchy:
  * - Atom: Single-purpose, no dependencies
  * - Molecule: Combines atoms
@@ -24,14 +24,10 @@ const TODO_PATTERN = /atomic_layer: \{TODO: Atom\|Molecule\|Organism\}/g;
 // Classification rules based on task complexity and purpose
 const ATOMIC_CLASSIFICATIONS = {
   // Atom: Simple, single-purpose operations
-  'Atom': [
-    'undo-last.md',
-    'kb-mode-interaction.md',
-    'init-project-status.md',
-  ],
-  
+  Atom: ['undo-last.md', 'kb-mode-interaction.md', 'init-project-status.md'],
+
   // Molecule: Combines multiple atoms
-  'Molecule': [
+  Molecule: [
     'apply-qa-fixes.md',
     'cleanup-utilities.md',
     'collaborative-edit.md',
@@ -50,9 +46,9 @@ const ATOMIC_CLASSIFICATIONS = {
     'create-suite.md',
     'integrate-expansion-pack.md',
   ],
-  
+
   // Organism: Complex workflows orchestrating multiple tasks
-  'Organism': [
+  Organism: [
     'dev-develop-story.md',
     'qa-gate.md',
     'execute-checklist.md',
@@ -85,9 +81,9 @@ const ATOMIC_CLASSIFICATIONS = {
     'db-rollback.md',
     'db-supabase-setup.md',
   ],
-  
+
   // Template: Document generation
-  'Template': [
+  Template: [
     'create-doc.md',
     'shard-doc.md',
     'generate-documentation.md',
@@ -97,9 +93,9 @@ const ATOMIC_CLASSIFICATIONS = {
     'create-deep-research-prompt.md',
     'ux-create-wireframe.md',
   ],
-  
+
   // Strategy: High-level planning, analysis, decision-making
-  'Strategy': [
+  Strategy: [
     'advanced-elicitation.md',
     'facilitate-brainstorming-session.md',
     'analyst-facilitate-brainstorming.md',
@@ -133,9 +129,9 @@ const ATOMIC_CLASSIFICATIONS = {
     'ux-ds-scan-artifact.md',
     'ux-user-research.md',
   ],
-  
+
   // Config: System configuration, setup, initialization
-  'Config': [
+  Config: [
     'create-agent.md',
     'modify-agent.md',
     'create-task.md',
@@ -165,7 +161,7 @@ const ATOMIC_CLASSIFICATIONS = {
 function buildClassificationMap() {
   const map = {};
   for (const [layer, files] of Object.entries(ATOMIC_CLASSIFICATIONS)) {
-    files.forEach(file => {
+    files.forEach((file) => {
       map[file] = layer;
     });
   }
@@ -182,40 +178,37 @@ function classifyTask(filename) {
 // Main: Process single task file
 function processTaskFile(filename) {
   const filePath = path.join(TASKS_DIR, filename);
-  
+
   // Skip backup files
   if (filename.includes('backup') || filename.includes('.legacy')) {
     return { skipped: true, reason: 'backup/legacy file' };
   }
-  
+
   // Read file content
   const content = fs.readFileSync(filePath, 'utf8');
-  
+
   // Check if TODO exists
   if (!TODO_PATTERN.test(content)) {
     return { skipped: true, reason: 'no TODO placeholder found' };
   }
-  
+
   // Classify task
   const atomicLayer = classifyTask(filename);
-  
+
   if (atomicLayer === 'UNKNOWN - NEEDS MANUAL REVIEW') {
-    return { 
-      needsReview: true, 
+    return {
+      needsReview: true,
       filename,
       reason: 'No clear classification found',
     };
   }
-  
+
   // Replace TODO with actual classification
-  const updatedContent = content.replace(
-    TODO_PATTERN,
-    `atomic_layer: ${atomicLayer}`,
-  );
-  
+  const updatedContent = content.replace(TODO_PATTERN, `atomic_layer: ${atomicLayer}`);
+
   // Write updated content
   fs.writeFileSync(filePath, updatedContent, 'utf8');
-  
+
   return {
     processed: true,
     filename,
@@ -227,34 +220,35 @@ function processTaskFile(filename) {
 function main() {
   console.log('🚀 Atomic Layer Classifier\n');
   console.log(`📂 Processing tasks in: ${TASKS_DIR}\n`);
-  
+
   // Get all .md files
-  const files = fs.readdirSync(TASKS_DIR)
-    .filter(f => f.endsWith('.md') && !f.includes('backup') && !f.includes('.legacy'))
+  const files = fs
+    .readdirSync(TASKS_DIR)
+    .filter((f) => f.endsWith('.md') && !f.includes('backup') && !f.includes('.legacy'))
     .sort();
-  
+
   console.log(`📝 Found ${files.length} task files\n`);
-  
+
   const results = {
     processed: [],
     skipped: [],
     needsReview: [],
     errors: [],
     byLayer: {
-      'Atom': 0,
-      'Molecule': 0,
-      'Organism': 0,
-      'Template': 0,
-      'Strategy': 0,
-      'Config': 0,
+      Atom: 0,
+      Molecule: 0,
+      Organism: 0,
+      Template: 0,
+      Strategy: 0,
+      Config: 0,
     },
   };
-  
+
   // Process each file
-  files.forEach(filename => {
+  files.forEach((filename) => {
     try {
       const result = processTaskFile(filename);
-      
+
       if (result.processed) {
         results.processed.push(result);
         results.byLayer[result.atomicLayer]++;
@@ -270,7 +264,7 @@ function main() {
       console.error(`❌ ${filename}: ${error.message}`);
     }
   });
-  
+
   // Summary
   console.log('\n' + '='.repeat(60));
   console.log('📊 Summary:');
@@ -283,12 +277,12 @@ function main() {
     console.log(`   ${layer}: ${count}`);
   });
   console.log('='.repeat(60) + '\n');
-  
+
   // Save report
   const reportPath = path.join(__dirname, '../../.ai/task-1.3-atomic-layer-report.json');
   fs.writeFileSync(reportPath, JSON.stringify(results, null, 2), 'utf8');
   console.log(`📄 Report saved: ${reportPath}\n`);
-  
+
   return results;
 }
 
@@ -296,7 +290,7 @@ function main() {
 if (require.main === module) {
   try {
     const results = main();
-    const exitCode = (results.errors.length > 0 || results.needsReview.length > 0) ? 1 : 0;
+    const exitCode = results.errors.length > 0 || results.needsReview.length > 0 ? 1 : 0;
     process.exit(exitCode);
   } catch (error) {
     console.error('💥 Fatal error:', error.message);
@@ -305,4 +299,3 @@ if (require.main === module) {
 }
 
 module.exports = { classifyTask, processTaskFile };
-

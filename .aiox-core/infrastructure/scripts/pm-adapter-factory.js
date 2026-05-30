@@ -97,7 +97,6 @@ function getPMAdapter() {
     }
 
     return cachedAdapter;
-
   } catch (error) {
     console.error('❌ Error loading PM config:', error.message);
     console.log('   Falling back to local-only mode');

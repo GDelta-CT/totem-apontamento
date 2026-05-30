@@ -198,7 +198,7 @@ class SquadPublisher {
       throw new SquadPublisherError(
         PublisherErrorCodes.SQUAD_NOT_FOUND,
         `Squad not found at: ${squadPath}`,
-        'Check the path and ensure squad exists',
+        'Check the path and ensure squad exists'
       );
     }
 
@@ -208,7 +208,7 @@ class SquadPublisher {
       throw new SquadPublisherError(
         PublisherErrorCodes.VALIDATION_FAILED,
         `Squad validation failed:\n${validation.errors.map((e) => e.message).join('\n')}`,
-        'Run *validate-squad to see all issues',
+        'Run *validate-squad to see all issues'
       );
     }
 
@@ -218,7 +218,7 @@ class SquadPublisher {
       throw new SquadPublisherError(
         PublisherErrorCodes.MANIFEST_ERROR,
         'Failed to load squad manifest or missing name',
-        'Ensure squad.yaml has required fields: name, version',
+        'Ensure squad.yaml has required fields: name, version'
       );
     }
 
@@ -229,7 +229,7 @@ class SquadPublisher {
       throw new SquadPublisherError(
         PublisherErrorCodes.INVALID_SQUAD_NAME,
         `Invalid squad name: "${squadName}". Only alphanumerics, hyphens, underscores, and dots allowed.`,
-        'Update squad.yaml name field to use only safe characters',
+        'Update squad.yaml name field to use only safe characters'
       );
     }
 
@@ -244,7 +244,7 @@ class SquadPublisher {
       throw new SquadPublisherError(
         PublisherErrorCodes.AUTH_REQUIRED,
         'GitHub CLI not authenticated',
-        'Run: gh auth login',
+        'Run: gh auth login'
       );
     }
 
@@ -371,10 +371,14 @@ Tested locally with:
 
       this._log(`Cloning fork to: ${tempDir}`);
       // Use spawnSync with array args
-      const cloneResult = spawnSync('gh', ['repo', 'clone', this.repo, tempDir, '--', '--depth', '1'], {
-        encoding: 'utf-8',
-        stdio: ['pipe', 'pipe', 'pipe'],
-      });
+      const cloneResult = spawnSync(
+        'gh',
+        ['repo', 'clone', this.repo, tempDir, '--', '--depth', '1'],
+        {
+          encoding: 'utf-8',
+          stdio: ['pipe', 'pipe', 'pipe'],
+        }
+      );
       if (cloneResult.status !== 0) {
         throw new Error(cloneResult.stderr || 'Clone failed');
       }
@@ -442,12 +446,23 @@ Tested locally with:
       // Use spawnSync with array args - title contains validated squadName
       const prResult = spawnSync(
         'gh',
-        ['pr', 'create', '--repo', this.repo, '--title', title, '--body-file', prBodyFile, '--base', 'main'],
+        [
+          'pr',
+          'create',
+          '--repo',
+          this.repo,
+          '--title',
+          title,
+          '--body-file',
+          prBodyFile,
+          '--base',
+          'main',
+        ],
         {
           cwd: tempDir,
           encoding: 'utf-8',
           stdio: ['pipe', 'pipe', 'pipe'],
-        },
+        }
       );
       if (prResult.status !== 0) {
         throw new Error(prResult.stderr || 'PR creation failed');
@@ -463,7 +478,7 @@ Tested locally with:
       throw new SquadPublisherError(
         PublisherErrorCodes.PR_ERROR,
         `Failed to create PR: ${error.message}`,
-        'Check GitHub CLI is working: gh auth status',
+        'Check GitHub CLI is working: gh auth status'
       );
     }
   }
@@ -506,12 +521,12 @@ Tested locally with:
       registry.squads.community = registry.squads.community.map((s) =>
         s.name === manifest.name
           ? {
-            name: manifest.name,
-            version: manifest.version || '1.0.0',
-            description: manifest.description || '',
-            author: manifest.author || 'Unknown',
-          }
-          : s,
+              name: manifest.name,
+              version: manifest.version || '1.0.0',
+              description: manifest.description || '',
+              author: manifest.author || 'Unknown',
+            }
+          : s
       );
     } else {
       // Add new entry

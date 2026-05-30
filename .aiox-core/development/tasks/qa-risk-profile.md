@@ -203,12 +203,15 @@ updated_at: 2025-11-17
  Powered by AIOX™ Core -->
 
 ---
+
 tools:
-  - github-cli        # Code analysis and historical risk patterns
-  - context7          # Research security vulnerabilities and patterns
-  - exa               # Research similar implementation risks
-checklists:
-  - architect-master-checklist.md
+
+- github-cli # Code analysis and historical risk patterns
+- context7 # Research security vulnerabilities and patterns
+- exa # Research similar implementation risks
+  checklists:
+- architect-master-checklist.md
+
 ---
 
 # risk-profile
@@ -564,4 +567,3 @@ Risk profile: qa.qaLocation/assessments/{epic}.{story}-risk-{YYYYMMDD}.md
 - Link risks to specific test requirements
 - Track residual risk after mitigation
 - Update risk profile as story evolves
- 

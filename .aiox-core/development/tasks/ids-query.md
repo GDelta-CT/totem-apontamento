@@ -86,7 +86,9 @@ node bin/aiox-ids.js ids:query "agent persona" --category agents
 ```javascript
 const path = require('path');
 const { RegistryLoader } = require(path.resolve('.aiox-core/core/ids/registry-loader'));
-const { IncrementalDecisionEngine } = require(path.resolve('.aiox-core/core/ids/incremental-decision-engine'));
+const { IncrementalDecisionEngine } = require(
+  path.resolve('.aiox-core/core/ids/incremental-decision-engine')
+);
 
 const loader = new RegistryLoader();
 loader.load();
@@ -103,30 +105,30 @@ const result = engine.analyze('validate story drafts before implementation');
 
 ## Decision Interpretation
 
-| Decision | Meaning | Action |
-|----------|---------|--------|
-| **REUSE** | >=90% relevance match | Use the existing artifact directly |
-| **ADAPT** | 60-89% match + adaptable | Modify existing artifact (changes <30%) |
-| **CREATE** | No suitable match | Create new artifact with justification |
+| Decision   | Meaning                  | Action                                  |
+| ---------- | ------------------------ | --------------------------------------- |
+| **REUSE**  | >=90% relevance match    | Use the existing artifact directly      |
+| **ADAPT**  | 60-89% match + adaptable | Modify existing artifact (changes <30%) |
+| **CREATE** | No suitable match        | Create new artifact with justification  |
 
 ---
 
 ## Output Structure
 
 ```yaml
-intent: "validate story drafts"
+intent: 'validate story drafts'
 recommendations:
-  - entityId: "validate-story"
-    decision: "REUSE"
-    confidence: "high"
+  - entityId: 'validate-story'
+    decision: 'REUSE'
+    confidence: 'high'
     relevanceScore: 0.95
-    rationale: "Strong match..."
+    rationale: 'Strong match...'
 summary:
   totalEntities: 474
   matchesFound: 3
-  decision: "REUSE"
-  confidence: "high"
-rationale: "Found 3 matches above threshold..."
+  decision: 'REUSE'
+  confidence: 'high'
+rationale: 'Found 3 matches above threshold...'
 ```
 
 ---

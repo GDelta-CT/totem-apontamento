@@ -224,7 +224,7 @@ class NotificationManager {
     if (reviewRequest.automatedSummary?.layer1) {
       lines.push('### Layer 1: Pre-commit');
       reviewRequest.automatedSummary.layer1.checks.forEach((c) => {
-        const icon = c.status === 'passed' ? '✅' : (c.status === 'skipped' ? '⏭️' : '❌');
+        const icon = c.status === 'passed' ? '✅' : c.status === 'skipped' ? '⏭️' : '❌';
         lines.push(`- ${icon} ${c.check}: ${c.message}`);
       });
       lines.push('');
@@ -235,7 +235,9 @@ class NotificationManager {
       lines.push('### Layer 2: PR Automation');
       if (reviewRequest.automatedSummary.layer2.coderabbit) {
         const cr = reviewRequest.automatedSummary.layer2.coderabbit;
-        lines.push(`- 🐰 CodeRabbit: ${cr.issues.critical} CRITICAL, ${cr.issues.high} HIGH, ${cr.issues.medium} MEDIUM`);
+        lines.push(
+          `- 🐰 CodeRabbit: ${cr.issues.critical} CRITICAL, ${cr.issues.high} HIGH, ${cr.issues.medium} MEDIUM`
+        );
       }
       if (reviewRequest.automatedSummary.layer2.quinn) {
         const q = reviewRequest.automatedSummary.layer2.quinn;
@@ -472,36 +474,38 @@ class NotificationManager {
    */
   async saveNotification(notification) {
     // Chain the save operation onto the queue to serialize concurrent writes
-    this.saveQueue = this.saveQueue.then(async () => {
-      const historyPath = path.join(this.notificationsPath, 'history.json');
+    this.saveQueue = this.saveQueue
+      .then(async () => {
+        const historyPath = path.join(this.notificationsPath, 'history.json');
 
-      let history = [];
-      try {
-        const content = await fs.readFile(historyPath, 'utf8');
-        history = JSON.parse(content);
-      } catch {
-        // No history file
-      }
+        let history = [];
+        try {
+          const content = await fs.readFile(historyPath, 'utf8');
+          history = JSON.parse(content);
+        } catch {
+          // No history file
+        }
 
-      history.push({
-        id: notification.id,
-        type: notification.type,
-        recipient: notification.recipient,
-        timestamp: notification.timestamp,
-        status: notification.status,
+        history.push({
+          id: notification.id,
+          type: notification.type,
+          recipient: notification.recipient,
+          timestamp: notification.timestamp,
+          status: notification.status,
+        });
+
+        // Keep only last 100 notifications
+        if (history.length > 100) {
+          history = history.slice(-100);
+        }
+
+        await fs.mkdir(this.notificationsPath, { recursive: true });
+        await fs.writeFile(historyPath, JSON.stringify(history, null, 2));
+      })
+      .catch((err) => {
+        // Log but don't break the queue for future saves
+        console.error('Failed to save notification to history:', err.message);
       });
-
-      // Keep only last 100 notifications
-      if (history.length > 100) {
-        history = history.slice(-100);
-      }
-
-      await fs.mkdir(this.notificationsPath, { recursive: true });
-      await fs.writeFile(historyPath, JSON.stringify(history, null, 2));
-    }).catch((err) => {
-      // Log but don't break the queue for future saves
-      console.error('Failed to save notification to history:', err.message);
-    });
 
     // Wait for this save to complete
     await this.saveQueue;

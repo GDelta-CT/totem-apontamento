@@ -14,6 +14,7 @@
 Configure LLM routing for Claude Code to use alternative providers (DeepSeek, OpenRouter) instead of or alongside direct Anthropic API. This enables cost reduction of up to 100x while maintaining full Claude Code functionality including tool calling.
 
 **Primary commands installed:**
+
 - `claude-max`: Uses Claude Max subscription (OAuth/claude.ai)
 - `claude-free`: Uses DeepSeek API (~$0.14/M tokens)
 
@@ -28,6 +29,7 @@ node .aiox-core/infrastructure/scripts/llm-routing/install-llm-routing.js
 ```
 
 This will:
+
 1. Detect your OS (Windows/Unix)
 2. Install `claude-max` and `claude-free` commands
 3. Configure paths automatically
@@ -39,10 +41,12 @@ This will:
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous
+
 - Uses sensible defaults
 - **Best for:** Experienced users, quick testing
 
 ### 2. Interactive Mode **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** First-time setup
@@ -145,7 +149,9 @@ claude-free --version
 ## Usage
 
 ### claude-max
+
 Uses your Claude Max subscription via OAuth (claude.ai login).
+
 - No API key required
 - Full Claude capabilities
 - ~$15/M tokens if using API billing
@@ -155,7 +161,9 @@ claude-max
 ```
 
 ### claude-free
+
 Uses DeepSeek API with Anthropic-compatible endpoint.
+
 - Requires DEEPSEEK_API_KEY
 - Tool calling supported
 - ~$0.14/M tokens
@@ -168,11 +176,11 @@ claude-free
 
 ## Cost Comparison
 
-| Provider | Input | Output | Notes |
-|----------|-------|--------|-------|
-| Claude (API) | $15/M | $75/M | Direct Anthropic API |
-| Claude (Max) | Included | Included | Subscription-based |
-| DeepSeek | $0.07/M | $0.14/M | Native Anthropic endpoint |
+| Provider     | Input    | Output   | Notes                     |
+| ------------ | -------- | -------- | ------------------------- |
+| Claude (API) | $15/M    | $75/M    | Direct Anthropic API      |
+| Claude (Max) | Included | Included | Subscription-based        |
+| DeepSeek     | $0.07/M  | $0.14/M  | Native Anthropic endpoint |
 
 **Savings with DeepSeek:** ~99% cost reduction
 
@@ -181,15 +189,18 @@ claude-free
 ## Troubleshooting
 
 ### Command not found
+
 - **Windows:** Ensure `%APPDATA%\npm` is in PATH
 - **Unix:** Ensure `/usr/local/bin` or `~/bin` is in PATH
 
 ### API key error
+
 1. Create `.env` in project root
 2. Add: `DEEPSEEK_API_KEY=sk-your-key`
 3. Get key at: <https://platform.deepseek.com/api_keys>
 
 ### Tool calling fails
+
 - Verify DeepSeek API endpoint is reachable
 - Check API key is valid
 - DeepSeek's `/anthropic` endpoint supports tools
@@ -198,8 +209,8 @@ claude-free
 
 ## References
 
-- [DeepSeek API](<https://platform.deepseek.com/api_keys>)
-- [Claude Code Documentation](<https://docs.anthropic.com/claude-code>)
+- [DeepSeek API](https://platform.deepseek.com/api_keys)
+- [Claude Code Documentation](https://docs.anthropic.com/claude-code)
 - Tool Definition: `.aiox-core/infrastructure/tools/cli/llm-routing.yaml`
 - Install Script: `.aiox-core/infrastructure/scripts/llm-routing/install-llm-routing.js`
 
@@ -208,7 +219,7 @@ claude-free
 ## Metadata
 
 ```yaml
-story: "6.7"
+story: '6.7'
 version: 1.1.0
 migrated_from: aiox-core
 dependencies:

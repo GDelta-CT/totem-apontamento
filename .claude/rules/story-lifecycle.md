@@ -1,7 +1,7 @@
 ---
 paths:
-  - "docs/stories/**"
-  - ".aiox-core/development/**"
+  - 'docs/stories/**'
+  - '.aiox-core/development/**'
 ---
 
 # Story Lifecycle — Detailed Rules
@@ -12,13 +12,13 @@ paths:
 Draft → Ready → InProgress → InReview → Done
 ```
 
-| Status | Trigger | Agent | Action |
-|--------|---------|-------|--------|
-| Draft | @sm creates story | @sm | Story file created |
-| Ready | @po validates (GO) | @po | **MUST update status field in story file from Draft → Ready** |
-| InProgress | @dev starts implementation | @dev | Update status field |
-| InReview | @dev completes, @qa reviews | @qa | Update status field |
-| Done | @qa PASS, @devops pushes | @devops | Update status field |
+| Status     | Trigger                     | Agent   | Action                                                        |
+| ---------- | --------------------------- | ------- | ------------------------------------------------------------- |
+| Draft      | @sm creates story           | @sm     | Story file created                                            |
+| Ready      | @po validates (GO)          | @po     | **MUST update status field in story file from Draft → Ready** |
+| InProgress | @dev starts implementation  | @dev    | Update status field                                           |
+| InReview   | @dev completes, @qa reviews | @qa     | Update status field                                           |
+| Done       | @qa PASS, @devops pushes    | @devops | Update status field                                           |
 
 **CRITICAL:** The `Draft → Ready` transition is the responsibility of @po during `*validate-story-draft`. When verdict is GO (including conditional GO after fixes are applied), @po MUST update the story's Status field to `Ready` and log the transition in the Change Log. A story left in `Draft` after a GO verdict is a process violation.
 
@@ -54,16 +54,19 @@ Draft → Ready → InProgress → InReview → Done
 ### Execution Modes
 
 **YOLO (autonomous):**
+
 - 0-1 prompts
 - Decisions logged in `decision-log-{story-id}.md`
 - Best for: simple, deterministic tasks
 
 **Interactive (default):**
+
 - 5-10 prompts with educational checkpoints
 - Confirmations at key decision points
 - Best for: learning, complex decisions
 
 **Pre-Flight (plan-first):**
+
 - All questions upfront (10-15 prompts)
 - Generates execution plan
 - Then zero-ambiguity execution
@@ -96,12 +99,12 @@ if CRITICAL persist after 2 iterations:
 
 ### Gate Decisions
 
-| Decision | Score | Action |
-|----------|-------|--------|
-| PASS | All checks OK | Approve, proceed to @devops push |
-| CONCERNS | Minor issues | Approve with observations documented |
-| FAIL | HIGH/CRITICAL issues | Return to @dev with feedback |
-| WAIVED | Issues accepted | Approve with waiver documented (rare) |
+| Decision | Score                | Action                                |
+| -------- | -------------------- | ------------------------------------- |
+| PASS     | All checks OK        | Approve, proceed to @devops push      |
+| CONCERNS | Minor issues         | Approve with observations documented  |
+| FAIL     | HIGH/CRITICAL issues | Return to @dev with feedback          |
+| WAIVED   | Issues accepted      | Approve with waiver documented (rare) |
 
 ### Gate File Structure
 
@@ -111,8 +114,8 @@ verdict: PASS | CONCERNS | FAIL | WAIVED
 issues:
   - severity: low | medium | high
     category: code | tests | requirements | performance | security | docs
-    description: "..."
-    recommendation: "..."
+    description: '...'
+    recommendation: '...'
 ```
 
 ## QA Loop (Iterative Review-Fix)
@@ -122,12 +125,14 @@ issues:
 ```
 
 **Commands:**
+
 - `*qa-loop {storyId}` — Start full loop
 - `*stop-qa-loop` — Pause and save state
 - `*resume-qa-loop` — Resume from saved state
 - `*escalate-qa-loop` — Force manual escalation
 
 **Escalation triggers:**
+
 - max_iterations_reached (default: 5)
 - verdict_blocked
 - fix_failure (after retries)
@@ -137,9 +142,9 @@ issues:
 
 ## Story File Update Rules
 
-| Section | Who Can Edit |
-|---------|-------------|
-| Title, Description, AC, Scope | @po only |
-| File List, Dev Notes, checkboxes | @dev |
-| QA Results | @qa only |
-| Change Log | Any agent (append only) |
+| Section                          | Who Can Edit            |
+| -------------------------------- | ----------------------- |
+| Title, Description, AC, Scope    | @po only                |
+| File List, Dev Notes, checkboxes | @dev                    |
+| QA Results                       | @qa only                |
+| Change Log                       | Any agent (append only) |

@@ -182,6 +182,7 @@ token_usage: ~3,000-10,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Break into smaller workflows; implement checkpointing; use async processing where possible
 
 ---
@@ -202,11 +203,13 @@ updated_at: 2025-11-17
 ---
 
 tools:
-  - github-cli        # Access repository structure and previous stories
-  - context7          # Look up documentation for technical requirements
-  - clickup           # Manage story metadata and tracking
-checklists:
-  - po-master-checklist.md
+
+- github-cli # Access repository structure and previous stories
+- context7 # Look up documentation for technical requirements
+- clickup # Manage story metadata and tracking
+  checklists:
+- po-master-checklist.md
+
 ---
 
 # Create Next Story Task
@@ -262,12 +265,14 @@ To identify the next logical story based on project progress and epic definition
 **CRITICAL: File Fallback Strategy**
 
 When attempting to read architecture files, use this fallback order:
+
 1. Try primary filename (e.g., `tech-stack.md`)
 2. If not found, try fallback alternatives from `devLoadAlwaysFilesFallback` in core-config.yaml
 3. If still not found, check for Portuguese equivalents
 4. If none exist, note the missing file in Dev Notes
 
 **Common Fallback Mappings:**
+
 ```yaml
 tech-stack.md → [technology-stack.md, pilha-tecnologica.md, stack.md]
 coding-standards.md → [code-standards.md, padroes-de-codigo.md, standards.md]
@@ -277,12 +282,14 @@ database-schema.md → [db-schema.md, esquema.md, schema.md]
 ```
 
 **For ALL Stories (try in fallback order):**
+
 - tech-stack.md
 - unified-project-structure.md (or project-structure.md, source-tree.md)
 - coding-standards.md
 - testing-strategy.md
 
 **For Backend/API Stories, additionally:**
+
 - data-models.md
 - database-schema.md
 - backend-architecture.md
@@ -290,6 +297,7 @@ database-schema.md → [db-schema.md, esquema.md, schema.md]
 - external-apis.md
 
 **For Frontend/UI Stories, additionally:**
+
 - frontend-architecture.md
 - components.md
 - core-workflows.md (or workflows.md, user-flows.md)
@@ -298,6 +306,7 @@ database-schema.md → [db-schema.md, esquema.md, schema.md]
 **For Full-Stack Stories:** Read both Backend and Frontend sections above
 
 **Important:** When a fallback file is used, note it in Dev Notes:
+
 ```
 [Note: Using fallback file 'pilha-tecnologica.md' instead of 'tech-stack.md']
 ```
@@ -347,7 +356,7 @@ ALWAYS cite source documents: `[Source: architecture/{filename}.md#{section}]`
 
 - **Step 2: Search for Epic in Backlog**
   - Use `get_workspace_tasks` with parameters:
-    - list_ids: [{backlog_list_id}]  # From Step 1
+    - list_ids: [{backlog_list_id}] # From Step 1
     - tags: ["epic-{epicNum}"]
     - status: ["Planning", "In Progress"]
 
@@ -359,7 +368,7 @@ ALWAYS cite source documents: `[Source: architecture/{filename}.md#{section}]`
     - List: Backlog (list_id: {backlog_list_id})
     - Tags: ['epic', 'epic-{epicNum}']
     - Status: Planning or In Progress
-    Then retry story creation."
+      Then retry story creation."
 
 - **If Epic found:**
   - Capture epic_task_id for parent relationship
@@ -379,11 +388,11 @@ ALWAYS cite source documents: `[Source: architecture/{filename}.md#{section}]`
 - Prepare ClickUp section structure (will be populated after ClickUp task creation):
   ```yaml
   clickup:
-    task_id: ""  # To be filled
-    epic_task_id: "{epic_task_id from 5.1}"
-    list: "Backlog"
-    url: ""  # To be filled
-    last_sync: ""  # To be filled
+    task_id: '' # To be filled
+    epic_task_id: '{epic_task_id from 5.1}'
+    list: 'Backlog'
+    url: '' # To be filled
+    last_sync: '' # To be filled
   ```
 
 #### 5.3 Create Story Task in ClickUp
@@ -393,36 +402,40 @@ ALWAYS cite source documents: `[Source: architecture/{filename}.md#{section}]`
 - **CRITICAL:** Use numeric list_id from Step 5.1, NOT a list name string
 
 **Task Creation Parameters:**
+
 ```yaml
-list_id: "{backlog_list_id}"  # MUST be numeric string from 5.1 (e.g., "901317181013")
-name: "Story {epicNum}.{storyNum}: {Story Title}"
-parent: "{epic_task_id}"  # Creates as subtask of Epic (from 5.1)
-markdown_description: "{entire story .md file content}"
+list_id: '{backlog_list_id}' # MUST be numeric string from 5.1 (e.g., "901317181013")
+name: 'Story {epicNum}.{storyNum}: {Story Title}'
+parent: '{epic_task_id}' # Creates as subtask of Epic (from 5.1)
+markdown_description: '{entire story .md file content}'
 tags:
-  - "story"
-  - "epic-{epicNum}"
-  - "story-{epicNum}.{storyNum}"
+  - 'story'
+  - 'epic-{epicNum}'
+  - 'story-{epicNum}.{storyNum}'
 custom_fields:
-  - id: "epic_number"
-    value: {epicNum}
-  - id: "story_number"
-    value: "{epicNum}.{storyNum}"
-  - id: "story_file_path"
-    value: "{devStoryLocation}/{epicNum}.{storyNum}.story.md"
-  - id: "story-status"
-    value: "Draft"
+  - id: 'epic_number'
+    value: { epicNum }
+  - id: 'story_number'
+    value: '{epicNum}.{storyNum}'
+  - id: 'story_file_path'
+    value: '{devStoryLocation}/{epicNum}.{storyNum}.story.md'
+  - id: 'story-status'
+    value: 'Draft'
 ```
 
 **Validation Notes:**
+
 - list_id MUST be numeric string (validated by /^\d+$/)
 - Using "Backlog" or other non-numeric values will fail validation
 - assignees (if provided) must be array, not object
 
 **Response Handling:**
+
 - **Capture:** story_task_id from response
 - **Log:** "✅ Story task created in ClickUp: {story_task_id}"
 
 **Error Handling:**
+
 - If create_task fails with validation error, display the exact error and parameters used
 - If API error occurs, log error but continue (local story still valid)
 - Warn user: "⚠️ Story created locally but ClickUp sync failed: {error_message}"
@@ -432,11 +445,11 @@ custom_fields:
 - Update the frontmatter YAML clickup section with captured values:
   ```yaml
   clickup:
-    task_id: "{story_task_id from 5.3}"
-    epic_task_id: "{epic_task_id from 5.1}"
-    list: "Backlog"
-    url: "https://app.clickup.com/t/{story_task_id}"
-    last_sync: "{current ISO 8601 timestamp}"
+    task_id: '{story_task_id from 5.3}'
+    epic_task_id: '{epic_task_id from 5.1}'
+    list: 'Backlog'
+    url: 'https://app.clickup.com/t/{story_task_id}'
+    last_sync: '{current ISO 8601 timestamp}'
   ```
 - Save story file with updated frontmatter
 - Log: "✅ Story task created in ClickUp: {story_task_id}"

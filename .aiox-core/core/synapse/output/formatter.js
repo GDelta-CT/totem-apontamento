@@ -42,7 +42,7 @@ const SECTION_ORDER = [
  */
 const LAYER_TO_SECTION = {
   constitution: 'CONSTITUTION',
-  global: 'CONTEXT_BRACKET',   // global rules go into bracket section
+  global: 'CONTEXT_BRACKET', // global rules go into bracket section
   agent: 'AGENT',
   workflow: 'WORKFLOW',
   task: 'TASK',
@@ -65,7 +65,9 @@ const LAYER_TO_SECTION = {
  * @returns {string}
  */
 function formatContextBracket(bracket, contextPercent, globalResults) {
-  const lines = [`[CONTEXT BRACKET]\nCONTEXT BRACKET: [${bracket}] (${contextPercent.toFixed(1)}% remaining)`];
+  const lines = [
+    `[CONTEXT BRACKET]\nCONTEXT BRACKET: [${bracket}] (${contextPercent.toFixed(1)}% remaining)`,
+  ];
 
   // Include global/context rules if present
   for (const result of globalResults) {
@@ -207,7 +209,9 @@ function formatKeyword(result) {
 
   if (meta.matches && Array.isArray(meta.matches)) {
     for (const match of meta.matches) {
-      lines.push(`  "${match.keyword}" matched ${match.domain} (${match.reason || 'keyword match'})`);
+      lines.push(
+        `  "${match.keyword}" matched ${match.domain} (${match.reason || 'keyword match'})`
+      );
     }
   }
 
@@ -259,9 +263,8 @@ function formatMemoryHints(result) {
 
   for (const hint of result.rules) {
     const source = hint.source || 'memory';
-    const relevance = typeof hint.relevance === 'number'
-      ? `${(hint.relevance * 100).toFixed(0)}%`
-      : '?%';
+    const relevance =
+      typeof hint.relevance === 'number' ? `${(hint.relevance * 100).toFixed(0)}%` : '?%';
     const content = hint.content || '';
     lines.push(`  [${source}] (relevance: ${relevance}) ${content}`);
   }
@@ -294,20 +297,20 @@ function formatDevmode(bracket, contextPercent, session, metrics, results) {
   ];
 
   // Layers loaded
-  const loaded = Object.entries(metrics.per_layer || {})
-    .filter(([, v]) => v.status === 'ok');
+  const loaded = Object.entries(metrics.per_layer || {}).filter(([, v]) => v.status === 'ok');
   if (loaded.length > 0) {
     lines.push('Layers Loaded:');
     for (const [name, info] of loaded) {
       const duration = info.duration != null ? `${info.duration}ms` : '?ms';
-      lines.push(`  [L${info.layer != null ? info.layer : '?'}] ${name.toUpperCase()}: ${info.rules || 0} rules (${duration})`);
+      lines.push(
+        `  [L${info.layer != null ? info.layer : '?'}] ${name.toUpperCase()}: ${info.rules || 0} rules (${duration})`
+      );
     }
     lines.push('');
   }
 
   // Layers skipped
-  const skipped = Object.entries(metrics.per_layer || {})
-    .filter(([, v]) => v.status === 'skipped');
+  const skipped = Object.entries(metrics.per_layer || {}).filter(([, v]) => v.status === 'skipped');
   if (skipped.length > 0) {
     lines.push('Layers Skipped:');
     for (const [name, info] of skipped) {
@@ -331,15 +334,19 @@ function formatDevmode(bracket, contextPercent, session, metrics, results) {
 
   // Pipeline metrics
   lines.push('Pipeline Metrics:');
-  lines.push(`  Total: ${metrics.total_ms}ms | Layers: ${metrics.layers_loaded}/${metrics.layers_loaded + metrics.layers_skipped + metrics.layers_errored} | Rules: ${metrics.total_rules}`);
+  lines.push(
+    `  Total: ${metrics.total_ms}ms | Layers: ${metrics.layers_loaded}/${metrics.layers_loaded + metrics.layers_skipped + metrics.layers_errored} | Rules: ${metrics.total_rules}`
+  );
 
   // Available domains (not loaded) — based on results metadata
-  const loadedDomains = new Set(results.map(r => (r.metadata && r.metadata.source) || '').filter(Boolean));
+  const loadedDomains = new Set(
+    results.map((r) => (r.metadata && r.metadata.source) || '').filter(Boolean)
+  );
   if (loadedDomains.size > 0) {
     lines.push('');
     lines.push('Loaded Domains:');
     for (const domain of loadedDomains) {
-      const result = results.find(r => r.metadata && r.metadata.source === domain);
+      const result = results.find((r) => r.metadata && r.metadata.source === domain);
       const ruleCount = result ? result.rules.length : 0;
       lines.push(`  [${domain.toUpperCase()}] (${ruleCount} rules)`);
     }
@@ -466,7 +473,16 @@ const SECTION_FORMATTERS = {
  * @param {boolean} showHandoffWarning - Whether to include handoff warning
  * @returns {string} Formatted <synapse-rules> XML string
  */
-function formatSynapseRules(results, bracket, contextPercent, session, devmode, metrics, tokenBudget, showHandoffWarning) {
+function formatSynapseRules(
+  results,
+  bracket,
+  contextPercent,
+  session,
+  devmode,
+  metrics,
+  tokenBudget,
+  showHandoffWarning
+) {
   if (!results || results.length === 0) {
     return '';
   }
@@ -528,7 +544,9 @@ function formatSynapseRules(results, bracket, contextPercent, session, devmode, 
 
   // Handoff warning (CRITICAL bracket)
   if (showHandoffWarning) {
-    sections.push('[HANDOFF WARNING]\n  Context is nearly exhausted. Consider starting a new session to preserve quality.');
+    sections.push(
+      '[HANDOFF WARNING]\n  Context is nearly exhausted. Consider starting a new session to preserve quality.'
+    );
     sectionIds.push('HANDOFF_WARNING');
   }
 

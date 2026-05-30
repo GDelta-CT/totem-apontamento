@@ -41,24 +41,81 @@ try {
   console.log('\nTest 3: Listing available exports by category...');
 
   const categories = {
-    'Git Integration': ['GitWrapper', 'GitConfigDetector', 'BranchManager', 'CommitMessageGenerator'],
-    'PM Integration': ['PMAdapter', 'getPMAdapter', 'isPMToolConfigured', 'clearPMAdapterCache', 'StatusMapper', 'ClickUpHelpers'],
-    'Template & Generation': ['TemplateEngine', 'ComponentGenerator', 'ComponentMetadata', 'ComponentSearch', 'BatchCreator'],
-    'Validation': ['AioxValidator', 'TemplateValidator', 'validateOutputPattern', 'SpotCheckValidator'],
-    'Analysis': ['DependencyAnalyzer', 'DependencyImpactAnalyzer', 'FrameworkAnalyzer', 'CapabilityAnalyzer', 'SecurityChecker', 'ModificationRiskAssessment'],
-    'Testing': ['CoverageAnalyzer', 'TestGenerator', 'TestUtilities', 'TestUtilitiesFast', 'TestQualityAssessment', 'SandboxTester'],
-    'Performance': ['PerformanceAnalyzer', 'PerformanceOptimizer', 'PerformanceTracker', 'PerformanceAndErrorResolver'],
-    'Quality': ['CodeQualityImprover', 'RefactoringSuggester', 'ImprovementEngine', 'ImprovementValidator', 'ModificationValidator'],
-    'Utilities': ['ConflictResolver', 'DocumentationSynchronizer', 'resolveTool', 'UsageAnalytics', 'loadProjectStatus', 'formatStatusDisplay', 'VisualImpactGenerator', 'AtomicLayerClassifier'],
-    'System': ['BackupManager', 'TransactionManager', 'RepositoryDetector', 'ApprovalWorkflow'],
-    'Config': ['ConfigCache', 'ConfigLoader', 'OutputFormatter', 'YamlValidator'],
+    'Git Integration': [
+      'GitWrapper',
+      'GitConfigDetector',
+      'BranchManager',
+      'CommitMessageGenerator',
+    ],
+    'PM Integration': [
+      'PMAdapter',
+      'getPMAdapter',
+      'isPMToolConfigured',
+      'clearPMAdapterCache',
+      'StatusMapper',
+      'ClickUpHelpers',
+    ],
+    'Template & Generation': [
+      'TemplateEngine',
+      'ComponentGenerator',
+      'ComponentMetadata',
+      'ComponentSearch',
+      'BatchCreator',
+    ],
+    Validation: [
+      'AioxValidator',
+      'TemplateValidator',
+      'validateOutputPattern',
+      'SpotCheckValidator',
+    ],
+    Analysis: [
+      'DependencyAnalyzer',
+      'DependencyImpactAnalyzer',
+      'FrameworkAnalyzer',
+      'CapabilityAnalyzer',
+      'SecurityChecker',
+      'ModificationRiskAssessment',
+    ],
+    Testing: [
+      'CoverageAnalyzer',
+      'TestGenerator',
+      'TestUtilities',
+      'TestUtilitiesFast',
+      'TestQualityAssessment',
+      'SandboxTester',
+    ],
+    Performance: [
+      'PerformanceAnalyzer',
+      'PerformanceOptimizer',
+      'PerformanceTracker',
+      'PerformanceAndErrorResolver',
+    ],
+    Quality: [
+      'CodeQualityImprover',
+      'RefactoringSuggester',
+      'ImprovementEngine',
+      'ImprovementValidator',
+      'ModificationValidator',
+    ],
+    Utilities: [
+      'ConflictResolver',
+      'DocumentationSynchronizer',
+      'resolveTool',
+      'UsageAnalytics',
+      'loadProjectStatus',
+      'formatStatusDisplay',
+      'VisualImpactGenerator',
+      'AtomicLayerClassifier',
+    ],
+    System: ['BackupManager', 'TransactionManager', 'RepositoryDetector', 'ApprovalWorkflow'],
+    Config: ['ConfigCache', 'ConfigLoader', 'OutputFormatter', 'YamlValidator'],
   };
 
   let totalAvailable = 0;
   let totalExpected = 0;
 
   for (const [category, exports] of Object.entries(categories)) {
-    const available = exports.filter(e => infra[e]);
+    const available = exports.filter((e) => infra[e]);
     totalAvailable += available.length;
     totalExpected += exports.length;
     console.log(`  ${category}: ${available.length}/${exports.length} available`);
@@ -87,7 +144,6 @@ try {
     console.log('========================================\n');
     process.exit(0); // Still exit 0 - module structure is correct
   }
-
 } catch (error) {
   console.error('\n❌ Validation failed:', error.message);
   if (error.stack) {

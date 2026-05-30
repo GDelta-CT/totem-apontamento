@@ -30,7 +30,9 @@ function createListCommand() {
     .option('-l, --limit <n>', 'Items per page', '20')
     .option('--count', 'Show count summary only')
     .option('-v, --verbose', 'Show verbose/debug output')
-    .addHelpText('after', `
+    .addHelpText(
+      'after',
+      `
 Examples:
   $ aiox workers list
   $ aiox workers list --category=task
@@ -53,7 +55,8 @@ Categories:
   checklist  Quality validation checklists
   workflow   Multi-step workflow definitions
   data       Knowledge base and configuration data
-`)
+`
+    )
     .action(executeList);
 
   return list;
@@ -95,7 +98,7 @@ async function executeList(options) {
         if (!categories[options.category.toLowerCase()]) {
           console.error(`Error: Category '${options.category}' not found.`);
           console.log('\nAvailable categories:');
-          Object.keys(categories).forEach(cat => {
+          Object.keys(categories).forEach((cat) => {
             console.log(`  - ${cat} (${categories[cat].count} workers)`);
           });
           process.exit(1);
@@ -147,7 +150,6 @@ async function executeList(options) {
     }
 
     logPerformance(startTime, options.verbose);
-
   } catch (error) {
     console.error(`Error: ${error.message}`);
     if (options.verbose) {

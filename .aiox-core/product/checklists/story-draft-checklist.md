@@ -115,6 +115,7 @@ Note: We don't need every file listed - just the important ones.]]
 [[LLM: CONDITIONAL SECTION - Check `coderabbit_integration.enabled` in `.aiox-core/core-config.yaml`
 
 **IF `coderabbit_integration.enabled: false`:**
+
 - SKIP this entire section (6)
 - Verify the story contains the skip notice:
   > **CodeRabbit Integration**: Disabled
@@ -122,6 +123,7 @@ Note: We don't need every file listed - just the important ones.]]
 - Log: "ℹ️ CodeRabbit validation skipped - disabled in core-config.yaml"
 
 **IF `coderabbit_integration.enabled: true`:**
+
 - Validate ALL items below
 - Story must have complete CodeRabbit section including Story 6.3.3 Self-Healing
 
@@ -135,15 +137,18 @@ CodeRabbit integration ensures automated code review and quality gates. Verify:
 6. Focus areas match the story type]]
 
 **Section Presence:**
+
 - [ ] 🤖 CodeRabbit Integration section exists
 - [ ] All subsections are populated (Story Type Analysis, Specialized Agents, Quality Gates, Self-Healing, Focus Areas)
 
 **Story Type Analysis:**
+
 - [ ] Primary story type is correctly identified
 - [ ] Complexity level matches story scope
 - [ ] Secondary types listed if applicable
 
 **Specialized Agent Assignment:**
+
 - [ ] @dev listed as primary agent (required for all stories)
 - [ ] Type-specific agents assigned appropriately:
   - Database stories → @db-sage
@@ -152,11 +157,13 @@ CodeRabbit integration ensures automated code review and quality gates. Verify:
   - Security stories → @architect
 
 **Quality Gate Tasks:**
+
 - [ ] Pre-Commit (@dev) defined - REQUIRED for all stories
 - [ ] Pre-PR (@github-devops) defined if PR will be created
 - [ ] Pre-Deployment (@github-devops) defined for production stories
 
 **Self-Healing Configuration (Story 6.3.3):**
+
 - [ ] Self-healing configuration section is present
 - [ ] Mode matches primary agent:
   - @dev: light mode (2 iterations, 15 min, CRITICAL only)
@@ -165,6 +172,7 @@ CodeRabbit integration ensures automated code review and quality gates. Verify:
 - [ ] Severity behavior is documented
 
 **Focus Areas:**
+
 - [ ] Focus areas match the story type
 - [ ] Type-specific validations are listed
 
@@ -175,19 +183,16 @@ CodeRabbit integration ensures automated code review and quality gates. Verify:
 Generate a concise validation report:
 
 1. Quick Summary
-
    - Story readiness: READY / NEEDS REVISION / BLOCKED
    - Clarity score (1-10)
    - Major gaps identified
 
 2. Fill in the validation table with:
-
    - PASS: Requirements clearly met
    - PARTIAL: Some gaps but workable
    - FAIL: Critical information missing
 
 3. Specific Issues (if any)
-
    - List concrete problems to fix
    - Suggest specific improvements
    - Identify any blocking dependencies
@@ -199,13 +204,13 @@ Generate a concise validation report:
 
 Be pragmatic - perfect documentation doesn't exist, but it must be enough to provide the extreme context a dev agent needs to get the work down and not create a mess.]]
 
-| Category                             | Status | Issues |
-| ------------------------------------ | ------ | ------ |
-| 1. Goal & Context Clarity            | _TBD_  |        |
-| 2. Technical Implementation Guidance | _TBD_  |        |
-| 3. Reference Effectiveness           | _TBD_  |        |
-| 4. Self-Containment Assessment       | _TBD_  |        |
-| 5. Testing Guidance                  | _TBD_  |        |
+| Category                                | Status       | Issues |
+| --------------------------------------- | ------------ | ------ |
+| 1. Goal & Context Clarity               | _TBD_        |        |
+| 2. Technical Implementation Guidance    | _TBD_        |        |
+| 3. Reference Effectiveness              | _TBD_        |        |
+| 4. Self-Containment Assessment          | _TBD_        |        |
+| 5. Testing Guidance                     | _TBD_        |        |
 | 6. CodeRabbit Integration (conditional) | _TBD_ or N/A |        |
 
 **Final Assessment:**
@@ -213,4 +218,3 @@ Be pragmatic - perfect documentation doesn't exist, but it must be enough to pro
 - READY: The story provides sufficient context for implementation
 - NEEDS REVISION: The story requires updates (see issues)
 - BLOCKED: External information required (specify what information)
- 

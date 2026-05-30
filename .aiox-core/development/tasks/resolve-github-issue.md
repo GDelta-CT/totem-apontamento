@@ -11,16 +11,19 @@
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Investigate, fix, test, commit, push, close — minimal prompts
 - Decisions logged but not confirmed
 - **Best for:** Quick fixes (XS/S effort), well-defined bugs, chore tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Checkpoints at investigation, plan, implementation, and push
 - User confirms approach before major changes
 - **Best for:** Most issues, medium complexity
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Full investigation + research + detailed plan BEFORE any code
 - User approves plan, then autonomous execution
 - **Best for:** Complex issues, multi-file changes, unknown root cause
@@ -163,6 +166,7 @@ steps:
 **Checkpoint (Interactive/Pre-Flight modes):**
 
 Present investigation summary to user:
+
 ```
 Investigation Summary for Issue #{number}:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -244,7 +248,7 @@ steps:
       - No `any` in TypeScript
       - kebab-case files, PascalCase components
       - Conventional Commits for commit message
-      - Reference issue number in commit: "fix(scope): description (#N)"
+      - Reference issue number in commit: 'fix(scope): description (#N)'
 
   2_parallel_execution:
     condition: Multiple independent changes can be made simultaneously
@@ -351,7 +355,7 @@ steps:
 
   3_push:
     command: git push origin {branch}
-    authority: "@devops EXCLUSIVE — only this agent pushes to remote"
+    authority: '@devops EXCLUSIVE — only this agent pushes to remote'
     on_failure: |
       Check if branch has upstream: git push -u origin {branch}
       Check for conflicts: git pull --rebase origin {branch}
@@ -485,12 +489,12 @@ acceptance-criteria:
 ```yaml
 dependencies:
   tasks:
-    - triage-github-issues.md        # Upstream: triage feeds into resolve
-    - github-devops-pre-push-quality-gate.md  # Optional: full quality gate before push
+    - triage-github-issues.md # Upstream: triage feeds into resolve
+    - github-devops-pre-push-quality-gate.md # Optional: full quality gate before push
   checklists: []
   templates: []
   skills:
-    - tech-search                     # For deep research when needed
+    - tech-search # For deep research when needed
   tools:
     - gh (GitHub CLI)
     - git
@@ -581,20 +585,24 @@ related_tasks:
 These patterns were identified from real issue resolution sessions and should guide execution:
 
 ### Issue #159 (Bulk Rename) — Parallel + Edge Cases
+
 - **Pattern:** 5 parallel agents for 136 files, split by directory
 - **Pitfall:** `@synkra/aiox-core` inside email `security@synkra/aiox-core.dev` was corrupted
 - **Lesson:** Always Grep for edge cases AFTER bulk replacements
 
 ### Issue #138 (Copilot Format) — Research-First
+
 - **Pattern:** /tech-search before implementation, 6-phase plan from research
 - **Pitfall:** YAML parsed `CRITICAL: value` as `{CRITICAL: value}` object instead of string
 - **Lesson:** Handle both string and object formats when processing YAML arrays
 
 ### Issue #174 (Package Name) — Quick Win
+
 - **Pattern:** Small, focused fix in 1 file, immediate validation
 - **Lesson:** Quick wins should still follow full validate → commit → push → close cycle
 
 ### Email Removal — User Feedback Mid-Session
+
 - **Pattern:** User noticed non-existent emails during issue resolution
 - **Lesson:** Be responsive to user feedback even when working on a different issue
 

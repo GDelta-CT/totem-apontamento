@@ -52,21 +52,39 @@ const WORKFLOW_META = {
 const mcp = globalThis.mcp || {
   // Filesystem operations
   fs: {
-    readFile: async (path) => { /* implementation provided by runtime */ },
-    writeFile: async (path, content) => { /* implementation provided by runtime */ },
-    listDirectory: async (path) => { /* implementation provided by runtime */ },
-    exists: async (path) => { /* implementation provided by runtime */ },
+    readFile: async (path) => {
+      /* implementation provided by runtime */
+    },
+    writeFile: async (path, content) => {
+      /* implementation provided by runtime */
+    },
+    listDirectory: async (path) => {
+      /* implementation provided by runtime */
+    },
+    exists: async (path) => {
+      /* implementation provided by runtime */
+    },
   },
   // HTTP fetch operations
   fetch: {
-    get: async (url, options) => { /* implementation provided by runtime */ },
-    post: async (url, body, options) => { /* implementation provided by runtime */ },
+    get: async (url, options) => {
+      /* implementation provided by runtime */
+    },
+    post: async (url, body, options) => {
+      /* implementation provided by runtime */
+    },
   },
   // GitHub operations (if enabled)
   github: {
-    getRepo: async (owner, repo) => { /* implementation provided by runtime */ },
-    createIssue: async (owner, repo, title, body) => { /* implementation provided by runtime */ },
-    listPRs: async (owner, repo, state) => { /* implementation provided by runtime */ },
+    getRepo: async (owner, repo) => {
+      /* implementation provided by runtime */
+    },
+    createIssue: async (owner, repo, title, body) => {
+      /* implementation provided by runtime */
+    },
+    listPRs: async (owner, repo, state) => {
+      /* implementation provided by runtime */
+    },
   },
 };
 
@@ -214,7 +232,6 @@ async function runWorkflow(params) {
       },
       tokensUsed: 0, // Processing was in sandbox
     };
-
   } catch (error) {
     return {
       success: false,

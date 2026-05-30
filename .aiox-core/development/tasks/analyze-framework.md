@@ -1,6 +1,7 @@
 # Task: Analyze Framework
 
 ## Description
+
 Performs comprehensive analysis of the Synkra AIOX framework to identify improvement opportunities, performance bottlenecks, component redundancies, and usage patterns.
 
 ## Execution Modes
@@ -8,16 +9,19 @@ Performs comprehensive analysis of the Synkra AIOX framework to identify improve
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -185,6 +189,7 @@ token_usage: ~2,000-8,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Iterative analysis with depth limits; cache intermediate results; batch similar operations
 
 ---
@@ -204,19 +209,22 @@ updated_at: 2025-11-17
 
 ---
 
-
 ## Type
+
 Analysis Task
 
 ## Complexity
+
 High
 
 ## Categories
+
 - framework-analysis
 - performance-optimization
 - code-quality
 
 ## Dependencies
+
 - component-search.js (for component discovery)
 - usage-analytics.js (for usage pattern analysis)
 - performance-analyzer.js (for bottleneck detection)
@@ -224,6 +232,7 @@ High
 - improvement-engine.js (for suggestion generation)
 
 ## Parameters
+
 - `scope` (string, optional): Analysis scope - 'full', 'agents', 'tasks', 'workflows', 'utils' (default: 'full')
 - `output_format` (string, optional): Output format - 'detailed', 'summary', 'json' (default: 'detailed')
 - `include_metrics` (boolean, optional): Include performance metrics (default: true)
@@ -245,14 +254,14 @@ const chalk = require('chalk');
 module.exports = {
   name: 'analyze-framework',
   description: 'Performs comprehensive framework analysis with improvement recommendations',
-  
+
   async execute(params) {
     const {
       scope = 'full',
       output_format = 'detailed',
       include_metrics = true,
       include_suggestions = true,
-      save_report = true
+      save_report = true,
     } = params;
 
     console.log(chalk.blue('🔍 Starting framework analysis...'));
@@ -268,7 +277,7 @@ module.exports = {
       performance_analysis: {},
       redundancy_analysis: {},
       improvement_suggestions: [],
-      summary: {}
+      summary: {},
     };
 
     try {
@@ -282,7 +291,7 @@ module.exports = {
       // Step 1: Discover and catalog framework components
       console.log(chalk.blue('📊 Discovering framework components...'));
       analysis.framework_info = await frameworkAnalyzer.analyzeFrameworkStructure(scope);
-      
+
       console.log(chalk.gray(`   Found: ${analysis.framework_info.total_components} components`));
       console.log(chalk.gray(`   Agents: ${analysis.framework_info.agents?.length || 0}`));
       console.log(chalk.gray(`   Tasks: ${analysis.framework_info.tasks?.length || 0}`));
@@ -315,7 +324,7 @@ module.exports = {
         analysis.improvement_suggestions = await improvementEngine.generateSuggestions({
           components: analysis.framework_info.components,
           usage: analysis.usage_analytics,
-          performance: analysis.performance_analysis
+          performance: analysis.performance_analysis,
           // redundancy: analysis.redundancy_analysis // Archived - Story 3.1.4
         });
       }
@@ -333,22 +342,21 @@ module.exports = {
       }
 
       console.log(chalk.green('✅ Framework analysis completed'));
-      
+
       return {
         success: true,
         analysis,
         suggestions_count: analysis.improvement_suggestions.length,
         critical_issues: analysis.summary.critical_issues || 0,
-        performance_score: analysis.summary.performance_score || 'N/A'
+        performance_score: analysis.summary.performance_score || 'N/A',
       };
-
     } catch (error) {
       console.error(chalk.red(`Framework analysis failed: ${error.message}`));
-      
+
       return {
         success: false,
         error: error.message,
-        partial_analysis: analysis
+        partial_analysis: analysis,
       };
     }
   },
@@ -367,12 +375,12 @@ module.exports = {
       redundancy_level: 'low',
       usage_efficiency: 0,
       top_concerns: [],
-      strengths: []
+      strengths: [],
     };
 
     // Calculate health score
     let healthPoints = 100;
-    
+
     if (analysis.redundancy_analysis.redundant_components) {
       const redundancyPenalty = analysis.redundancy_analysis.redundant_components.length * 5;
       healthPoints -= redundancyPenalty;
@@ -413,11 +421,11 @@ module.exports = {
     if (analysis.performance_analysis.bottlenecks?.length > 0) {
       summary.top_concerns.push('Performance bottlenecks detected');
     }
-    
+
     if (analysis.redundancy_analysis.redundant_components?.length > 0) {
       summary.top_concerns.push('Code redundancy found');
     }
-    
+
     if (analysis.usage_analytics.unused_components?.length > 0) {
       summary.top_concerns.push('Unused components detected');
     }
@@ -426,11 +434,11 @@ module.exports = {
     if (summary.health_score >= 90) {
       summary.strengths.push('Overall framework health excellent');
     }
-    
+
     if (summary.performance_score >= 8) {
       summary.strengths.push('Good performance characteristics');
     }
-    
+
     if (summary.usage_efficiency >= 85) {
       summary.strengths.push('High component utilization');
     }
@@ -461,31 +469,31 @@ module.exports = {
    */
   displaySummary(analysis) {
     const { summary } = analysis;
-    
+
     console.log(chalk.bold('\n📊 Framework Analysis Summary'));
     console.log(chalk.gray('─'.repeat(50)));
-    
+
     // Health score with color coding
-    const healthColor = summary.health_score >= 80 ? 'green' : 
-                       summary.health_score >= 60 ? 'yellow' : 'red';
+    const healthColor =
+      summary.health_score >= 80 ? 'green' : summary.health_score >= 60 ? 'yellow' : 'red';
     console.log(`Health Score: ${chalk[healthColor](summary.health_score + '/100')}`);
-    
+
     console.log(`Components: ${summary.total_components}`);
     console.log(`Critical Issues: ${chalk.red(summary.critical_issues)}`);
     console.log(`Warnings: ${chalk.yellow(summary.warnings)}`);
     console.log(`Recommendations: ${chalk.blue(summary.recommendations)}`);
-    
+
     if (summary.performance_score !== 'N/A') {
       console.log(`Performance: ${chalk.cyan(summary.performance_score + '/10')}`);
     }
-    
+
     console.log(`Usage Efficiency: ${chalk.cyan(summary.usage_efficiency + '%')}`);
     console.log(`Redundancy Level: ${chalk.magenta(summary.redundancy_level)}`);
 
     // Top concerns
     if (summary.top_concerns.length > 0) {
       console.log('\n🚨 Top Concerns:');
-      summary.top_concerns.forEach(concern => {
+      summary.top_concerns.forEach((concern) => {
         console.log(`  • ${chalk.red(concern)}`);
       });
     }
@@ -493,7 +501,7 @@ module.exports = {
     // Strengths
     if (summary.strengths.length > 0) {
       console.log('\n✅ Strengths:');
-      summary.strengths.forEach(strength => {
+      summary.strengths.forEach((strength) => {
         console.log(`  • ${chalk.green(strength)}`);
       });
     }
@@ -504,14 +512,14 @@ module.exports = {
    */
   displayDetailed(analysis) {
     this.displaySummary(analysis);
-    
+
     // Component breakdown
     console.log(chalk.bold('\n📋 Component Analysis'));
     console.log(chalk.gray('─'.repeat(50)));
-    
+
     if (analysis.framework_info.agents) {
       console.log(`Agents (${analysis.framework_info.agents.length}):`);
-      analysis.framework_info.agents.slice(0, 5).forEach(agent => {
+      analysis.framework_info.agents.slice(0, 5).forEach((agent) => {
         console.log(`  • ${chalk.cyan(agent.name)} - ${agent.description || 'No description'}`);
       });
       if (analysis.framework_info.agents.length > 5) {
@@ -523,10 +531,12 @@ module.exports = {
     if (analysis.performance_analysis.bottlenecks?.length > 0) {
       console.log(chalk.bold('\n⚡ Performance Bottlenecks'));
       console.log(chalk.gray('─'.repeat(50)));
-      
-      analysis.performance_analysis.bottlenecks.slice(0, 3).forEach(bottleneck => {
+
+      analysis.performance_analysis.bottlenecks.slice(0, 3).forEach((bottleneck) => {
         console.log(`  • ${chalk.red(bottleneck.component)}: ${bottleneck.issue}`);
-        console.log(`    Impact: ${chalk.yellow(bottleneck.impact)} | Effort: ${bottleneck.effort}`);
+        console.log(
+          `    Impact: ${chalk.yellow(bottleneck.impact)} | Effort: ${bottleneck.effort}`
+        );
       });
     }
 
@@ -534,10 +544,12 @@ module.exports = {
     if (analysis.redundancy_analysis.redundant_components?.length > 0) {
       console.log(chalk.bold('\n🔄 Redundant Components'));
       console.log(chalk.gray('─'.repeat(50)));
-      
-      analysis.redundancy_analysis.redundant_components.slice(0, 3).forEach(redundancy => {
+
+      analysis.redundancy_analysis.redundant_components.slice(0, 3).forEach((redundancy) => {
         console.log(`  • ${chalk.red(redundancy.component1)} ↔️ ${redundancy.component2}`);
-        console.log(`    Similarity: ${chalk.yellow(redundancy.similarity + '%')} | Type: ${redundancy.type}`);
+        console.log(
+          `    Similarity: ${chalk.yellow(redundancy.similarity + '%')} | Type: ${redundancy.type}`
+        );
       });
     }
 
@@ -545,16 +557,22 @@ module.exports = {
     if (analysis.improvement_suggestions.length > 0) {
       console.log(chalk.bold('\n💡 Top Improvement Suggestions'));
       console.log(chalk.gray('─'.repeat(50)));
-      
+
       analysis.improvement_suggestions
         .sort((a, b) => (b.priority_score || 0) - (a.priority_score || 0))
         .slice(0, 5)
         .forEach((suggestion, index) => {
-          const priorityColor = suggestion.priority === 'high' ? 'red' : 
-                               suggestion.priority === 'medium' ? 'yellow' : 'gray';
+          const priorityColor =
+            suggestion.priority === 'high'
+              ? 'red'
+              : suggestion.priority === 'medium'
+                ? 'yellow'
+                : 'gray';
           console.log(`  ${index + 1}. ${chalk[priorityColor](suggestion.title)}`);
           console.log(`     ${suggestion.description}`);
-          console.log(`     Impact: ${chalk.cyan(suggestion.impact)} | Effort: ${suggestion.effort}`);
+          console.log(
+            `     Impact: ${chalk.cyan(suggestion.impact)} | Effort: ${suggestion.effort}`
+          );
         });
     }
   },
@@ -565,17 +583,17 @@ module.exports = {
   async saveReport(analysis) {
     const reportsDir = path.join(process.cwd(), '.aiox', 'reports');
     await fs.mkdir(reportsDir, { recursive: true });
-    
+
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const reportPath = path.join(reportsDir, `framework-analysis-${timestamp}.json`);
-    
+
     await fs.writeFile(reportPath, JSON.stringify(analysis, null, 2));
-    
+
     // Also save a human-readable summary
     const summaryPath = path.join(reportsDir, `framework-analysis-summary-${timestamp}.md`);
     const summaryContent = this.generateMarkdownSummary(analysis);
     await fs.writeFile(summaryPath, summaryContent);
-    
+
     return reportPath;
   },
 
@@ -584,7 +602,7 @@ module.exports = {
    */
   generateMarkdownSummary(analysis) {
     const { summary } = analysis;
-    
+
     return `# Framework Analysis Report
 
 **Generated:** ${new Date(analysis.timestamp).toLocaleString()}
@@ -603,11 +621,11 @@ module.exports = {
 
 ## Top Concerns
 
-${summary.top_concerns.map(concern => `- ${concern}`).join('\n') || 'None identified'}
+${summary.top_concerns.map((concern) => `- ${concern}`).join('\n') || 'None identified'}
 
 ## Strengths
 
-${summary.strengths.map(strength => `- ${strength}`).join('\n') || 'None identified'}
+${summary.strengths.map((strength) => `- ${strength}`).join('\n') || 'None identified'}
 
 ## Key Metrics
 
@@ -618,53 +636,71 @@ ${summary.strengths.map(strength => `- ${strength}`).join('\n') || 'None identif
 - Utils: ${analysis.framework_info.utils?.length || 0}
 
 ### Performance Analysis
-${analysis.performance_analysis.bottlenecks?.length > 0 ? 
-  `**Bottlenecks Found:** ${analysis.performance_analysis.bottlenecks.length}\n\n` +
-  analysis.performance_analysis.bottlenecks.slice(0, 3).map(b => 
-    `- **${b.component}:** ${b.issue} (Impact: ${b.impact})`
-  ).join('\n') : 'No significant bottlenecks detected'}
+${
+  analysis.performance_analysis.bottlenecks?.length > 0
+    ? `**Bottlenecks Found:** ${analysis.performance_analysis.bottlenecks.length}\n\n` +
+      analysis.performance_analysis.bottlenecks
+        .slice(0, 3)
+        .map((b) => `- **${b.component}:** ${b.issue} (Impact: ${b.impact})`)
+        .join('\n')
+    : 'No significant bottlenecks detected'
+}
 
 ### Redundancy Analysis
-${analysis.redundancy_analysis.redundant_components?.length > 0 ?
-  `**Redundant Components:** ${analysis.redundancy_analysis.redundant_components.length}\n\n` +
-  analysis.redundancy_analysis.redundant_components.slice(0, 3).map(r =>
-    `- **${r.component1}** ↔️ **${r.component2}** (${r.similarity}% similar)`
-  ).join('\n') : 'No significant redundancy detected'}
+${
+  analysis.redundancy_analysis.redundant_components?.length > 0
+    ? `**Redundant Components:** ${analysis.redundancy_analysis.redundant_components.length}\n\n` +
+      analysis.redundancy_analysis.redundant_components
+        .slice(0, 3)
+        .map((r) => `- **${r.component1}** ↔️ **${r.component2}** (${r.similarity}% similar)`)
+        .join('\n')
+    : 'No significant redundancy detected'
+}
 
 ## Top Improvement Suggestions
 
-${analysis.improvement_suggestions.slice(0, 5).map((suggestion, index) => 
-  `${index + 1}. **${suggestion.title}** (${suggestion.priority})
+${
+  analysis.improvement_suggestions
+    .slice(0, 5)
+    .map(
+      (suggestion, index) =>
+        `${index + 1}. **${suggestion.title}** (${suggestion.priority})
    - ${suggestion.description}
    - Impact: ${suggestion.impact} | Effort: ${suggestion.effort}`
-).join('\n\n') || 'No suggestions generated'}
+    )
+    .join('\n\n') || 'No suggestions generated'
+}
 
 ---
 *Report generated by AIOX Framework Analyzer*
 `;
-  }
+  },
 };
 ```
 
 ## Usage Examples
 
 ### Basic Analysis
+
 ```bash
 *analyze-framework
 ```
 
 ### Scope-specific Analysis
+
 ```bash
 *analyze-framework scope=agents
 *analyze-framework scope=utils include_suggestions=false
 ```
 
 ### Summary Output
+
 ```bash
 *analyze-framework output_format=summary
 ```
 
 ### Performance-focused Analysis
+
 ```bash
 *analyze-framework include_metrics=true output_format=detailed
 ```
@@ -691,7 +727,8 @@ The analysis provides:
 ## Integration
 
 Works seamlessly with:
+
 - `*improve-self` command for implementing suggestions
 - Memory layer for storing analysis history
 - Version control for tracking improvements
-- Component modification tools for applying changes 
+- Component modification tools for applying changes

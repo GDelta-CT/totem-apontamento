@@ -44,10 +44,7 @@
         "dev_debug_log": { "type": "string" },
         "slash_prefix": { "type": "string", "description": "Prefix for slash commands in IDEs" },
         "custom_technical_documents": {
-          "oneOf": [
-            { "type": "array", "items": { "type": "string" } },
-            { "type": "null" }
-          ]
+          "oneOf": [{ "type": "array", "items": { "type": "string" } }, { "type": "null" }]
         },
         "dev_load_always_files": {
           "type": "array",
@@ -322,10 +319,7 @@
           "type": "object",
           "properties": {
             "sections_order": {
-              "oneOf": [
-                { "type": "array", "items": { "type": "string" } },
-                { "type": "null" }
-              ],
+              "oneOf": [{ "type": "array", "items": { "type": "string" } }, { "type": "null" }],
               "description": "Custom section order for story templates. null = use template default."
             },
             "optional_sections": {

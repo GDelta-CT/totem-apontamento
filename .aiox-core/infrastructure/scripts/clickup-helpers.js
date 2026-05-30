@@ -88,7 +88,9 @@ async function updateEpicStatus(epicTaskId, newStatus) {
     // Validate Epic status (must be one of the three valid values)
     const validStatuses = ['Planning', 'In Progress', 'Done'];
     if (!validStatuses.includes(newStatus)) {
-      throw new Error(`Invalid Epic status: ${newStatus}. Must be one of: ${validStatuses.join(', ')}`);
+      throw new Error(
+        `Invalid Epic status: ${newStatus}. Must be one of: ${validStatuses.join(', ')}`
+      );
     }
 
     console.log(`Updating Epic ${epicTaskId} status to: ${newStatus}`);
@@ -98,7 +100,7 @@ async function updateEpicStatus(epicTaskId, newStatus) {
 
     await tool.updateTask({
       taskId: epicTaskId,
-      status: newStatus,  // Native field for Epics
+      status: newStatus, // Native field for Epics
     });
 
     console.log('✅ Epic status updated successfully');
@@ -183,23 +185,30 @@ async function verifyEpicExists(epicNum) {
     });
 
     if (!result || !result.tasks || result.tasks.length === 0) {
-      throw new Error(`Epic ${epicNum} not found in ClickUp Backlog list. Please create Epic task with tags: ['epic', 'epic-${epicNum}'] and status: Planning or In Progress`);
+      throw new Error(
+        `Epic ${epicNum} not found in ClickUp Backlog list. Please create Epic task with tags: ['epic', 'epic-${epicNum}'] and status: Planning or In Progress`
+      );
     }
 
     // Filter for Epics (should have 'epic' tag and valid status)
-    const epics = result.tasks.filter(task =>
-      task.tags &&
-      task.tags.includes('epic') &&
-      task.tags.includes(`epic-${epicNum}`) &&
-      ['Planning', 'In Progress'].includes(task.status),
+    const epics = result.tasks.filter(
+      (task) =>
+        task.tags &&
+        task.tags.includes('epic') &&
+        task.tags.includes(`epic-${epicNum}`) &&
+        ['Planning', 'In Progress'].includes(task.status)
     );
 
     if (epics.length === 0) {
-      throw new Error(`Epic ${epicNum} found but has invalid status. Status must be 'Planning' or 'In Progress'.`);
+      throw new Error(
+        `Epic ${epicNum} found but has invalid status. Status must be 'Planning' or 'In Progress'.`
+      );
     }
 
     if (epics.length > 1) {
-      console.warn(`⚠️ Multiple Epics found with epic-${epicNum} tag. Using first one: ${epics[0].id}`);
+      console.warn(
+        `⚠️ Multiple Epics found with epic-${epicNum} tag. Using first one: ${epics[0].id}`
+      );
     }
 
     const epic = epics[0];
@@ -210,7 +219,6 @@ async function verifyEpicExists(epicNum) {
       epicTaskId: epic.id,
       epic: epic,
     };
-
   } catch (error) {
     console.error(`Error verifying Epic ${epicNum}:`, error);
     throw error;

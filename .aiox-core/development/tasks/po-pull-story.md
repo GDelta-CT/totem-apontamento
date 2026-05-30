@@ -1,6 +1,6 @@
 ---
 tools:
-  - pm-tool  # Uses configured PM tool (ClickUp, GitHub, Jira, or local-only)
+  - pm-tool # Uses configured PM tool (ClickUp, GitHub, Jira, or local-only)
 ---
 
 # pull-story
@@ -8,6 +8,7 @@ tools:
 **Purpose:** Pull story updates from the configured PM tool to check for external changes.
 
 **When to Use:**
+
 - To check if story status changed in PM tool
 - Before starting work on a story (ensure you have latest state)
 - To detect if someone else updated the story in PM tool
@@ -17,16 +18,19 @@ tools:
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -194,6 +198,7 @@ token_usage: ~3,000-10,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Break into smaller workflows; implement checkpointing; use async processing where possible
 
 ---
@@ -212,7 +217,6 @@ updated_at: 2025-11-17
 ```
 
 ---
-
 
 ## Task Inputs
 

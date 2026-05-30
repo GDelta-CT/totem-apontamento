@@ -198,6 +198,7 @@ token_usage: ~800-2,500 tokens
 ```
 
 **Optimization Notes:**
+
 - Validate configuration early; use atomic writes; implement rollback checkpoints
 
 ---
@@ -218,7 +219,9 @@ updated_at: 2025-11-17
 ---
 
 checklists:
-  - change-checklist.md
+
+- change-checklist.md
+
 ---
 
 # Modify Task Task
@@ -250,6 +253,7 @@ To safely modify existing task definitions while maintaining their effectiveness
 ### 2. Usage Impact Analysis
 
 Before modifying, analyze where task is used:
+
 - Search all agents for task dependencies
 - Check workflows that reference the task
 - Identify any tasks that chain into this task
@@ -258,12 +262,14 @@ Before modifying, analyze where task is used:
 ### 3. Modification Intent Processing
 
 If user provides high-level intent (e.g., "add validation step"):
+
 - Analyze current task flow
 - Determine optimal insertion points
 - Ensure modifications maintain task coherence
 - Preserve existing functionality
 
 If user provides specific changes:
+
 - Validate changes don't break task flow
 - Ensure elicitation blocks remain valid
 - Check output format compatibility
@@ -272,6 +278,7 @@ If user provides specific changes:
 ### 4. Elicitation Flow Preservation
 
 For tasks with `elicit: true`:
+
 - Maintain `[[LLM:` instruction blocks
 - Preserve user interaction points
 - Ensure prompts remain clear and actionable
@@ -280,6 +287,7 @@ For tasks with `elicit: true`:
 ### 5. Generate Modification Diff
 
 Create a visual diff showing:
+
 ```diff
 @@ Task: {task-name} @@
 --- Current Version
@@ -293,10 +301,10 @@ Create a visual diff showing:
   ### Step 1: Initial Setup
   - Existing step content
 + - New validation substep
-  
+
   ### Step 2: Processing
   [Content remains unchanged]
-  
+
 + ### Step 3: New Validation Step
 + - Validate inputs against schema
 + - Check for security concerns
@@ -316,6 +324,7 @@ Create a visual diff showing:
 ### 6. Validation Pipeline
 
 Run comprehensive validation:
+
 - Markdown syntax validation
 - Task flow logical consistency
 - Elicitation block format checking
@@ -326,6 +335,7 @@ Run comprehensive validation:
 ### 7. Backward Compatibility Check
 
 Ensure modifications maintain compatibility:
+
 - Existing inputs still accepted
 - Output format additions are optional
 - Task can be called with old parameters
@@ -334,6 +344,7 @@ Ensure modifications maintain compatibility:
 ### 8. User Approval Flow
 
 Present to user:
+
 1. Summary of changes
 2. Visual diff
 3. Impact analysis:
@@ -347,6 +358,7 @@ Request explicit approval before applying changes.
 ### 9. Apply Modifications
 
 Upon approval:
+
 1. Write modified content to task file
 2. Update task metadata if needed
 3. Create git commit with descriptive message
@@ -356,6 +368,7 @@ Upon approval:
 ### 10. Post-Modification Testing
 
 Create test scenarios:
+
 ```javascript
 // Test basic functionality
 const result = await executeTask('modified-task', originalParams);
@@ -373,6 +386,7 @@ assert(isCompatibleOutput(legacyResult));
 ### 11. Rollback Capability
 
 If issues detected:
+
 1. Restore from timestamped backup
 2. Revert git commit
 3. Notify affected components
@@ -438,4 +452,4 @@ Task ready for use with enhanced capabilities.
 - Coordinates with agent modification tasks
 - Uses `git-wrapper.js` for version control
 - Leverages `dependency-analyzer.js` for usage
-- Integrates with test frameworks for validation 
+- Integrates with test frameworks for validation

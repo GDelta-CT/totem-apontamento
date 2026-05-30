@@ -173,7 +173,8 @@ function checkLinkStatus(projectRoot = process.cwd()) {
       // Use path.relative to safely compare - empty string means same path,
       // no '..' prefix means target is equal to or child of global
       const relativePath = path.relative(resolvedGlobal, resolvedTarget);
-      const isLinkedToGlobal = relativePath === '' || (!relativePath.startsWith('..') && !path.isAbsolute(relativePath));
+      const isLinkedToGlobal =
+        relativePath === '' || (!relativePath.startsWith('..') && !path.isAbsolute(relativePath));
 
       if (isLinkedToGlobal) {
         return {

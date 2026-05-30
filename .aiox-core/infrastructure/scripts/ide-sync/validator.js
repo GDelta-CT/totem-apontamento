@@ -68,7 +68,7 @@ function validateIdeSync(expectedFiles, targetDir, redirectsConfig) {
   };
 
   // Track expected filenames
-  const expectedFilenames = new Set(expectedFiles.map(f => f.filename));
+  const expectedFilenames = new Set(expectedFiles.map((f) => f.filename));
 
   // Add redirect filenames to expected
   const redirectFilenames = getRedirectFilenames(redirectsConfig);
@@ -116,7 +116,7 @@ function validateIdeSync(expectedFiles, targetDir, redirectsConfig) {
   // Check for orphaned files (files in target not in expected)
   if (fs.existsSync(targetDir)) {
     try {
-      const actualFiles = fs.readdirSync(targetDir).filter(f => f.endsWith('.md'));
+      const actualFiles = fs.readdirSync(targetDir).filter((f) => f.endsWith('.md'));
 
       for (const file of actualFiles) {
         if (!expectedFilenames.has(file)) {
@@ -155,11 +155,7 @@ function validateAllIdes(ideConfigs, redirectsConfig) {
   };
 
   for (const [ideName, config] of Object.entries(ideConfigs)) {
-    const ideResult = validateIdeSync(
-      config.expectedFiles,
-      config.targetDir,
-      redirectsConfig
-    );
+    const ideResult = validateIdeSync(config.expectedFiles, config.targetDir, redirectsConfig);
 
     results.ides[ideName] = ideResult;
 
@@ -172,8 +168,7 @@ function validateAllIdes(ideConfigs, redirectsConfig) {
   }
 
   // Pass if no missing or drift
-  results.summary.pass =
-    results.summary.missing === 0 && results.summary.drift === 0;
+  results.summary.pass = results.summary.missing === 0 && results.summary.drift === 0;
 
   return results;
 }

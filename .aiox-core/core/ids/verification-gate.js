@@ -219,7 +219,7 @@ class VerificationGate {
    */
   async _doVerify(_context) {
     throw new Error(
-      `[IDS-Gate] _doVerify() must be implemented by subclass (gate: ${this._gateId})`,
+      `[IDS-Gate] _doVerify() must be implemented by subclass (gate: ${this._gateId})`
     );
   }
 

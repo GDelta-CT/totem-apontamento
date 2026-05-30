@@ -30,12 +30,7 @@ try {
 class BasicInputValidator {
   checkCode(input) {
     // Basic validation - no dangerous patterns
-    const dangerousPatterns = [
-      /eval\s*\(/i,
-      /Function\s*\(/i,
-      /<script/i,
-      /javascript:/i,
-    ];
+    const dangerousPatterns = [/eval\s*\(/i, /Function\s*\(/i, /<script/i, /javascript:/i];
 
     for (const pattern of dangerousPatterns) {
       if (pattern.test(String(input))) {
@@ -64,15 +59,15 @@ function isSafePattern(pattern) {
     // - Nested quantifiers: (a+)+ or (a*)*
     // - Overlapping alternations with quantifiers: (a|a)+
     const reDoSPatterns = [
-      /\(\.\*\)\{2,\}/,           // (.*){2,} - nested quantifiers
-      /\(\.\+\)\{2,\}/,           // (.+){2,} - nested quantifiers
-      /\(\[.*\]\+\)\+/,           // ([...]+)+ - nested quantifiers
-      /\(\[.*\]\*\)\*/,           // ([...]*)*  - nested quantifiers
-      /\(\.\+\)\+/,               // (.+)+ - catastrophic backtracking
-      /\(\.\*\)\+/,               // (.*)+  - catastrophic backtracking
-      /\(\.\+\)\*/,               // (.+)* - catastrophic backtracking
-      /\(\.\*\)\*/,               // (.*)* - catastrophic backtracking
-      /\(\?!/,                     // Negative lookahead (can be slow)
+      /\(\.\*\)\{2,\}/, // (.*){2,} - nested quantifiers
+      /\(\.\+\)\{2,\}/, // (.+){2,} - nested quantifiers
+      /\(\[.*\]\+\)\+/, // ([...]+)+ - nested quantifiers
+      /\(\[.*\]\*\)\*/, // ([...]*)*  - nested quantifiers
+      /\(\.\+\)\+/, // (.+)+ - catastrophic backtracking
+      /\(\.\*\)\+/, // (.*)+  - catastrophic backtracking
+      /\(\.\+\)\*/, // (.+)* - catastrophic backtracking
+      /\(\.\*\)\*/, // (.*)* - catastrophic backtracking
+      /\(\?!/, // Negative lookahead (can be slow)
     ];
 
     for (const reDoSPattern of reDoSPatterns) {
@@ -122,7 +117,7 @@ class ElicitationEngine {
       this.sessionFile = path.join(
         process.cwd(),
         '.aiox-sessions',
-        `${componentType}-${Date.now()}.json`,
+        `${componentType}-${Date.now()}.json`
       );
       await fs.ensureDir(path.dirname(this.sessionFile));
     }
@@ -181,7 +176,7 @@ class ElicitationEngine {
    * @private
    */
   async runStep(step) {
-    const questions = step.questions.map(q => this.enhanceQuestion(q, step));
+    const questions = step.questions.map((q) => this.enhanceQuestion(q, step));
 
     // Add contextual help if available
     if (step.help) {
@@ -206,7 +201,7 @@ class ElicitationEngine {
     const validation = await this.validateStepAnswers(answers, step);
     if (!validation.valid) {
       console.log(chalk.red('\n❌ Validation errors:'));
-      validation.errors.forEach(err => console.log(chalk.red(`  - ${err}`)));
+      validation.errors.forEach((err) => console.log(chalk.red(`  - ${err}`)));
       return this.runStep(step); // Re-run the step
     }
 
@@ -297,7 +292,10 @@ class ElicitationEngine {
     switch (config.generator) {
       case 'kebabCase': {
         const source = this.sessionData.answers[config.source] || '';
-        return source.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+        return source
+          .toLowerCase()
+          .replace(/\s+/g, '-')
+          .replace(/[^a-z0-9-]/g, '');
       }
 
       case 'timestamp':
@@ -451,8 +449,9 @@ class ElicitationEngine {
       componentType: this.sessionData.componentType,
       completedSteps: this.sessionData.currentStep + 1,
       answers: Object.keys(this.sessionData.answers).length,
-      duration: this.sessionData.startTime ?
-        Date.now() - new Date(this.sessionData.startTime).getTime() : 0,
+      duration: this.sessionData.startTime
+        ? Date.now() - new Date(this.sessionData.startTime).getTime()
+        : 0,
     };
   }
 

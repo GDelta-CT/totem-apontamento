@@ -52,7 +52,6 @@ function quickTest(utilityFile) {
       result.status = 'FIXABLE';
       result.recommendation = 'Loads but exports nothing';
     }
-
   } catch (error) {
     // Restore console
     console.log = console.log.bind(console);
@@ -82,8 +81,9 @@ function runFastAudit() {
   console.log('🔍 Fast Framework Utilities Audit Starting...\n');
 
   // Get all .js files except test utilities
-  utilities = fs.readdirSync(utilsDir)
-    .filter(f => f.endsWith('.js') && !f.includes('test-utilities'))
+  utilities = fs
+    .readdirSync(utilsDir)
+    .filter((f) => f.endsWith('.js') && !f.includes('test-utilities'))
     .sort();
 
   results = [];
@@ -100,14 +100,20 @@ function runFastAudit() {
   console.log('\n');
 
   // Summary
-  const working = results.filter(r => r.status === 'WORKING');
-  const fixable = results.filter(r => r.status === 'FIXABLE');
-  const deprecated = results.filter(r => r.status === 'DEPRECATED');
+  const working = results.filter((r) => r.status === 'WORKING');
+  const fixable = results.filter((r) => r.status === 'FIXABLE');
+  const deprecated = results.filter((r) => r.status === 'DEPRECATED');
 
   console.log('\n📊 QUICK AUDIT SUMMARY\n');
-  console.log(`✅ WORKING:     ${working.length} (${Math.round(working.length / utilities.length * 100)}%)`);
-  console.log(`🔧 FIXABLE:     ${fixable.length} (${Math.round(fixable.length / utilities.length * 100)}%)`);
-  console.log(`🗑️  DEPRECATED:  ${deprecated.length} (${Math.round(deprecated.length / utilities.length * 100)}%)`);
+  console.log(
+    `✅ WORKING:     ${working.length} (${Math.round((working.length / utilities.length) * 100)}%)`
+  );
+  console.log(
+    `🔧 FIXABLE:     ${fixable.length} (${Math.round((fixable.length / utilities.length) * 100)}%)`
+  );
+  console.log(
+    `🗑️  DEPRECATED:  ${deprecated.length} (${Math.round((deprecated.length / utilities.length) * 100)}%)`
+  );
   console.log(`\n📦 Total: ${utilities.length}`);
 
   // Save results
@@ -115,7 +121,12 @@ function runFastAudit() {
   fs.writeFileSync(outputPath, JSON.stringify(results, null, 2));
   console.log(`\n💾 Results: ${outputPath}\n`);
 
-  return { results, working: working.length, fixable: fixable.length, deprecated: deprecated.length };
+  return {
+    results,
+    working: working.length,
+    fixable: fixable.length,
+    deprecated: deprecated.length,
+  };
 }
 
 // Run audit if executed directly

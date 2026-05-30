@@ -317,7 +317,7 @@ class SubagentDispatcher extends EventEmitter {
       try {
         const memory = await this.memoryQuery.getContextForAgent(
           this.resolveAgent(task),
-          task.description,
+          task.description
         );
         enriched.memory = memory.relevantMemory || [];
         enriched.patterns = memory.suggestedPatterns || [];

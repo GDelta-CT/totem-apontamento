@@ -8,9 +8,11 @@
 ## The Five Levels
 
 ### Atoms
+
 **Definition:** Basic building blocks that can't be broken down further.
 
 **Examples:**
+
 - Button
 - Input
 - Label
@@ -19,54 +21,66 @@
 - Text
 
 **Rules:**
+
 - Standalone, reusable
 - No dependencies on other atoms
 - Uses tokens only (no hardcoded values)
 - Single responsibility
 
 ### Molecules
+
 **Definition:** Groups of atoms functioning together as a unit.
 
 **Examples:**
+
 - FormField (Label + Input + HelperText)
 - SearchBar (Input + Button)
 - Card Header (Icon + Heading + Text)
 
 **Rules:**
+
 - Composes atoms (doesn't reimplement)
 - Adds composition logic
 - Atoms remain independent
 
 ### Organisms
+
 **Definition:** Complex UI components composed of molecules and/or atoms.
 
 **Examples:**
+
 - Navigation (Logo + NavLinks + SearchBar + UserMenu)
 - LoginForm (FormFields + Button + Link)
 - ProductCard (Image + CardHeader + CardBody + Button)
 
 **Rules:**
+
 - Distinct section of interface
 - Can be reused across templates
 - Manages internal state if needed
 
 ### Templates
+
 **Definition:** Page-level layout without real content.
 
 **Examples:**
+
 - DashboardLayout
 - ArticleLayout
 - CheckoutFlowLayout
 
 **Rules:**
+
 - Defines page structure
 - Placeholder content
 - Reusable across pages
 
 ### Pages
+
 **Definition:** Templates with real content.
 
 **Examples:**
+
 - Homepage
 - Product Detail Page
 - User Dashboard

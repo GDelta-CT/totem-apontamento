@@ -1,13 +1,13 @@
 /**
  * @deprecated Use agent-config-loader.js instead
  * This file will be removed in a future version.
- * 
+ *
  * Migration guide:
  * - Old: const { loadAgentConfig } = require('./config-loader');
  * - New: const { AgentConfigLoader } = require('./agent-config-loader');
  *        const loader = new AgentConfigLoader(agentId);
  *        const config = await loader.load(coreConfig);
- * 
+ *
  * AIOX Config Loader with Lazy Loading
  *
  * Intelligent configuration loader that only loads what each agent needs,
@@ -30,26 +30,106 @@ const configCache = {
   full: null,
   sections: {},
   lastLoad: null,
-  TTL: 5 * 60 * 1000,  // 5 minutes
+  TTL: 5 * 60 * 1000, // 5 minutes
 };
 
 /**
  * Agent requirements mapping (from agent-config-requirements.yaml)
  */
 const agentRequirements = {
-  dev: ['frameworkDocsLocation', 'projectDocsLocation', 'devLoadAlwaysFiles', 'lazyLoading', 'toolConfigurations', 'pvMindContext', 'hybridOpsConfig'],
-  qa: ['frameworkDocsLocation', 'projectDocsLocation', 'devLoadAlwaysFiles', 'lazyLoading', 'toolConfigurations'],
-  po: ['frameworkDocsLocation', 'projectDocsLocation', 'devLoadAlwaysFiles', 'lazyLoading', 'toolConfigurations'],
+  dev: [
+    'frameworkDocsLocation',
+    'projectDocsLocation',
+    'devLoadAlwaysFiles',
+    'lazyLoading',
+    'toolConfigurations',
+    'pvMindContext',
+    'hybridOpsConfig',
+  ],
+  qa: [
+    'frameworkDocsLocation',
+    'projectDocsLocation',
+    'devLoadAlwaysFiles',
+    'lazyLoading',
+    'toolConfigurations',
+  ],
+  po: [
+    'frameworkDocsLocation',
+    'projectDocsLocation',
+    'devLoadAlwaysFiles',
+    'lazyLoading',
+    'toolConfigurations',
+  ],
   pm: ['frameworkDocsLocation', 'projectDocsLocation', 'devLoadAlwaysFiles', 'lazyLoading'],
-  sm: ['frameworkDocsLocation', 'projectDocsLocation', 'devLoadAlwaysFiles', 'lazyLoading', 'toolConfigurations'],
-  architect: ['frameworkDocsLocation', 'projectDocsLocation', 'devLoadAlwaysFiles', 'lazyLoading', 'toolConfigurations'],
-  analyst: ['frameworkDocsLocation', 'projectDocsLocation', 'devLoadAlwaysFiles', 'lazyLoading', 'toolConfigurations'],
-  'data-engineer': ['frameworkDocsLocation', 'projectDocsLocation', 'devLoadAlwaysFiles', 'lazyLoading', 'toolConfigurations', 'pvMindContext', 'hybridOpsConfig'],
-  devops: ['frameworkDocsLocation', 'projectDocsLocation', 'devLoadAlwaysFiles', 'lazyLoading', 'toolConfigurations'],
-  'aiox-master': ['frameworkDocsLocation', 'projectDocsLocation', 'devLoadAlwaysFiles', 'lazyLoading', 'registry', 'expansionPacks', 'toolConfigurations'],
-  'ux-expert': ['frameworkDocsLocation', 'projectDocsLocation', 'devLoadAlwaysFiles', 'lazyLoading', 'toolConfigurations'],
-  'db-sage': ['frameworkDocsLocation', 'projectDocsLocation', 'devLoadAlwaysFiles', 'lazyLoading', 'toolConfigurations', 'pvMindContext', 'hybridOpsConfig'],
-  security: ['frameworkDocsLocation', 'projectDocsLocation', 'devLoadAlwaysFiles', 'lazyLoading', 'toolConfigurations'],
+  sm: [
+    'frameworkDocsLocation',
+    'projectDocsLocation',
+    'devLoadAlwaysFiles',
+    'lazyLoading',
+    'toolConfigurations',
+  ],
+  architect: [
+    'frameworkDocsLocation',
+    'projectDocsLocation',
+    'devLoadAlwaysFiles',
+    'lazyLoading',
+    'toolConfigurations',
+  ],
+  analyst: [
+    'frameworkDocsLocation',
+    'projectDocsLocation',
+    'devLoadAlwaysFiles',
+    'lazyLoading',
+    'toolConfigurations',
+  ],
+  'data-engineer': [
+    'frameworkDocsLocation',
+    'projectDocsLocation',
+    'devLoadAlwaysFiles',
+    'lazyLoading',
+    'toolConfigurations',
+    'pvMindContext',
+    'hybridOpsConfig',
+  ],
+  devops: [
+    'frameworkDocsLocation',
+    'projectDocsLocation',
+    'devLoadAlwaysFiles',
+    'lazyLoading',
+    'toolConfigurations',
+  ],
+  'aiox-master': [
+    'frameworkDocsLocation',
+    'projectDocsLocation',
+    'devLoadAlwaysFiles',
+    'lazyLoading',
+    'registry',
+    'expansionPacks',
+    'toolConfigurations',
+  ],
+  'ux-expert': [
+    'frameworkDocsLocation',
+    'projectDocsLocation',
+    'devLoadAlwaysFiles',
+    'lazyLoading',
+    'toolConfigurations',
+  ],
+  'db-sage': [
+    'frameworkDocsLocation',
+    'projectDocsLocation',
+    'devLoadAlwaysFiles',
+    'lazyLoading',
+    'toolConfigurations',
+    'pvMindContext',
+    'hybridOpsConfig',
+  ],
+  security: [
+    'frameworkDocsLocation',
+    'projectDocsLocation',
+    'devLoadAlwaysFiles',
+    'lazyLoading',
+    'toolConfigurations',
+  ],
 };
 
 /**
@@ -129,7 +209,7 @@ async function loadConfigSections(sections) {
     performanceMetrics.cacheHits++;
 
     const config = {};
-    sections.forEach(section => {
+    sections.forEach((section) => {
       if (configCache.full[section] !== undefined) {
         config[section] = configCache.full[section];
       }
@@ -144,7 +224,7 @@ async function loadConfigSections(sections) {
 
   // Extract requested sections
   const config = {};
-  sections.forEach(section => {
+  sections.forEach((section) => {
     if (fullConfig[section] !== undefined) {
       config[section] = fullConfig[section];
     }
@@ -218,9 +298,10 @@ function clearCache() {
 function getPerformanceMetrics() {
   return {
     ...performanceMetrics,
-    cacheHitRate: performanceMetrics.loads > 0
-      ? ((performanceMetrics.cacheHits / performanceMetrics.loads) * 100).toFixed(1) + '%'
-      : '0%',
+    cacheHitRate:
+      performanceMetrics.loads > 0
+        ? ((performanceMetrics.cacheHits / performanceMetrics.loads) * 100).toFixed(1) + '%'
+        : '0%',
     avgLoadTimeMs: Math.round(performanceMetrics.avgLoadTime),
   };
 }
@@ -236,9 +317,7 @@ async function validateAgentConfig(agentId) {
 
   const config = await loadFullConfig();
 
-  const missingSections = requiredSections.filter(
-    section => config[section] === undefined,
-  );
+  const missingSections = requiredSections.filter((section) => config[section] === undefined);
 
   return {
     valid: missingSections.length === 0,

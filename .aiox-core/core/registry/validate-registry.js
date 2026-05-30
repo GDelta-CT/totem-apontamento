@@ -94,7 +94,7 @@ const SMOKE_TESTS = {
     description: 'All worker IDs are unique',
     priority: 'P1',
     test: async (ctx) => {
-      const ids = ctx.registry.workers?.map(w => w.id) || [];
+      const ids = ctx.registry.workers?.map((w) => w.id) || [];
       const seen = new Set();
       const duplicates = [];
       for (const id of ids) {
@@ -202,7 +202,7 @@ async function runSmokeTests(registryPath, schemaPath, baseDir) {
   console.log('SUMMARY');
   console.log('='.repeat(50));
 
-  const passed = Object.values(results).filter(r => r.passed).length;
+  const passed = Object.values(results).filter((r) => r.passed).length;
   const total = Object.keys(results).length;
 
   console.log(`Tests: ${passed}/${total} passed`);
@@ -261,7 +261,7 @@ async function validateFields(registryPath) {
     console.log('All fields valid!');
   } else {
     console.log(`Found ${issues.length} field issues:`);
-    issues.slice(0, 20).forEach(i => {
+    issues.slice(0, 20).forEach((i) => {
       console.log(`  - ${i.id}: ${i.issue}`);
     });
     if (issues.length > 20) {
@@ -327,7 +327,7 @@ async function main() {
 
 // Run if called directly
 if (require.main === module) {
-  main().catch(error => {
+  main().catch((error) => {
     console.error('Validation failed:', error);
     process.exit(1);
   });

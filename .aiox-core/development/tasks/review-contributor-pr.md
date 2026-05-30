@@ -74,7 +74,7 @@ gh pr view {pr_number} --json files,additions,deletions,author,body
 - [ ] No string-based command construction (use array args)
 - [ ] CodeRabbit review completed (check for hidden content in PR description)
 
-#### For Config PRs (.gitmodules, *.config.*)
+#### For Config PRs (.gitmodules, _.config._)
 
 - [ ] No URL changes to external/unknown repositories
 - [ ] No new submodule additions
@@ -103,15 +103,15 @@ gh pr view {pr_number} --json body --jq '.body' | grep -iE "(<picture|<source|<i
 
 ### Step 4: Decision Matrix
 
-| PR Changes | Risk Level | Required Actions |
-|-----------|-----------|-----------------|
-| Documentation only | LOW | Standard review |
-| Test files only | MEDIUM | Security scan + grep |
-| Source code | MEDIUM-HIGH | Security scan + careful review |
-| CI/Workflows | HIGH | Security scan + SHA audit + 2 approvals |
-| package.json | HIGH | Block until verified |
-| .gitmodules | MEDIUM | URL verification required |
-| Config files | MEDIUM | Value verification required |
+| PR Changes         | Risk Level  | Required Actions                        |
+| ------------------ | ----------- | --------------------------------------- |
+| Documentation only | LOW         | Standard review                         |
+| Test files only    | MEDIUM      | Security scan + grep                    |
+| Source code        | MEDIUM-HIGH | Security scan + careful review          |
+| CI/Workflows       | HIGH        | Security scan + SHA audit + 2 approvals |
+| package.json       | HIGH        | Block until verified                    |
+| .gitmodules        | MEDIUM      | URL verification required               |
+| Config files       | MEDIUM      | Value verification required             |
 
 ### Step 5: Merge Decision
 

@@ -1,6 +1,6 @@
 ---
 task: Create Squad
-responsavel: "@squad-creator"
+responsavel: '@squad-creator'
 responsavel_type: agent
 atomic_layer: task
 Entrada: |
@@ -15,18 +15,18 @@ Saida: |
   - manifest: Conteudo do squad.yaml gerado
   - next_steps: Instrucoes para proximos passos
 Checklist:
-  - "[ ] Validar nome (kebab-case, nao existe)"
-  - "[ ] Coletar informacoes via elicitacao"
-  - "[ ] Gerar estrutura de diretorios"
-  - "[ ] Gerar squad.yaml"
-  - "[ ] Gerar arquivos de config (coding-standards, etc.)"
-  - "[ ] Gerar exemplo de agent"
-  - "[ ] Gerar exemplo de task"
-  - "[ ] Executar validacao inicial"
-  - "[ ] Exibir proximos passos"
+  - '[ ] Validar nome (kebab-case, nao existe)'
+  - '[ ] Coletar informacoes via elicitacao'
+  - '[ ] Gerar estrutura de diretorios'
+  - '[ ] Gerar squad.yaml'
+  - '[ ] Gerar arquivos de config (coding-standards, etc.)'
+  - '[ ] Gerar exemplo de agent'
+  - '[ ] Gerar exemplo de task'
+  - '[ ] Executar validacao inicial'
+  - '[ ] Exibir proximos passos'
 ---
 
-# *create-squad
+# \*create-squad
 
 Cria um novo squad seguindo a arquitetura task-first do AIOX.
 
@@ -47,16 +47,16 @@ Cria um novo squad seguindo a arquitetura task-first do AIOX.
 
 ## Parametros
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `name` | string | - | Squad name (kebab-case, required) |
-| `--description` | string | "Custom squad" | Squad description |
-| `--author` | string | git user.name | Author name |
-| `--license` | string | MIT | License type |
-| `--template` | string | basic | Template: basic, etl, agent-only |
-| `--config-mode` | string | extend | Config inheritance: extend, override, none |
-| `--skip-validation` | flag | false | Skip initial validation |
-| `--yes` | flag | false | Skip interactive prompts, use defaults |
+| Parameter           | Type   | Default        | Description                                |
+| ------------------- | ------ | -------------- | ------------------------------------------ |
+| `name`              | string | -              | Squad name (kebab-case, required)          |
+| `--description`     | string | "Custom squad" | Squad description                          |
+| `--author`          | string | git user.name  | Author name                                |
+| `--license`         | string | MIT            | License type                               |
+| `--template`        | string | basic          | Template: basic, etl, agent-only           |
+| `--config-mode`     | string | extend         | Config inheritance: extend, override, none |
+| `--skip-validation` | flag   | false          | Skip initial validation                    |
+| `--yes`             | flag   | false          | Skip interactive prompts, use defaults     |
 
 ## Elicitacao Interativa
 
@@ -84,11 +84,11 @@ Cria um novo squad seguindo a arquitetura task-first do AIOX.
 
 ## Templates Disponiveis
 
-| Template | Description | Components |
-|----------|-------------|------------|
-| `basic` | Estrutura minima | 1 agent, 1 task |
-| `etl` | Processamento de dados | 2 agents, 3 tasks, scripts |
-| `agent-only` | Apenas agentes | 2 agents, sem tasks |
+| Template     | Description            | Components                 |
+| ------------ | ---------------------- | -------------------------- |
+| `basic`      | Estrutura minima       | 1 agent, 1 task            |
+| `etl`        | Processamento de dados | 2 agents, 3 tasks, scripts |
+| `agent-only` | Apenas agentes         | 2 agents, sem tasks        |
 
 ## Estrutura Gerada
 
@@ -151,7 +151,7 @@ license: MIT
 slashPrefix: meu-dominio
 
 aiox:
-  minVersion: "2.1.0"
+  minVersion: '2.1.0'
   type: squad
 
 components:
@@ -168,9 +168,9 @@ components:
 config:
   extends: extend
   # SQS-10: References project-level files when docs/framework/ exists
-  coding-standards: ../../docs/framework/CODING-STANDARDS.md   # or config/coding-standards.md
-  tech-stack: ../../docs/framework/TECH-STACK.md               # or config/tech-stack.md
-  source-tree: ../../docs/framework/SOURCE-TREE.md             # or config/source-tree.md
+  coding-standards: ../../docs/framework/CODING-STANDARDS.md # or config/coding-standards.md
+  tech-stack: ../../docs/framework/TECH-STACK.md # or config/tech-stack.md
+  source-tree: ../../docs/framework/SOURCE-TREE.md # or config/source-tree.md
 
 dependencies:
   node: []
@@ -239,12 +239,12 @@ tags:
 
 ## Error Handling
 
-| Error | Cause | Resolution |
-|-------|-------|------------|
-| `INVALID_NAME` | Name not kebab-case | Use lowercase with hyphens |
-| `SQUAD_EXISTS` | Squad already exists | Choose different name or delete existing |
-| `PERMISSION_DENIED` | Can't write to squads/ | Check directory permissions |
-| `VALIDATION_FAILED` | Generated squad invalid | Check error details, fix manually |
+| Error               | Cause                   | Resolution                               |
+| ------------------- | ----------------------- | ---------------------------------------- |
+| `INVALID_NAME`      | Name not kebab-case     | Use lowercase with hyphens               |
+| `SQUAD_EXISTS`      | Squad already exists    | Choose different name or delete existing |
+| `PERMISSION_DENIED` | Can't write to squads/  | Check directory permissions              |
+| `VALIDATION_FAILED` | Generated squad invalid | Check error details, fix manually        |
 
 ## Implementation
 
@@ -263,7 +263,7 @@ async function createSquad(options) {
     skipValidation,
     includeAgent,
     includeTask,
-    aioxMinVersion
+    aioxMinVersion,
   } = options;
 
   // Validate name
@@ -282,7 +282,7 @@ async function createSquad(options) {
     configMode,
     includeAgent,
     includeTask,
-    aioxMinVersion
+    aioxMinVersion,
   });
 
   // Validate (unless skipped)

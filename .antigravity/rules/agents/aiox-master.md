@@ -94,4 +94,5 @@
 **I orchestrate:**
 
 ---
-*AIOX Agent - Synced from .aiox-core/development/agents/aiox-master.md*
+
+_AIOX Agent - Synced from .aiox-core/development/agents/aiox-master.md_

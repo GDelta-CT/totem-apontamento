@@ -16,7 +16,18 @@ const { execSync } = require('child_process');
 
 const VALID_TYPES = ['bug', 'feature', 'enhancement', 'docs', 'test', 'chore'];
 const VALID_PRIORITIES = ['P1', 'P2', 'P3', 'P4'];
-const VALID_AREAS = ['core', 'installer', 'synapse', 'cli', 'pro', 'health-check', 'docs', 'devops', 'agents', 'workflows'];
+const VALID_AREAS = [
+  'core',
+  'installer',
+  'synapse',
+  'cli',
+  'pro',
+  'health-check',
+  'docs',
+  'devops',
+  'agents',
+  'workflows',
+];
 
 function gh(cmd) {
   try {
@@ -28,7 +39,9 @@ function gh(cmd) {
 }
 
 function listUntriaged() {
-  const raw = gh('issue list --label "status: needs-triage" --json number,title,labels,createdAt,author --limit 100');
+  const raw = gh(
+    'issue list --label "status: needs-triage" --json number,title,labels,createdAt,author --limit 100'
+  );
   const issues = JSON.parse(raw);
 
   if (issues.length === 0) {
@@ -38,7 +51,7 @@ function listUntriaged() {
 
   console.log(`\n=== ${issues.length} Untriaged Issues ===\n`);
   for (const issue of issues) {
-    const labels = issue.labels.map(l => l.name).join(', ');
+    const labels = issue.labels.map((l) => l.name).join(', ');
     const date = issue.createdAt.split('T')[0];
     console.log(`  #${issue.number} [${date}] ${issue.title}`);
     console.log(`    Author: ${issue.author.login} | Labels: ${labels}`);
@@ -68,7 +81,7 @@ function applyLabels(number, type, priority, areas, extra) {
     addLabels.push(...extra);
   }
 
-  const addStr = addLabels.map(l => `"${l}"`).join(',');
+  const addStr = addLabels.map((l) => `"${l}"`).join(',');
   console.log(`Applying to #${number}: ${addLabels.join(', ')}`);
   gh(`issue edit ${number} --add-label ${addStr} --remove-label "status: needs-triage"`);
   console.log(`  Done.`);
@@ -84,11 +97,11 @@ function generateReport() {
     byType: {},
     byPriority: {},
     byArea: {},
-    byStatus: {}
+    byStatus: {},
   };
 
   for (const issue of issues) {
-    const labels = issue.labels.map(l => l.name);
+    const labels = issue.labels.map((l) => l.name);
 
     if (labels.includes('status: needs-triage')) stats.untriaged++;
 
@@ -147,7 +160,9 @@ if (args.includes('--list')) {
   const extraIdx = args.indexOf('--extra');
 
   if (!number || typeIdx === -1 || prioIdx === -1 || areaIdx === -1) {
-    console.error('Usage: --apply <number> --type <type> --priority <P1-P4> --area <area> [--extra "label1,label2"]');
+    console.error(
+      'Usage: --apply <number> --type <type> --priority <P1-P4> --area <area> [--extra "label1,label2"]'
+    );
     process.exit(1);
   }
 

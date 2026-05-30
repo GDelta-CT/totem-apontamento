@@ -38,7 +38,7 @@ async function run(context) {
   }
 
   const missing = EXPECTED_AGENTS.filter(
-    (agent) => !fs.existsSync(path.join(agentsDir, agent, 'MEMORY.md')),
+    (agent) => !fs.existsSync(path.join(agentsDir, agent, 'MEMORY.md'))
   );
 
   if (missing.length === 0) {

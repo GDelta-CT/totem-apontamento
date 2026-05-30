@@ -57,7 +57,12 @@ async function run(context) {
 
     if (!available) {
       // Check if entity-registry.yaml exists but provider still failed
-      const registryPath = path.join(context.projectRoot, '.aiox-core', 'data', 'entity-registry.yaml');
+      const registryPath = path.join(
+        context.projectRoot,
+        '.aiox-core',
+        'data',
+        'entity-registry.yaml'
+      );
       if (fs.existsSync(registryPath)) {
         const stat = fs.statSync(registryPath);
         const sizeKB = Math.round(stat.size / 1024);
@@ -83,7 +88,12 @@ async function run(context) {
 
     if (provider === 'registry') {
       // Read entity count from registry metadata
-      const registryPath = path.join(context.projectRoot, '.aiox-core', 'data', 'entity-registry.yaml');
+      const registryPath = path.join(
+        context.projectRoot,
+        '.aiox-core',
+        'data',
+        'entity-registry.yaml'
+      );
       let entityInfo = '';
       if (fs.existsSync(registryPath)) {
         const content = fs.readFileSync(registryPath, 'utf8');

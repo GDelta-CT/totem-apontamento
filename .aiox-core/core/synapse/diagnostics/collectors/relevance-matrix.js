@@ -100,7 +100,9 @@ function collectRelevanceMatrix(projectRoot) {
 
   const uapData = safeReadJson(path.join(metricsDir, 'uap-metrics.json'));
   const hookData = safeReadJson(path.join(metricsDir, 'hook-metrics.json'));
-  const bridgeData = safeReadJson(path.join(projectRoot, '.synapse', 'sessions', '_active-agent.json'));
+  const bridgeData = safeReadJson(
+    path.join(projectRoot, '.synapse', 'sessions', '_active-agent.json')
+  );
 
   const agentId = (uapData && uapData.agentId) || (bridgeData && bridgeData.id) || 'unknown';
 

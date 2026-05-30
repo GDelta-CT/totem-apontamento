@@ -182,6 +182,7 @@ token_usage: ~2,000-8,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Iterative analysis with depth limits; cache intermediate results; batch similar operations
 
 ---
@@ -202,24 +203,30 @@ updated_at: 2025-11-17
 ---
 
 checklists:
-  - dev-master-checklist.md
+
+- dev-master-checklist.md
+
 ---
 
 # Optimize Performance - AIOX Developer Task
 
 ## Purpose
+
 Analyze code for performance bottlenecks and suggest optimizations to improve runtime performance, memory usage, and scalability.
 
 ## Command Pattern
+
 ```
 *optimize-performance <path> [options]
 ```
 
 ## Parameters
+
 - `path`: File or directory path to analyze
 - `options`: Performance analysis configuration
 
 ### Options
+
 - `--patterns <types>`: Comma-separated optimization patterns to check
 - `--profile`: Enable runtime profiling (if applicable)
 - `--threshold <level>`: Minimum impact threshold for suggestions (low/medium/high)
@@ -230,6 +237,7 @@ Analyze code for performance bottlenecks and suggest optimizations to improve ru
 - `--focus <category>`: Focus on specific category (algorithm/memory/async/database/bundle/react)
 
 ## Optimization Patterns
+
 - `algorithm_complexity`: High time complexity algorithms
 - `loop_optimization`: Nested loops and iterations
 - `memory_usage`: Memory consumption and leaks
@@ -242,6 +250,7 @@ Analyze code for performance bottlenecks and suggest optimizations to improve ru
 - `object_operations`: Object creation and access
 
 ## Examples
+
 ```bash
 # Analyze single file
 *optimize-performance aiox-core/scripts/data-processor.js
@@ -285,13 +294,13 @@ class OptimizePerformanceTask {
 
       // Parse parameters
       const config = await this.parseParameters(params);
-      
+
       // Initialize dependencies
       await this.initializeDependencies();
 
       // Get files to analyze
       const files = await this.getFilesToAnalyze(config);
-      
+
       if (files.length === 0) {
         console.log(chalk.yellow('No files found to analyze'));
         return { success: true, results: [] };
@@ -306,10 +315,10 @@ class OptimizePerformanceTask {
       } else {
         // Analyze files
         await this.analyzeFiles(files, config);
-        
+
         // Display results
         await this.displayResults(config);
-        
+
         // Generate report if requested
         if (config.report) {
           await this.generateReport(config.report);
@@ -320,9 +329,8 @@ class OptimizePerformanceTask {
         success: true,
         filesAnalyzed: files.length,
         totalIssues: this.getTotalIssues(),
-        criticalIssues: this.getCriticalIssues()
+        criticalIssues: this.getCriticalIssues(),
       };
-
     } catch (error) {
       console.error(chalk.red(`\n❌ Performance optimization failed: ${error.message}`));
       throw error;
@@ -343,19 +351,19 @@ class OptimizePerformanceTask {
       apply: null,
       recursive: false,
       exclude: [],
-      focus: null
+      focus: null,
     };
 
     // Parse options
     for (let i = 1; i < params.length; i++) {
       const param = params[i];
-      
+
       if (param === '--profile') {
         config.profile = true;
       } else if (param === '--recursive') {
         config.recursive = true;
       } else if (param.startsWith('--patterns') && params[i + 1]) {
-        config.patterns = params[++i].split(',').map(p => p.trim());
+        config.patterns = params[++i].split(',').map((p) => p.trim());
       } else if (param.startsWith('--threshold') && params[i + 1]) {
         config.threshold = params[++i];
       } else if (param.startsWith('--report') && params[i + 1]) {
@@ -363,7 +371,7 @@ class OptimizePerformanceTask {
       } else if (param.startsWith('--apply') && params[i + 1]) {
         config.apply = params[++i];
       } else if (param.startsWith('--exclude') && params[i + 1]) {
-        config.exclude = params[++i].split(',').map(e => e.trim());
+        config.exclude = params[++i].split(',').map((e) => e.trim());
       } else if (param.startsWith('--focus') && params[i + 1]) {
         config.focus = params[++i];
       }
@@ -380,16 +388,15 @@ class OptimizePerformanceTask {
   async initializeDependencies() {
     try {
       const PerformanceOptimizer = require('../scripts/performance-optimizer');
-      this.performanceOptimizer = new PerformanceOptimizer({ 
+      this.performanceOptimizer = new PerformanceOptimizer({
         rootPath: this.rootPath,
-        enableProfiling: true
+        enableProfiling: true,
       });
 
       // Listen to events
       this.performanceOptimizer.on('analyzed', (analysis) => {
         this.analysisResults.push(analysis);
       });
-
     } catch (error) {
       throw new Error(`Failed to initialize dependencies: ${error.message}`);
     }
@@ -401,7 +408,7 @@ class OptimizePerformanceTask {
 
     try {
       const stats = await fs.stat(targetPath);
-      
+
       if (stats.isFile()) {
         // Single file
         if (this.shouldAnalyzeFile(targetPath, config)) {
@@ -411,12 +418,12 @@ class OptimizePerformanceTask {
         // Directory
         const pattern = config.recursive ? '**/*.{js,jsx,ts,tsx}' : '*.{js,jsx,ts,tsx}';
         const globPattern = path.join(targetPath, pattern);
-        
+
         const matches = await glob(globPattern, {
-          ignore: config.exclude.map(e => path.join(targetPath, '**', e)),
-          nodir: true
+          ignore: config.exclude.map((e) => path.join(targetPath, '**', e)),
+          nodir: true,
         });
-        
+
         for (const match of matches) {
           if (this.shouldAnalyzeFile(match, config)) {
             files.push(match);
@@ -435,62 +442,59 @@ class OptimizePerformanceTask {
     if (filePath.includes('.test.') || filePath.includes('.spec.')) {
       return false;
     }
-    
+
     // Skip minified files
     if (filePath.includes('.min.')) {
       return false;
     }
-    
+
     // Skip build artifacts
     if (filePath.includes('/dist/') || filePath.includes('/build/')) {
       return false;
     }
-    
+
     // Skip node_modules
     if (filePath.includes('node_modules')) {
       return false;
     }
-    
+
     return true;
   }
 
   async analyzeFiles(files, config) {
     console.log(chalk.blue('🔍 Analyzing performance...'));
-    
+
     const progressInterval = Math.max(1, Math.floor(files.length / 20));
-    
+
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      
+
       try {
         const analysis = await this.performanceOptimizer.analyzePerformance(file, {
           patterns: config.patterns,
-          enableProfiling: config.profile
+          enableProfiling: config.profile,
         });
-        
+
         // Filter by threshold
         if (analysis.issues && analysis.issues.length > 0) {
           analysis.issues = this.filterByThreshold(analysis.issues, config.threshold);
         }
-        
+
         // Filter by focus category
         if (config.focus && analysis.issues) {
-          analysis.issues = analysis.issues.filter(issue => 
-            issue.category === config.focus
-          );
+          analysis.issues = analysis.issues.filter((issue) => issue.category === config.focus);
         }
-        
+
         // Show progress
         if (i % progressInterval === 0) {
           const progress = Math.floor((i / files.length) * 100);
           process.stdout.write(`\rProgress: ${progress}%`);
         }
-        
       } catch (error) {
         console.warn(chalk.yellow(`\nFailed to analyze ${file}: ${error.message}`));
       }
     }
-    
+
     console.log('\rProgress: 100%\n');
   }
 
@@ -498,20 +502,19 @@ class OptimizePerformanceTask {
     const thresholdMap = {
       low: ['low', 'medium', 'high', 'critical'],
       medium: ['medium', 'high', 'critical'],
-      high: ['high', 'critical']
+      high: ['high', 'critical'],
     };
-    
+
     const allowedImpacts = thresholdMap[threshold];
-    
-    return issues.filter(issue => 
-      allowedImpacts.includes(issue.impact) || 
-      allowedImpacts.includes(issue.severity)
+
+    return issues.filter(
+      (issue) => allowedImpacts.includes(issue.impact) || allowedImpacts.includes(issue.severity)
     );
   }
 
   async displayResults(config) {
     const totalIssues = this.getTotalIssues();
-    
+
     if (totalIssues === 0) {
       console.log(chalk.green('✅ No performance issues found!'));
       console.log(chalk.gray('Your code is already well optimized.'));
@@ -519,16 +522,20 @@ class OptimizePerformanceTask {
     }
 
     console.log(chalk.blue(`\n📊 Performance Analysis Results\n`));
-    console.log(chalk.gray('Found ') + chalk.yellow(totalIssues) + chalk.gray(' optimization opportunities\n'));
+    console.log(
+      chalk.gray('Found ') + chalk.yellow(totalIssues) + chalk.gray(' optimization opportunities\n')
+    );
 
     // Group by category
     const byCategory = this.groupByCategory();
-    
+
     // Display by category
     for (const [category, results] of Object.entries(byCategory)) {
-      console.log(chalk.blue(`\n${this.getCategoryIcon(category)} ${this.getCategoryName(category)}`));
+      console.log(
+        chalk.blue(`\n${this.getCategoryIcon(category)} ${this.getCategoryName(category)}`)
+      );
       console.log(chalk.gray('─'.repeat(50)));
-      
+
       for (const result of results) {
         this.displayFileResults(result);
       }
@@ -553,24 +560,24 @@ class OptimizePerformanceTask {
 
   displayFileResults(result) {
     const relativePath = path.relative(this.rootPath, result.filePath);
-    
+
     console.log(`\n📄 ${chalk.blue(relativePath)}`);
-    
+
     if (result.metrics?.performanceScore !== undefined) {
       const score = result.metrics.performanceScore;
       const scoreColor = score >= 80 ? chalk.green : score >= 60 ? chalk.yellow : chalk.red;
       console.log(`   Performance Score: ${scoreColor(score + '/100')}`);
     }
-    
+
     // Display issues
     for (const issue of result.issues) {
       this.displayIssue(issue);
-      
+
       // Display suggestions for this issue
-      const suggestion = result.suggestions?.find(s => 
-        s.issueId === issue.id || s.pattern === issue.pattern
+      const suggestion = result.suggestions?.find(
+        (s) => s.issueId === issue.id || s.pattern === issue.pattern
       );
-      
+
       if (suggestion) {
         this.displaySuggestion(suggestion);
       }
@@ -582,17 +589,19 @@ class OptimizePerformanceTask {
       critical: chalk.red,
       high: chalk.red,
       medium: chalk.yellow,
-      low: chalk.gray
+      low: chalk.gray,
     };
-    
+
     const impactColor = impactColors[issue.impact || issue.severity] || chalk.gray;
-    
-    console.log(`\n   ${impactColor(`[${(issue.impact || issue.severity || 'info').toUpperCase()}]`)} ${issue.description}`);
-    
+
+    console.log(
+      `\n   ${impactColor(`[${(issue.impact || issue.severity || 'info').toUpperCase()}]`)} ${issue.description}`
+    );
+
     if (issue.location) {
       console.log(chalk.gray(`   Location: Line ${issue.location.start?.line || '?'}`));
     }
-    
+
     if (issue.type) {
       console.log(chalk.gray(`   Type: ${issue.type}`));
     }
@@ -600,11 +609,11 @@ class OptimizePerformanceTask {
 
   displaySuggestion(suggestion) {
     console.log(chalk.green('   💡 Suggestion:'));
-    
+
     if (suggestion.optimizations) {
       for (const opt of suggestion.optimizations) {
         console.log(`      - ${opt.description}`);
-        
+
         if (opt.code) {
           console.log(chalk.gray('        Example:'));
           const codeLines = opt.code.split('\n');
@@ -612,13 +621,13 @@ class OptimizePerformanceTask {
             console.log(chalk.gray(`          ${line}`));
           }
         }
-        
+
         if (opt.improvement) {
           console.log(chalk.green(`        → ${opt.improvement}`));
         }
       }
     }
-    
+
     if (suggestion.estimatedImprovement) {
       console.log(chalk.green(`      Estimated improvement: ${suggestion.estimatedImprovement}`));
     }
@@ -626,33 +635,33 @@ class OptimizePerformanceTask {
 
   groupByCategory() {
     const grouped = {};
-    
+
     for (const result of this.analysisResults) {
       if (!result.issues || result.issues.length === 0) continue;
-      
+
       for (const issue of result.issues) {
         const category = issue.category || 'other';
-        
+
         if (!grouped[category]) {
           grouped[category] = [];
         }
-        
+
         // Find or create file entry
-        let fileEntry = grouped[category].find(r => r.filePath === result.filePath);
+        let fileEntry = grouped[category].find((r) => r.filePath === result.filePath);
         if (!fileEntry) {
           fileEntry = {
             filePath: result.filePath,
             issues: [],
             suggestions: result.suggestions || [],
-            metrics: result.metrics
+            metrics: result.metrics,
           };
           grouped[category].push(fileEntry);
         }
-        
+
         fileEntry.issues.push(issue);
       }
     }
-    
+
     return grouped;
   }
 
@@ -666,9 +675,9 @@ class OptimizePerformanceTask {
       react: '⚛️',
       caching: '💰',
       framework: '🏗️',
-      other: '🔧'
+      other: '🔧',
     };
-    
+
     return icons[category] || icons.other;
   }
 
@@ -682,40 +691,40 @@ class OptimizePerformanceTask {
       react: 'React Performance',
       caching: 'Caching Opportunities',
       framework: 'Framework-Specific',
-      other: 'Other Optimizations'
+      other: 'Other Optimizations',
     };
-    
+
     return names[category] || category;
   }
 
   displayPerformanceScores() {
     console.log(chalk.blue('\n📈 Performance Summary'));
     console.log(chalk.gray('─'.repeat(50)));
-    
+
     let totalScore = 0;
     let fileCount = 0;
-    
+
     for (const result of this.analysisResults) {
       if (result.metrics?.performanceScore !== undefined) {
         totalScore += result.metrics.performanceScore;
         fileCount++;
       }
     }
-    
+
     if (fileCount > 0) {
       const avgScore = Math.round(totalScore / fileCount);
       const scoreColor = avgScore >= 80 ? chalk.green : avgScore >= 60 ? chalk.yellow : chalk.red;
-      
+
       console.log(`Average Performance Score: ${scoreColor(avgScore + '/100')}`);
       console.log(`Files Analyzed: ${fileCount}`);
     }
-    
+
     // Issue breakdown
     const criticalCount = this.getCriticalIssues();
     const highCount = this.getIssuesByImpact('high');
     const mediumCount = this.getIssuesByImpact('medium');
     const lowCount = this.getIssuesByImpact('low');
-    
+
     console.log('\nIssue Breakdown:');
     if (criticalCount > 0) console.log(chalk.red(`  Critical: ${criticalCount}`));
     if (highCount > 0) console.log(chalk.red(`  High: ${highCount}`));
@@ -726,14 +735,14 @@ class OptimizePerformanceTask {
   displayTopRecommendations() {
     console.log(chalk.blue('\n🎯 Top Recommendations'));
     console.log(chalk.gray('─'.repeat(50)));
-    
+
     const recommendations = this.getTopRecommendations();
-    
+
     if (recommendations.length === 0) {
       console.log(chalk.gray('No specific recommendations'));
       return;
     }
-    
+
     for (let i = 0; i < Math.min(5, recommendations.length); i++) {
       const rec = recommendations[i];
       console.log(`\n${i + 1}. ${rec.title}`);
@@ -747,110 +756,111 @@ class OptimizePerformanceTask {
   getTopRecommendations() {
     const recommendations = [];
     const byCategory = this.groupByCategory();
-    
+
     // Algorithm complexity issues
     if (byCategory.algorithm?.length > 0) {
-      const highComplexity = byCategory.algorithm.filter(r => 
-        r.issues.some(i => i.type === 'high_complexity' && i.severity === 'critical')
+      const highComplexity = byCategory.algorithm.filter((r) =>
+        r.issues.some((i) => i.type === 'high_complexity' && i.severity === 'critical')
       );
-      
+
       if (highComplexity.length > 0) {
         recommendations.push({
           title: 'Optimize High-Complexity Algorithms',
-          description: 'Several functions have O(n²) or worse complexity. Consider using more efficient algorithms.',
+          description:
+            'Several functions have O(n²) or worse complexity. Consider using more efficient algorithms.',
           priority: 'critical',
-          files: highComplexity
+          files: highComplexity,
         });
       }
     }
-    
+
     // Async issues
     if (byCategory.async?.length > 0) {
-      const sequentialAwaits = byCategory.async.filter(r => 
-        r.issues.some(i => i.type === 'sequential_awaits')
+      const sequentialAwaits = byCategory.async.filter((r) =>
+        r.issues.some((i) => i.type === 'sequential_awaits')
       );
-      
+
       if (sequentialAwaits.length > 0) {
         recommendations.push({
           title: 'Parallelize Async Operations',
           description: 'Use Promise.all to run independent async operations in parallel.',
           priority: 'high',
-          files: sequentialAwaits
+          files: sequentialAwaits,
         });
       }
     }
-    
+
     // Database issues
     if (byCategory.database?.length > 0) {
-      const nPlusOne = byCategory.database.filter(r => 
-        r.issues.some(i => i.type === 'n_plus_one')
+      const nPlusOne = byCategory.database.filter((r) =>
+        r.issues.some((i) => i.type === 'n_plus_one')
       );
-      
+
       if (nPlusOne.length > 0) {
         recommendations.push({
           title: 'Fix N+1 Query Problems',
-          description: 'Database queries in loops cause performance degradation. Use JOINs or batch loading.',
+          description:
+            'Database queries in loops cause performance degradation. Use JOINs or batch loading.',
           priority: 'critical',
-          files: nPlusOne
+          files: nPlusOne,
         });
       }
     }
-    
+
     // Memory issues
     if (byCategory.memory?.length > 0) {
       recommendations.push({
         title: 'Optimize Memory Usage',
-        description: 'Review memory allocations and potential leaks. Consider using more efficient data structures.',
+        description:
+          'Review memory allocations and potential leaks. Consider using more efficient data structures.',
         priority: 'medium',
-        files: byCategory.memory
+        files: byCategory.memory,
       });
     }
-    
+
     // Caching opportunities
     if (byCategory.caching?.length > 0) {
       recommendations.push({
         title: 'Implement Caching',
         description: 'Add memoization or caching for expensive repeated operations.',
         priority: 'medium',
-        files: byCategory.caching
+        files: byCategory.caching,
       });
     }
-    
+
     // Sort by priority
     const priorityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
-    recommendations.sort((a, b) => 
-      priorityOrder[a.priority] - priorityOrder[b.priority]
-    );
-    
+    recommendations.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+
     return recommendations;
   }
 
   async applyOptimization(optimizationId, config) {
     console.log(chalk.blue(`\n🔧 Applying optimization: ${optimizationId}`));
-    
+
     // Find the optimization in results
     let targetOptimization = null;
     let targetFile = null;
-    
+
     for (const result of this.analysisResults) {
-      const suggestion = result.suggestions?.find(s => 
-        s.issueId === optimizationId || s.id === optimizationId
+      const suggestion = result.suggestions?.find(
+        (s) => s.issueId === optimizationId || s.id === optimizationId
       );
-      
+
       if (suggestion) {
         targetOptimization = suggestion;
         targetFile = result.filePath;
         break;
       }
     }
-    
+
     if (!targetOptimization) {
       throw new Error(`Optimization not found: ${optimizationId}`);
     }
-    
+
     console.log(chalk.gray(`File: ${path.relative(this.rootPath, targetFile)}`));
     console.log(chalk.gray(`Type: ${targetOptimization.type || 'General optimization'}`));
-    
+
     // Show optimization details
     if (targetOptimization.optimizations) {
       console.log(chalk.blue('\nOptimizations to apply:'));
@@ -858,40 +868,42 @@ class OptimizePerformanceTask {
         console.log(`  - ${opt.description}`);
       }
     }
-    
+
     // Confirm application
-    const { confirm } = await inquirer.prompt([{
-      type: 'confirm',
-      name: 'confirm',
-      message: 'Apply this optimization?',
-      default: true
-    }]);
-    
+    const { confirm } = await inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'confirm',
+        message: 'Apply this optimization?',
+        default: true,
+      },
+    ]);
+
     if (!confirm) {
       console.log(chalk.gray('Optimization cancelled'));
       return;
     }
-    
+
     // Apply the optimization
     try {
       const result = await this.performanceOptimizer.applyOptimization(
         targetFile,
         targetOptimization
       );
-      
+
       if (result.success) {
         console.log(chalk.green('✅ Optimization applied successfully'));
-        
+
         // Show changes
         for (const change of result.changes) {
           console.log(chalk.gray(`  - ${change.description}`));
         }
-        
+
         this.appliedOptimizations.push({
           file: targetFile,
           optimization: targetOptimization,
           result,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
       } else {
         console.error(chalk.red(`Failed to apply optimization: ${result.error}`));
@@ -903,26 +915,25 @@ class OptimizePerformanceTask {
 
   async generateReport(reportPath) {
     console.log(chalk.blue('\n📤 Generating performance report...'));
-    
+
     const report = await this.performanceOptimizer.generateOptimizationReport();
-    
+
     // Add analysis results
-    report.analysisResults = this.analysisResults.map(r => ({
+    report.analysisResults = this.analysisResults.map((r) => ({
       file: path.relative(this.rootPath, r.filePath),
       performanceScore: r.metrics?.performanceScore,
       issues: r.issues.length,
-      criticalIssues: r.issues.filter(i => 
-        i.impact === 'critical' || i.severity === 'critical'
-      ).length,
-      suggestions: r.suggestions?.length || 0
+      criticalIssues: r.issues.filter((i) => i.impact === 'critical' || i.severity === 'critical')
+        .length,
+      suggestions: r.suggestions?.length || 0,
     }));
-    
+
     // Add applied optimizations
     report.appliedOptimizations = this.appliedOptimizations;
-    
+
     await fs.writeFile(reportPath, JSON.stringify(report, null, 2));
     console.log(chalk.green(`✅ Report generated: ${reportPath}`));
-    
+
     // Show report summary
     console.log(chalk.blue('\n📊 Report Summary:'));
     console.log(`  Files analyzed: ${report.summary.filesAnalyzed}`);
@@ -932,24 +943,25 @@ class OptimizePerformanceTask {
   }
 
   getTotalIssues() {
-    return this.analysisResults.reduce((total, result) => 
-      total + (result.issues?.length || 0), 0
-    );
+    return this.analysisResults.reduce((total, result) => total + (result.issues?.length || 0), 0);
   }
 
   getCriticalIssues() {
-    return this.analysisResults.reduce((total, result) => 
-      total + (result.issues?.filter(i => 
-        i.impact === 'critical' || i.severity === 'critical'
-      ).length || 0), 0
+    return this.analysisResults.reduce(
+      (total, result) =>
+        total +
+        (result.issues?.filter((i) => i.impact === 'critical' || i.severity === 'critical')
+          .length || 0),
+      0
     );
   }
 
   getIssuesByImpact(impact) {
-    return this.analysisResults.reduce((total, result) => 
-      total + (result.issues?.filter(i => 
-        i.impact === impact || i.severity === impact
-      ).length || 0), 0
+    return this.analysisResults.reduce(
+      (total, result) =>
+        total +
+        (result.issues?.filter((i) => i.impact === impact || i.severity === impact).length || 0),
+      0
     );
   }
 }
@@ -960,12 +972,14 @@ module.exports = OptimizePerformanceTask;
 ## Integration Points
 
 ### Performance Optimizer
+
 - Core analysis engine
 - Pattern detection system
 - Optimization suggestion generator
 - Runtime profiling capability
 
 ### Analysis Categories
+
 - **Algorithm**: Time complexity, nested loops
 - **Memory**: Allocations, leaks, data structures
 - **Async**: Promise patterns, parallelization
@@ -975,6 +989,7 @@ module.exports = OptimizePerformanceTask;
 - **Caching**: Memoization opportunities
 
 ### Metrics Collection
+
 - Static code analysis
 - Complexity calculations
 - Performance scoring
@@ -983,6 +998,7 @@ module.exports = OptimizePerformanceTask;
 ## Performance Analysis Workflow
 
 ### Detection Phase
+
 1. Parse source code into AST
 2. Run pattern detectors
 3. Calculate complexity metrics
@@ -990,6 +1006,7 @@ module.exports = OptimizePerformanceTask;
 5. Score performance impact
 
 ### Analysis Phase
+
 1. Evaluate issue severity
 2. Group related issues
 3. Generate optimization suggestions
@@ -997,6 +1014,7 @@ module.exports = OptimizePerformanceTask;
 5. Prioritize recommendations
 
 ### Optimization Phase
+
 1. Review suggestions
 2. Validate safety
 3. Apply transformations
@@ -1006,6 +1024,7 @@ module.exports = OptimizePerformanceTask;
 ## Best Practices
 
 ### Performance Analysis
+
 - Start with critical issues
 - Focus on hot paths
 - Measure before and after
@@ -1013,6 +1032,7 @@ module.exports = OptimizePerformanceTask;
 - Consider trade-offs
 
 ### Optimization Strategy
+
 - Profile first, optimize second
 - Target biggest bottlenecks
 - Preserve code readability
@@ -1020,6 +1040,7 @@ module.exports = OptimizePerformanceTask;
 - Monitor regression
 
 ### Continuous Improvement
+
 - Regular performance audits
 - Automated performance tests
 - Track metrics over time
@@ -1027,8 +1048,9 @@ module.exports = OptimizePerformanceTask;
 - Build performance culture
 
 ## Security Considerations
+
 - Validate optimization safety
 - Preserve functionality
 - Avoid premature optimization
 - Test edge cases
-- Monitor side effects 
+- Monitor side effects

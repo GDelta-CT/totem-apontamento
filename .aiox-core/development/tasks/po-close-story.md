@@ -18,6 +18,7 @@ This task closes the PO story lifecycle that begins with `*validate-story-draft`
 5. **Suggests next story** from the same epic or backlog
 
 **Lifecycle:**
+
 ```
 *validate-story-draft (START) --> Development --> PR/Merge --> *close-story (END)
         |                                                            |
@@ -32,16 +33,19 @@ This task closes the PO story lifecycle that begins with `*validate-story-draft`
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous updates with logging
 - Minimal user interaction
 - **Best for:** Simple story closures with clear PR info
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Confirms each update before applying
 - Educational explanations
 - **Best for:** Learning, first-time users
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Analyzes story, epic, and backlog state first
 - Shows complete plan before execution
 - **Best for:** Complex epics, critical milestones
@@ -187,21 +191,21 @@ questions:
   - Story path (relative to docs/stories/):
     input: text
     validation: File must exist
-    example: "epics/epic-pro-aiox-pro-architecture/story-pro-5-repo-bootstrap.md"
+    example: 'epics/epic-pro-aiox-pro-architecture/story-pro-5-repo-bootstrap.md'
 
   - PR number (optional):
     input: text
     validation: Numeric or empty
-    example: "84"
+    example: '84'
 
   - Merge commit SHA (optional):
     input: text
     validation: 7+ hex chars or empty
-    example: "ce19c81a"
+    example: 'ce19c81a'
 
   - Additional notes for changelog (optional):
     input: textarea
-    example: "CodeRabbit approved with 0 findings"
+    example: 'CodeRabbit approved with 0 findings'
 ```
 
 ### 2. Read and Parse Story
@@ -227,10 +231,7 @@ if (metadata.status === 'Done') {
 
 ```javascript
 // Update Status field
-const updatedStory = storyContent.replace(
-  /\*\*Status:\*\* .+/,
-  '**Status:** Done'
-);
+const updatedStory = storyContent.replace(/\*\*Status:\*\* .+/, '**Status:** Done');
 
 // Add changelog entry
 const today = new Date().toISOString().split('T')[0];
@@ -270,10 +271,7 @@ if (epicId) {
     const completedStories = totalStories - storiesRemaining;
 
     if (storiesRemaining === 0) {
-      updatedEpic = updatedEpic.replace(
-        /\*\*Status:\*\* .+/,
-        '**Status:** Complete'
-      );
+      updatedEpic = updatedEpic.replace(/\*\*Status:\*\* .+/, '**Status:** Complete');
     } else {
       updatedEpic = updatedEpic.replace(
         /\*\*Status:\*\* .+/,
@@ -339,14 +337,17 @@ if (fs.existsSync(backlogPath)) {
 **Changelog:** v${version} added
 
 ### Epic Progress
+
 **Epic:** ${epicId}
 **Progress:** ${completedStories}/${totalStories} stories complete
 **Status:** ${epicStatus}
 
 ### Next Steps
+
 ${nextStorySuggestion}
 
 ---
+
 — Pax, equilibrando prioridades 🎯
 ```
 
@@ -379,10 +380,12 @@ ${nextStorySuggestion}
 ## Integration Points
 
 **Complements:**
+
 - `*validate-story-draft` - Start of story lifecycle (validation)
 - `*close-story` - End of story lifecycle (closure)
 
 **Related Tasks:**
+
 - `po-backlog-add.md` - Add items discovered during closure
 - `po-stories-index.md` - Regenerate story index after closure
 - `po-sync-story.md` - Sync closed story to PM tool
@@ -422,13 +425,16 @@ updated_at: 2026-02-05
 ---
 
 **Related Tasks:**
+
 - `validate-next-story.md` - Validates story before implementation (START)
 - `po-close-story.md` - Closes story after merge (END)
 - `po-backlog-review.md` - Review backlog for sprint planning
 
 ## Handoff
+
 next_agent: @sm
-next_command: *draft
+next_command: \*draft
 condition: Story closed, next story in epic available
 alternatives:
-  - agent: @po, command: *backlog-review, condition: Sprint review needed before next story
+
+- agent: @po, command: \*backlog-review, condition: Sprint review needed before next story

@@ -5,6 +5,7 @@
 **Elicit**: true
 
 **Renamed From (Story 6.1.2.3):**
+
 - `db-impersonate.md` - Clearer name for RLS testing purpose
 
 ---
@@ -14,16 +15,19 @@
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -191,6 +195,7 @@ token_usage: ~800-2,500 tokens
 ```
 
 **Optimization Notes:**
+
 - Validate configuration early; use atomic writes; implement rollback checkpoints
 
 ---
@@ -210,13 +215,14 @@ updated_at: 2025-11-17
 
 ---
 
-
 ## Inputs
 
 **Required:**
+
 - `user_id` (uuid): User ID to emulate
 
 **Optional:**
+
 - `role` (text): Role to test (default: 'authenticated')
 
 ---
@@ -248,6 +254,7 @@ What are you testing?
 **Capture:** `{test_purpose}`
 
 **CRITICAL WARNING:** Display warning:
+
 ```
 ⚠️  WARNING: This is for RLS testing only!
    - Never use in production application code
@@ -386,6 +393,7 @@ SELECT auth.uid() AS current_user;
 ```
 
 **Expected Result:**
+
 - Only rows with `user_id = '{user_id}'` returned
 - Policy `users_read_own_posts` should be active
 
@@ -399,6 +407,7 @@ SELECT * FROM posts WHERE user_id != auth.uid();
 ```
 
 **Expected Result:**
+
 - 0 rows returned (RLS blocks access)
 - No error (just filtered out by RLS)
 
@@ -417,6 +426,7 @@ VALUES ('Hacked Post', 'Content', 'another-user-id');
 ```
 
 **Expected Result:**
+
 - First INSERT succeeds
 - Second INSERT fails or is blocked by RLS `WITH CHECK` policy
 
@@ -433,6 +443,7 @@ UPDATE posts SET title = 'Hacked' WHERE user_id != auth.uid();
 ```
 
 **Expected Result:**
+
 - First UPDATE succeeds
 - Second UPDATE returns `UPDATE 0` (no rows modified)
 
@@ -448,6 +459,7 @@ SELECT * FROM posts;  -- Should see ALL posts
 ```
 
 **Expected Result:**
+
 - All rows returned (service_role bypasses RLS)
 - **WARNING:** Never use service_role in client code!
 
@@ -460,6 +472,7 @@ SELECT * FROM posts;  -- Should see ALL posts
 **Cause:** Session claims not set correctly
 
 **Fix:**
+
 ```sql
 -- Check current settings
 SELECT
@@ -476,6 +489,7 @@ RESET ALL;
 **Cause:** RLS not enabled on table
 
 **Fix:**
+
 ```sql
 -- Check if RLS is enabled
 SELECT tablename, rowsecurity
@@ -491,6 +505,7 @@ ALTER TABLE {tablename} ENABLE ROW LEVEL SECURITY;
 **Cause:** Role doesn't have table permissions
 
 **Fix:**
+
 ```sql
 -- Grant table permissions to role
 GRANT SELECT, INSERT, UPDATE, DELETE ON {tablename} TO authenticated;
@@ -501,6 +516,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON {tablename} TO authenticated;
 **Cause:** Missing or incorrect RLS policy
 
 **Fix:**
+
 ```sql
 -- Check existing policies
 \dp {tablename}
@@ -518,11 +534,13 @@ CREATE POLICY users_read_own_data ON {tablename}
 ### Before Testing
 
 1. **Know your policies:** Review RLS policies before testing
+
    ```sql
    \dp tablename
    ```
 
 2. **Have test data:** Ensure test user has data to query
+
    ```sql
    SELECT * FROM posts WHERE user_id = '{user_id}';
    ```
@@ -551,10 +569,10 @@ CREATE POLICY users_read_own_data ON {tablename}
 
 ```javascript
 // ❌ BAD: Setting JWT claims in application code
-supabase.rpc('set_claims', { user_id: userId })
+supabase.rpc('set_claims', { user_id: userId });
 
 // ❌ BAD: Using service_role key in client
-const supabase = createClient(url, SERVICE_ROLE_KEY)
+const supabase = createClient(url, SERVICE_ROLE_KEY);
 ```
 
 **Testing workflow:**

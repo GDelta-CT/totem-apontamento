@@ -24,7 +24,6 @@ class UsageTracker {
 
       console.log(chalk.green('✅ Usage tracker initialized'));
       return true;
-
     } catch (_error) {
       console.error(chalk.red(`Failed to initialize usage tracker: ${error.message}`));
       throw error;
@@ -46,8 +45,8 @@ class UsageTracker {
       risk_assessment: {
         impact_level: 'low',
         affected_areas: [],
-        migration_complexity: 'simple'
-      }
+        migration_complexity: 'simple',
+      },
     };
 
     try {
@@ -90,7 +89,6 @@ class UsageTracker {
       console.log(chalk.gray(`   Impact level: ${analysis.risk_assessment.impact_level}`));
 
       return analysis;
-
     } catch (_error) {
       console.error(chalk.red(`Usage analysis failed for ${componentId}: ${error.message}`));
       throw error;
@@ -102,7 +100,7 @@ class UsageTracker {
    */
   async trackUsageChanges(componentId, baselineAnalysis) {
     const currentAnalysis = await this.analyzeComponentUsage(componentId);
-    
+
     const changes = {
       component_id: componentId,
       comparison_timestamp: new Date().toISOString(),
@@ -111,18 +109,26 @@ class UsageTracker {
         total_references: {
           before: baselineAnalysis.total_references,
           after: currentAnalysis.total_references,
-          change: currentAnalysis.total_references - baselineAnalysis.total_references
+          change: currentAnalysis.total_references - baselineAnalysis.total_references,
         },
         dependent_components: {
           before: baselineAnalysis.dependent_components.length,
           after: currentAnalysis.dependent_components.length,
-          change: currentAnalysis.dependent_components.length - baselineAnalysis.dependent_components.length
+          change:
+            currentAnalysis.dependent_components.length -
+            baselineAnalysis.dependent_components.length,
         },
-        new_usages: this.findNewUsages(baselineAnalysis.usage_locations, currentAnalysis.usage_locations),
-        removed_usages: this.findRemovedUsages(baselineAnalysis.usage_locations, currentAnalysis.usage_locations)
+        new_usages: this.findNewUsages(
+          baselineAnalysis.usage_locations,
+          currentAnalysis.usage_locations
+        ),
+        removed_usages: this.findRemovedUsages(
+          baselineAnalysis.usage_locations,
+          currentAnalysis.usage_locations
+        ),
       },
       trend: this.calculateUsageTrend(baselineAnalysis, currentAnalysis),
-      migration_progress: this.calculateMigrationProgress(baselineAnalysis, currentAnalysis)
+      migration_progress: this.calculateMigrationProgress(baselineAnalysis, currentAnalysis),
     };
 
     // Save change tracking
@@ -145,11 +151,11 @@ class UsageTracker {
         usage_location: {
           file: usage.file,
           line: usage.line,
-          context: usage.context
+          context: usage.context,
         },
         message: this.generateWarningMessage(componentId, deprecationInfo, usage),
         severity: this.calculateWarningSeverity(deprecationInfo, usage),
-        suggested_actions: this.generateSuggestedActions(componentId, deprecationInfo, usage)
+        suggested_actions: this.generateSuggestedActions(componentId, deprecationInfo, usage),
       };
 
       warnings.push(warning);
@@ -171,11 +177,11 @@ class UsageTracker {
       high_usage_components: [],
       zero_usage_components: [],
       usage_distribution: {},
-      dependency_graph: {}
+      dependency_graph: {},
     };
 
-    const componentsToAnalyze = componentIds || await this.getAllTrackedComponents();
-    
+    const componentsToAnalyze = componentIds || (await this.getAllTrackedComponents());
+
     for (const componentId of componentsToAnalyze) {
       try {
         const analysis = await this.getOrAnalyzeUsage(componentId);
@@ -188,7 +194,7 @@ class UsageTracker {
           stats.high_usage_components.push({
             component_id: componentId,
             reference_count: analysis.total_references,
-            impact_level: analysis.risk_assessment.impact_level
+            impact_level: analysis.risk_assessment.impact_level,
           });
         }
 
@@ -197,8 +203,9 @@ class UsageTracker {
         stats.usage_distribution[usageRange] = (stats.usage_distribution[usageRange] || 0) + 1;
 
         // Add to dependency graph
-        stats.dependency_graph[componentId] = analysis.dependent_components.map(dep => dep.component_id);
-
+        stats.dependency_graph[componentId] = analysis.dependent_components.map(
+          (dep) => dep.component_id
+        );
       } catch (_error) {
         console.warn(chalk.yellow(`Failed to analyze usage for ${componentId}: ${error.message}`));
       }
@@ -251,7 +258,7 @@ class UsageTracker {
    */
   async scanFile(filePath, component) {
     const references = [];
-    
+
     try {
       const content = await fs.readFile(filePath, 'utf-8');
       const lines = content.split('\n');
@@ -262,7 +269,7 @@ class UsageTracker {
 
         // Check for various reference patterns
         const matches = this.findReferencesInLine(line, component);
-        
+
         for (const match of matches) {
           references.push({
             file: filePath,
@@ -270,7 +277,7 @@ class UsageTracker {
             column: match.column,
             context: line.trim(),
             reference_type: match.type,
-            match_text: match.text
+            match_text: match.text,
           });
         }
       }
@@ -289,7 +296,10 @@ class UsageTracker {
     const patterns = this.scanPatterns[component.type] || this.scanPatterns.default;
 
     for (const pattern of patterns) {
-      const regex = new RegExp(pattern.pattern.replace('{component_name}', component.name), pattern.flags || 'gi');
+      const regex = new RegExp(
+        pattern.pattern.replace('{component_name}', component.name),
+        pattern.flags || 'gi'
+      );
       let match;
 
       while ((match = regex.exec(line)) !== null) {
@@ -297,7 +307,7 @@ class UsageTracker {
           type: pattern.type,
           text: match[0],
           column: match.index,
-          confidence: pattern.confidence || 0.8
+          confidence: pattern.confidence || 0.8,
         });
       }
     }
@@ -310,10 +320,10 @@ class UsageTracker {
    */
   async analyzeDependencyRelationships(component, options = {}) {
     const dependencies = [];
-    
+
     // This would analyze manifest files, import statements, etc.
     // For now, return empty array as placeholder
-    
+
     return dependencies;
   }
 
@@ -322,7 +332,7 @@ class UsageTracker {
    */
   async scanForExternalReferences(component, options = {}) {
     const externalRefs = [];
-    
+
     // Check configuration files
     const configRefs = await this.scanConfigurationFiles(component);
     externalRefs.push(...configRefs);
@@ -342,7 +352,7 @@ class UsageTracker {
       by_file_type: {},
       by_usage_type: {},
       temporal_distribution: {},
-      complexity_indicators: {}
+      complexity_indicators: {},
     };
 
     for (const ref of references) {
@@ -351,7 +361,8 @@ class UsageTracker {
       patterns.by_file_type[ext] = (patterns.by_file_type[ext] || 0) + 1;
 
       // Group by reference type
-      patterns.by_usage_type[ref.reference_type] = (patterns.by_usage_type[ref.reference_type] || 0) + 1;
+      patterns.by_usage_type[ref.reference_type] =
+        (patterns.by_usage_type[ref.reference_type] || 0) + 1;
     }
 
     return patterns;
@@ -387,7 +398,7 @@ class UsageTracker {
     return {
       impact_level: impactLevel,
       affected_areas: affectedAreas,
-      migration_complexity: migrationComplexity
+      migration_complexity: migrationComplexity,
     };
   }
 
@@ -397,12 +408,12 @@ class UsageTracker {
     // This would typically integrate with the component registry
     // For now, return a basic component structure
     const [type, name] = componentId.split('/');
-    
+
     return {
       id: componentId,
       type: type,
       name: name,
-      file_path: `aiox-core/${type}s/${name}.md`
+      file_path: `aiox-core/${type}s/${name}.md`,
     };
   }
 
@@ -410,7 +421,7 @@ class UsageTracker {
     const defaultPaths = [
       path.join(this.rootPath, 'aiox-core'),
       path.join(this.rootPath, 'src'),
-      path.join(this.rootPath, 'lib')
+      path.join(this.rootPath, 'lib'),
     ];
 
     if (options.scanPaths) {
@@ -433,13 +444,13 @@ class UsageTracker {
 
   async getFilesToScan(scanPath) {
     const files = [];
-    
+
     try {
       const entries = await fs.readdir(scanPath, { withFileTypes: true });
-      
+
       for (const entry of entries) {
         const fullPath = path.join(scanPath, entry.name);
-        
+
         if (entry.isDirectory()) {
           // Recursively scan subdirectories
           const subFiles = await this.getFilesToScan(fullPath);
@@ -463,19 +474,14 @@ class UsageTracker {
 
   async scanConfigurationFiles(component) {
     const configRefs = [];
-    const configFiles = [
-      'package.json',
-      '.aioxrc',
-      'aiox.config.js',
-      'manifest.yaml'
-    ];
+    const configFiles = ['package.json', '.aioxrc', 'aiox.config.js', 'manifest.yaml'];
 
     for (const configFile of configFiles) {
       const configPath = path.join(this.rootPath, configFile);
-      
+
       try {
         const refs = await this.scanFile(configPath, component);
-        configRefs.push(...refs.map(ref => ({ ...ref, source: 'configuration' })));
+        configRefs.push(...refs.map((ref) => ({ ...ref, source: 'configuration' })));
       } catch (_error) {
         // Config file doesn't exist or can't be read
       }
@@ -487,13 +493,13 @@ class UsageTracker {
   async scanDocumentationFiles(component) {
     const docRefs = [];
     const docsPath = path.join(this.rootPath, 'docs');
-    
+
     try {
       const files = await this.getFilesToScan(docsPath);
-      
+
       for (const file of files) {
         const refs = await this.scanFile(file, component);
-        docRefs.push(...refs.map(ref => ({ ...ref, source: 'documentation' })));
+        docRefs.push(...refs.map((ref) => ({ ...ref, source: 'documentation' })));
       }
     } catch (_error) {
       // Docs directory doesn't exist
@@ -503,24 +509,26 @@ class UsageTracker {
   }
 
   findNewUsages(oldUsages, newUsages) {
-    return newUsages.filter(newUsage => 
-      !oldUsages.some(oldUsage => 
-        oldUsage.file === newUsage.file && oldUsage.line === newUsage.line
-      )
+    return newUsages.filter(
+      (newUsage) =>
+        !oldUsages.some(
+          (oldUsage) => oldUsage.file === newUsage.file && oldUsage.line === newUsage.line
+        )
     );
   }
 
   findRemovedUsages(oldUsages, newUsages) {
-    return oldUsages.filter(oldUsage => 
-      !newUsages.some(newUsage => 
-        newUsage.file === oldUsage.file && newUsage.line === oldUsage.line
-      )
+    return oldUsages.filter(
+      (oldUsage) =>
+        !newUsages.some(
+          (newUsage) => newUsage.file === oldUsage.file && newUsage.line === oldUsage.line
+        )
     );
   }
 
   calculateUsageTrend(baseline, current) {
     const referenceChange = current.total_references - baseline.total_references;
-    
+
     if (referenceChange > 0) return 'increasing';
     if (referenceChange < 0) return 'decreasing';
     return 'stable';
@@ -528,24 +536,24 @@ class UsageTracker {
 
   calculateMigrationProgress(baseline, current) {
     if (baseline.total_references === 0) return 1.0;
-    
+
     const remainingUsages = current.total_references;
     const originalUsages = baseline.total_references;
-    
+
     return Math.max(0, (originalUsages - remainingUsages) / originalUsages);
   }
 
   generateWarningMessage(componentId, deprecationInfo, usage) {
     let message = `DEPRECATED: ${componentId} is deprecated`;
-    
+
     if (deprecationInfo.replacement) {
       message += ` - use ${deprecationInfo.replacement} instead`;
     }
-    
+
     if (deprecationInfo.removalVersion) {
       message += ` (will be removed in ${deprecationInfo.removalVersion})`;
     }
-    
+
     return message;
   }
 
@@ -557,18 +565,18 @@ class UsageTracker {
 
   generateSuggestedActions(componentId, deprecationInfo, usage) {
     const actions = [];
-    
+
     if (deprecationInfo.replacement) {
       actions.push(`Replace with ${deprecationInfo.replacement}`);
     }
-    
+
     if (deprecationInfo.migrationGuide) {
       actions.push(`See migration guide: ${deprecationInfo.migrationGuide}`);
     }
-    
+
     actions.push('Update imports and references');
     actions.push('Test functionality after replacement');
-    
+
     return actions;
   }
 
@@ -584,7 +592,7 @@ class UsageTracker {
     if (this.usageCache.has(componentId)) {
       return this.usageCache.get(componentId);
     }
-    
+
     return await this.analyzeComponentUsage(componentId);
   }
 
@@ -597,21 +605,21 @@ class UsageTracker {
   async saveUsageAnalysis(analysis) {
     const filename = `usage-${analysis.component_id.replace('/', '-')}-${Date.now()}.json`;
     const filePath = path.join(this.usageDir, filename);
-    
+
     await fs.writeFile(filePath, JSON.stringify(analysis, null, 2));
   }
 
   async saveUsageChanges(changes) {
     const filename = `changes-${changes.component_id.replace('/', '-')}-${Date.now()}.json`;
     const filePath = path.join(this.usageDir, filename);
-    
+
     await fs.writeFile(filePath, JSON.stringify(changes, null, 2));
   }
 
   async saveUsageWarnings(componentId, warnings) {
     const filename = `warnings-${componentId.replace('/', '-')}-${Date.now()}.json`;
     const filePath = path.join(this.usageDir, filename);
-    
+
     await fs.writeFile(filePath, JSON.stringify(warnings, null, 2));
   }
 
@@ -621,52 +629,52 @@ class UsageTracker {
         {
           pattern: 'agent:\\s*{component_name}',
           type: 'yaml_reference',
-          confidence: 0.9
+          confidence: 0.9,
         },
         {
           pattern: 'use\\s+{component_name}',
           type: 'usage_statement',
-          confidence: 0.8
-        }
+          confidence: 0.8,
+        },
       ],
       task: [
         {
           pattern: '\\*{component_name}',
           type: 'task_invocation',
-          confidence: 0.9
+          confidence: 0.9,
         },
         {
           pattern: 'require\\(.*{component_name}.*\\)',
           type: 'import_statement',
-          confidence: 0.8
-        }
+          confidence: 0.8,
+        },
       ],
       workflow: [
         {
           pattern: 'workflow:\\s*{component_name}',
           type: 'workflow_reference',
-          confidence: 0.9
-        }
+          confidence: 0.9,
+        },
       ],
       util: [
         {
           pattern: 'require\\(.*{component_name}.*\\)',
           type: 'import_statement',
-          confidence: 0.9
+          confidence: 0.9,
         },
         {
           pattern: 'import.*{component_name}',
           type: 'import_statement',
-          confidence: 0.9
-        }
+          confidence: 0.9,
+        },
       ],
       default: [
         {
           pattern: '{component_name}',
           type: 'general_reference',
-          confidence: 0.6
-        }
-      ]
+          confidence: 0.6,
+        },
+      ],
     };
   }
 }

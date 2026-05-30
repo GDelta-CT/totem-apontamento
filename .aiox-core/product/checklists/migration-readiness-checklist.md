@@ -70,6 +70,6 @@
 
 **Go/No-Go Decision:**
 [ ] GO - All critical items checked
-[ ] NO-GO - Blockers:_________________
+[ ] NO-GO - Blockers:********\_********
 
-**Approved By:** ________ **Date:** ________
+**Approved By:** **\_\_\_\_** **Date:** **\_\_\_\_**

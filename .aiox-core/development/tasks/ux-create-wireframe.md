@@ -12,16 +12,19 @@
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -175,6 +178,7 @@ token_usage: ~1,500-5,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Cache template compilation; minimize data transformations; lazy load resources
 
 ---
@@ -193,7 +197,6 @@ updated_at: 2025-11-17
 ```
 
 ---
-
 
 ## 📋 Description
 
@@ -215,18 +218,21 @@ Design wireframes, prototypes, and interaction flows based on user research insi
 ## 📊 Fidelity Levels
 
 ### Low-Fidelity (Lo-Fi)
+
 **When to use:** Early exploration, quick iteration
 **Tools:** Sketch, whiteboard, ASCII art
 **Time:** 30 min - 2 hours
 **Detail:** Boxes and labels, no styling
 
 ### Mid-Fidelity (Mid-Fi)
+
 **When to use:** Stakeholder review, usability testing
 **Tools:** Figma, Sketch, Balsamiq
 **Time:** 4-8 hours
 **Detail:** Layout, hierarchy, some content
 
 ### High-Fidelity (Hi-Fi)
+
 **When to use:** Developer handoff, final approval
 **Tools:** Figma, Adobe XD, Sketch
 **Time:** 1-3 days
@@ -237,6 +243,7 @@ Design wireframes, prototypes, and interaction flows based on user research insi
 ## 🔄 Workflow
 
 ### Step 1: Define Wireframe Scope
+
 **Interactive Elicitation:**
 
 ```
@@ -260,12 +267,14 @@ Your use case: _____
 ### Step 2: Review Research Insights
 
 **Pull from user research:**
+
 - User personas (who are we designing for?)
 - User goals (what do they want to accomplish?)
 - Pain points (what frustrates them currently?)
 - Behavioral patterns (how do they work?)
 
 **Example:**
+
 ```
 Designing for: [Persona Name]
 Goal: [User goal from research]
@@ -279,6 +288,7 @@ Constraint: [Technical or business constraint]
 
 **Content Inventory:**
 List all content elements needed per screen:
+
 - Headers and titles
 - Navigation elements
 - Form fields
@@ -288,6 +298,7 @@ List all content elements needed per screen:
 - Helper text
 
 **Example:**
+
 ```
 Screen: Dashboard
 -----
@@ -307,6 +318,7 @@ Screen: Dashboard
 #### Low-Fidelity (ASCII/Text-Based)
 
 **Example Lo-Fi Wireframe:**
+
 ```
 +----------------------------------------------------------+
 |  [Logo]                    [Nav1] [Nav2] [Nav3] [Profile]|
@@ -339,6 +351,7 @@ Screen: Dashboard
 #### Mid-Fidelity Wireframe Components
 
 **Component Checklist:**
+
 - [ ] Navigation (global, contextual)
 - [ ] Page title and breadcrumbs
 - [ ] Content areas (primary, secondary, sidebar)
@@ -352,6 +365,7 @@ Screen: Dashboard
 
 **Atomic Design Structure:**
 Break wireframe into components:
+
 - **Atoms:** Button, Input, Label, Icon
 - **Molecules:** Form Field (Label + Input), Card (Image + Title + Text)
 - **Organisms:** Header (Logo + Nav + Profile), Form (Multiple Fields + Button)
@@ -361,6 +375,7 @@ Break wireframe into components:
 ### Step 5: Document Interaction Flows
 
 **Flow Diagram Template:**
+
 ```
 [Start] → [Screen 1] → [User Action] → [Screen 2] → [Conditional Branch]
                                               ↓
@@ -374,6 +389,7 @@ Break wireframe into components:
 ```
 
 **Example: Login Flow**
+
 ```
 [Landing Page]
       ↓
@@ -400,6 +416,7 @@ Break wireframe into components:
 ### Step 6: Add Annotations
 
 **Annotation Types:**
+
 1. **Functionality** - "Clicking here opens modal"
 2. **Content** - "Show user's first name from profile"
 3. **State** - "Disabled if form incomplete"
@@ -408,6 +425,7 @@ Break wireframe into components:
 6. **Performance** - "Lazy load images below fold"
 
 **Example:**
+
 ```
 [Button: Save Changes]
 ---
@@ -429,6 +447,7 @@ List all unique components for development:
 ## Component Inventory (Atomic Design)
 
 ### Atoms (18 total)
+
 - Button (Primary, Secondary, Destructive, Ghost)
 - Input (Text, Email, Password, Number, Search)
 - Label
@@ -438,6 +457,7 @@ List all unique components for development:
 - Divider
 
 ### Molecules (8 total)
+
 - Form Field (Label + Input + Helper Text + Error)
 - Search Bar (Input + Icon + Button)
 - Card Header (Avatar + Title + Subtitle)
@@ -448,6 +468,7 @@ List all unique components for development:
 - Empty State (Icon + Title + Description + CTA)
 
 ### Organisms (5 total)
+
 - Header (Logo + Navigation + Search + Profile)
 - Form (Multiple Fields + Submit Button)
 - Data Table (Headers + Rows + Pagination)
@@ -460,6 +481,7 @@ List all unique components for development:
 ### Step 8: Prepare Developer Handoff
 
 **Handoff Package Includes:**
+
 1. **Wireframes** - All screens (PNG/PDF export)
 2. **Interaction Flows** - Flow diagrams
 3. **Component Inventory** - List with specifications
@@ -468,6 +490,7 @@ List all unique components for development:
 6. **Measurements** - Spacing, sizing guidelines
 
 **Spacing System:**
+
 ```
 Base unit: 4px
 
@@ -482,6 +505,7 @@ Scale:
 ```
 
 **Breakpoints:**
+
 ```
 - Mobile: < 640px
 - Tablet: 640px - 1024px
@@ -495,6 +519,7 @@ Scale:
 All artifacts saved to: `outputs/wireframes/{project}/`
 
 ### Required Files:
+
 1. **wireframes/** - All screen wireframes (PNG/ASCII)
 2. **flows.md** - Interaction flow diagrams
 3. **component-inventory.md** - List of all components (Atomic Design)
@@ -502,6 +527,7 @@ All artifacts saved to: `outputs/wireframes/{project}/`
 5. **handoff-package.md** - Developer handoff guide
 
 ### Optional Files:
+
 6. **assets/** - Icons, logos, images
 7. **measurements.md** - Spacing and sizing specs
 8. **responsive-notes.md** - Mobile/tablet/desktop variations
@@ -526,15 +552,18 @@ All artifacts saved to: `outputs/wireframes/{project}/`
 ## 🔄 Integration with Other Tasks
 
 **Previous Steps:**
+
 - `*research` - Use personas and insights to inform design
 
 **Next Steps:**
+
 - `*generate-ui-prompt` - Convert wireframes to AI prompts for v0/Lovable
 - `*build` - Implement components from inventory
 - `*create-front-end-spec` - Create detailed specifications
 
 **State Management:**
 Updates `.state.yaml` with:
+
 - `wireframes_created: [list of screen names]`
 - `fidelity_level: "low" | "mid" | "high"`
 - `component_inventory: [list of components]`
@@ -547,6 +576,7 @@ Updates `.state.yaml` with:
 After creating wireframes, generate prompts for AI tools:
 
 **v0.dev Prompt Template:**
+
 ```
 Create a [Component Name] component with:
 - [Feature 1]
@@ -560,6 +590,7 @@ Accessibility: WCAG AA compliant
 ```
 
 **Lovable Prompt Template:**
+
 ```
 Build a [Screen Name] page featuring:
 - [Section 1 description]
@@ -576,18 +607,21 @@ Dark mode: [Yes/No]
 ## 📚 Best Practices
 
 ### Visual Hierarchy
+
 - Larger = more important
 - Bold = action or emphasis
 - Color = status or category
 - Proximity = related items
 
 ### Consistency
+
 - Use same components throughout
 - Maintain spacing patterns
 - Follow established navigation
 - Repeat interaction patterns
 
 ### Accessibility
+
 - Sufficient contrast (4.5:1 minimum)
 - Clear focus indicators
 - Logical tab order
@@ -595,6 +629,7 @@ Dark mode: [Yes/No]
 - Form labels and error messages
 
 ### Mobile-First
+
 - Design for smallest screen first
 - Progressive enhancement for larger screens
 - Touch targets minimum 44x44px

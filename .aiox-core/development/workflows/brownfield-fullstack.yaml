@@ -5,7 +5,7 @@ workflow:
     Agent workflow for enhancing existing full-stack applications with new features,
     modernization, or significant changes. Handles existing system analysis and safe integration.
   type: brownfield
-  version: "1.0"
+  version: '1.0'
   project_types:
     - feature-addition
     - refactoring
@@ -30,7 +30,7 @@ workflow:
       step: enhancement_classification
       agent: analyst
       action: classify enhancement scope
-      duration_estimate: "10-15 min"
+      duration_estimate: '10-15 min'
       elicit: true
       notes: |
         Determine enhancement complexity to route to appropriate path:
@@ -43,20 +43,20 @@ workflow:
     - id: routing-decision
       step: routing_decision
       meta: routing
-      duration_estimate: "5 min"
+      duration_estimate: '5 min'
       condition: based_on_classification
       routes:
         single_story:
           agent: pm
           uses: brownfield-create-story
-          notes: "Create single story for immediate implementation. Exit workflow after story creation."
+          notes: 'Create single story for immediate implementation. Exit workflow after story creation.'
         small_feature:
           agent: pm
           uses: brownfield-create-epic
-          notes: "Create focused epic with 1-3 stories. Exit workflow after epic creation."
+          notes: 'Create focused epic with 1-3 stories. Exit workflow after epic creation.'
         major_enhancement:
           continue: to_next_step
-          notes: "Continue with comprehensive planning workflow below."
+          notes: 'Continue with comprehensive planning workflow below.'
 
     - phase: 2
       name: Planning & Documentation
@@ -65,7 +65,7 @@ workflow:
       step: documentation_check
       agent: analyst
       action: check existing documentation
-      duration_estimate: "10-20 min"
+      duration_estimate: '10-20 min'
       condition: major_enhancement_path
       notes: |
         Check if adequate project documentation exists:
@@ -79,15 +79,15 @@ workflow:
       agent: architect
       action: analyze existing project and use task document-project
       creates: [brownfield-architecture.md]
-      duration_estimate: "30-60 min"
+      duration_estimate: '30-60 min'
       condition: documentation_inadequate
-      notes: "Run document-project to capture current system state, technical debt, and constraints. Pass findings to PRD creation."
+      notes: 'Run document-project to capture current system state, technical debt, and constraints. Pass findings to PRD creation.'
 
     - id: pm-create-prd
       agent: pm
       creates: prd.md
       uses: brownfield-prd-tmpl
-      duration_estimate: "30-60 min"
+      duration_estimate: '30-60 min'
       requires: existing_documentation_or_analysis
       notes: |
         Creates PRD for major enhancement. If document-project was run, reference its output to avoid re-analysis.
@@ -99,7 +99,7 @@ workflow:
       agent: pm
       alternative_agent: architect
       action: determine if architecture document needed
-      duration_estimate: "10-15 min"
+      duration_estimate: '10-15 min'
       condition: after_prd_creation
       notes: |
         Review PRD to determine if architectural planning is needed:
@@ -112,7 +112,7 @@ workflow:
       agent: architect
       creates: architecture.md
       uses: brownfield-architecture-tmpl
-      duration_estimate: "30-60 min"
+      duration_estimate: '30-60 min'
       requires: prd.md
       condition: architecture_changes_needed
       notes: "Creates architecture ONLY for significant architectural changes. SAVE OUTPUT: Copy final architecture.md to your project's docs/ folder."
@@ -121,17 +121,17 @@ workflow:
       agent: po
       validates: all_artifacts
       uses: po-master-checklist
-      duration_estimate: "15-30 min"
-      notes: "Validates all documents for integration safety and completeness. May require updates to any document."
+      duration_estimate: '15-30 min'
+      notes: 'Validates all documents for integration safety and completeness. May require updates to any document.'
 
     - id: po-delegate-fixes
       agent: po
       action: delegate_fixes
       delegates_to: [analyst, pm, architect]
       updates: any_flagged_documents
-      duration_estimate: "15-30 min"
+      duration_estimate: '15-30 min'
       condition: po_checklist_issues
-      notes: "If PO finds issues, PO delegates fixes to the relevant agent and re-validates updated documents in docs/ folder."
+      notes: 'If PO finds issues, PO delegates fixes to the relevant agent and re-validates updated documents in docs/ folder.'
 
     - phase: 3
       name: Document Sharding
@@ -140,8 +140,8 @@ workflow:
       agent: po
       action: shard_documents
       creates: sharded_docs
-      duration_estimate: "15-30 min"
-      requires:  # all validated artifacts must be saved in project docs/ folder
+      duration_estimate: '15-30 min'
+      requires: # all validated artifacts must be saved in project docs/ folder
         - prd.md
         - architecture.md
       notes: |
@@ -157,7 +157,7 @@ workflow:
       agent: sm
       action: create_story
       creates: story.md
-      duration_estimate: "15-30 min"
+      duration_estimate: '15-30 min'
       requires: sharded_docs_or_brownfield_docs
       repeats: for_each_epic_or_enhancement
       notes: |
@@ -173,7 +173,7 @@ workflow:
       alternative_agent: analyst
       action: review_draft_story
       updates: story.md
-      duration_estimate: "10-20 min"
+      duration_estimate: '10-20 min'
       requires: story.md
       optional: true
       condition: user_wants_story_review
@@ -187,7 +187,7 @@ workflow:
       agent: dev
       action: implement_story
       creates: implementation_files
-      duration_estimate: "1-4 hours"
+      duration_estimate: '1-4 hours'
       requires: story.md
       notes: |
         Dev Agent (New Chat): @dev
@@ -199,7 +199,7 @@ workflow:
       agent: qa
       action: review_implementation
       updates: implementation_files
-      duration_estimate: "20-40 min"
+      duration_estimate: '20-40 min'
       requires: implementation_files
       optional: true
       notes: |
@@ -214,7 +214,7 @@ workflow:
       action: address_qa_feedback
       updates: implementation_files
       requires: implementation_files
-      duration_estimate: "30-60 min"
+      duration_estimate: '30-60 min'
       condition: qa_left_unchecked_items
       notes: |
         If QA left unchecked items:
@@ -232,7 +232,7 @@ workflow:
       agent: po
       action: epic_retrospective
       creates: epic-retrospective.md
-      duration_estimate: "15-30 min"
+      duration_estimate: '15-30 min'
       condition: epic_complete
       optional: true
       notes: |
@@ -352,7 +352,7 @@ workflow:
       {{if yes}}: Proceeding to create architecture document for: {{specific_changes}}
       {{if no}}: No architectural changes needed. Proceeding to validation.
 
-    architect_to_po: "Architecture complete. Save it as docs/architecture.md. Please validate all artifacts for integration safety."
+    architect_to_po: 'Architecture complete. Save it as docs/architecture.md. Please validate all artifacts for integration safety.'
 
     po_to_sm: |
       All artifacts validated.
@@ -364,4 +364,4 @@ workflow:
       Creating story from {{documentation_type}}.
       {{if missing_context}}: May need to gather additional context from user during story creation.
 
-    complete: "All planning artifacts validated and development can begin. Stories will be created based on available documentation format."
+    complete: 'All planning artifacts validated and development can begin. Stories will be created based on available documentation format.'

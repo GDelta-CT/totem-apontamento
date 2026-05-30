@@ -37,12 +37,12 @@ function collectHookStatus(projectRoot) {
 
       hasHookRegistered = promptHooks.some((entry) => {
         // Flat format: { command: "node ..." } or string
-        const flatCmd = typeof entry === 'string' ? entry : (entry.command || '');
+        const flatCmd = typeof entry === 'string' ? entry : entry.command || '';
         if (flatCmd.includes('synapse-engine')) return true;
         // Nested format (Claude Code actual): { hooks: [{ type, command }] }
         if (Array.isArray(entry.hooks)) {
           return entry.hooks.some((h) => {
-            const cmd = typeof h === 'string' ? h : (h.command || '');
+            const cmd = typeof h === 'string' ? h : h.command || '';
             return cmd.includes('synapse-engine');
           });
         }

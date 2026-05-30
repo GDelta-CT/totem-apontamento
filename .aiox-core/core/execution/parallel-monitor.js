@@ -367,7 +367,7 @@ class ParallelMonitor extends EventEmitter {
       JSON.stringify({
         type: 'status',
         data: this.getStatus(),
-      }),
+      })
     );
   }
 

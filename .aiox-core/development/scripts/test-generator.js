@@ -15,7 +15,7 @@ class TestGenerator {
       total_generated: 0,
       successful: 0,
       failed: 0,
-      generation_time: 0
+      generation_time: 0,
     };
   }
 
@@ -35,7 +35,6 @@ class TestGenerator {
 
       console.log(chalk.green('✅ Test generator initialized'));
       return true;
-
     } catch (_error) {
       console.error(chalk.red(`Failed to initialize test generator: ${error.message}`));
       throw error;
@@ -47,7 +46,7 @@ class TestGenerator {
    */
   async generateTestFile(component, testFile, config) {
     const startTime = Date.now();
-    
+
     try {
       console.log(chalk.blue(`🧪 Generating ${testFile.test_type} test for ${component.name}`));
 
@@ -64,9 +63,8 @@ class TestGenerator {
       this.updateGenerationStats(true, Date.now() - startTime);
 
       console.log(chalk.green(`✅ Generated ${testFile.test_type} test for ${component.name}`));
-      
-      return processedContent;
 
+      return processedContent;
     } catch (_error) {
       this.updateGenerationStats(false, Date.now() - startTime);
       console.error(chalk.red(`Failed to generate test for ${component.name}: ${error.message}`));
@@ -87,19 +85,18 @@ class TestGenerator {
     for (const testFile of testSuite.test_files) {
       try {
         const testContent = await this.generateTestFile(component, testFile, config);
-        
+
         generatedFiles.push({
           file_path: testFile.file_path,
           test_type: testFile.test_type,
           content: testContent,
-          test_count: testFile.test_count
+          test_count: testFile.test_count,
         });
-
       } catch (_error) {
         errors.push({
           file_path: testFile.file_path,
           test_type: testFile.test_type,
-          error: error.message
+          error: error.message,
         });
       }
     }
@@ -108,11 +105,13 @@ class TestGenerator {
       component_id: component.id,
       generated_files: generatedFiles,
       errors: errors,
-      success_rate: generatedFiles.length / testSuite.test_files.length
+      success_rate: generatedFiles.length / testSuite.test_files.length,
     };
 
     console.log(chalk.green(`✅ Test suite generated for ${component.name}`));
-    console.log(chalk.gray(`   Generated: ${generatedFiles.length}/${testSuite.test_files.length} files`));
+    console.log(
+      chalk.gray(`   Generated: ${generatedFiles.length}/${testSuite.test_files.length} files`)
+    );
     console.log(chalk.gray(`   Success rate: ${Math.round(result.success_rate * 100)}%`));
 
     return result;
@@ -146,8 +145,8 @@ class TestGenerator {
 
       // Add component-specific test cases
       const additionalTestCases = await this.generateAdditionalTestCases(
-        componentAnalysis, 
-        testFile.test_type, 
+        componentAnalysis,
+        testFile.test_type,
         config
       );
 
@@ -166,7 +165,6 @@ class TestGenerator {
       if (setupTeardown) {
         enhancedContent = this.injectSetupTeardown(enhancedContent, setupTeardown);
       }
-
     } catch (_error) {
       console.warn(chalk.yellow(`Failed to enhance test content: ${error.message}`));
       // Return base content if enhancement fails
@@ -190,7 +188,7 @@ class TestGenerator {
       dependencies: [],
       async_operations: false,
       error_handling: false,
-      configuration: null
+      configuration: null,
     };
 
     try {
@@ -200,7 +198,7 @@ class TestGenerator {
 
       // Read component file
       const content = await fs.readFile(component.filePath, 'utf-8');
-      
+
       if (component.type === 'util') {
         // Analyze JavaScript utility
         analysis.exports = this.extractExports(content);
@@ -220,7 +218,6 @@ class TestGenerator {
         analysis.functions = this.extractFunctions(content);
         analysis.configuration = this.extractTaskConfig(content);
       }
-
     } catch (_error) {
       console.warn(chalk.yellow(`Failed to analyze component ${component.id}: ${error.message}`));
     }
@@ -271,8 +268,8 @@ class TestGenerator {
       setup: func.async ? 'const result = await ' : 'const result = ',
       assertions: [
         `expect(result).toBeDefined();`,
-        func.async ? `expect(typeof result).toBe('object');` : `expect(result).toBeTruthy();`
-      ]
+        func.async ? `expect(typeof result).toBe('object');` : `expect(result).toBeTruthy();`,
+      ],
     });
 
     // Parameter validation test
@@ -281,9 +278,7 @@ class TestGenerator {
         name: `should handle invalid parameters for ${func.name}`,
         type: 'validation',
         setup: `const invalidCall = () => ${func.name}();`,
-        assertions: [
-          `expect(invalidCall).toThrow();`
-        ]
+        assertions: [`expect(invalidCall).toThrow();`],
       });
     }
 
@@ -293,9 +288,7 @@ class TestGenerator {
         name: `should handle edge cases for ${func.name}`,
         type: 'edge_case',
         setup: `// Edge case testing for ${func.name}`,
-        assertions: [
-          `// Add edge case assertions here`
-        ]
+        assertions: [`// Add edge case assertions here`],
       });
     }
 
@@ -315,8 +308,8 @@ class TestGenerator {
       setup: `const instance = new ${cls.name}();`,
       assertions: [
         `expect(instance).toBeInstanceOf(${cls.name});`,
-        `expect(instance).toBeDefined();`
-      ]
+        `expect(instance).toBeDefined();`,
+      ],
     });
 
     // Method tests
@@ -325,9 +318,7 @@ class TestGenerator {
         name: `should execute ${cls.name}.${method.name} correctly`,
         type: 'method',
         setup: `const instance = new ${cls.name}();\nconst result = ${method.async ? 'await ' : ''}instance.${method.name}();`,
-        assertions: [
-          `expect(result).toBeDefined();`
-        ]
+        assertions: [`expect(result).toBeDefined();`],
       });
     }
 
@@ -343,19 +334,14 @@ class TestGenerator {
         name: 'should handle async operations correctly',
         type: 'async',
         setup: '// Async operation test setup',
-        assertions: [
-          '// Add async-specific assertions',
-          'expect(result).resolves.toBeDefined();'
-        ]
+        assertions: ['// Add async-specific assertions', 'expect(result).resolves.toBeDefined();'],
       },
       {
         name: 'should handle async operation timeouts',
         type: 'timeout',
         setup: '// Timeout test setup',
-        assertions: [
-          'expect(longRunningOperation).rejects.toThrow("timeout");'
-        ]
-      }
+        assertions: ['expect(longRunningOperation).rejects.toThrow("timeout");'],
+      },
     ];
   }
 
@@ -370,9 +356,9 @@ class TestGenerator {
         setup: '// Error simulation setup',
         assertions: [
           'expect(errorHandlerFunction).not.toThrow();',
-          'expect(result.error).toBeDefined();'
-        ]
-      }
+          'expect(result.error).toBeDefined();',
+        ],
+      },
     ];
   }
 
@@ -477,7 +463,10 @@ class TestGenerator {
     // Replace component variables
     result = result.replace(/\${data\.component\.name}/g, component.name);
     result = result.replace(/\${data\.component\.type}/g, component.type);
-    result = result.replace(/\${this\.toClassName\(data\.component\.name\)}/g, this.toClassName(component.name));
+    result = result.replace(
+      /\${this\.toClassName\(data\.component\.name\)}/g,
+      this.toClassName(component.name)
+    );
 
     // Replace config variables
     result = result.replace(/\${data\.config\.framework}/g, config.framework);
@@ -494,7 +483,10 @@ class TestGenerator {
     let formatted = content;
 
     // Fix indentation
-    formatted = formatted.replace(/\n {2,}/g, match => '\n' + '  '.repeat(Math.floor(match.length / 2)));
+    formatted = formatted.replace(
+      /\n {2,}/g,
+      (match) => '\n' + '  '.repeat(Math.floor(match.length / 2))
+    );
 
     // Remove excessive blank lines
     formatted = formatted.replace(/\n{3,}/g, '\n\n');
@@ -529,7 +521,11 @@ ${content}`;
       // Basic syntax validation
       if (framework === 'jest' || framework === 'vitest') {
         // Check for required Jest/Vitest patterns
-        if (!content.includes('describe(') && !content.includes('test(') && !content.includes('it(')) {
+        if (
+          !content.includes('describe(') &&
+          !content.includes('test(') &&
+          !content.includes('it(')
+        ) {
           throw new Error('No test cases found');
         }
       } else if (framework === 'mocha') {
@@ -542,11 +538,10 @@ ${content}`;
       // Check for balanced brackets
       const openBrackets = (content.match(/\{/g) || []).length;
       const closeBrackets = (content.match(/\}/g) || []).length;
-      
+
       if (openBrackets !== closeBrackets) {
         throw new Error('Unbalanced brackets in generated test');
       }
-
     } catch (_error) {
       console.warn(chalk.yellow(`Test syntax validation warning: ${error.message}`));
     }
@@ -557,23 +552,31 @@ ${content}`;
   injectAdditionalTestCases(content, testCases) {
     if (testCases.length === 0) return content;
 
-    const additionalTests = testCases.map(testCase => {
-      let caseContent = `  it('${testCase.name}', async () => {\n`;
-      
-      if (testCase.setup) {
-        caseContent += `    ${testCase.setup}\n\n`;
-      }
-      
-      caseContent += testCase.assertions.map(assertion => `    ${assertion}`).join('\n');
-      caseContent += '\n  });';
-      
-      return caseContent;
-    }).join('\n\n');
+    const additionalTests = testCases
+      .map((testCase) => {
+        let caseContent = `  it('${testCase.name}', async () => {\n`;
+
+        if (testCase.setup) {
+          caseContent += `    ${testCase.setup}\n\n`;
+        }
+
+        caseContent += testCase.assertions.map((assertion) => `    ${assertion}`).join('\n');
+        caseContent += '\n  });';
+
+        return caseContent;
+      })
+      .join('\n\n');
 
     // Find insertion point (before closing of describe block)
     const insertionPoint = content.lastIndexOf('});');
     if (insertionPoint !== -1) {
-      return content.slice(0, insertionPoint) + '\n\n' + additionalTests + '\n\n' + content.slice(insertionPoint);
+      return (
+        content.slice(0, insertionPoint) +
+        '\n\n' +
+        additionalTests +
+        '\n\n' +
+        content.slice(insertionPoint)
+      );
     }
 
     return content + '\n\n' + additionalTests;
@@ -584,12 +587,14 @@ ${content}`;
 
     const importSection = imports.join('\n');
     const existingImports = content.match(/^(const|import|require).*$/gm);
-    
+
     if (existingImports && existingImports.length > 0) {
       // Add after existing imports
       const lastImportIndex = content.lastIndexOf(existingImports[existingImports.length - 1]);
       const insertionPoint = lastImportIndex + existingImports[existingImports.length - 1].length;
-      return content.slice(0, insertionPoint) + '\n' + importSection + content.slice(insertionPoint);
+      return (
+        content.slice(0, insertionPoint) + '\n' + importSection + content.slice(insertionPoint)
+      );
     } else {
       // Add at the beginning
       return importSection + '\n\n' + content;
@@ -605,7 +610,8 @@ ${content}`;
     const describeMatch = content.match(/describe\([^{]+\{/);
     if (describeMatch) {
       const insertionPoint = describeMatch.index + describeMatch[0].length;
-      injected = content.slice(0, insertionPoint) + '\n' + setupTeardown + content.slice(insertionPoint);
+      injected =
+        content.slice(0, insertionPoint) + '\n' + setupTeardown + content.slice(insertionPoint);
     }
 
     return injected;
@@ -615,7 +621,7 @@ ${content}`;
 
   extractExports(content) {
     const exports = [];
-    
+
     // Extract module.exports
     const moduleExports = content.match(/module\.exports\s*=\s*([^;]+)/);
     if (moduleExports) {
@@ -625,7 +631,7 @@ ${content}`;
     // Extract named exports
     const namedExports = content.match(/exports\.(\w+)/g);
     if (namedExports) {
-      namedExports.forEach(exp => {
+      namedExports.forEach((exp) => {
         const name = exp.replace('exports.', '');
         exports.push({ type: 'named', name: name });
       });
@@ -636,18 +642,18 @@ ${content}`;
 
   extractFunctions(content) {
     const functions = [];
-    
+
     // Extract function declarations
     const functionDeclarations = content.match(/(?:async\s+)?function\s+(\w+)\s*\([^)]*\)/g);
     if (functionDeclarations) {
-      functionDeclarations.forEach(func => {
+      functionDeclarations.forEach((func) => {
         const match = func.match(/(?:async\s+)?function\s+(\w+)\s*\(([^)]*)\)/);
         if (match) {
           functions.push({
             name: match[1],
-            parameters: match[2] ? match[2].split(',').map(p => p.trim()) : [],
+            parameters: match[2] ? match[2].split(',').map((p) => p.trim()) : [],
             async: func.includes('async'),
-            visibility: 'public'
+            visibility: 'public',
           });
         }
       });
@@ -656,14 +662,14 @@ ${content}`;
     // Extract arrow functions
     const arrowFunctions = content.match(/(\w+)\s*=\s*(?:async\s+)?\([^)]*\)\s*=>/g);
     if (arrowFunctions) {
-      arrowFunctions.forEach(func => {
+      arrowFunctions.forEach((func) => {
         const match = func.match(/(\w+)\s*=\s*(async\s+)?\(([^)]*)\)\s*=>/);
         if (match) {
           functions.push({
             name: match[1],
-            parameters: match[3] ? match[3].split(',').map(p => p.trim()) : [],
+            parameters: match[3] ? match[3].split(',').map((p) => p.trim()) : [],
             async: !!match[2],
-            visibility: 'public'
+            visibility: 'public',
           });
         }
       });
@@ -674,22 +680,24 @@ ${content}`;
 
   extractClasses(content) {
     const classes = [];
-    
+
     const classDeclarations = content.match(/class\s+(\w+)(?:\s+extends\s+\w+)?\s*\{[^}]*\}/g);
     if (classDeclarations) {
-      classDeclarations.forEach(cls => {
+      classDeclarations.forEach((cls) => {
         const nameMatch = cls.match(/class\s+(\w+)/);
         if (nameMatch) {
           const methods = cls.match(/(\w+)\s*\([^)]*\)\s*\{/g) || [];
           classes.push({
             name: nameMatch[1],
-            methods: methods.map(method => {
-              const methodMatch = method.match(/(\w+)\s*\(/);
-              return {
-                name: methodMatch ? methodMatch[1] : 'unknown',
-                async: method.includes('async')
-              };
-            }).filter(m => m.name !== 'constructor')
+            methods: methods
+              .map((method) => {
+                const methodMatch = method.match(/(\w+)\s*\(/);
+                return {
+                  name: methodMatch ? methodMatch[1] : 'unknown',
+                  async: method.includes('async'),
+                };
+              })
+              .filter((m) => m.name !== 'constructor'),
           });
         }
       });
@@ -700,15 +708,15 @@ ${content}`;
 
   extractDependencies(content) {
     const dependencies = [];
-    
+
     const requires = content.match(/require\(['"]([^'"]+)['"]\)/g);
     if (requires) {
-      requires.forEach(req => {
+      requires.forEach((req) => {
         const match = req.match(/require\(['"]([^'"]+)['"]\)/);
         if (match) {
           dependencies.push({
             name: match[1],
-            type: match[1].startsWith('./') || match[1].startsWith('../') ? 'local' : 'external'
+            type: match[1].startsWith('./') || match[1].startsWith('../') ? 'local' : 'external',
           });
         }
       });
@@ -766,11 +774,15 @@ ${content}`;
 
   generateSetupTeardown(componentAnalysis, testType) {
     const setup = [];
-    
+
     if (componentAnalysis.type === 'util' && componentAnalysis.classes.length > 0) {
       setup.push(`  let instance;\n`);
-      setup.push(`  beforeEach(() => {\n    instance = new ${componentAnalysis.classes[0].name}();\n  });\n`);
-      setup.push(`  afterEach(() => {\n    if (instance && instance.cleanup) instance.cleanup();\n  });\n`);
+      setup.push(
+        `  beforeEach(() => {\n    instance = new ${componentAnalysis.classes[0].name}();\n  });\n`
+      );
+      setup.push(
+        `  afterEach(() => {\n    if (instance && instance.cleanup) instance.cleanup();\n  });\n`
+      );
     }
 
     return setup.length > 0 ? setup.join('\n') : null;
@@ -808,8 +820,9 @@ ${content}`;
   }
 
   toClassName(name) {
-    return name.split('-')
-      .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+    return name
+      .split('-')
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
       .join('');
   }
 
@@ -823,12 +836,14 @@ ${content}`;
   getGenerationStats() {
     return {
       ...this.generationStats,
-      success_rate: this.generationStats.total_generated > 0 
-        ? this.generationStats.successful / this.generationStats.total_generated 
-        : 0,
-      average_generation_time: this.generationStats.total_generated > 0
-        ? this.generationStats.generation_time / this.generationStats.total_generated
-        : 0
+      success_rate:
+        this.generationStats.total_generated > 0
+          ? this.generationStats.successful / this.generationStats.total_generated
+          : 0,
+      average_generation_time:
+        this.generationStats.total_generated > 0
+          ? this.generationStats.generation_time / this.generationStats.total_generated
+          : 0,
     };
   }
 

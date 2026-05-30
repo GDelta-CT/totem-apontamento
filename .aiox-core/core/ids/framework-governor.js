@@ -83,56 +83,59 @@ class FrameworkGovernor {
     if (intent == null || typeof intent !== 'string') {
       throw new Error('[IDS-Governor] preCheck requires a string intent parameter');
     }
-    return this._withTimeout(async () => {
-      const context = {};
-      if (entityType) {
-        context.type = entityType;
-      }
+    return this._withTimeout(
+      async () => {
+        const context = {};
+        if (entityType) {
+          context.type = entityType;
+        }
 
-      const analysis = this._engine.analyze(intent, context);
+        const analysis = this._engine.analyze(intent, context);
 
-      const topMatch = analysis.recommendations.length > 0
-        ? analysis.recommendations[0]
-        : null;
+        const topMatch = analysis.recommendations.length > 0 ? analysis.recommendations[0] : null;
 
-      return {
+        return {
+          intent,
+          entityType: entityType || 'any',
+          topDecision: analysis.summary.decision,
+          confidence: analysis.summary.confidence,
+          shouldProceed: true, // Always advisory — user decides
+          matchesFound: analysis.summary.matchesFound,
+          recommendations: analysis.recommendations.slice(0, 5),
+          alternatives: analysis.recommendations.slice(0, 3).map((r) => ({
+            entityId: r.entityId,
+            decision: r.decision,
+            relevance: r.relevanceScore,
+            path: r.entityPath,
+          })),
+          rationale: analysis.rationale,
+          advisory: true,
+          topMatch: topMatch
+            ? {
+                entityId: topMatch.entityId,
+                decision: topMatch.decision,
+                relevance: topMatch.relevanceScore,
+                path: topMatch.entityPath,
+                adaptability: topMatch.adaptability || null,
+              }
+            : null,
+        };
+      },
+      {
         intent,
         entityType: entityType || 'any',
-        topDecision: analysis.summary.decision,
-        confidence: analysis.summary.confidence,
-        shouldProceed: true, // Always advisory — user decides
-        matchesFound: analysis.summary.matchesFound,
-        recommendations: analysis.recommendations.slice(0, 5),
-        alternatives: analysis.recommendations.slice(0, 3).map((r) => ({
-          entityId: r.entityId,
-          decision: r.decision,
-          relevance: r.relevanceScore,
-          path: r.entityPath,
-        })),
-        rationale: analysis.rationale,
+        topDecision: 'CREATE',
+        confidence: 'low',
+        shouldProceed: true,
+        matchesFound: 0,
+        recommendations: [],
+        alternatives: [],
+        rationale: 'IDS check unavailable — proceeding with CREATE.',
         advisory: true,
-        topMatch: topMatch ? {
-          entityId: topMatch.entityId,
-          decision: topMatch.decision,
-          relevance: topMatch.relevanceScore,
-          path: topMatch.entityPath,
-          adaptability: topMatch.adaptability || null,
-        } : null,
-      };
-    }, {
-      intent,
-      entityType: entityType || 'any',
-      topDecision: 'CREATE',
-      confidence: 'low',
-      shouldProceed: true,
-      matchesFound: 0,
-      recommendations: [],
-      alternatives: [],
-      rationale: 'IDS check unavailable — proceeding with CREATE.',
-      advisory: true,
-      topMatch: null,
-      error: null,
-    });
+        topMatch: null,
+        error: null,
+      }
+    );
   }
 
   /**
@@ -146,86 +149,88 @@ class FrameworkGovernor {
     if (!entityId || typeof entityId !== 'string') {
       throw new Error('[IDS-Governor] impactAnalysis requires a non-empty entityId string');
     }
-    return this._withTimeout(async () => {
-      this._loader._ensureLoaded();
+    return this._withTimeout(
+      async () => {
+        this._loader._ensureLoaded();
 
-      const entity = this._loader._findById(entityId);
-      if (!entity) {
-        return {
-          entityId,
-          found: false,
-          directConsumers: [],
-          indirectConsumers: [],
-          totalAffected: 0,
-          riskLevel: 'NONE',
-          adaptabilityScore: null,
-          message: `Entity "${entityId}" not found in registry.`,
-        };
-      }
-
-      // BFS traversal of usedBy graph
-      const directConsumers = entity.usedBy || [];
-      const visited = new Set();
-      const queue = [...directConsumers];
-      const allAffected = new Set(directConsumers);
-
-      while (queue.length > 0) {
-        const consumerId = queue.shift();
-        if (visited.has(consumerId)) {
-          continue;
+        const entity = this._loader._findById(entityId);
+        if (!entity) {
+          return {
+            entityId,
+            found: false,
+            directConsumers: [],
+            indirectConsumers: [],
+            totalAffected: 0,
+            riskLevel: 'NONE',
+            adaptabilityScore: null,
+            message: `Entity "${entityId}" not found in registry.`,
+          };
         }
-        visited.add(consumerId);
 
-        const consumer = this._loader._findById(consumerId);
-        if (consumer && consumer.usedBy) {
-          for (const indirect of consumer.usedBy) {
-            if (!allAffected.has(indirect)) {
-              allAffected.add(indirect);
-              queue.push(indirect);
+        // BFS traversal of usedBy graph
+        const directConsumers = entity.usedBy || [];
+        const visited = new Set();
+        const queue = [...directConsumers];
+        const allAffected = new Set(directConsumers);
+
+        while (queue.length > 0) {
+          const consumerId = queue.shift();
+          if (visited.has(consumerId)) {
+            continue;
+          }
+          visited.add(consumerId);
+
+          const consumer = this._loader._findById(consumerId);
+          if (consumer && consumer.usedBy) {
+            for (const indirect of consumer.usedBy) {
+              if (!allAffected.has(indirect)) {
+                allAffected.add(indirect);
+                queue.push(indirect);
+              }
             }
           }
         }
-      }
 
-      const indirectConsumers = [...allAffected].filter(
-        (id) => !directConsumers.includes(id),
-      );
+        const indirectConsumers = [...allAffected].filter((id) => !directConsumers.includes(id));
 
-      const totalEntities = this._loader.getEntityCount();
-      const percentage = totalEntities > 0 ? allAffected.size / totalEntities : 0;
+        const totalEntities = this._loader.getEntityCount();
+        const percentage = totalEntities > 0 ? allAffected.size / totalEntities : 0;
 
-      const riskLevel = this._calculateRiskLevel(percentage);
-      const adaptabilityScore = entity.adaptability ? entity.adaptability.score : null;
-      const adaptabilityConstraints = entity.adaptability ? entity.adaptability.constraints : [];
+        const riskLevel = this._calculateRiskLevel(percentage);
+        const adaptabilityScore = entity.adaptability ? entity.adaptability.score : null;
+        const adaptabilityConstraints = entity.adaptability ? entity.adaptability.constraints : [];
 
-      return {
+        return {
+          entityId,
+          found: true,
+          entityPath: entity.path || null,
+          entityType: entity.type || null,
+          directConsumers,
+          indirectConsumers,
+          totalAffected: allAffected.size,
+          affectedPercentage: Math.round(percentage * 10000) / 10000,
+          riskLevel,
+          adaptabilityScore,
+          adaptabilityConstraints,
+          thresholdWarning:
+            adaptabilityScore !== null && adaptabilityScore < 0.3
+              ? 'Low adaptability score — modifications may break consumers.'
+              : null,
+          dependencies: entity.dependencies || [],
+        };
+      },
+      {
         entityId,
-        found: true,
-        entityPath: entity.path || null,
-        entityType: entity.type || null,
-        directConsumers,
-        indirectConsumers,
-        totalAffected: allAffected.size,
-        affectedPercentage: Math.round(percentage * 10000) / 10000,
-        riskLevel,
-        adaptabilityScore,
-        adaptabilityConstraints,
-        thresholdWarning: adaptabilityScore !== null && adaptabilityScore < 0.3
-          ? 'Low adaptability score — modifications may break consumers.'
-          : null,
-        dependencies: entity.dependencies || [],
-      };
-    }, {
-      entityId,
-      found: false,
-      directConsumers: [],
-      indirectConsumers: [],
-      totalAffected: 0,
-      riskLevel: 'UNKNOWN',
-      adaptabilityScore: null,
-      message: 'IDS impact analysis unavailable — proceed with caution.',
-      error: null,
-    });
+        found: false,
+        directConsumers: [],
+        indirectConsumers: [],
+        totalAffected: 0,
+        riskLevel: 'UNKNOWN',
+        adaptabilityScore: null,
+        message: 'IDS impact analysis unavailable — proceed with caution.',
+        error: null,
+      }
+    );
   }
 
   /**
@@ -240,37 +245,40 @@ class FrameworkGovernor {
     if (!filePath || typeof filePath !== 'string') {
       throw new Error('[IDS-Governor] postRegister requires a non-empty filePath string');
     }
-    return this._withTimeout(async () => {
-      const task = {
-        id: metadata.taskId || 'framework-governor-register',
-        agent: metadata.agent || 'aiox-master',
-        type: metadata.type || 'create',
-      };
+    return this._withTimeout(
+      async () => {
+        const task = {
+          id: metadata.taskId || 'framework-governor-register',
+          agent: metadata.agent || 'aiox-master',
+          type: metadata.type || 'create',
+        };
 
-      const artifacts = [filePath];
+        const artifacts = [filePath];
 
-      const result = await this._updater.onAgentTaskComplete(task, artifacts);
+        const result = await this._updater.onAgentTaskComplete(task, artifacts);
 
-      return {
-        registered: result.updated > 0,
+        return {
+          registered: result.updated > 0,
+          filePath,
+          updated: result.updated,
+          errors: result.errors || [],
+          metadata: {
+            type: metadata.type || 'unknown',
+            purpose: metadata.purpose || '',
+            keywords: metadata.keywords || [],
+            agent: task.agent,
+          },
+        };
+      },
+      {
+        registered: false,
         filePath,
-        updated: result.updated,
-        errors: result.errors || [],
-        metadata: {
-          type: metadata.type || 'unknown',
-          purpose: metadata.purpose || '',
-          keywords: metadata.keywords || [],
-          agent: task.agent,
-        },
-      };
-    }, {
-      registered: false,
-      filePath,
-      updated: 0,
-      errors: ['IDS registration unavailable — entity not registered.'],
-      metadata: {},
-      error: null,
-    });
+        updated: 0,
+        errors: ['IDS registration unavailable — entity not registered.'],
+        metadata: {},
+        error: null,
+      }
+    );
   }
 
   /**
@@ -280,37 +288,40 @@ class FrameworkGovernor {
    * @returns {Promise<object>} Health check result
    */
   async healthCheck() {
-    return this._withTimeout(async () => {
-      if (!this._healer) {
-        // Degraded mode — healer not available
-        const entityCount = this._loader.getEntityCount();
+    return this._withTimeout(
+      async () => {
+        if (!this._healer) {
+          // Degraded mode — healer not available
+          const entityCount = this._loader.getEntityCount();
+          return {
+            available: false,
+            healerStatus: 'not-configured',
+            message: 'RegistryHealer not available (IDS-4a pending). Basic stats provided.',
+            basicStats: {
+              entityCount,
+              registryLoaded: entityCount > 0,
+            },
+          };
+        }
+
+        // Full health check via RegistryHealer
+        const healthResult = this._healer.runHealthCheck
+          ? await this._healer.runHealthCheck()
+          : { status: 'unknown' };
+
         return {
-          available: false,
-          healerStatus: 'not-configured',
-          message: 'RegistryHealer not available (IDS-4a pending). Basic stats provided.',
-          basicStats: {
-            entityCount,
-            registryLoaded: entityCount > 0,
-          },
+          available: true,
+          healerStatus: 'active',
+          ...healthResult,
         };
+      },
+      {
+        available: false,
+        healerStatus: 'error',
+        message: 'Health check timed out or failed.',
+        error: null,
       }
-
-      // Full health check via RegistryHealer
-      const healthResult = this._healer.runHealthCheck
-        ? await this._healer.runHealthCheck()
-        : { status: 'unknown' };
-
-      return {
-        available: true,
-        healerStatus: 'active',
-        ...healthResult,
-      };
-    }, {
-      available: false,
-      healerStatus: 'error',
-      message: 'Health check timed out or failed.',
-      error: null,
-    });
+    );
   }
 
   /**
@@ -319,59 +330,61 @@ class FrameworkGovernor {
    * @returns {Promise<object>} Stats with entity counts by type, category, health score
    */
   async getStats() {
-    return this._withTimeout(async () => {
-      this._loader._ensureLoaded();
+    return this._withTimeout(
+      async () => {
+        this._loader._ensureLoaded();
 
-      const allEntities = this._loader._getAllEntities();
-      const metadata = this._loader.getMetadata();
-      const categories = this._loader.getCategories();
+        const allEntities = this._loader._getAllEntities();
+        const metadata = this._loader.getMetadata();
+        const categories = this._loader.getCategories();
 
-      // Count by type
-      const byType = {};
-      for (const entity of allEntities) {
-        const type = entity.type || 'unknown';
-        byType[type] = (byType[type] || 0) + 1;
-      }
-
-      // Count by category
-      const byCategory = {};
-      for (const entity of allEntities) {
-        const category = entity.category || 'unknown';
-        byCategory[category] = (byCategory[category] || 0) + 1;
-      }
-
-      // Calculate health score (percentage of entities with checksums and recent verification)
-      let verifiedCount = 0;
-      for (const entity of allEntities) {
-        if (entity.checksum && entity.lastVerified) {
-          verifiedCount++;
+        // Count by type
+        const byType = {};
+        for (const entity of allEntities) {
+          const type = entity.type || 'unknown';
+          byType[type] = (byType[type] || 0) + 1;
         }
-      }
-      const healthScore = allEntities.length > 0
-        ? Math.round((verifiedCount / allEntities.length) * 100)
-        : 0;
 
-      return {
-        totalEntities: allEntities.length,
-        byType,
-        byCategory,
-        categories: categories.map((c) => c.id || c),
-        lastUpdated: metadata.lastUpdated || null,
-        registryVersion: metadata.version || '1.0.0',
-        healthScore,
-        healerAvailable: !!this._healer,
-      };
-    }, {
-      totalEntities: 0,
-      byType: {},
-      byCategory: {},
-      categories: [],
-      lastUpdated: null,
-      registryVersion: 'unknown',
-      healthScore: 0,
-      healerAvailable: false,
-      error: null,
-    });
+        // Count by category
+        const byCategory = {};
+        for (const entity of allEntities) {
+          const category = entity.category || 'unknown';
+          byCategory[category] = (byCategory[category] || 0) + 1;
+        }
+
+        // Calculate health score (percentage of entities with checksums and recent verification)
+        let verifiedCount = 0;
+        for (const entity of allEntities) {
+          if (entity.checksum && entity.lastVerified) {
+            verifiedCount++;
+          }
+        }
+        const healthScore =
+          allEntities.length > 0 ? Math.round((verifiedCount / allEntities.length) * 100) : 0;
+
+        return {
+          totalEntities: allEntities.length,
+          byType,
+          byCategory,
+          categories: categories.map((c) => c.id || c),
+          lastUpdated: metadata.lastUpdated || null,
+          registryVersion: metadata.version || '1.0.0',
+          healthScore,
+          healerAvailable: !!this._healer,
+        };
+      },
+      {
+        totalEntities: 0,
+        byType: {},
+        byCategory: {},
+        categories: [],
+        lastUpdated: null,
+        registryVersion: 'unknown',
+        healthScore: 0,
+        healerAvailable: false,
+        error: null,
+      }
+    );
   }
 
   // ================================================================

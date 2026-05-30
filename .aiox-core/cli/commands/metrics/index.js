@@ -22,9 +22,9 @@ const { createCleanupCommand } = require('./cleanup');
 function createMetricsCommand() {
   const metrics = new Command('metrics');
 
-  metrics
-    .description('Quality Gates Metrics - collect and analyze quality data')
-    .addHelpText('after', `
+  metrics.description('Quality Gates Metrics - collect and analyze quality data').addHelpText(
+    'after',
+    `
 Commands:
   record            Record a quality gate run
   show              Display current metrics
@@ -49,7 +49,8 @@ Examples:
   $ aiox metrics seed --days 30
   $ aiox metrics cleanup
   $ aiox metrics cleanup --dry-run
-`);
+`
+  );
 
   // Add subcommands
   metrics.addCommand(createRecordCommand());

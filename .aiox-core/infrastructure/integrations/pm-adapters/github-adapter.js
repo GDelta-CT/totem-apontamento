@@ -34,7 +34,7 @@ class GitHubProjectsAdapter extends PMAdapter {
 
     this.org = config.org;
     this.projectNumber = config.project_number;
-    this.projectId = null;  // Will be fetched lazily
+    this.projectId = null; // Will be fetched lazily
   }
 
   /**
@@ -92,7 +92,6 @@ class GitHubProjectsAdapter extends PMAdapter {
           url: newIssueUrl,
         };
       }
-
     } catch (error) {
       console.error('❌ Error syncing story to GitHub Projects:', error);
       return {
@@ -129,8 +128,8 @@ class GitHubProjectsAdapter extends PMAdapter {
 
       // Map GitHub issue state to AIOX status
       const statusMapping = {
-        'open': 'InProgress',
-        'closed': 'Done',
+        open: 'InProgress',
+        closed: 'Done',
       };
 
       const mappedStatus = statusMapping[issueData.state] || 'Draft';
@@ -143,7 +142,6 @@ class GitHubProjectsAdapter extends PMAdapter {
           status: mappedStatus,
         },
       };
-
     } catch (error) {
       console.error('❌ Error pulling story from GitHub Projects:', error);
       return {
@@ -171,7 +169,6 @@ class GitHubProjectsAdapter extends PMAdapter {
         success: true,
         url: issueUrl,
       };
-
     } catch (error) {
       console.error('❌ Error creating story in GitHub Projects:', error);
       return {
@@ -205,10 +202,10 @@ class GitHubProjectsAdapter extends PMAdapter {
 
       // Map AIOX status to GitHub state
       const stateMapping = {
-        'Draft': 'open',
-        'InProgress': 'open',
-        'Review': 'open',
-        'Done': 'closed',
+        Draft: 'open',
+        InProgress: 'open',
+        Review: 'open',
+        Done: 'closed',
       };
 
       const githubState = stateMapping[status] || 'open';
@@ -219,7 +216,6 @@ class GitHubProjectsAdapter extends PMAdapter {
       console.log(`✅ Story ${storyId} status updated to ${status}`);
 
       return { success: true };
-
     } catch (error) {
       console.error('❌ Error updating story status:', error);
       return {
@@ -276,7 +272,6 @@ class GitHubProjectsAdapter extends PMAdapter {
       console.log('✅ GitHub connection successful');
 
       return { success: true };
-
     } catch (error) {
       console.error('❌ GitHub connection failed:', error);
       return {
@@ -306,10 +301,14 @@ class GitHubProjectsAdapter extends PMAdapter {
   async _findIssueByStoryId(storyId) {
     try {
       const result = this._execGH([
-        'issue', 'list',
-        '--label', `story-${storyId}`,
-        '--json', 'number',
-        '--limit', '1',
+        'issue',
+        'list',
+        '--label',
+        `story-${storyId}`,
+        '--json',
+        'number',
+        '--limit',
+        '1',
       ]);
 
       const issues = JSON.parse(result);
@@ -333,8 +332,11 @@ class GitHubProjectsAdapter extends PMAdapter {
    */
   async _getIssue(issueNumber) {
     const result = this._execGH([
-      'issue', 'view', issueNumber.toString(),
-      '--json', 'state,title,body,labels',
+      'issue',
+      'view',
+      issueNumber.toString(),
+      '--json',
+      'state,title,body,labels',
     ]);
 
     return JSON.parse(result);
@@ -359,10 +361,14 @@ class GitHubProjectsAdapter extends PMAdapter {
     ];
 
     const result = this._execGH([
-      'issue', 'create',
-      '--title', `"${title}"`,
-      '--body', `"${body.replace(/"/g, '\\"')}"`,
-      '--label', labels.join(','),
+      'issue',
+      'create',
+      '--title',
+      `"${title}"`,
+      '--body',
+      `"${body.replace(/"/g, '\\"')}"`,
+      '--label',
+      labels.join(','),
     ]);
 
     // Extract URL from output
@@ -382,9 +388,13 @@ class GitHubProjectsAdapter extends PMAdapter {
     const body = content || story.description || '';
 
     this._execGH([
-      'issue', 'edit', issueNumber.toString(),
-      '--title', `"${title}"`,
-      '--body', `"${body.replace(/"/g, '\\"')}"`,
+      'issue',
+      'edit',
+      issueNumber.toString(),
+      '--title',
+      `"${title}"`,
+      '--body',
+      `"${body.replace(/"/g, '\\"')}"`,
     ]);
   }
 }

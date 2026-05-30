@@ -220,9 +220,7 @@ class ParallelExecutor extends EventEmitter {
     try {
       const result = await Promise.race([
         executor(),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Timeout')), this.timeout),
-        ),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), this.timeout)),
       ]);
       return { ...result, provider };
     } catch (error) {

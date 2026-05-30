@@ -131,7 +131,7 @@ class ApiEndpointsCheck extends BaseCheck {
           } else {
             reject(new Error(`HTTP ${res.statusCode}`));
           }
-        },
+        }
       );
 
       req.on('error', reject);

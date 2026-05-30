@@ -39,6 +39,7 @@ Read `.aiox-core/data/agent-config-requirements.yaml` and extract all `files_loa
 ### Step 2: Verify file existence
 
 For each referenced file path:
+
 1. Check if the file exists on disk relative to project root
 2. Record results as OK or MISSING
 
@@ -49,12 +50,14 @@ Read `docs/framework/source-tree.md` and extract all files listed in the "Data F
 ### Step 4: Cross-reference
 
 Compare files from step 1 with files from step 3:
+
 - Files in config but NOT in source-tree = **Undocumented** (governance gap)
 - Files in source-tree but NOT in config = **Unused** (may be stale)
 
 ### Step 5: Check ownership
 
 For each file in the governance tables:
+
 - Verify it has a documented **Owner** (agent @name)
 - Verify it has a documented **Fill Rule** (when/how it gets updated)
 - Verify it has a documented **Update Trigger** (what triggers the update)
@@ -90,6 +93,7 @@ Fill Rules:
 ### Step 7: Fix (if mode=fix)
 
 If `mode=fix`:
+
 1. Add missing files to source-tree.md governance tables
 2. Use the file's directory to infer likely owner
 3. Flag entries needing human review for fill rule

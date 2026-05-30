@@ -169,9 +169,7 @@ class PatternExtractor {
       for (const pattern of patterns) {
         if (allPatterns[pattern.category]) {
           // Check for duplicates
-          const exists = allPatterns[pattern.category].some(
-            (p) => p.name === pattern.name
-          );
+          const exists = allPatterns[pattern.category].some((p) => p.name === pattern.name);
           if (!exists) {
             allPatterns[pattern.category].push(pattern);
           }
@@ -195,7 +193,11 @@ class PatternExtractor {
       if (!content) continue;
 
       // Zustand with persist middleware
-      if (content.includes('create<') && content.includes('zustand') && content.includes('persist')) {
+      if (
+        content.includes('create<') &&
+        content.includes('zustand') &&
+        content.includes('persist')
+      ) {
         const pattern = this._extractZustandPersistPattern(content, file);
         if (pattern) patterns.push(pattern);
       }
@@ -243,8 +245,10 @@ class PatternExtractor {
     return {
       category: PATTERN_CATEGORIES.STATE_MANAGEMENT,
       name: 'Zustand Store with Persist',
-      description: 'State management with persistence across browser sessions using Zustand and persist middleware.',
-      whenToUse: 'Any domain state that needs persistence across sessions (settings, preferences, cached data).',
+      description:
+        'State management with persistence across browser sessions using Zustand and persist middleware.',
+      whenToUse:
+        'Any domain state that needs persistence across sessions (settings, preferences, cached data).',
       example: this._generateZustandPersistExample(interfaceName, storeName, persistName),
       filesUsing,
       confidence: 0.95,
@@ -315,7 +319,7 @@ export const useUIStore = create<UIState>()((set) => ({
 }));
 \`\`\``,
       filesUsing: [relativePath],
-      confidence: 0.90,
+      confidence: 0.9,
     };
   }
 
@@ -355,7 +359,7 @@ export const { increment, decrement, incrementByAmount } = counterSlice.actions;
 export default counterSlice.reducer;
 \`\`\``,
       filesUsing: [relativePath],
-      confidence: 0.90,
+      confidence: 0.9,
     };
   }
 
@@ -369,7 +373,8 @@ export default counterSlice.reducer;
       category: PATTERN_CATEGORIES.STATE_MANAGEMENT,
       name: 'React Context Pattern',
       description: 'Native React state management using Context API.',
-      whenToUse: 'Shared state across component tree without external libraries (theme, auth, locale).',
+      whenToUse:
+        'Shared state across component tree without external libraries (theme, auth, locale).',
       example: `\`\`\`typescript
 import { createContext, useContext, useState, ReactNode } from 'react';
 
@@ -421,8 +426,10 @@ export function useTheme() {
         patterns.push({
           category: PATTERN_CATEGORIES.API_CALLS,
           name: 'SWR Data Fetching',
-          description: 'Data fetching with automatic caching, revalidation, and optimistic updates.',
-          whenToUse: 'Client-side data fetching with automatic cache management and real-time sync.',
+          description:
+            'Data fetching with automatic caching, revalidation, and optimistic updates.',
+          whenToUse:
+            'Client-side data fetching with automatic cache management and real-time sync.',
           example: `\`\`\`typescript
 import useSWR from 'swr';
 
@@ -453,7 +460,12 @@ export function useData(id: string) {
       }
 
       // Fetch with error handling
-      if (content.includes('fetch(') && content.includes('try') && content.includes('catch') && !seenPatterns.has('fetch-error')) {
+      if (
+        content.includes('fetch(') &&
+        content.includes('try') &&
+        content.includes('catch') &&
+        !seenPatterns.has('fetch-error')
+      ) {
         seenPatterns.add('fetch-error');
         patterns.push({
           category: PATTERN_CATEGORIES.API_CALLS,
@@ -487,7 +499,10 @@ async function fetchData<T>(url: string, options?: RequestInit): Promise<T> {
       }
 
       // React Query / TanStack Query
-      if ((content.includes('useQuery') || content.includes('@tanstack/react-query')) && !seenPatterns.has('react-query')) {
+      if (
+        (content.includes('useQuery') || content.includes('@tanstack/react-query')) &&
+        !seenPatterns.has('react-query')
+      ) {
         seenPatterns.add('react-query');
         patterns.push({
           category: PATTERN_CATEGORIES.API_CALLS,
@@ -521,7 +536,7 @@ export function useCreateItem() {
 }
 \`\`\``,
           filesUsing: [relativePath],
-          confidence: 0.90,
+          confidence: 0.9,
         });
       }
     }
@@ -563,7 +578,7 @@ async function operation(params: Params): Promise<Result> {
 }
 \`\`\``,
             filesUsing: [relativePath],
-            confidence: 0.90,
+            confidence: 0.9,
           });
         }
       }
@@ -618,7 +633,10 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       // Toast notifications for errors
-      if (content.includes('toast.error') || content.includes('toast(') && content.includes('error')) {
+      if (
+        content.includes('toast.error') ||
+        (content.includes('toast(') && content.includes('error'))
+      ) {
         if (!seenPatterns.has('toast-error')) {
           seenPatterns.add('toast-error');
           patterns.push({
@@ -671,7 +689,8 @@ async function handleSubmit(data: FormData) {
             category: PATTERN_CATEGORIES.COMPONENTS,
             name: 'Memoized Component',
             description: 'Performance-optimized component using React.memo.',
-            whenToUse: 'Components that receive the same props frequently and are expensive to render.',
+            whenToUse:
+              'Components that receive the same props frequently and are expensive to render.',
             example: `\`\`\`typescript
 import { memo } from 'react';
 
@@ -691,7 +710,7 @@ export const Card = memo(function Card({ title, description, onClick }: CardProp
 });
 \`\`\``,
             filesUsing: [relativePath],
-            confidence: 0.90,
+            confidence: 0.9,
           });
         }
       }
@@ -704,7 +723,8 @@ export const Card = memo(function Card({ title, description, onClick }: CardProp
             category: PATTERN_CATEGORIES.COMPONENTS,
             name: 'Compound Component',
             description: 'Component with attached sub-components for flexible composition.',
-            whenToUse: 'Complex UI components that need flexible internal composition (Card, Menu, Dialog).',
+            whenToUse:
+              'Complex UI components that need flexible internal composition (Card, Menu, Dialog).',
             example: `\`\`\`typescript
 interface CardProps {
   children: ReactNode;
@@ -736,7 +756,7 @@ export { Card };
 // </Card>
 \`\`\``,
             filesUsing: [relativePath],
-            confidence: 0.80,
+            confidence: 0.8,
           });
         }
       }
@@ -842,7 +862,7 @@ export function useAgents() {
 }
 \`\`\``,
             filesUsing: [relativePath],
-            confidence: 0.90,
+            confidence: 0.9,
           });
         }
       }
@@ -883,7 +903,7 @@ export function useWindowSize() {
 }
 \`\`\``,
             filesUsing: [relativePath],
-            confidence: 0.90,
+            confidence: 0.9,
           });
         }
       }
@@ -992,13 +1012,13 @@ export async function getUsers(options?: {
 }
 \`\`\``,
             filesUsing: [relativePath],
-            confidence: 0.90,
+            confidence: 0.9,
           });
         }
       }
 
       // File system operations
-      if (content.includes("fs.promises") || content.includes("require('fs').promises")) {
+      if (content.includes('fs.promises') || content.includes("require('fs').promises")) {
         if (!seenPatterns.has('fs-async')) {
           seenPatterns.add('fs-async');
           patterns.push({
@@ -1136,7 +1156,7 @@ describe('MyComponent', () => {
 });
 \`\`\``,
             filesUsing: [relativePath],
-            confidence: 0.90,
+            confidence: 0.9,
           });
         }
       }
@@ -1152,7 +1172,9 @@ describe('MyComponent', () => {
     const patterns = [];
     const seenPatterns = new Set();
 
-    const utilFiles = files.filter((f) => f.includes('/utils/') || f.includes('/lib/') || f.includes('/helpers/'));
+    const utilFiles = files.filter(
+      (f) => f.includes('/utils/') || f.includes('/lib/') || f.includes('/helpers/')
+    );
 
     for (const file of utilFiles) {
       const content = await this.readFile(file);
@@ -1245,7 +1267,7 @@ function deepClone(obj) {
 module.exports = { formatBytes, debounce, deepClone };
 \`\`\``,
             filesUsing: [relativePath],
-            confidence: 0.80,
+            confidence: 0.8,
           });
         }
       }

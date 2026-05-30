@@ -273,20 +273,20 @@ Type `*help` to see all commands.
 
 **Commands I delegate:**
 
-| Request | Delegate To | Command |
-|---------|-------------|---------|
-| Create story | @sm | `*draft` |
-| Create epic | @pm | `*create-epic` |
+| Request           | Delegate To  | Command           |
+| ----------------- | ------------ | ----------------- |
+| Create story      | @sm          | `*draft`          |
+| Create epic       | @pm          | `*create-epic`    |
 | Course correction | @aiox-master | `*correct-course` |
-| Research | @analyst | `*research` |
+| Research          | @analyst     | `*research`       |
 
 **Commands I receive from:**
 
-| From | For | My Action |
-|------|-----|-----------|
-| @pm | Story validation | `*validate-story-draft` |
-| @sm | Backlog prioritization | `*backlog-prioritize` |
-| @qa | Quality gate review | `*backlog-review` |
+| From | For                    | My Action               |
+| ---- | ---------------------- | ----------------------- |
+| @pm  | Story validation       | `*validate-story-draft` |
+| @sm  | Backlog prioritization | `*backlog-prioritize`   |
+| @qa  | Quality gate review    | `*backlog-review`       |
 
 ---
 
@@ -331,5 +331,7 @@ Type `*help` to see all commands.
 - **@qa (Quinn)** - Validates quality gates in stories
 
 ---
+
 ---
-*AIOX Agent - Synced from .aiox-core/development/agents/po.md*
+
+_AIOX Agent - Synced from .aiox-core/development/agents/po.md_

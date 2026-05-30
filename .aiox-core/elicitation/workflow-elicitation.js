@@ -26,13 +26,19 @@ const workflowElicitationSteps = [
         type: 'input',
         name: 'workflowName',
         message: 'What is the workflow name?',
-        examples: ['Data Processing Pipeline', 'Software Release Process', 'Quality Assurance Workflow'],
+        examples: [
+          'Data Processing Pipeline',
+          'Software Release Process',
+          'Quality Assurance Workflow',
+        ],
         smartDefault: {
           type: 'fromAnswer',
           source: 'workflowId',
-          transform: (id) => id.split('-').map(w => 
-            w.charAt(0).toUpperCase() + w.slice(1),
-          ).join(' '),
+          transform: (id) =>
+            id
+              .split('-')
+              .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+              .join(' '),
         },
       },
       {
@@ -89,7 +95,7 @@ const workflowElicitationSteps = [
         message: 'Which events trigger this workflow? (comma-separated):',
         when: (answers) => answers.triggerTypes.includes('event'),
         examples: ['file.created', 'task.completed', 'error.detected'],
-        filter: (input) => input ? input.split(',').map(e => e.trim()) : [],
+        filter: (input) => (input ? input.split(',').map((e) => e.trim()) : []),
       },
     ],
   },
@@ -279,14 +285,7 @@ const workflowElicitationSteps = [
         name: 'allowedRoles',
         message: 'Which roles can execute this workflow?',
         when: (answers) => answers.requireAuth,
-        choices: [
-          'admin',
-          'developer',
-          'analyst',
-          'reviewer',
-          'operator',
-          'viewer',
-        ],
+        choices: ['admin', 'developer', 'analyst', 'reviewer', 'operator', 'viewer'],
         default: ['admin', 'developer'],
       },
       {

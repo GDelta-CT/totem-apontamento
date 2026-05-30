@@ -37,7 +37,8 @@ async function run(context) {
 
   let sourceAgents, ideFiles;
   try {
-    sourceAgents = fs.readdirSync(agentsSourceDir)
+    sourceAgents = fs
+      .readdirSync(agentsSourceDir)
       .filter((f) => f.endsWith('.md'))
       .map((f) => f.replace('.md', ''));
   } catch (_err) {
@@ -50,8 +51,7 @@ async function run(context) {
   }
 
   try {
-    ideFiles = fs.readdirSync(agentsIdeDir)
-      .filter((f) => f.endsWith('.md'));
+    ideFiles = fs.readdirSync(agentsIdeDir).filter((f) => f.endsWith('.md'));
   } catch (_err) {
     return {
       check: name,

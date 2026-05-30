@@ -7,11 +7,13 @@ Synkra AIOX now automatically translates Portuguese documentation into English f
 ## Problem Solved
 
 **Before:** Sharding a Portuguese PRD/Architecture resulted in filenames like:
+
 - `viso-do-produto.md` (missing accent, Portuguese)
 - `pilha-tecnolgica.md` (missing accent, Portuguese)
 - `padroes-de-codigo.md` (missing accent, Portuguese)
 
 **After:** Sharding now produces proper English filenames:
+
 - `product-vision.md` ✅
 - `tech-stack.md` ✅
 - `coding-standards.md` ✅
@@ -34,13 +36,13 @@ The shard task includes 60+ Portuguese→English mappings:
 
 ```yaml
 Common Terms:
-- visão → vision
-- produto → product
-- arquitetura → architecture
-- pilha tecnológica → tech-stack
-- padrões de código → coding-standards
-- requisitos → requirements
-- testes → tests
+  - visão → vision
+  - produto → product
+  - arquitetura → architecture
+  - pilha tecnológica → tech-stack
+  - padrões de código → coding-standards
+  - requisitos → requirements
+  - testes → tests
 # ... and many more
 ```
 
@@ -51,6 +53,7 @@ Common Terms:
 If the Agent needs architecture files and finds Portuguese names:
 
 **Order of attempts:**
+
 1. `tech-stack.md` (primary)
 2. `technology-stack.md` (fallback)
 3. `pilha-tecnologica.md` (Portuguese fallback)
@@ -75,6 +78,7 @@ devLoadAlwaysFilesFallback:
 ### Creating New Documentation
 
 #### Option 1: Write in English (Recommended)
+
 ```bash
 # Write your PRD in English
 docs/prd.md
@@ -86,6 +90,7 @@ docs/prd.md
 ```
 
 #### Option 2: Write in Portuguese
+
 ```bash
 # Write your PRD in Portuguese
 docs/prd.md
@@ -110,6 +115,7 @@ node .aiox-core/scripts/validate-filenames.js --fix
 ```
 
 **What the validator checks:**
+
 - ❌ Portuguese characters (á, ã, ç, etc.)
 - ❌ Portuguese terms (visão, pilha, padrões)
 - ✅ English standard names
@@ -135,18 +141,18 @@ node .aiox-core/scripts/validate-filenames.js --fix
 
 ## Translation Examples
 
-| Portuguese Heading | English Filename |
-|-------------------|------------------|
-| ## Visão do Produto | `product-vision.md` |
-| ## Pilha Tecnológica | `tech-stack.md` |
-| ## Padrões de Código | `coding-standards.md` |
-| ## Estrutura do Projeto | `project-structure.md` |
-| ## Requisitos Funcionais | `functional-requirements.md` |
-| ## Estratégia de Testes | `testing-strategy.md` |
-| ## Banco de Dados - Esquema | `database-schema.md` |
-| ## API Design (tRPC) | `api-design-trpc.md` |
-| ## Riscos Técnicos | `technical-risks.md` |
-| ## Infraestrutura | `infrastructure.md` |
+| Portuguese Heading          | English Filename             |
+| --------------------------- | ---------------------------- |
+| ## Visão do Produto         | `product-vision.md`          |
+| ## Pilha Tecnológica        | `tech-stack.md`              |
+| ## Padrões de Código        | `coding-standards.md`        |
+| ## Estrutura do Projeto     | `project-structure.md`       |
+| ## Requisitos Funcionais    | `functional-requirements.md` |
+| ## Estratégia de Testes     | `testing-strategy.md`        |
+| ## Banco de Dados - Esquema | `database-schema.md`         |
+| ## API Design (tRPC)        | `api-design-trpc.md`         |
+| ## Riscos Técnicos          | `technical-risks.md`         |
+| ## Infraestrutura           | `infrastructure.md`          |
 
 ## Advanced: Adding Custom Translations
 
@@ -174,6 +180,7 @@ The system can be extended to support other languages by:
 ### Problem: Files still have Portuguese names
 
 **Solution:**
+
 1. Check you're using the updated `.aiox-core/tasks/shard-doc.md`
 2. Run validator to confirm: `node .aiox-core/scripts/validate-filenames.js`
 3. Use `--fix` flag to auto-correct
@@ -182,6 +189,7 @@ The system can be extended to support other languages by:
 
 **Solution:**
 The fallback system handles this automatically. Agent will try:
+
 1. Primary name (English)
 2. Fallback alternatives
 3. Portuguese equivalents
@@ -242,6 +250,7 @@ const ALLOWED_EXCEPTIONS = ['your-term'];
 ### Key Configuration Options
 
 **Enable/Disable Markdown Exploder:**
+
 ```yaml
 # .aiox-core/core-config.yaml
 markdownExploder: true  # Uses md-tree CLI (faster)
@@ -255,6 +264,7 @@ markdownExploder: false # Uses manual method (has translation)
 ### From Portuguese to English Filenames
 
 #### Step 1: Assessment
+
 ```bash
 # Check current state
 ls docs/prd/
@@ -265,12 +275,14 @@ node .aiox-core/scripts/validate-filenames.js
 ```
 
 #### Step 2: Backup
+
 ```bash
 # Backup current structure
 cp -r docs docs.backup-$(date +%Y%m%d)
 ```
 
 #### Step 3: Re-shard or Fix
+
 ```bash
 # Option A: Re-shard from source
 *shard docs/prd.md docs/prd
@@ -281,6 +293,7 @@ node .aiox-core/scripts/validate-filenames.js --fix
 ```
 
 #### Step 4: Verify
+
 ```bash
 # Confirm all files are English
 node .aiox-core/scripts/validate-filenames.js
@@ -290,6 +303,7 @@ node .aiox-core/scripts/validate-filenames.js
 ```
 
 #### Step 5: Update References
+
 ```bash
 # Search for any hardcoded Portuguese filenames
 grep -r "pilha-tecnologica" .

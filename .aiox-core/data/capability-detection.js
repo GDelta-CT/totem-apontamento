@@ -31,13 +31,13 @@ function detectToolSearch() {
     return {
       available: features.tengu_mcp_tool_search === true,
       source: 'cachedGrowthBookFeatures.tengu_mcp_tool_search',
-      detectionMethod: 'claude-json-feature-flag'
+      detectionMethod: 'claude-json-feature-flag',
     };
   } catch {
     return {
       available: false,
       source: 'detection-failed',
-      detectionMethod: 'claude-json-feature-flag'
+      detectionMethod: 'claude-json-feature-flag',
     };
   }
 }
@@ -47,7 +47,7 @@ function detectDeferLoading() {
   return {
     available: false,
     reason: 'defer_loading is API-only (Python SDK). Not exposed in Claude Code CLI.',
-    source: 'ADR-7 / Codex CRITICO-1'
+    source: 'ADR-7 / Codex CRITICO-1',
   };
 }
 
@@ -60,7 +60,7 @@ function detectProjectMcps() {
       name,
       type: cfg.type || 'command',
       scope: 'project',
-      source: '.mcp.json'
+      source: '.mcp.json',
     }));
   } catch {
     return [];
@@ -83,7 +83,7 @@ function detectGlobalMcps() {
           name: match[1],
           type: 'docker-gateway',
           scope: 'global',
-          source: '~/.docker/mcp/config.yaml'
+          source: '~/.docker/mcp/config.yaml',
         });
       }
     }
@@ -103,7 +103,7 @@ function detectGlobalMcps() {
           name,
           type: cfg.type || 'command',
           scope: 'global-settings',
-          source: '~/.claude/settings.json'
+          source: '~/.claude/settings.json',
         });
       }
     }
@@ -121,7 +121,7 @@ function detectDockerGateway() {
   return {
     available: exists,
     configPath: exists ? dockerMcpDir : null,
-    detectionMethod: 'filesystem-check'
+    detectionMethod: 'filesystem-check',
   };
 }
 
@@ -150,13 +150,22 @@ function loadToolRegistry() {
       if (!currentTool) continue;
 
       const tierMatch = line.match(/^\s+tier:\s*(\d)/);
-      if (tierMatch) { tools[currentTool].tier = parseInt(tierMatch[1]); continue; }
+      if (tierMatch) {
+        tools[currentTool].tier = parseInt(tierMatch[1]);
+        continue;
+      }
 
       const mcpMatch = line.match(/^\s+mcp_server:\s*(.+)/);
-      if (mcpMatch) { tools[currentTool].mcpServer = mcpMatch[1].trim(); continue; }
+      if (mcpMatch) {
+        tools[currentTool].mcpServer = mcpMatch[1].trim();
+        continue;
+      }
 
       const essentialMatch = line.match(/^\s+essential:\s*(true|false)/);
-      if (essentialMatch) { tools[currentTool].essential = essentialMatch[1] === 'true'; continue; }
+      if (essentialMatch) {
+        tools[currentTool].essential = essentialMatch[1] === 'true';
+        continue;
+      }
     }
 
     // Pass 2: classify Tier 3 tools with essential flag
@@ -180,10 +189,18 @@ function loadToolRegistry() {
       tier2Count: tier2,
       tier3Count: tier3,
       essential,
-      nonEssential
+      nonEssential,
     };
   } catch {
-    return { available: false, totalTools: 0, tier1Count: 0, tier2Count: 0, tier3Count: 0, essential: [], nonEssential: [] };
+    return {
+      available: false,
+      totalTools: 0,
+      tier1Count: 0,
+      tier2Count: 0,
+      tier3Count: 0,
+      essential: [],
+      nonEssential: [],
+    };
   }
 }
 
@@ -196,23 +213,26 @@ function determineStrategy(toolSearch, deferLoading, dockerGateway) {
   if (toolSearch.available) {
     return {
       primary: 'tool-search-auto',
-      description: 'Claude Code Tool Search is active. Tier 3 MCP tools are automatically deferred via tool_search.',
-      fallbacks: ['mcp-discipline', 'claudemd-guidance']
+      description:
+        'Claude Code Tool Search is active. Tier 3 MCP tools are automatically deferred via tool_search.',
+      fallbacks: ['mcp-discipline', 'claudemd-guidance'],
     };
   }
 
   if (dockerGateway.available) {
     return {
       primary: 'mcp-discipline',
-      description: 'Tool Search not available. Using MCP discipline: disable non-essential servers in .mcp.json.',
-      fallbacks: ['claudemd-guidance']
+      description:
+        'Tool Search not available. Using MCP discipline: disable non-essential servers in .mcp.json.',
+      fallbacks: ['claudemd-guidance'],
     };
   }
 
   return {
     primary: 'claudemd-guidance',
-    description: 'Neither Tool Search nor Docker Gateway available. Using CLAUDE.md guidance for tool selection priority.',
-    fallbacks: []
+    description:
+      'Neither Tool Search nor Docker Gateway available. Using CLAUDE.md guidance for tool selection priority.',
+    fallbacks: [],
   };
 }
 
@@ -235,21 +255,23 @@ function run() {
     story: 'TOK-2',
 
     methodology: {
-      toolSearchLatency: 'Managed internally by Claude Code — not programmatically measurable. Guidance-level enforcement via CLAUDE.md.',
-      mcpCountUnit: 'servers (not individual tools). TOK-1.5 baseline uses tool count (e.g., Apify = 7 tools = 1 server).'
+      toolSearchLatency:
+        'Managed internally by Claude Code — not programmatically measurable. Guidance-level enforcement via CLAUDE.md.',
+      mcpCountUnit:
+        'servers (not individual tools). TOK-1.5 baseline uses tool count (e.g., Apify = 7 tools = 1 server).',
     },
 
     runtime: {
       toolSearch,
       deferLoading,
-      dockerGateway
+      dockerGateway,
     },
 
     mcpServers: {
       project: projectMcps,
       global: globalMcps,
       totalCount: projectMcps.length + globalMcps.length,
-      countUnit: 'servers'
+      countUnit: 'servers',
     },
 
     toolRegistry,
@@ -257,13 +279,15 @@ function run() {
     strategy,
 
     // Essential/non-essential derived from tool-registry.yaml (single source of truth)
-    essentialServers: toolRegistry.essential.length > 0
-      ? toolRegistry.essential
-      : [{ name: 'nogic', scope: 'project' }, { name: 'code-graph', scope: 'project' }],
+    essentialServers:
+      toolRegistry.essential.length > 0
+        ? toolRegistry.essential
+        : [
+            { name: 'nogic', scope: 'project' },
+            { name: 'code-graph', scope: 'project' },
+          ],
 
-    nonEssentialServers: toolRegistry.nonEssential.length > 0
-      ? toolRegistry.nonEssential
-      : []
+    nonEssentialServers: toolRegistry.nonEssential.length > 0 ? toolRegistry.nonEssential : [],
   };
 
   // Ensure output directory exists
@@ -276,8 +300,12 @@ function run() {
   console.log(`✅ Runtime capabilities detected and saved to ${OUTPUT_PATH}`);
   console.log(`   Strategy: ${strategy.primary} — ${strategy.description}`);
   console.log(`   Tool Search: ${toolSearch.available ? 'AVAILABLE' : 'NOT AVAILABLE'}`);
-  console.log(`   MCPs: ${projectMcps.length} project + ${globalMcps.length} global = ${projectMcps.length + globalMcps.length} total`);
-  console.log(`   Tool Registry: ${toolRegistry.totalTools} tools (T1:${toolRegistry.tier1Count} T2:${toolRegistry.tier2Count} T3:${toolRegistry.tier3Count})`);
+  console.log(
+    `   MCPs: ${projectMcps.length} project + ${globalMcps.length} global = ${projectMcps.length + globalMcps.length} total`
+  );
+  console.log(
+    `   Tool Registry: ${toolRegistry.totalTools} tools (T1:${toolRegistry.tier1Count} T2:${toolRegistry.tier2Count} T3:${toolRegistry.tier3Count})`
+  );
 
   return capabilities;
 }
@@ -287,4 +315,10 @@ if (require.main === module) {
   run();
 }
 
-module.exports = { run, detectToolSearch, detectProjectMcps, detectGlobalMcps, detectDockerGateway };
+module.exports = {
+  run,
+  detectToolSearch,
+  detectProjectMcps,
+  detectGlobalMcps,
+  detectDockerGateway,
+};

@@ -15,7 +15,7 @@ class TemplateValidator {
     this.requiredVariables = {
       agent: [
         'AGENT_NAME',
-        'AGENT_ID', 
+        'AGENT_ID',
         'AGENT_TITLE',
         'AGENT_ICON',
         'WHEN_TO_USE',
@@ -72,7 +72,7 @@ class TemplateValidator {
   validateTemplate(template, templateType) {
     const errors = [];
     const warnings = [];
-    
+
     // Check template type is valid
     if (!this.requiredVariables[templateType]) {
       return {
@@ -80,41 +80,41 @@ class TemplateValidator {
         errors: [`Unknown template type: ${templateType}`],
       };
     }
-    
+
     // Validate required variables
     const requiredVars = this.requiredVariables[templateType];
     const validation = this.engine.validateTemplate(template, requiredVars);
-    
+
     if (!validation.valid) {
       errors.push(`Missing required variables: ${validation.missing.join(', ')}`);
     }
-    
+
     // Check for balanced conditionals
     const conditionalCheck = this.checkBalancedConditionals(template);
     if (!conditionalCheck.valid) {
       errors.push(...conditionalCheck.errors);
     }
-    
+
     // Check for balanced loops
     const loopCheck = this.checkBalancedLoops(template);
     if (!loopCheck.valid) {
       errors.push(...loopCheck.errors);
     }
-    
+
     // Template-specific validation
     const specificCheck = this.validateSpecificTemplate(template, templateType);
     if (!specificCheck.valid) {
       errors.push(...specificCheck.errors);
     }
     warnings.push(...specificCheck.warnings);
-    
+
     // Check for potential security issues
     const securityCheck = this.checkSecurityIssues(template);
     if (!securityCheck.valid) {
       errors.push(...securityCheck.errors);
     }
     warnings.push(...securityCheck.warnings);
-    
+
     return {
       valid: errors.length === 0,
       errors,
@@ -131,24 +131,24 @@ class TemplateValidator {
     const errors = [];
     const openTags = template.match(/\{\{#IF_([^}]+)\}\}/g) || [];
     const closeTags = template.match(/\{\{\/IF_([^}]+)\}\}/g) || [];
-    
-    const openConditions = openTags.map(tag => tag.match(/IF_([^}]+)/)[1]);
-    const closeConditions = closeTags.map(tag => tag.match(/IF_([^}]+)/)[1]);
-    
+
+    const openConditions = openTags.map((tag) => tag.match(/IF_([^}]+)/)[1]);
+    const closeConditions = closeTags.map((tag) => tag.match(/IF_([^}]+)/)[1]);
+
     // Check each open has a close
     for (const condition of openConditions) {
       if (!closeConditions.includes(condition)) {
         errors.push(`Unclosed conditional: {{#IF_${condition}}}`);
       }
     }
-    
+
     // Check each close has an open
     for (const condition of closeConditions) {
       if (!openConditions.includes(condition)) {
         errors.push(`Unexpected closing tag: {{/IF_${condition}}}`);
       }
     }
-    
+
     return { valid: errors.length === 0, errors };
   }
 
@@ -160,24 +160,24 @@ class TemplateValidator {
     const errors = [];
     const openTags = template.match(/\{\{#EACH_([^}]+)\}\}/g) || [];
     const closeTags = template.match(/\{\{\/EACH_([^}]+)\}\}/g) || [];
-    
-    const openLoops = openTags.map(tag => tag.match(/EACH_([^}]+)/)[1]);
-    const closeLoops = closeTags.map(tag => tag.match(/EACH_([^}]+)/)[1]);
-    
+
+    const openLoops = openTags.map((tag) => tag.match(/EACH_([^}]+)/)[1]);
+    const closeLoops = closeTags.map((tag) => tag.match(/EACH_([^}]+)/)[1]);
+
     // Check each open has a close
     for (const loop of openLoops) {
       if (!closeLoops.includes(loop)) {
         errors.push(`Unclosed loop: {{#EACH_${loop}}}`);
       }
     }
-    
+
     // Check each close has an open
     for (const loop of closeLoops) {
       if (!openLoops.includes(loop)) {
         errors.push(`Unexpected closing tag: {{/EACH_${loop}}}`);
       }
     }
-    
+
     return { valid: errors.length === 0, errors };
   }
 
@@ -188,7 +188,7 @@ class TemplateValidator {
   validateSpecificTemplate(template, templateType) {
     const errors = [];
     const warnings = [];
-    
+
     switch (templateType) {
       case 'agent':
         // Check for YAML structure
@@ -199,7 +199,7 @@ class TemplateValidator {
           warnings.push('Agent template should include commands: section');
         }
         break;
-        
+
       case 'task':
         // Check for markdown headers
         if (!template.includes('# {{TASK_TITLE}}')) {
@@ -209,7 +209,7 @@ class TemplateValidator {
           warnings.push('Task template should include ## Workflow section');
         }
         break;
-        
+
       case 'workflow':
         // Check for YAML structure
         if (!template.includes('workflow:') || !template.includes('steps:')) {
@@ -220,7 +220,7 @@ class TemplateValidator {
         }
         break;
     }
-    
+
     return { valid: errors.length === 0, errors, warnings };
   }
 
@@ -231,26 +231,29 @@ class TemplateValidator {
   checkSecurityIssues(template) {
     const errors = [];
     const warnings = [];
-    
+
     // Check for dangerous patterns
     const dangerousPatterns = [
       { pattern: /eval\s*\(/, message: 'Template contains eval() - security risk' },
       { pattern: /Function\s*\(/, message: 'Template contains Function() - security risk' },
-      { pattern: /require\s*\([^'"]+\)/, message: 'Dynamic require detected - potential security risk' },
+      {
+        pattern: /require\s*\([^'"]+\)/,
+        message: 'Dynamic require detected - potential security risk',
+      },
       { pattern: /<script/i, message: 'Script tags detected in template' },
     ];
-    
+
     for (const { pattern, message } of dangerousPatterns) {
       if (pattern.test(template)) {
         errors.push(message);
       }
     }
-    
+
     // Check for suspicious patterns
     if (template.includes('__proto__') || template.includes('constructor')) {
       warnings.push('Template contains potentially dangerous property access');
     }
-    
+
     return { valid: errors.length === 0, errors, warnings };
   }
 

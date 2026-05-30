@@ -12,16 +12,19 @@
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -189,6 +192,7 @@ token_usage: ~3,000-10,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Break into smaller workflows; implement checkpointing; use async processing where possible
 
 ---
@@ -208,10 +212,10 @@ updated_at: 2025-11-17
 
 ---
 
-
 ## Task Flow
 
 ### 1. Elicit Technical Debt Details
+
 ```yaml
 elicit: true
 questions:
@@ -271,6 +275,7 @@ questions:
 ```
 
 ### 2. Validate Input
+
 ```javascript
 // Validate story exists if provided
 if (relatedStory) {
@@ -285,18 +290,19 @@ if (relatedStory) {
 
   if (matches.length > 1) {
     console.log('⚠️ Multiple stories matched, using first:');
-    matches.forEach(m => console.log(`  - ${m}`));
+    matches.forEach((m) => console.log(`  - ${m}`));
   }
 }
 
 // Parse tags
-const tags = tagsInput ? tagsInput.split(',').map(t => t.trim()) : [];
+const tags = tagsInput ? tagsInput.split(',').map((t) => t.trim()) : [];
 if (impactArea) {
   tags.push(`area:${impactArea}`);
 }
 ```
 
 ### 3. Add to Backlog
+
 ```javascript
 const { BacklogManager } = require('.aiox-core/scripts/backlog-manager');
 
@@ -305,20 +311,21 @@ await manager.load();
 
 // Dev always creates Technical Debt type (T)
 const item = await manager.addItem({
-  type: 'T',  // Technical Debt
+  type: 'T', // Technical Debt
   title: title,
   description: description,
   priority: priority,
   relatedStory: relatedStory || null,
   createdBy: '@dev',
   tags: tags,
-  estimatedEffort: estimatedEffort
+  estimatedEffort: estimatedEffort,
 });
 
 console.log(`✅ Technical debt registered: ${item.id}`);
 ```
 
 ### 4. Regenerate Backlog
+
 ```javascript
 await manager.generateBacklogFile();
 
@@ -326,6 +333,7 @@ console.log('✅ Backlog updated: docs/stories/backlog.md');
 ```
 
 ### 5. Summary Output
+
 ```markdown
 ## 🔧 Technical Debt Registered
 
@@ -342,13 +350,14 @@ console.log('✅ Backlog updated: docs/stories/backlog.md');
 ${description}
 
 **Next Steps:**
+
 - Review in backlog: docs/stories/backlog.md
 - @po will prioritize with `*backlog-prioritize ${item.id}`
 - Can be addressed in dedicated refactoring story or alongside related work
 
 ${priority === 'Critical'
-  ? '⚠️ **CRITICAL DEBT** - Should be addressed soon to prevent blocking future work'
-  : ''
+? '⚠️ **CRITICAL DEBT** - Should be addressed soon to prevent blocking future work'
+: ''
 }
 ```
 
@@ -394,6 +403,7 @@ Priority: 🟠 High
 ### When to Register Technical Debt
 
 **DO register:**
+
 - Code duplication across 3+ files
 - Missing test coverage for critical paths
 - Hard-coded values that should be configurable
@@ -403,6 +413,7 @@ Priority: 🟠 High
 - Security anti-patterns
 
 **DON'T register:**
+
 - Nitpicky style preferences
 - Premature optimizations
 - "I would have done it differently"
@@ -464,6 +475,7 @@ Add to `package.json`:
 ---
 
 **Related Tasks:**
+
 - `develop-story.md` - Main development workflow
 - `apply-qa-fixes.md` - Addressing QA feedback
 - `po-backlog-review.md` - PO reviews all debt items

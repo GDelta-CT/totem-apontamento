@@ -5,16 +5,16 @@ const { getEnricher, getClient, isCodeIntelAvailable } = require('../index');
 // Risk level thresholds based on blast radius (reference count)
 // Consistent with dev-helper.js
 const RISK_THRESHOLDS = {
-  LOW_MAX: 4,       // 0-4 refs = LOW
-  MEDIUM_MAX: 15,   // 5-15 refs = MEDIUM
-                     // >15 refs = HIGH
+  LOW_MAX: 4, // 0-4 refs = LOW
+  MEDIUM_MAX: 15, // 5-15 refs = MEDIUM
+  // >15 refs = HIGH
 };
 
 // Coverage status thresholds based on test reference count
 const COVERAGE_THRESHOLDS = {
-  INDIRECT_MAX: 2,  // 1-2 test refs = INDIRECT
-  MINIMAL_MAX: 5,   // 3-5 test refs = MINIMAL
-                     // >5 test refs = GOOD
+  INDIRECT_MAX: 2, // 1-2 test refs = INDIRECT
+  MINIMAL_MAX: 5, // 3-5 test refs = MINIMAL
+  // >5 test refs = GOOD
 };
 
 /**
@@ -83,7 +83,7 @@ async function getTestCoverage(symbols) {
             tests: [],
           };
         }
-      }),
+      })
     );
 
     return results;
@@ -119,7 +119,7 @@ async function getReferenceImpact(files) {
             consumers: [],
           };
         }
-      }),
+      })
     );
 
     return results;
@@ -140,7 +140,8 @@ function suggestGateInfluence(riskLevel) {
 
   if (riskLevel === 'HIGH') {
     return {
-      advisory: 'HIGH blast radius detected. Consider CONCERNS gate with additional review recommended.',
+      advisory:
+        'HIGH blast radius detected. Consider CONCERNS gate with additional review recommended.',
       suggestedGate: 'CONCERNS',
     };
   }

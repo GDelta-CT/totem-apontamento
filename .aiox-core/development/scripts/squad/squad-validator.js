@@ -316,18 +316,16 @@ class SquadValidator {
         const manifest = yaml.load(content);
 
         if (manifest && manifest.components) {
-          await this._validateReferencedFiles(
-            squadPath,
-            manifest.components,
-            result,
-          );
+          await this._validateReferencedFiles(squadPath, manifest.components, result);
         }
       } catch {
         // Already handled in manifest validation
       }
     }
 
-    this._log(`Structure validation: ${result.errors.length} errors, ${result.warnings.length} warnings`);
+    this._log(
+      `Structure validation: ${result.errors.length} errors, ${result.warnings.length} warnings`
+    );
     return result;
   }
 
@@ -453,7 +451,9 @@ class SquadValidator {
       }
     }
 
-    this._log(`Config validation: ${result.errors.length} errors, ${result.warnings.length} warnings`);
+    this._log(
+      `Config validation: ${result.errors.length} errors, ${result.warnings.length} warnings`
+    );
     return result;
   }
 
@@ -505,8 +505,7 @@ class SquadValidator {
             code: ValidationErrorCodes.AGENT_INVALID_FORMAT,
             file: agentFile,
             message: 'Agent file may not follow AIOX agent definition format',
-            suggestion:
-              'Use agent: YAML frontmatter or markdown heading structure',
+            suggestion: 'Use agent: YAML frontmatter or markdown heading structure',
           });
         }
 
@@ -616,9 +615,7 @@ class SquadValidator {
       return result;
     }
 
-    const yamlFiles = files.filter(
-      (f) => f.endsWith('.yaml') || f.endsWith('.yml'),
-    );
+    const yamlFiles = files.filter((f) => f.endsWith('.yaml') || f.endsWith('.yml'));
 
     if (yamlFiles.length === 0) {
       return result; // No workflow files to validate
@@ -731,10 +728,7 @@ class SquadValidator {
         // Create patterns that handle Portuguese accents
         const patterns = [
           new RegExp(`^[#*-]*\\s*${field}\\s*:`, 'im'),
-          new RegExp(
-            `^[#*-]*\\s*${field.replace(/a/g, '[aá]').replace(/i/g, '[ií]')}\\s*:`,
-            'im',
-          ),
+          new RegExp(`^[#*-]*\\s*${field.replace(/a/g, '[aá]').replace(/i/g, '[ií]')}\\s*:`, 'im'),
           // Also check for markdown headers with the field
           new RegExp(`^#+\\s*${field}`, 'im'),
         ];
@@ -817,8 +811,7 @@ class SquadValidator {
    */
   _getSchemaSuggestion(error) {
     const suggestions = {
-      'must match pattern':
-        'Use correct format (kebab-case for names, semver for versions)',
+      'must match pattern': 'Use correct format (kebab-case for names, semver for versions)',
       'must be string': 'Wrap value in quotes',
       'must be array': 'Use YAML array syntax: [item1, item2] or - item',
       'must have required property': 'Add the missing required property',

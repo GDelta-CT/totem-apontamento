@@ -1,6 +1,6 @@
 ---
 tools:
-  - clickup  # Required for ClickUp synchronization
+  - clickup # Required for ClickUp synchronization
 checklists:
   - po-master-checklist.md
 ---
@@ -10,6 +10,7 @@ checklists:
 **Purpose:** Manually force synchronization of a local story file to ClickUp. Use this when you've edited a story file directly (via Edit tool) and need to ensure changes are reflected in ClickUp.
 
 **When to Use:**
+
 - After making changes to story file that didn't automatically sync
 - When you want to force-push current story state to ClickUp
 - After manual edits that bypassed story-manager utilities
@@ -20,16 +21,19 @@ checklists:
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -197,6 +201,7 @@ token_usage: ~3,000-10,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Break into smaller workflows; implement checkpointing; use async processing where possible
 
 ---
@@ -215,7 +220,6 @@ updated_at: 2025-11-17
 ```
 
 ---
-
 
 ## Task Inputs
 
@@ -255,6 +259,7 @@ optional:
 ### Step 3: Prepare Sync Data
 
 Extract from story file:
+
 - Full markdown content (for description update)
 - Current status from frontmatter
 - Tasks/checkboxes (for change detection)
@@ -277,6 +282,7 @@ await saveStoryFile(storyFilePath, currentContent, false);
 ```
 
 **What This Does:**
+
 1. Detects changes between previous and current content
 2. Updates ClickUp task description with full markdown
 3. Updates story-status custom field if status changed
@@ -304,6 +310,7 @@ Display formatted summary:
 **Last Sync:** {timestamp}
 
 **Changes Synced:**
+
 - Status: {old_status} → {new_status} (if changed)
 - Tasks completed: {count}
 - Files added: {count}
@@ -311,6 +318,7 @@ Display formatted summary:
 - Acceptance Criteria updated: {yes/no}
 
 **ClickUp Updates:**
+
 - Task description updated with full story markdown
 - story-status custom field updated
 - Changelog comment added to task
@@ -319,6 +327,7 @@ Display formatted summary:
 ## Error Handling
 
 **Error: Story file not found**
+
 ```
 ❌ Story file not found for ID: {story_id}
 
@@ -329,6 +338,7 @@ Please check:
 ```
 
 **Error: No ClickUp metadata**
+
 ```
 ❌ Story has no ClickUp integration
 
@@ -345,6 +355,7 @@ To integrate with ClickUp:
 ```
 
 **Error: ClickUp API failure**
+
 ```
 ❌ Failed to sync to ClickUp: {error_message}
 
@@ -359,6 +370,7 @@ You can verify task manually at:
 ```
 
 **Error: No changes detected (with force=false)**
+
 ```
 ℹ️  No changes detected - sync not needed
 
@@ -372,16 +384,19 @@ Use force=true to sync anyway:
 ## Usage Examples
 
 ### Basic Sync
+
 ```
 *sync-story 99.2
 ```
 
 ### Force Sync (even if no changes)
+
 ```
 *sync-story 5.2.2 --force
 ```
 
 ### After Manual Edits
+
 ```
 # Scenario: You used Edit tool to update story file
 1. Edit story file with changes
@@ -393,18 +408,22 @@ Use force=true to sync anyway:
 ## Integration Notes
 
 **For PO Agent:**
+
 - Add to po.md commands: `sync-story {story}`: Force sync story to ClickUp
 - Use after manual story edits or when validation updates story
 
 **For Dev Agent:**
+
 - Add to dev.md commands: `sync-story {story}`: Force sync story to ClickUp
 - Use after marking tasks complete or updating File List
 
 **For QA Agent:**
+
 - Add to qa.md commands: `sync-story {story}`: Force sync story to ClickUp
 - Use after adding QA Results section
 
 **Best Practice:**
+
 - Agents should use story-manager utilities when possible (automatic sync)
 - Use this task only when direct file edits were made
 - Check last_sync timestamp to verify sync freshness
@@ -412,12 +431,14 @@ Use force=true to sync anyway:
 ## Technical Implementation
 
 **Dependencies:**
+
 - `common/scripts/story-manager.js` - saveStoryFile function
 - `common/scripts/story-update-hook.js` - detectChanges, syncStoryToClickUp
 - `common/scripts/clickup-helpers.js` - ClickUp API wrappers
-- ClickUp MCP tool (via global.mcp__clickup__* or tool-resolver)
+- ClickUp MCP tool (via global.mcp**clickup**\* or tool-resolver)
 
 **Process Flow:**
+
 ```
 Task invoked
     ↓
@@ -441,6 +462,7 @@ Return sync results
 ## Testing This Task
 
 **Manual Test:**
+
 1. Edit Story 99.2 directly (mark a checkbox)
 2. Note current last_sync timestamp
 3. Run: `*sync-story 99.2`
@@ -454,4 +476,4 @@ Return sync results
 
 ---
 
-*Task created to provide manual sync control for ClickUp integration*
+_Task created to provide manual sync control for ClickUp integration_

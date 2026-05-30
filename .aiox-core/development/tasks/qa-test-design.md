@@ -203,12 +203,15 @@ updated_at: 2025-11-17
  Powered by AIOX™ Core -->
 
 ---
+
 tools:
-  - browser           # E2E testing and UI scenario validation
-  - context7          # Research testing frameworks and patterns
-  - github-cli        # Test report generation and tracking
-checklists:
-  - qa-master-checklist.md
+
+- browser # E2E testing and UI scenario validation
+- context7 # Research testing frameworks and patterns
+- github-cli # Test report generation and tracking
+  checklists:
+- qa-master-checklist.md
+
 ---
 
 # test-design
@@ -385,4 +388,3 @@ Before finalizing, verify:
 - **Efficient coverage**: Test once at the right level
 - **Maintainability**: Consider long-term test maintenance
 - **Fast feedback**: Quick tests run first
- 

@@ -25,7 +25,9 @@ const value = process.argv[4];
 
           console.log('📊 Agent Greeting Configuration\n');
           console.log(`Preference: ${config.preference || 'auto'} (auto|minimal|named|archetypal)`);
-          console.log(`Context Detection: ${config.contextDetection !== false ? 'enabled' : 'disabled'}`);
+          console.log(
+            `Context Detection: ${config.contextDetection !== false ? 'enabled' : 'disabled'}`
+          );
           console.log(`Session Detection: ${config.sessionDetection || 'hybrid'}`);
           console.log(`Workflow Detection: ${config.workflowDetection || 'hardcoded'}`);
           console.log(`Show Archetype: ${config.showArchetype !== false ? 'yes' : 'no'}`);
@@ -56,7 +58,9 @@ const value = process.argv[4];
             console.log(`\n📌 Using fixed level: ${value} for all sessions`);
           }
         } else {
-          console.error('Usage: node greeting-config-cli.js set greeting.preference <auto|minimal|named|archetypal>');
+          console.error(
+            'Usage: node greeting-config-cli.js set greeting.preference <auto|minimal|named|archetypal>'
+          );
           console.error('\nExamples:');
           console.error('  node greeting-config-cli.js set greeting.preference auto');
           console.error('  node greeting-config-cli.js set greeting.preference minimal');
@@ -82,4 +86,3 @@ Examples:
     process.exit(1);
   }
 })();
-

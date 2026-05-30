@@ -351,28 +351,28 @@ Display full analysis and ASK user to confirm before proceeding.
 ```yaml
 # .aiox/epic-{epicId}-state.yaml
 epic_state:
-  epicId: {epicId}
-  execution_plan: {execution_plan_path}
-  mode: {mode}
-  started_at: {ISO timestamp}
-  updated_at: {ISO timestamp}
+  epicId: { epicId }
+  execution_plan: { execution_plan_path }
+  mode: { mode }
+  started_at: { ISO timestamp }
+  updated_at: { ISO timestamp }
   status: active
 
   current_wave: 1
-  total_waves: {count}
+  total_waves: { count }
 
   waves:
     1:
-      name: {wave.name}
-      status: pending  # pending | in_progress | gate_review | completed | failed
+      name: { wave.name }
+      status: pending # pending | in_progress | gate_review | completed | failed
       stories:
-        {story_id}:
-          status: pending  # pending | in_progress | completed | failed | blocked
-          branch: {story.branch}
+        { story_id }:
+          status: pending # pending | in_progress | completed | failed | blocked
+          branch: { story.branch }
           started_at: null
           completed_at: null
-          executor: {story.executor}
-          quality_gate: {story.quality_gate}
+          executor: { story.executor }
+          quality_gate: { story.quality_gate }
     2:
       # ...
 
@@ -771,16 +771,16 @@ epic_state:
   epicId: EPIC-ACT
   execution_plan: docs/stories/epics/epic-activation-pipeline/EPIC-ACT-EXECUTION.yaml
   mode: interactive
-  started_at: "2026-02-06T10:00:00Z"
-  updated_at: "2026-02-06T14:30:00Z"
-  status: active  # active | completed | aborted
+  started_at: '2026-02-06T10:00:00Z'
+  updated_at: '2026-02-06T14:30:00Z'
+  status: active # active | completed | aborted
 
   current_wave: 2
   total_waves: 3
 
   waves:
     1:
-      name: "Foundation Fixes"
+      name: 'Foundation Fixes'
       status: completed
       tag: wave-1-complete
       stories:
@@ -789,12 +789,12 @@ epic_state:
         ACT-3: { status: completed, branch: feat/act-3-status-loader-reliability }
         ACT-4: { status: completed, branch: feat/act-4-permission-mode }
     2:
-      name: "Unification"
+      name: 'Unification'
       status: in_progress
       stories:
         ACT-6: { status: in_progress, branch: feat/act-6-unified-pipeline }
     3:
-      name: "Intelligence & Governance"
+      name: 'Intelligence & Governance'
       status: pending
       stories:
         ACT-5: { status: pending }
@@ -802,7 +802,7 @@ epic_state:
         ACT-8: { status: pending }
 
   gate_verdicts:
-    1: { status: approved, agent: architect, at: "2026-02-06T12:00:00Z" }
+    1: { status: approved, agent: architect, at: '2026-02-06T12:00:00Z' }
 
   bug_verification:
     1: { verified: true, by: ACT-1 }
@@ -824,7 +824,9 @@ The executor loads state, reads `current_wave` and story statuses, and picks up 
 ## Integration with Existing Infrastructure
 
 ### development-cycle.yaml (inner loop)
+
 Each story spawns the full development-cycle:
+
 1. `@po` validates story draft
 2. `${story.executor}` develops (spawned in terminal)
 3. `@dev` self-healing (CodeRabbit, conditional)
@@ -833,12 +835,15 @@ Each story spawns the full development-cycle:
 6. `@po` checkpoint (auto-GO in wave mode)
 
 ### epic-orchestration.yaml (template)
+
 Provides the generic wave pattern that this task instantiates with project-specific data from the EXECUTION.yaml.
 
 ### po-epic-context.md
+
 Used by @po during story validation to understand accumulated changes across the epic.
 
 ### Wave Executor (wave-executor.js)
+
 The JS engine can be used for programmatic wave execution if available. This task provides the AI-driven alternative that works without code changes.
 
 ---
@@ -846,6 +851,7 @@ The JS engine can be used for programmatic wave execution if available. This tas
 ## Output Format
 
 All actions produce structured output:
+
 - Epic header with progress
 - Current wave status
 - Story-level detail
@@ -867,9 +873,11 @@ All actions produce structured output:
 ## Agent Integration
 
 This task is owned by:
+
 - `@pm` (Morgan/Bob) - Primary orchestrator
 
 This task spawns:
+
 - `@po` (Pax) - Story validation, checkpoints
 - `@dev` (Dex) - Story implementation (via development-cycle)
 - `@architect` (Aria) - Wave gates, final gate
@@ -880,6 +888,6 @@ This task spawns:
 
 ## Change Log
 
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0.0 | 2026-02-06 | Initial implementation — connects epic-orchestration + development-cycle |
+| Version | Date       | Changes                                                                  |
+| ------- | ---------- | ------------------------------------------------------------------------ |
+| 1.0.0   | 2026-02-06 | Initial implementation — connects epic-orchestration + development-cycle |

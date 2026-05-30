@@ -142,7 +142,7 @@ class ConfigCache {
    */
   getStats() {
     const total = this.hits + this.misses;
-    const hitRate = total > 0 ? (this.hits / total * 100).toFixed(1) : '0.0';
+    const hitRate = total > 0 ? ((this.hits / total) * 100).toFixed(1) : '0.0';
 
     return {
       size: this.size,
@@ -213,15 +213,19 @@ class ConfigCache {
    * @returns {string} JSON string
    */
   toJSON() {
-    return JSON.stringify({
-      size: this.size,
-      stats: this.getStats(),
-      entries: this.entries().map(e => ({
-        key: e.key,
-        age: e.ageSeconds,
-        expires: e.expiresSeconds,
-      })),
-    }, null, 2);
+    return JSON.stringify(
+      {
+        size: this.size,
+        stats: this.getStats(),
+        entries: this.entries().map((e) => ({
+          key: e.key,
+          age: e.ageSeconds,
+          expires: e.expiresSeconds,
+        })),
+      },
+      null,
+      2
+    );
   }
 }
 

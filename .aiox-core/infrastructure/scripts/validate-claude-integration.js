@@ -20,7 +20,8 @@ function countMarkdownFiles(dirPath) {
 function validateClaudeIntegration(options = {}) {
   const projectRoot = options.projectRoot || process.cwd();
   const rulesFile = options.rulesFile || path.join(projectRoot, '.claude', 'CLAUDE.md');
-  const agentsDir = options.agentsDir || path.join(projectRoot, '.claude', 'commands', 'AIOX', 'agents');
+  const agentsDir =
+    options.agentsDir || path.join(projectRoot, '.claude', 'commands', 'AIOX', 'agents');
   const hooksDir = options.hooksDir || path.join(projectRoot, '.claude', 'hooks');
   const sourceAgentsDir =
     options.sourceAgentsDir || path.join(projectRoot, '.aiox-core', 'development', 'agents');
@@ -57,7 +58,9 @@ function validateClaudeIntegration(options = {}) {
 
 function formatHumanReport(result) {
   if (result.ok) {
-    const lines = [`✅ Claude integration validation passed (agents: ${result.metrics.claudeAgents})`];
+    const lines = [
+      `✅ Claude integration validation passed (agents: ${result.metrics.claudeAgents})`,
+    ];
     if (result.warnings.length > 0) {
       lines.push(...result.warnings.map((w) => `⚠️ ${w}`));
     }

@@ -3,7 +3,17 @@
   "title": "DBDR Template Variables",
   "description": "Schema for Database Decision Record template variables",
   "type": "object",
-  "required": ["number", "title", "status", "dbType", "owner", "context", "decision", "migrationStrategy", "rollbackPlan"],
+  "required": [
+    "number",
+    "title",
+    "status",
+    "dbType",
+    "owner",
+    "context",
+    "decision",
+    "migrationStrategy",
+    "rollbackPlan"
+  ],
   "properties": {
     "number": {
       "type": "integer",

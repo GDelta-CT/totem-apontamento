@@ -8,11 +8,7 @@
  */
 
 // IDS-1: Entity Registry Foundation
-const {
-  RegistryLoader,
-  DEFAULT_REGISTRY_PATH,
-  EMPTY_REGISTRY,
-} = require('./registry-loader');
+const { RegistryLoader, DEFAULT_REGISTRY_PATH, EMPTY_REGISTRY } = require('./registry-loader');
 
 // IDS-2: Incremental Decision Engine
 const {
@@ -73,11 +69,7 @@ const {
   DEFAULT_RESET_TIMEOUT_MS,
 } = require('./circuit-breaker');
 
-const {
-  VerificationGate,
-  createGateResult,
-  DEFAULT_TIMEOUT_MS,
-} = require('./verification-gate');
+const { VerificationGate, createGateResult, DEFAULT_TIMEOUT_MS } = require('./verification-gate');
 
 // IDS-5a: Gates G1-G4 (Advisory)
 const { G1EpicCreationGate } = require('./gates/g1-epic-creation');
@@ -86,11 +78,7 @@ const { G3StoryValidationGate } = require('./gates/g3-story-validation');
 const { G4DevContextGate, G4_DEFAULT_TIMEOUT_MS } = require('./gates/g4-dev-context');
 
 // IDS-7: Framework Governor (aiox-master integration)
-const {
-  FrameworkGovernor,
-  TIMEOUT_MS,
-  RISK_THRESHOLDS,
-} = require('./framework-governor');
+const { FrameworkGovernor, TIMEOUT_MS, RISK_THRESHOLDS } = require('./framework-governor');
 
 module.exports = {
   // IDS-1: Registry Foundation

@@ -92,7 +92,7 @@ class WorkflowExecutor {
 
     this.workflowPath = path.join(
       projectRoot,
-      '.aiox-core/development/workflows/development-cycle.yaml',
+      '.aiox-core/development/workflows/development-cycle.yaml'
     );
     this.statePath = path.join(projectRoot, '.aiox/workflow-state/');
     this.configPath = path.join(projectRoot, '.aiox-core/core-config.yaml');
@@ -658,7 +658,10 @@ class WorkflowExecutor {
    */
   async executeSelfHealingPhase(phase, agent) {
     try {
-      const maxIterations = phase.config?.max_iterations || this.config?.coderabbit_integration?.self_healing?.max_iterations || 3;
+      const maxIterations =
+        phase.config?.max_iterations ||
+        this.config?.coderabbit_integration?.self_healing?.max_iterations ||
+        3;
       const severityFilter = phase.config?.severity_filter || ['CRITICAL', 'HIGH'];
       let iterations = 0;
       const issuesFixed = [];
@@ -699,7 +702,8 @@ class WorkflowExecutor {
                 iterations,
                 issues_fixed: issuesFixed,
                 issues_remaining: issuesRemaining,
-                note: analysisResult.error || coderabbitConfig.graceful_degradation?.fallback_message,
+                note:
+                  analysisResult.error || coderabbitConfig.graceful_degradation?.fallback_message,
               },
             };
           }
@@ -707,8 +711,8 @@ class WorkflowExecutor {
         }
 
         // Filter issues by severity
-        const relevantIssues = analysisResult.issues.filter(
-          (issue) => severityFilter.includes(issue.severity),
+        const relevantIssues = analysisResult.issues.filter((issue) =>
+          severityFilter.includes(issue.severity)
         );
 
         if (relevantIssues.length === 0) {
@@ -781,7 +785,9 @@ class WorkflowExecutor {
       // Build command based on installation mode
       let command;
       if (coderabbitConfig.installation_mode === 'wsl') {
-        const wslPath = this.projectRoot.replace(/^([A-Z]):/, (_, drive) => `/mnt/${drive.toLowerCase()}`).replace(/\\/g, '/');
+        const wslPath = this.projectRoot
+          .replace(/^([A-Z]):/, (_, drive) => `/mnt/${drive.toLowerCase()}`)
+          .replace(/\\/g, '/');
         command = `wsl bash -c 'cd "${wslPath}" && ~/.local/bin/coderabbit --prompt-only -t uncommitted 2>&1'`;
       } else {
         command = 'coderabbit --prompt-only -t uncommitted';
@@ -884,7 +890,9 @@ class WorkflowExecutor {
     // This would require integration with an AI model to generate fixes
     // Just log the attempt and return false
     if (this.options.debug) {
-      console.log(`[WorkflowExecutor] Would auto-fix: ${issue.file}:${issue.line} - ${issue.message}`);
+      console.log(
+        `[WorkflowExecutor] Would auto-fix: ${issue.file}:${issue.line} - ${issue.message}`
+      );
     }
 
     // If issue has a suggestion, we could apply it

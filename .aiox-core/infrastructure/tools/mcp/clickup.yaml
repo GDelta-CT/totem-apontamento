@@ -136,7 +136,7 @@ tool:
       - id: extract-custom-field
         language: javascript
         runtime: isolated_vm
-        description: "Extract specific custom field value from task response"
+        description: 'Extract specific custom field value from task response'
         function: |
           (function() {
             const { response, fieldName } = args;
@@ -150,7 +150,7 @@ tool:
       - id: format-assignee-for-create
         language: javascript
         runtime: isolated_vm
-        description: "Convert assignee IDs to create_task format (array)"
+        description: 'Convert assignee IDs to create_task format (array)'
         function: |
           (function() {
             const { assignees } = args;
@@ -163,7 +163,7 @@ tool:
       - id: format-assignee-for-update
         language: javascript
         runtime: isolated_vm
-        description: "Convert assignee IDs to update_task format (object)"
+        description: 'Convert assignee IDs to update_task format (object)'
         function: |
           (function() {
             const { add, remove } = args;
@@ -176,7 +176,7 @@ tool:
       - id: parse-webhook-type
         language: javascript
         runtime: isolated_vm
-        description: "Detect webhook payload type from structure"
+        description: 'Detect webhook payload type from structure'
         function: |
           (function() {
             const { payload } = args;
@@ -192,7 +192,7 @@ tool:
       - id: extract-webhook-payload
         language: javascript
         runtime: isolated_vm
-        description: "Extract actual payload based on webhook type"
+        description: 'Extract actual payload based on webhook type'
         function: |
           (function() {
             const { webhook } = args;
@@ -219,7 +219,7 @@ tool:
       - id: calculate-time-tracking-total
         language: javascript
         runtime: isolated_vm
-        description: "Sum time tracking entries for a task"
+        description: 'Sum time tracking entries for a task'
         function: |
           (function() {
             const { timeEntries } = args;
@@ -233,7 +233,7 @@ tool:
       - id: format-custom-field-update
         language: javascript
         runtime: isolated_vm
-        description: "Format custom field for API update"
+        description: 'Format custom field for API update'
         function: |
           (function() {
             const { fieldId, value } = args;
@@ -246,8 +246,8 @@ tool:
   api_complexity:
     payload_schemas:
       - type: standard
-        detection: "event field exists in root"
-        payload_path: "payload"
+        detection: 'event field exists in root'
+        payload_path: 'payload'
         example: |
           {
             "event": "taskCreated",
@@ -255,8 +255,8 @@ tool:
           }
 
       - type: webhook_variant
-        detection: "webhook_id field exists"
-        payload_path: "data.webhook.payload"
+        detection: 'webhook_id field exists'
+        payload_path: 'data.webhook.payload'
         example: |
           {
             "webhook_id": "abc123",
@@ -268,8 +268,8 @@ tool:
           }
 
       - type: history_items
-        detection: "history_items array exists"
-        payload_path: "history_items"
+        detection: 'history_items array exists'
+        payload_path: 'history_items'
         example: |
           {
             "history_items": [
@@ -280,50 +280,50 @@ tool:
     field_mappings:
       assignees:
         create_format:
-          structure: "[user_id1, user_id2]"
-          type: "array of integers"
-          example: "[123, 456]"
+          structure: '[user_id1, user_id2]'
+          type: 'array of integers'
+          example: '[123, 456]'
         update_format:
-          structure: "{add: [user_id], rem: [user_id]}"
-          type: "object with add/rem arrays"
-          example: "{add: [789], rem: [456]}"
-        note: "Different formats for create vs update - common error source"
+          structure: '{add: [user_id], rem: [user_id]}'
+          type: 'object with add/rem arrays'
+          example: '{add: [789], rem: [456]}'
+        note: 'Different formats for create vs update - common error source'
 
       custom_fields:
-        structure: "[{id: field_id, value: field_value}]"
-        type: "array of objects"
+        structure: '[{id: field_id, value: field_value}]'
+        type: 'array of objects'
         validation: "Each object must have 'id' and 'value' keys"
         example: "[{id: 'field-uuid', value: 'text value'}]"
 
       list_id:
-        format: "numeric string"
+        format: 'numeric string'
         validation: "Must match /^\\d+$/"
         note: "Often called 'listId' in some API responses but 'list_id' in requests"
 
     api_quirks:
       - quirk: assignee_format_mismatch
-        description: "Create API expects [123], Update expects {add: [123], rem: []}"
-        impact: "Runtime errors if wrong format used"
-        mitigation: "Use command-specific validators (validate-assignee-format, validate-task-update-assignees)"
+        description: 'Create API expects [123], Update expects {add: [123], rem: []}'
+        impact: 'Runtime errors if wrong format used'
+        mitigation: 'Use command-specific validators (validate-assignee-format, validate-task-update-assignees)'
 
       - quirk: rate_limit_headers_missing
-        description: "Rate limit info only in X-RateLimit-* headers, not in error response body"
-        impact: "Difficult to implement retry logic without header access"
-        mitigation: "Always capture response headers for rate limit tracking"
+        description: 'Rate limit info only in X-RateLimit-* headers, not in error response body'
+        impact: 'Difficult to implement retry logic without header access'
+        mitigation: 'Always capture response headers for rate limit tracking'
 
       - quirk: custom_field_id_instability
-        description: "Custom field IDs can change when field is renamed or recreated"
-        impact: "Stored field IDs may become invalid"
-        mitigation: "Use field names to lookup IDs via get_workspace_hierarchy before updates"
+        description: 'Custom field IDs can change when field is renamed or recreated'
+        impact: 'Stored field IDs may become invalid'
+        mitigation: 'Use field names to lookup IDs via get_workspace_hierarchy before updates'
 
       - quirk: inconsistent_list_id_naming
         description: "API uses 'list_id' in requests but 'listId' in responses"
-        impact: "Field mapping confusion in response processing"
+        impact: 'Field mapping confusion in response processing'
         mitigation: "Normalize to 'list_id' in all internal processing"
 
   anti_patterns:
     - pattern: wrong_assignee_format
-      description: "Using update format in create API"
+      description: 'Using update format in create API'
       category: api_usage
       severity: high
       wrong: |
@@ -338,10 +338,10 @@ tool:
           list_id: "123",
           assignees: [456]  // ✅ Correct - array format
         })
-      rationale: "Create API expects array, not object. Use format-assignee-for-create helper."
+      rationale: 'Create API expects array, not object. Use format-assignee-for-create helper.'
 
     - pattern: missing_custom_field_validation
-      description: "Setting custom fields without validating structure"
+      description: 'Setting custom fields without validating structure'
       category: data_validation
       severity: medium
       wrong: |
@@ -358,10 +358,10 @@ tool:
             {id: "field-uuid", value: "field-value"}
           ]
         })
-      rationale: "Custom fields must be array of {id, value} objects. Use validate-custom-field-structure."
+      rationale: 'Custom fields must be array of {id, value} objects. Use validate-custom-field-structure.'
 
     - pattern: undocumented_rate_limit_handling
-      description: "Not checking rate limit headers before subsequent requests"
+      description: 'Not checking rate limit headers before subsequent requests'
       category: api_reliability
       severity: medium
       wrong: |
@@ -379,14 +379,14 @@ tool:
             await sleep(60000);  // ✅ Proper rate limit handling
           }
         }
-      rationale: "ClickUp API has strict rate limits. Always monitor X-RateLimit-* headers."
+      rationale: 'ClickUp API has strict rate limits. Always monitor X-RateLimit-* headers.'
 
   examples:
     # WORKFLOW EXAMPLE: Complete Story Creation Flow
     story_creation_workflow:
       - step: 1
         action: get_workspace_hierarchy
-        description: "First, get workspace structure to find list IDs"
+        description: 'First, get workspace structure to find list IDs'
         command: get_workspace_hierarchy
         input: {}
         output_extract: |
@@ -402,131 +402,131 @@ tool:
               ]
             }]
           }
-        notes: "CRITICAL: You must use the numeric list_id from this response in create_task"
+        notes: 'CRITICAL: You must use the numeric list_id from this response in create_task'
 
       - step: 2
         action: create_task
-        description: "Create story task with discovered list_id"
+        description: 'Create story task with discovered list_id'
         command: create_task
         input:
-          list_id: "901317181013"  # ← From step 1 (numeric string)
-          name: "Story 5.2: Implement Feature X"
-          markdown_description: "Complete story content here..."
-          parent: "86acfeqeq"  # Epic task ID (if creating as subtask)
-          tags: ["story", "epic-5", "story-5.2"]
+          list_id: '901317181013' # ← From step 1 (numeric string)
+          name: 'Story 5.2: Implement Feature X'
+          markdown_description: 'Complete story content here...'
+          parent: '86acfeqeq' # Epic task ID (if creating as subtask)
+          tags: ['story', 'epic-5', 'story-5.2']
           custom_fields:
-            - id: "epic_number"
+            - id: 'epic_number'
               value: 5
-            - id: "story_number"
-              value: "5.2"
+            - id: 'story_number'
+              value: '5.2'
         output:
-          id: "86acfetr9"
-          name: "Story 5.2: Implement Feature X"
-          url: "https://app.clickup.com/t/86acfetr9"
+          id: '86acfetr9'
+          name: 'Story 5.2: Implement Feature X'
+          url: 'https://app.clickup.com/t/86acfetr9'
         notes: "list_id MUST be numeric string from get_workspace_hierarchy. Using 'listName' or non-numeric values will fail validation."
 
     create_task:
       - scenario: success
-        description: "Standard task creation with assignees"
+        description: 'Standard task creation with assignees'
         input:
-          name: "Implement user authentication"
-          list_id: "123456789"
+          name: 'Implement user authentication'
+          list_id: '123456789'
           assignees: [456, 789]
           priority: 2
         output:
-          id: "task_abc123"
-          status: "created"
-          name: "Implement user authentication"
+          id: 'task_abc123'
+          status: 'created'
+          name: 'Implement user authentication'
 
       - scenario: failure_invalid_param
-        description: "Wrong assignee format (object instead of array)"
+        description: 'Wrong assignee format (object instead of array)'
         input:
-          name: "Fix login bug"
-          list_id: "123456789"
-          assignees: {add: [456]}
+          name: 'Fix login bug'
+          list_id: '123456789'
+          assignees: { add: [456] }
         error:
           code: VALIDATION_ERROR
-          message: "assignees must be array for create_task, got object"
+          message: 'assignees must be array for create_task, got object'
           validator: validate-assignee-format
 
       - scenario: failure_api_error
-        description: "Invalid list_id"
+        description: 'Invalid list_id'
         input:
-          name: "Task"
-          list_id: "invalid"
+          name: 'Task'
+          list_id: 'invalid'
         error:
           code: API_ERROR
-          message: "List not found"
+          message: 'List not found'
           http_status: 404
 
       - scenario: edge_case
-        description: "Task with custom fields"
+        description: 'Task with custom fields'
         input:
-          name: "Research task"
-          list_id: "123456789"
+          name: 'Research task'
+          list_id: '123456789'
           custom_fields:
-            - id: "field-uuid-1"
-              value: "High"
-            - id: "field-uuid-2"
+            - id: 'field-uuid-1'
+              value: 'High'
+            - id: 'field-uuid-2'
               value: 1000
         output:
-          id: "task_xyz789"
-          status: "created"
+          id: 'task_xyz789'
+          status: 'created'
           custom_fields:
-            - name: "Complexity"
-              value: "High"
-            - name: "Estimate"
+            - name: 'Complexity'
+              value: 'High'
+            - name: 'Estimate'
               value: 1000
 
     update_task:
       - scenario: success
-        description: "Update task assignees"
+        description: 'Update task assignees'
         input:
-          task_id: "task_abc123"
+          task_id: 'task_abc123'
           assignees:
             add: [999]
             rem: [456]
         output:
-          id: "task_abc123"
-          status: "updated"
+          id: 'task_abc123'
+          status: 'updated'
 
       - scenario: failure_invalid_param
-        description: "Wrong assignee format (array instead of object)"
+        description: 'Wrong assignee format (array instead of object)'
         input:
-          task_id: "task_abc123"
+          task_id: 'task_abc123'
           assignees: [999]
         error:
           code: VALIDATION_ERROR
-          message: "assignees must be object {add: [], rem: []} for update_task, got array"
+          message: 'assignees must be object {add: [], rem: []} for update_task, got array'
           validator: validate-task-update-assignees
 
       - scenario: failure_api_error
-        description: "Task not found"
+        description: 'Task not found'
         input:
-          task_id: "nonexistent"
-          name: "Updated name"
+          task_id: 'nonexistent'
+          name: 'Updated name'
         error:
           code: API_ERROR
-          message: "Task not found"
+          message: 'Task not found'
           http_status: 404
 
       - scenario: edge_case
-        description: "Update with partial assignee change"
+        description: 'Update with partial assignee change'
         input:
-          task_id: "task_abc123"
+          task_id: 'task_abc123'
           assignees:
             add: [111, 222]
         output:
-          id: "task_abc123"
+          id: 'task_abc123'
           assignees: [456, 789, 111, 222]
 
   mcp_specific:
-    server_command: "npx -y @modelcontextprotocol/server-clickup"
+    server_command: 'npx -y @modelcontextprotocol/server-clickup'
     transport: stdio
     environment_variables:
       - name: CLICKUP_API_KEY
         required: true
-        description: "ClickUp API key for authentication"
+        description: 'ClickUp API key for authentication'
     health_check:
       method: tool_call
       command: get_workspace_hierarchy

@@ -11,16 +11,19 @@
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -188,6 +191,7 @@ token_usage: ~2,000-8,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Iterative analysis with depth limits; cache intermediate results; batch similar operations
 
 ---
@@ -206,7 +210,6 @@ updated_at: 2025-11-17
 ```
 
 ---
-
 
 ## Inputs
 
@@ -261,6 +264,7 @@ EOF
 ```
 
 Ask user:
+
 ```
 Top 20 slow queries found.
 Select query numbers to analyze (comma-separated, e.g., 1,3,5):
@@ -388,8 +392,10 @@ cat > "$REPORT_FILE" << 'MDEOF'
 
 **EXPLAIN ANALYZE Output:**
 ```
+
 {explain_output}
-```
+
+````
 
 **Issues Identified:**
 1. {issue_1}
@@ -398,7 +404,7 @@ cat > "$REPORT_FILE" << 'MDEOF'
 **Recommended Indexes:**
 ```sql
 {recommended_indexes}
-```
+````
 
 **Expected Improvement:** {estimated_improvement}
 
@@ -418,6 +424,7 @@ cat > "$REPORT_FILE" << 'MDEOF'
 MDEOF
 
 echo "✓ Report: $REPORT_FILE"
+
 ```
 
 ---
@@ -427,25 +434,29 @@ echo "✓ Report: $REPORT_FILE"
 Display summary and next steps:
 
 ```
+
 ✅ HOT PATH ANALYSIS COMPLETE
 
 Queries analyzed: {count}
 Report: supabase/docs/performance-analysis-{timestamp}.md
 
 Key Findings:
+
 - {finding_1}
 - {finding_2}
 - {finding_3}
 
 Recommended Actions:
+
 1. Review report: cat {report_file}
 2. Create index migration for recommended indexes
 3. Update statistics: ANALYZE {affected_tables}
-4. Re-run analysis: *analyze-hotpaths
+4. Re-run analysis: \*analyze-hotpaths
 
 Index Recommendations:
 {list of CREATE INDEX statements}
-```
+
+````
 
 ---
 
@@ -458,9 +469,10 @@ SELECT * FROM posts WHERE user_id = 'xxx';
 
 -- Check: Index on user_id exists?
 -- Verify: USING (auth.uid() = user_id) is wrapped in SELECT for RLS performance
-```
+````
 
 ### Pattern 2: Joins
+
 ```sql
 -- Hot path: Posts with author info
 SELECT p.*, u.name
@@ -471,6 +483,7 @@ JOIN users u ON p.user_id = u.id;
 ```
 
 ### Pattern 3: Filters + Sorts
+
 ```sql
 -- Hot path: Recent published posts
 SELECT * FROM posts
@@ -482,6 +495,7 @@ LIMIT 10;
 ```
 
 ### Pattern 4: Aggregations
+
 ```sql
 -- Hot path: User post count
 SELECT user_id, COUNT(*)
@@ -496,21 +510,27 @@ GROUP BY user_id;
 ## BUFFERS Output Interpretation
 
 **Good (Cached):**
+
 ```
 Buffers: shared hit=100
 ```
+
 = 100 blocks found in cache (no disk I/O)
 
 **Bad (Disk Reads):**
+
 ```
 Buffers: shared hit=10 read=990
 ```
+
 = Only 10 blocks cached, 990 read from disk
 
 **Very Bad (Temp Files):**
+
 ```
 Buffers: temp read=5000 written=5000
 ```
+
 = Query spilled to disk (work_mem too small)
 
 **Target:** Maximize "shared hit", minimize "shared read", zero "temp"
@@ -522,18 +542,20 @@ Buffers: temp read=5000 written=5000
 ### Using with Supabase Client (PostgREST)
 
 Enable explain in SQL editor first (dev only):
+
 ```sql
 -- Run once in Dashboard SQL Editor
 ALTER DATABASE postgres SET app.settings.explain TO 'on';
 ```
 
 Then use in code:
+
 ```javascript
 const { data, error } = await supabase
   .from('posts')
   .select('*')
   .eq('status', 'published')
-  .explain({ analyze: true, buffers: true })
+  .explain({ analyze: true, buffers: true });
 ```
 
 ### Supabase Studio Integration

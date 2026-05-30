@@ -16,6 +16,7 @@ checklists:
 ## Purpose
 
 Safe, validated npm publishing using a two-phase release strategy:
+
 1. **Preview**: Publish to `preview` dist-tag for testing
 2. **Promote**: After validation, promote `preview` to `latest`
 
@@ -221,6 +222,7 @@ To fully block a version, use `npm unpublish aiox-core@{version}` (within 72h of
 ## Configuration Reference
 
 See `core-config.yaml` section `npm_registry` for:
+
 - Required files list
 - Excluded paths list
 - Smoke test configuration
@@ -230,13 +232,13 @@ See `core-config.yaml` section `npm_registry` for:
 
 ## Error Handling
 
-| Error | Cause | Resolution |
-|-------|-------|------------|
-| `npm ERR! 403` | Auth issue | Run `npm login`, check token permissions |
-| `npm ERR! 402` | Paid feature | Ensure package is public (`--access public`) |
-| Smoke test fails | Files missing from tarball | Fix `files` array in package.json, re-validate |
-| promote fails | Version not on preview | Run `*publish-preview` first |
-| Tag already exists | Re-publishing same version | Bump version or use `--force` (with caution) |
+| Error              | Cause                      | Resolution                                     |
+| ------------------ | -------------------------- | ---------------------------------------------- |
+| `npm ERR! 403`     | Auth issue                 | Run `npm login`, check token permissions       |
+| `npm ERR! 402`     | Paid feature               | Ensure package is public (`--access public`)   |
+| Smoke test fails   | Files missing from tarball | Fix `files` array in package.json, re-validate |
+| promote fails      | Version not on preview     | Run `*publish-preview` first                   |
+| Tag already exists | Re-publishing same version | Bump version or use `--force` (with caution)   |
 
 ---
 

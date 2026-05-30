@@ -61,10 +61,7 @@
       "type": "array",
       "description": "Available commands for this agent",
       "items": {
-        "oneOf": [
-          { "type": "object" },
-          { "type": "string" }
-        ]
+        "oneOf": [{ "type": "object" }, { "type": "string" }]
       }
     },
     "dependencies": {
@@ -102,8 +99,14 @@
           "type": "object",
           "description": "Execution Engine capabilities (Epic 4)",
           "properties": {
-            "canCreatePlan": { "type": "boolean", "description": "@architect - create implementation plan" },
-            "canCreateContext": { "type": "boolean", "description": "@architect - create project context" },
+            "canCreatePlan": {
+              "type": "boolean",
+              "description": "@architect - create implementation plan"
+            },
+            "canCreateContext": {
+              "type": "boolean",
+              "description": "@architect - create project context"
+            },
             "canExecute": { "type": "boolean", "description": "@dev - execute subtasks" },
             "canVerify": { "type": "boolean", "description": "@dev, @qa - verify subtasks" },
             "selfCritique": {

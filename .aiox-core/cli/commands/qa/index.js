@@ -20,9 +20,9 @@ const { createStatusCommand } = require('./status');
 function createQaCommand() {
   const qa = new Command('qa');
 
-  qa
-    .description('Quality Gate Manager - orchestrate 3-layer quality pipeline')
-    .addHelpText('after', `
+  qa.description('Quality Gate Manager - orchestrate 3-layer quality pipeline').addHelpText(
+    'after',
+    `
 Commands:
   run               Execute quality gate pipeline
   status            Show current gate status
@@ -42,7 +42,8 @@ Layers:
 Exit Codes:
   0 = All gates passed (or pending human review)
   1 = Gates failed (fix required)
-`);
+`
+  );
 
   // Add subcommands
   qa.addCommand(createRunCommand());

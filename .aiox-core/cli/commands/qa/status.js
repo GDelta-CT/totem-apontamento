@@ -138,8 +138,8 @@ function getStatusIcon(status) {
     'layer2-blocked': '🟠',
     'layer2-complete': '🟡',
     'layer3-pending': '⏳',
-    'passed': '✅',
-    'unknown': '❓',
+    passed: '✅',
+    unknown: '❓',
   };
   return icons[status] || '❓';
 }
@@ -157,8 +157,8 @@ function formatOverallStatus(status) {
     'layer2-blocked': 'Layer 2 Blocked',
     'layer2-complete': 'Layer 2 Complete',
     'layer3-pending': 'Awaiting Human Review',
-    'passed': 'All Gates Passed',
-    'unknown': 'Unknown',
+    passed: 'All Gates Passed',
+    unknown: 'Unknown',
   };
   return statusMap[status] || status;
 }

@@ -175,9 +175,9 @@ function parseAgentFile(filePath) {
     // Extract markdown sections (always try)
     result.sections.quickCommands = extractSection(content, 'Quick Commands');
     result.sections.collaboration = extractSection(content, 'Agent Collaboration');
-    result.sections.guide = extractSection(content, 'Developer Guide') ||
-                           extractSection(content, '.*Guide \\(\\*guide command\\)');
-
+    result.sections.guide =
+      extractSection(content, 'Developer Guide') ||
+      extractSection(content, '.*Guide \\(\\*guide command\\)');
   } catch (error) {
     result.error = error.message;
   }
@@ -198,7 +198,7 @@ function parseAllAgents(agentsDir) {
     return agents;
   }
 
-  const files = fs.readdirSync(agentsDir).filter(f => f.endsWith('.md'));
+  const files = fs.readdirSync(agentsDir).filter((f) => f.endsWith('.md'));
 
   for (const file of files) {
     const filePath = path.join(agentsDir, file);
@@ -218,7 +218,7 @@ function parseAllAgents(agentsDir) {
 function normalizeCommands(commands) {
   if (!Array.isArray(commands)) return [];
 
-  return commands.map(cmd => {
+  return commands.map((cmd) => {
     // Already in proper format with name property
     if (cmd.name && typeof cmd.name === 'string') {
       return {
@@ -261,7 +261,7 @@ function getVisibleCommands(commands, visibility) {
   // First normalize the commands to ensure consistent format
   const normalized = normalizeCommands(commands);
 
-  return normalized.filter(cmd => {
+  return normalized.filter((cmd) => {
     if (!cmd.visibility) return true; // Include if no visibility defined
     return cmd.visibility.includes(visibility);
   });
@@ -279,7 +279,7 @@ function formatCommandsList(commands, prefix = '*') {
   }
 
   return commands
-    .map(cmd => `- \`${prefix}${cmd.name}\` - ${cmd.description || 'No description'}`)
+    .map((cmd) => `- \`${prefix}${cmd.name}\` - ${cmd.description || 'No description'}`)
     .join('\n');
 }
 

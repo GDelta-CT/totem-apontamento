@@ -240,7 +240,7 @@ tools:
     essential: false # Task-specific: research, competitor analysis
     tokenCost: 500
     category: web-search
-    ptc_eligible: false  # ADR-3: MCP tools excluded from PTC/batch blocks
+    ptc_eligible: false # ADR-3: MCP tools excluded from PTC/batch blocks
     keywords:
       - search
       - research
@@ -262,7 +262,7 @@ tools:
     essential: false # Task-specific: browser automation, screenshots
     tokenCost: 800
     category: browser-automation
-    ptc_eligible: false  # ADR-3: MCP tools excluded from PTC/batch blocks
+    ptc_eligible: false # ADR-3: MCP tools excluded from PTC/batch blocks
     keywords:
       - browser
       - screenshot
@@ -286,7 +286,7 @@ tools:
     essential: false # Task-specific: web scraping, social media
     tokenCost: 600
     category: web-scraping
-    ptc_eligible: false  # ADR-3: MCP tools excluded from PTC/batch blocks
+    ptc_eligible: false # ADR-3: MCP tools excluded from PTC/batch blocks
     keywords:
       - scraping
       - social-media
@@ -310,7 +310,7 @@ tools:
     essential: true # Core code intelligence — NEVER disable
     tokenCost: 400
     category: code-intelligence
-    ptc_eligible: false  # ADR-3: MCP tools excluded from PTC/batch blocks
+    ptc_eligible: false # ADR-3: MCP tools excluded from PTC/batch blocks
     keywords:
       - code-analysis
       - nogic
@@ -324,7 +324,7 @@ tools:
     essential: true # Dependency analysis — NEVER disable
     tokenCost: 400
     category: code-intelligence
-    ptc_eligible: false  # ADR-3: MCP tools excluded from PTC/batch blocks
+    ptc_eligible: false # ADR-3: MCP tools excluded from PTC/batch blocks
     keywords:
       - graph
       - dependencies
@@ -559,7 +559,7 @@ task_bindings:
     optional:
       - browser
       - supabase
-    execution_mode: programmatic  # TOK-3: batch lint+typecheck+test in single Bash block
+    execution_mode: programmatic # TOK-3: batch lint+typecheck+test in single Bash block
 
   dev-develop-story:
     required:
@@ -618,7 +618,7 @@ task_bindings:
       - Glob
       - Bash
     optional: []
-    execution_mode: programmatic  # TOK-3: batch-scan N entities × M checks in single Bash block
+    execution_mode: programmatic # TOK-3: batch-scan N entities × M checks in single Bash block
 
   research-aggregation:
     required:
@@ -628,7 +628,7 @@ task_bindings:
       - WebSearch
     optional:
       - WebFetch
-    execution_mode: programmatic  # TOK-3: multi-search + filter in single Bash block
+    execution_mode: programmatic # TOK-3: multi-search + filter in single Bash block
 
 # =============================================================================
 # ANALYTICS CONFIGURATION (TOK-5)
@@ -641,8 +641,8 @@ task_bindings:
 analytics:
   thresholds:
     promote:
-      minUsesPerSession: 10   # Tool used >N times per session average
-      minSessions: 5          # Across M+ sessions to be statistically meaningful
+      minUsesPerSession: 10 # Tool used >N times per session average
+      minSessions: 5 # Across M+ sessions to be statistically meaningful
     demote:
-      maxUsesPerNSessions: 1  # Tool used <N times per window
-      sessionWindow: 5        # Window of M sessions for demote calculation
+      maxUsesPerNSessions: 1 # Tool used <N times per window
+      sessionWindow: 5 # Window of M sessions for demote calculation

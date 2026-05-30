@@ -8,7 +8,7 @@ const STATUS_CONFIG = {
   critical: { label: 'Critical', icon: '\u2717' },
   passed: { label: 'Passed', icon: '\u2713' },
   failed: { label: 'Failed', icon: '\u2717' },
-  skipped: { label: 'Skipped', icon: '-' }
+  skipped: { label: 'Skipped', icon: '-' },
 };
 
 const SEVERITY_CONFIG = {
@@ -16,7 +16,7 @@ const SEVERITY_CONFIG = {
   HIGH: { label: 'High', priority: 2 },
   MEDIUM: { label: 'Medium', priority: 3 },
   LOW: { label: 'Low', priority: 4 },
-  INFO: { label: 'Info', priority: 5 }
+  INFO: { label: 'Info', priority: 5 },
 };
 
 /**

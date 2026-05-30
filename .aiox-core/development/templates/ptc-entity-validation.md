@@ -1,10 +1,12 @@
 # PTC Template: Entity Validation Batch
 
 ---
+
 execution_mode: programmatic
-ptc_type: bash-batch  # Fallback — true PTC not available in Claude Code CLI (ADR-7)
+ptc_type: bash-batch # Fallback — true PTC not available in Claude Code CLI (ADR-7)
 adr_reference: ADR-3 (PTC native ONLY — no MCP tools in batch blocks)
 story: TOK-3
+
 ---
 
 ## Purpose
@@ -100,11 +102,11 @@ fi
 
 ## Token Comparison
 
-| Approach | Tool Calls | Context Entries | Estimated Tokens |
-|----------|-----------|-----------------|-----------------|
-| Direct (N checks) | 5-10 | 5-10 (each result) | ~5,000-10,000 |
-| Batch (1 call) | 1 | 1 (summary only) | ~2,000-3,000 |
-| **Reduction** | -80% calls | -80% entries | **~20-40%** |
+| Approach          | Tool Calls | Context Entries    | Estimated Tokens |
+| ----------------- | ---------- | ------------------ | ---------------- |
+| Direct (N checks) | 5-10       | 5-10 (each result) | ~5,000-10,000    |
+| Batch (1 call)    | 1          | 1 (summary only)   | ~2,000-3,000     |
+| **Reduction**     | -80% calls | -80% entries       | **~20-40%**      |
 
 ## Notes
 

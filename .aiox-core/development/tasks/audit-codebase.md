@@ -9,16 +9,19 @@
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -186,6 +189,7 @@ token_usage: ~2,000-8,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Iterative analysis with depth limits; cache intermediate results; batch similar operations
 
 ---
@@ -204,7 +208,6 @@ updated_at: 2025-11-17
 ```
 
 ---
-
 
 ## Description
 
@@ -246,10 +249,10 @@ This task uses interactive elicitation to gather scan parameters.
    - Validation: Path exists and is readable
 
 2. **Detect Frameworks**
-   - Count React/JSX files (*.jsx, *.tsx)
-   - Count Vue files (*.vue)
-   - Count HTML files (*.html)
-   - Count CSS files (*.css, *.scss, *.sass)
+   - Count React/JSX files (_.jsx, _.tsx)
+   - Count Vue files (\*.vue)
+   - Count HTML files (\*.html)
+   - Count CSS files (_.css, _.scss, \*.sass)
    - Validation: At least 1 UI file type found
 
 3. **Scan Button Patterns**
@@ -387,6 +390,7 @@ This task uses interactive elicitation to gather scan parameters.
 ```
 
 Output:
+
 ```
 🔍 Brad: Scanning ./src for UI chaos...
 
@@ -425,5 +429,5 @@ Output shows Vue-specific patterns (v-btn, el-button, etc.)
 - Colors >50 unique values = major consolidation opportunity
 - Buttons >20 variations = serious pattern explosion
 - Run this audit periodically to prevent pattern regression
-- Brad recommends: If redundancy factors are high, run *consolidate next
-- For cost analysis of this waste, run *calculate-roi after audit
+- Brad recommends: If redundancy factors are high, run \*consolidate next
+- For cost analysis of this waste, run \*calculate-roi after audit

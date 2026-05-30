@@ -11,16 +11,19 @@
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -188,6 +191,7 @@ token_usage: ~800-2,500 tokens
 ```
 
 **Optimization Notes:**
+
 - Validate configuration early; use atomic writes; implement rollback checkpoints
 
 ---
@@ -206,7 +210,6 @@ updated_at: 2025-11-17
 ```
 
 ---
-
 
 ## Inputs
 
@@ -442,6 +445,7 @@ Next steps:
 ### 1. Destructive Operation Detection
 
 Automatically warns for:
+
 - `DROP TABLE`
 - `TRUNCATE`
 - `DELETE FROM ... WHERE 1=1`
@@ -450,16 +454,19 @@ Automatically warns for:
 ### 2. Transaction Modes
 
 **Auto Mode (Recommended):**
+
 - Wraps SQL in BEGIN/COMMIT
 - Automatic rollback on error
 - Safe for modifications
 
 **Manual Mode:**
+
 - For files with own transaction control
 - Use when script has multiple transactions
 - More control, less safety
 
 **Read Mode:**
+
 - Read-only transaction
 - Cannot modify data
 - Safe for queries/exploration

@@ -5,6 +5,7 @@
 **Elicit**: true
 
 **Consolidated From (Story 6.1.2.3):**
+
 - `db-rls-audit.md` - RLS policy coverage checking
 - `schema-audit.md` - Schema design quality validation
 
@@ -15,16 +16,19 @@
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -192,6 +196,7 @@ token_usage: ~2,000-8,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Iterative analysis with depth limits; cache intermediate results; batch similar operations
 
 ---
@@ -210,7 +215,6 @@ updated_at: 2025-11-17
 ```
 
 ---
-
 
 ## Elicitation
 
@@ -530,11 +534,13 @@ SQL
 ## Recommendations
 
 **After RLS Audit:**
+
 1. Enable RLS on all public tables: `ALTER TABLE {table} ENABLE ROW LEVEL SECURITY;`
 2. Create policies for all CRUD operations (use `*policy-apply` command)
 3. Test with `*test-as-user` command
 
 **After Schema Audit:**
+
 1. Add missing primary keys: `ALTER TABLE {table} ADD PRIMARY KEY (id);`
 2. Add missing foreign keys: `ALTER TABLE {table} ADD FOREIGN KEY ({col}) REFERENCES {ref_table}(id);`
 3. Add missing NOT NULL: `ALTER TABLE {table} ALTER COLUMN {col} SET NOT NULL;`

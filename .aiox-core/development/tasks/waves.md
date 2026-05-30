@@ -16,17 +16,17 @@ Analyzes workflow task dependencies to identify waves of tasks that can execute 
 
 ## Arguments
 
-| Argument | Type | Required | Description |
-|----------|------|----------|-------------|
-| `workflow` | string | No | Workflow name to analyze (default: auto-detect from context) |
+| Argument   | Type   | Required | Description                                                  |
+| ---------- | ------ | -------- | ------------------------------------------------------------ |
+| `workflow` | string | No       | Workflow name to analyze (default: auto-detect from context) |
 
 ## Options
 
-| Option | Type | Description |
-|--------|------|-------------|
+| Option     | Type | Description                                |
+| ---------- | ---- | ------------------------------------------ |
 | `--visual` | flag | Show ASCII visualization of wave structure |
-| `--json` | flag | Output as JSON format |
-| `--help` | flag | Show this help message |
+| `--json`   | flag | Output as JSON format                      |
+| `--help`   | flag | Show this help message                     |
 
 ## Examples
 
@@ -155,14 +155,14 @@ Next Wave (after current completes):
 const { analyzeWaves, createWaveAnalyzer } = require('.aiox-core/workflow-intelligence');
 
 async function executeWaves(args, options) {
-  const workflowId = args[0] || await detectCurrentWorkflow();
+  const workflowId = args[0] || (await detectCurrentWorkflow());
   const analyzer = createWaveAnalyzer();
 
   try {
     const result = analyzer.analyzeWaves(workflowId);
     const output = analyzer.formatOutput(result, {
       visual: options.visual,
-      json: options.json
+      json: options.json,
     });
     console.log(output);
   } catch (error) {
@@ -179,11 +179,11 @@ async function executeWaves(args, options) {
 
 ## Performance
 
-| Workflow Size | Analysis Time |
-|--------------|---------------|
-| Small (5 tasks) | <10ms |
-| Medium (20 tasks) | <30ms |
-| Large (50 tasks) | <50ms |
+| Workflow Size     | Analysis Time |
+| ----------------- | ------------- |
+| Small (5 tasks)   | <10ms         |
+| Medium (20 tasks) | <30ms         |
+| Large (50 tasks)  | <50ms         |
 
 ## Related Commands
 
@@ -194,12 +194,13 @@ async function executeWaves(args, options) {
 ## Agent Integration
 
 This task is available for:
+
 - `@dev` - Developer Agent
 
 ---
 
 ## Change Log
 
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0.0 | 2025-12-25 | Initial implementation (WIS-4) |
+| Version | Date       | Changes                        |
+| ------- | ---------- | ------------------------------ |
+| 1.0.0   | 2025-12-25 | Initial implementation (WIS-4) |

@@ -1,7 +1,7 @@
 workflow:
   id: qa-loop
   name: QA Loop Orchestrator - Review Fix Re-review Cycle
-  version: "1.0"
+  version: '1.0'
   description: >-
     Automated QA loop that orchestrates the review → fix → re-review cycle.
     Runs up to maxIterations (default 5), tracking each iteration's results.
@@ -22,33 +22,33 @@ workflow:
   triggers:
     # Primary trigger: Explicit command to start loop
     - event: command
-      command: "*qa-loop"
+      command: '*qa-loop'
       action: start_loop
 
     # Start from specific phase
     - event: command
-      command: "*qa-loop-review"
+      command: '*qa-loop-review'
       action: run_step
       step: review
 
     - event: command
-      command: "*qa-loop-fix"
+      command: '*qa-loop-fix'
       action: run_step
       step: fix
 
     # Stop command (AC5)
     - event: command
-      command: "*stop-qa-loop"
+      command: '*stop-qa-loop'
       action: stop_loop
 
     # Resume command
     - event: command
-      command: "*resume-qa-loop"
+      command: '*resume-qa-loop'
       action: resume_loop
 
     # Force escalation
     - event: command
-      command: "*escalate-qa-loop"
+      command: '*escalate-qa-loop'
       action: escalate
 
   # ═══════════════════════════════════════════════════════════════════════════════════
@@ -72,8 +72,8 @@ workflow:
     legacyStatusPath: .aiox/status.json
 
     # Timeout per phase (milliseconds)
-    reviewTimeout: 1800000  # 30 minutes
-    fixTimeout: 3600000     # 60 minutes
+    reviewTimeout: 1800000 # 30 minutes
+    fixTimeout: 3600000 # 60 minutes
 
     # Retry configuration
     maxRetries: 2
@@ -87,31 +87,30 @@ workflow:
     storyId: string
     currentIteration: number
     maxIterations: number
-    status: "pending | in_progress | completed | stopped | escalated"
+    status: 'pending | in_progress | completed | stopped | escalated'
     startedAt: ISO-8601
     updatedAt: ISO-8601
     history:
       - iteration: number
         reviewedAt: ISO-8601
-        verdict: "APPROVE | REJECT | BLOCKED"
+        verdict: 'APPROVE | REJECT | BLOCKED'
         issuesFound: number
         fixedAt: ISO-8601 | null
         issuesFixed: number | null
-        duration: number  # milliseconds
+        duration: number # milliseconds
 
   # ═══════════════════════════════════════════════════════════════════════════════════
   #                              WORKFLOW SEQUENCE
   # ═══════════════════════════════════════════════════════════════════════════════════
 
   sequence:
-
     # ═════════════════════════════════════════════════════════════════════════════════
     # STEP 1: REVIEW (QA Agent)
     # ═════════════════════════════════════════════════════════════════════════════════
 
     - step: review
       phase: 1
-      phase_name: "QA Review"
+      phase_name: 'QA Review'
       agent: qa
 
       description: >-
@@ -121,24 +120,24 @@ workflow:
       task: qa-review-story.md
 
       inputs:
-        storyId: "{storyId}"
-        iteration: "{currentIteration}"
-        previousIssues: "{history[-1].issuesFound|0}"
+        storyId: '{storyId}'
+        iteration: '{currentIteration}'
+        previousIssues: '{history[-1].issuesFound|0}'
 
       outputs:
         - gate-file.yaml
         - verdict
         - issuesFound
 
-      timeout: "{config.reviewTimeout}"
+      timeout: '{config.reviewTimeout}'
 
       on_success:
-        log: "Review complete: {verdict} ({issuesFound} issues)"
+        log: 'Review complete: {verdict} ({issuesFound} issues)'
         next: check_verdict
 
       on_failure:
         action: retry
-        max_retries: "{config.maxRetries}"
+        max_retries: '{config.maxRetries}'
         on_exhausted: escalate
 
     # ═════════════════════════════════════════════════════════════════════════════════
@@ -147,7 +146,7 @@ workflow:
 
     - step: check_verdict
       phase: 2
-      phase_name: "Verdict Check"
+      phase_name: 'Verdict Check'
       agent: system
 
       description: >-
@@ -157,11 +156,11 @@ workflow:
       condition_check:
         - condition: verdict == "APPROVE"
           action: complete
-          log: "Story APPROVED after {currentIteration} iteration(s)"
+          log: 'Story APPROVED after {currentIteration} iteration(s)'
 
         - condition: verdict == "BLOCKED"
           action: escalate
-          reason: "QA review BLOCKED - requires human intervention"
+          reason: 'QA review BLOCKED - requires human intervention'
 
         - condition: verdict == "REJECT"
           action: continue
@@ -173,7 +172,7 @@ workflow:
 
     - step: create_fix_request
       phase: 3
-      phase_name: "Create Fix Request"
+      phase_name: 'Create Fix Request'
       agent: qa
 
       description: >-
@@ -183,21 +182,21 @@ workflow:
       task: qa-create-fix-request.md
 
       inputs:
-        storyId: "{storyId}"
-        gateFile: "{outputs.review.gate-file}"
-        iteration: "{currentIteration}"
+        storyId: '{storyId}'
+        gateFile: '{outputs.review.gate-file}'
+        iteration: '{currentIteration}'
 
       outputs:
         - fix-request.md
         - prioritizedIssues
 
       on_success:
-        log: "Fix request created with {prioritizedIssues.length} prioritized issues"
+        log: 'Fix request created with {prioritizedIssues.length} prioritized issues'
         next: fix_issues
 
       on_failure:
         action: continue
-        fallback: "Use raw gate file for fixes"
+        fallback: 'Use raw gate file for fixes'
 
     # ═════════════════════════════════════════════════════════════════════════════════
     # STEP 4: FIX ISSUES (Dev Agent)
@@ -205,7 +204,7 @@ workflow:
 
     - step: fix_issues
       phase: 4
-      phase_name: "Apply Fixes"
+      phase_name: 'Apply Fixes'
       agent: dev
 
       description: >-
@@ -215,26 +214,26 @@ workflow:
       task: dev-apply-qa-fixes.md
 
       inputs:
-        storyId: "{storyId}"
-        fixRequest: "{outputs.create_fix_request.fix-request}"
-        iteration: "{currentIteration}"
+        storyId: '{storyId}'
+        fixRequest: '{outputs.create_fix_request.fix-request}'
+        iteration: '{currentIteration}'
 
       outputs:
         - fixes-applied.json
         - issuesFixed
 
-      timeout: "{config.fixTimeout}"
+      timeout: '{config.fixTimeout}'
 
       on_success:
-        log: "Fixed {issuesFixed} of {issuesFound} issues"
+        log: 'Fixed {issuesFixed} of {issuesFound} issues'
         next: increment_iteration
 
       on_failure:
         action: retry
-        max_retries: "{config.maxRetries}"
+        max_retries: '{config.maxRetries}'
         on_exhausted:
           action: escalate
-          reason: "Dev agent unable to apply fixes after retries"
+          reason: 'Dev agent unable to apply fixes after retries'
 
     # ═════════════════════════════════════════════════════════════════════════════════
     # STEP 5: INCREMENT ITERATION (AC2)
@@ -242,7 +241,7 @@ workflow:
 
     - step: increment_iteration
       phase: 5
-      phase_name: "Check Iteration"
+      phase_name: 'Check Iteration'
       agent: system
 
       description: >-
@@ -254,13 +253,13 @@ workflow:
       condition_check:
         - condition: currentIteration >= maxIterations
           action: escalate
-          reason: "Max iterations ({maxIterations}) reached without APPROVE"
-          log: "Max iterations reached - escalating to human"
+          reason: 'Max iterations ({maxIterations}) reached without APPROVE'
+          log: 'Max iterations reached - escalating to human'
 
         - condition: currentIteration < maxIterations
           action: continue
           next: review
-          log: "Starting iteration {currentIteration + 1}/{maxIterations}"
+          log: 'Starting iteration {currentIteration + 1}/{maxIterations}'
 
   # ═══════════════════════════════════════════════════════════════════════════════════
   #                              ESCALATION (AC3)
@@ -276,8 +275,8 @@ workflow:
       - manual_escalate
 
     action:
-      log: "Escalating to human with full context"
-      status: "escalated"
+      log: 'Escalating to human with full context'
+      status: 'escalated'
 
       context_package:
         - loop-status.json
@@ -322,13 +321,13 @@ workflow:
       Duration: {totalDuration}
 
     summary:
-      storyId: "{storyId}"
-      status: "{status}"
-      iterations: "{currentIteration}"
-      finalVerdict: "{history[-1].verdict}"
-      totalIssuesFound: "{history.reduce((sum, h) => sum + h.issuesFound, 0)}"
-      totalIssuesFixed: "{history.reduce((sum, h) => sum + (h.issuesFixed || 0), 0)}"
-      duration: "{totalDuration}"
+      storyId: '{storyId}'
+      status: '{status}'
+      iterations: '{currentIteration}'
+      finalVerdict: '{history[-1].verdict}'
+      totalIssuesFound: '{history.reduce((sum, h) => sum + h.issuesFound, 0)}'
+      totalIssuesFixed: '{history.reduce((sum, h) => sum + (h.issuesFixed || 0), 0)}'
+      duration: '{totalDuration}'
 
     outputs:
       - loop-status.json
@@ -340,23 +339,23 @@ workflow:
 
   error_handling:
     missing_story_id:
-      message: "Story ID is required"
-      suggestion: "Usage: *qa-loop STORY-42"
+      message: 'Story ID is required'
+      suggestion: 'Usage: *qa-loop STORY-42'
       action: prompt
 
     review_timeout:
-      message: "Review phase timed out"
-      suggestion: "Check QA agent status and retry: *resume-qa-loop {storyId}"
+      message: 'Review phase timed out'
+      suggestion: 'Check QA agent status and retry: *resume-qa-loop {storyId}'
       action: escalate
 
     fix_timeout:
-      message: "Fix phase timed out"
-      suggestion: "Check Dev agent status and retry: *resume-qa-loop {storyId}"
+      message: 'Fix phase timed out'
+      suggestion: 'Check Dev agent status and retry: *resume-qa-loop {storyId}'
       action: escalate
 
     invalid_status:
-      message: "Loop status file is corrupted or invalid"
-      suggestion: "Reset loop: *qa-loop {storyId} --reset"
+      message: 'Loop status file is corrupted or invalid'
+      suggestion: 'Reset loop: *qa-loop {storyId} --reset'
       action: halt
 
   # ═══════════════════════════════════════════════════════════════════════════════════
@@ -365,7 +364,7 @@ workflow:
 
   control:
     stop:
-      command: "*stop-qa-loop"
+      command: '*stop-qa-loop'
       action: |
         - Set status to "stopped"
         - Save current state to loop-status.json
@@ -373,7 +372,7 @@ workflow:
         - Allow resume later
 
     resume:
-      command: "*resume-qa-loop"
+      command: '*resume-qa-loop'
       action: |
         - Load state from loop-status.json
         - Verify status was "stopped" or "escalated"
@@ -382,7 +381,7 @@ workflow:
         - Log: "QA loop resumed at iteration {currentIteration}"
 
     reset:
-      command: "*qa-loop --reset"
+      command: '*qa-loop --reset'
       action: |
         - Delete loop-status.json
         - Start fresh loop
@@ -413,13 +412,13 @@ workflow:
 
     notifications:
       on_approve:
-        message: "QA Loop APPROVED: {storyId}"
+        message: 'QA Loop APPROVED: {storyId}'
         channels: [log]
       on_escalate:
-        message: "QA Loop ESCALATED: {storyId} - needs attention"
+        message: 'QA Loop ESCALATED: {storyId} - needs attention'
         channels: [log]
       on_stop:
-        message: "QA Loop STOPPED: {storyId}"
+        message: 'QA Loop STOPPED: {storyId}'
         channels: [log]
 
   # ═══════════════════════════════════════════════════════════════════════════════════
@@ -427,10 +426,10 @@ workflow:
   # ═══════════════════════════════════════════════════════════════════════════════════
 
   metadata:
-    story: "6.5"
-    epic: "Epic 6 - QA Evolution"
-    created: "2026-01-29"
-    author: "@architect (Aria)"
+    story: '6.5'
+    epic: 'Epic 6 - QA Evolution'
+    created: '2026-01-29'
+    author: '@architect (Aria)'
     dependencies:
       - qa-review-story.md
       - qa-create-fix-request.md

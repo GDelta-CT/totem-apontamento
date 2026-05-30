@@ -275,16 +275,16 @@ func (b *OrderBuilder) Build() orders.PlaceOrderCommand {
 
 ## Tech Stack
 
-| Category | Technology | Version | Purpose |
-| -------- | ---------- | ------- | ------- |
-| Language | Go | 1.24+ | Runtime principal |
-| HTTP | Chi | ^5 | Routing simples e rapido |
-| Database | pgx/sqlc | latest | SQL typed e performatico |
-| Validation | go-playground/validator | ^10 | Validacao estruturada |
-| Logging | zap | ^1 | Logs estruturados |
-| Config | koanf | ^2 | Config por env/file |
-| Unit Test | testify | ^1 | Assertions e mocks |
-| Integration Test | testcontainers-go | ^0.34 | Ambientes reais de teste |
+| Category         | Technology              | Version | Purpose                  |
+| ---------------- | ----------------------- | ------- | ------------------------ |
+| Language         | Go                      | 1.24+   | Runtime principal        |
+| HTTP             | Chi                     | ^5      | Routing simples e rapido |
+| Database         | pgx/sqlc                | latest  | SQL typed e performatico |
+| Validation       | go-playground/validator | ^10     | Validacao estruturada    |
+| Logging          | zap                     | ^1      | Logs estruturados        |
+| Config           | koanf                   | ^2      | Config por env/file      |
+| Unit Test        | testify                 | ^1      | Assertions e mocks       |
+| Integration Test | testcontainers-go       | ^0.34   | Ambientes reais de teste |
 
 ### Required Dependencies
 
@@ -305,14 +305,14 @@ go get -t github.com/testcontainers/testcontainers-go
 
 ### Naming Conventions
 
-| Element | Convention | Example |
-| ------- | ---------- | ------- |
-| Packages | lowercase | `orders` |
-| Files | snake_case.go | `place_order_service.go` |
-| Interfaces | Noun or -er | `Repository`, `Clock` |
-| Structs | PascalCase | `OrderService` |
-| Functions | PascalCase export, camelCase private | `NewService`, `parseInput` |
-| Errors | `ErrX` vars | `ErrOrderNotFound` |
+| Element    | Convention                           | Example                    |
+| ---------- | ------------------------------------ | -------------------------- |
+| Packages   | lowercase                            | `orders`                   |
+| Files      | snake_case.go                        | `place_order_service.go`   |
+| Interfaces | Noun or -er                          | `Repository`, `Clock`      |
+| Structs    | PascalCase                           | `OrderService`             |
+| Functions  | PascalCase export, camelCase private | `NewService`, `parseInput` |
+| Errors     | `ErrX` vars                          | `ErrOrderNotFound`         |
 
 ### Critical Rules
 
@@ -411,12 +411,12 @@ Passe exemplos reais de request/response ao inves de prosa longa.
 
 ## Bug Prevention Stack
 
-| Layer | Catches | Implementation |
-| ----- | ------- | -------------- |
-| Compiler + Vet | 45% | `go build`, `go vet` |
-| Domain Validation | 30% | Construtores e invariantes |
-| Integration Tests | 20% | DB real com testcontainers |
-| E2E Smoke | 5% | Fluxos criticos |
+| Layer             | Catches | Implementation             |
+| ----------------- | ------- | -------------------------- |
+| Compiler + Vet    | 45%     | `go build`, `go vet`       |
+| Domain Validation | 30%     | Construtores e invariantes |
+| Integration Tests | 20%     | DB real com testcontainers |
+| E2E Smoke         | 5%      | Fluxos criticos            |
 
 ---
 
@@ -506,8 +506,8 @@ func (h *Handler) PlaceOrder(w http.ResponseWriter, r *http.Request) {
 
 ## Changelog
 
-| Date       | Version | Changes |
-| ---------- | ------- | ------- |
+| Date       | Version | Changes           |
+| ---------- | ------- | ----------------- |
 | 2026-02-19 | 1.0.0   | Initial Go preset |
 
 ---

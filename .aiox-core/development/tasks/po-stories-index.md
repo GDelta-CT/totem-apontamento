@@ -12,16 +12,19 @@
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -189,6 +192,7 @@ token_usage: ~3,000-10,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Break into smaller workflows; implement checkpointing; use async processing where possible
 
 ---
@@ -208,13 +212,13 @@ updated_at: 2025-11-17
 
 ---
 
-
 ## Task Flow
 
 ### 1. Confirm Regeneration
+
 ```yaml
 elicit: true
-question: "Regenerate story index? This will scan all stories and update docs/stories/index.md"
+question: 'Regenerate story index? This will scan all stories and update docs/stories/index.md'
 options:
   - yes: Proceed with regeneration
   - no: Cancel operation
@@ -222,6 +226,7 @@ options:
 ```
 
 ### 2. Generate Story Index
+
 ```javascript
 const { generateStoryIndex } = require('.aiox-core/scripts/story-index-generator');
 
@@ -235,6 +240,7 @@ console.log(`   Output: ${result.outputPath}`);
 ```
 
 ### 3. Display Summary
+
 ```markdown
 ## 📊 Story Index Updated
 
@@ -248,12 +254,14 @@ ${epics.map(epic => `- ${epic.name}: ${epic.count} stories`).join('\n')}
 ${statuses.map(status => `- ${status.emoji} ${status.name}: ${status.count}`).join('\n')}
 
 **Next Steps:**
+
 - Review index: docs/stories/index.md
 - Use `*backlog-review` to see backlog items
 - Use `*create-story` to add new stories
 ```
 
 ### 4. Preview Mode (if selected)
+
 ```javascript
 if (mode === 'preview') {
   const stories = await scanStoriesDirectory('docs/stories');
@@ -339,6 +347,7 @@ Add to `package.json`:
 ```
 
 Usage:
+
 ```bash
 npm run stories:index
 ```
@@ -346,6 +355,7 @@ npm run stories:index
 ---
 
 **Related Tasks:**
+
 - `po-backlog-add.md` - Add backlog items
 - `po-create-story.md` - Create new stories
 - `story-index-generator.js` - Core generator utility

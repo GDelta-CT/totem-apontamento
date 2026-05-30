@@ -65,8 +65,8 @@ class GreetingPreferenceManager {
       const validOptions = VALID_PREFERENCES.join(', ');
       throw new Error(
         `Invalid preference: "${preference}". ` +
-        `Valid options: ${validOptions}. ` +
-        'Examples: "auto" (session-aware), "minimal" (always minimal), "named" (always named), "archetypal" (always archetypal)',
+          `Valid options: ${validOptions}. ` +
+          'Examples: "auto" (session-aware), "minimal" (always minimal), "named" (always named), "archetypal" (always archetypal)'
       );
     }
 
@@ -166,4 +166,3 @@ class GreetingPreferenceManager {
 }
 
 module.exports = GreetingPreferenceManager;
-

@@ -10,9 +10,9 @@
 ```typescript
 // Design system provides hooks
 interface DesignSystemHook {
-    getTokens(context: Context): Tokens;
-    getComponents(): ComponentLibrary;
-    applyTheme(theme: Theme): void;
+  getTokens(context: Context): Tokens;
+  getComponents(): ComponentLibrary;
+  applyTheme(theme: Theme): void;
 }
 
 // Squads consume

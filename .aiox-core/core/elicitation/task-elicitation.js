@@ -30,9 +30,11 @@ const taskElicitationSteps = [
         smartDefault: {
           type: 'fromAnswer',
           source: 'taskId',
-          transform: (id) => id.split('-').map(w => 
-            w.charAt(0).toUpperCase() + w.slice(1),
-          ).join(' '),
+          transform: (id) =>
+            id
+              .split('-')
+              .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+              .join(' '),
         },
       },
       {
@@ -53,7 +55,7 @@ const taskElicitationSteps = [
 
   {
     title: 'Task Context & Prerequisites',
-    description: 'Define what\'s needed before the task can run',
+    description: "Define what's needed before the task can run",
     questions: [
       {
         type: 'confirm',
@@ -86,7 +88,7 @@ const taskElicitationSteps = [
         type: 'input',
         name: 'customPrerequisites',
         message: 'Any additional prerequisites? (comma-separated):',
-        filter: (input) => input ? input.split(',').map(p => p.trim()) : [],
+        filter: (input) => (input ? input.split(',').map((p) => p.trim()) : []),
       },
     ],
   },

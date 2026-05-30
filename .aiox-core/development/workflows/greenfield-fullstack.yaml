@@ -6,7 +6,7 @@ workflow:
     Supports both comprehensive planning for complex projects and rapid prototyping for simple ones.
     Includes Phase 0 environment bootstrap for proper tooling setup.
   type: greenfield
-  version: "1.0"
+  version: '1.0'
   project_types:
     - web-app
     - saas
@@ -30,12 +30,12 @@ workflow:
     # ═══════════════════════════════════════════════════════════════════════════
     - phase: 0
       name: Environment Bootstrap
-      description: "Setup development environment before starting project planning"
+      description: 'Setup development environment before starting project planning'
 
     - id: devops-environment-bootstrap
       agent: devops
       action: environment_bootstrap
-      duration_estimate: "15-30 min"
+      duration_estimate: '15-30 min'
       creates:
         - .aiox/config.yaml
         - .aiox/environment-report.json
@@ -62,12 +62,12 @@ workflow:
     # ═══════════════════════════════════════════════════════════════════════════
     - phase: 1
       name: Discovery & Planning
-      description: "Create all planning artifacts (project brief, PRD, specs, architecture)"
+      description: 'Create all planning artifacts (project brief, PRD, specs, architecture)'
 
     - id: analyst-project-brief
       agent: analyst
       creates: project-brief.md
-      duration_estimate: "30-60 min"
+      duration_estimate: '30-60 min'
       requires: environment_bootstrap_complete
       optional_steps:
         - brainstorming-session
@@ -77,14 +77,14 @@ workflow:
     - id: pm-create-prd
       agent: pm
       creates: prd.md
-      duration_estimate: "30-60 min"
+      duration_estimate: '30-60 min'
       requires: project-brief.md
       notes: "Creates PRD from project brief using prd-tmpl. SAVE OUTPUT: Copy final prd.md to your project's docs/ folder."
 
     - id: ux-create-frontend-spec
       agent: ux-design-expert
       creates: front-end-spec.md
-      duration_estimate: "30-45 min"
+      duration_estimate: '30-45 min'
       requires: prd.md
       optional_steps:
         - user-research-prompt
@@ -93,15 +93,15 @@ workflow:
     - id: ux-generate-v0-prompt
       agent: ux-design-expert
       creates: v0_prompt (optional)
-      duration_estimate: "15-30 min"
+      duration_estimate: '15-30 min'
       requires: front-end-spec.md
       condition: user_wants_ai_generation
-      notes: "OPTIONAL BUT RECOMMENDED: Generate AI UI prompt for tools like v0, Lovable, etc. Use the generate-ai-frontend-prompt task. User can then generate UI in external tool and download project structure."
+      notes: 'OPTIONAL BUT RECOMMENDED: Generate AI UI prompt for tools like v0, Lovable, etc. Use the generate-ai-frontend-prompt task. User can then generate UI in external tool and download project structure.'
 
     - id: architect-create-architecture
       agent: architect
       creates: fullstack-architecture.md
-      duration_estimate: "30-60 min"
+      duration_estimate: '30-60 min'
       requires:
         - prd.md
         - front-end-spec.md
@@ -113,51 +113,51 @@ workflow:
     - id: pm-update-prd
       agent: pm
       updates: prd.md
-      duration_estimate: "15-30 min"
+      duration_estimate: '15-30 min'
       requires: fullstack-architecture.md
       condition: architecture_suggests_prd_changes
-      notes: "If architect suggests story changes, update PRD and re-export the complete unredacted prd.md to docs/ folder."
+      notes: 'If architect suggests story changes, update PRD and re-export the complete unredacted prd.md to docs/ folder.'
 
     - id: po-validate-artifacts
       agent: po
       validates: all_artifacts
       uses: po-master-checklist
-      duration_estimate: "15-30 min"
-      notes: "Validates all documents for consistency and completeness. May require updates to any document."
+      duration_estimate: '15-30 min'
+      notes: 'Validates all documents for consistency and completeness. May require updates to any document.'
 
     - id: po-delegate-fixes
       agent: po
       action: delegate_fixes
       delegates_to: [analyst, pm, ux-design-expert, architect]
       updates: any_flagged_documents
-      duration_estimate: "15-30 min"
+      duration_estimate: '15-30 min'
       condition: po_checklist_issues
-      notes: "If PO finds issues, PO delegates fixes to the relevant agent and re-validates updated documents in docs/ folder."
+      notes: 'If PO finds issues, PO delegates fixes to the relevant agent and re-validates updated documents in docs/ folder.'
 
     - meta: guidance
       id: project-setup-guidance
       action: guide_project_structure
       condition: user_has_generated_ui
-      notes: "If user generated UI with v0/Lovable: For polyrepo setup, place downloaded project in separate frontend repo alongside backend repo. For monorepo, place in apps/web or packages/frontend directory. Review architecture document for specific guidance."
+      notes: 'If user generated UI with v0/Lovable: For polyrepo setup, place downloaded project in separate frontend repo alongside backend repo. For monorepo, place in apps/web or packages/frontend directory. Review architecture document for specific guidance.'
 
     - meta: guidance
       id: development-order-guidance
       action: guide_development_sequence
-      notes: "Based on PRD stories: If stories are frontend-heavy, start with frontend project/directory first. If backend-heavy or API-first, start with backend. For tightly coupled features, follow story sequence in monorepo setup. Reference sharded PRD epics for development order."
+      notes: 'Based on PRD stories: If stories are frontend-heavy, start with frontend project/directory first. If backend-heavy or API-first, start with backend. For tightly coupled features, follow story sequence in monorepo setup. Reference sharded PRD epics for development order.'
 
     # ═══════════════════════════════════════════════════════════════════════════
     # PHASE 2: DOCUMENT SHARDING
     # ═══════════════════════════════════════════════════════════════════════════
     - phase: 2
       name: Document Sharding
-      description: "Break down PRD and architecture into development-ready chunks"
+      description: 'Break down PRD and architecture into development-ready chunks'
 
     - id: po-shard-documents
       agent: po
       action: shard_documents
       creates: sharded_docs
-      duration_estimate: "15-30 min"
-      requires:  # all validated artifacts must be saved in project docs/ folder
+      duration_estimate: '15-30 min'
+      requires: # all validated artifacts must be saved in project docs/ folder
         - prd.md
         - front-end-spec.md
         - fullstack-architecture.md
@@ -173,13 +173,13 @@ workflow:
     # ═══════════════════════════════════════════════════════════════════════════
     - phase: 3
       name: Development Cycle
-      description: "Iterative story implementation with QA review"
+      description: 'Iterative story implementation with QA review'
 
     - id: sm-create-story
       agent: sm
       action: create_story
       creates: story.md
-      duration_estimate: "15-30 min"
+      duration_estimate: '15-30 min'
       requires: sharded_docs
       repeats: for_each_epic
       notes: |
@@ -193,7 +193,7 @@ workflow:
       action: review_draft_story
       alternative_agent: analyst
       updates: story.md
-      duration_estimate: "10-20 min"
+      duration_estimate: '10-20 min'
       requires: story.md
       optional: true
       condition: user_wants_story_review
@@ -207,7 +207,7 @@ workflow:
       agent: dev
       action: implement_story
       creates: implementation_files
-      duration_estimate: "1-4 hours"
+      duration_estimate: '1-4 hours'
       requires: story.md
       notes: |
         Dev Agent (New Chat): @dev
@@ -219,7 +219,7 @@ workflow:
       agent: qa
       action: review_implementation
       updates: implementation_files
-      duration_estimate: "20-40 min"
+      duration_estimate: '20-40 min'
       requires: implementation_files
       optional: true
       notes: |
@@ -234,7 +234,7 @@ workflow:
       action: address_qa_feedback
       updates: implementation_files
       requires: implementation_files
-      duration_estimate: "30-60 min"
+      duration_estimate: '30-60 min'
       condition: qa_left_unchecked_items
       notes: |
         If QA left unchecked items:
@@ -252,7 +252,7 @@ workflow:
       agent: po
       action: epic_retrospective
       creates: epic-retrospective.md
-      duration_estimate: "15-30 min"
+      duration_estimate: '15-30 min'
       condition: epic_complete
       optional: true
       notes: |
@@ -363,22 +363,22 @@ workflow:
 
   handoff_prompts:
     # Phase 0 → Phase 1
-    bootstrap_to_analyst: "Environment bootstrap complete! Git repo created, CLIs verified, project structure ready. Start a new chat with @analyst to create the project brief."
+    bootstrap_to_analyst: 'Environment bootstrap complete! Git repo created, CLIs verified, project structure ready. Start a new chat with @analyst to create the project brief.'
 
     # Phase 1 internal
-    analyst_to_pm: "Project brief is complete. Save it as docs/project-brief.md in your project, then create the PRD."
-    pm_to_ux: "PRD is ready. Save it as docs/prd.md in your project, then create the UI/UX specification."
-    ux_to_architect: "UI/UX spec complete. Save it as docs/front-end-spec.md in your project, then create the fullstack architecture."
-    architect_review: "Architecture complete. Save it as docs/fullstack-architecture.md. Do you suggest any changes to the PRD stories or need new stories added?"
-    architect_to_pm: "Please update the PRD with the suggested story changes, then re-export the complete prd.md to docs/."
-    updated_to_po: "All documents ready in docs/ folder. Please validate all artifacts for consistency."
-    po_issues: "PO found issues with [document]. Please return to [agent] to fix and re-save the updated document."
+    analyst_to_pm: 'Project brief is complete. Save it as docs/project-brief.md in your project, then create the PRD.'
+    pm_to_ux: 'PRD is ready. Save it as docs/prd.md in your project, then create the UI/UX specification.'
+    ux_to_architect: 'UI/UX spec complete. Save it as docs/front-end-spec.md in your project, then create the fullstack architecture.'
+    architect_review: 'Architecture complete. Save it as docs/fullstack-architecture.md. Do you suggest any changes to the PRD stories or need new stories added?'
+    architect_to_pm: 'Please update the PRD with the suggested story changes, then re-export the complete prd.md to docs/.'
+    updated_to_po: 'All documents ready in docs/ folder. Please validate all artifacts for consistency.'
+    po_issues: 'PO found issues with [document]. Please return to [agent] to fix and re-save the updated document.'
 
     # Phase 1 → Phase 2
-    phase1_to_phase2: "All planning artifacts validated. Now shard documents for development: @po → *shard-doc docs/prd.md"
+    phase1_to_phase2: 'All planning artifacts validated. Now shard documents for development: @po → *shard-doc docs/prd.md'
 
     # Phase 2 → Phase 3
-    phase2_to_phase3: "Documents sharded! source-tree.md, tech-stack.md, coding-standards.md created. Start development: @sm → *create-story"
+    phase2_to_phase3: 'Documents sharded! source-tree.md, tech-stack.md, coding-standards.md created. Start development: @sm → *create-story'
 
     # Completion
-    complete: "All stories implemented and reviewed. Project development phase complete!"
+    complete: 'All stories implemented and reviewed. Project development phase complete!'

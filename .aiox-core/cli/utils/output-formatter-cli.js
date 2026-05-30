@@ -52,9 +52,9 @@ function formatTable(results, options = {}) {
   let output = `Found ${results.length} worker${results.length !== 1 ? 's' : ''} (took ${duration}s):\n\n`;
 
   // Column widths
-  const idWidth = Math.min(25, Math.max(4, ...results.map(r => r.id.length)));
-  const nameWidth = Math.min(30, Math.max(4, ...results.map(r => r.name.length)));
-  const categoryWidth = Math.min(15, Math.max(8, ...results.map(r => (r.category || '').length)));
+  const idWidth = Math.min(25, Math.max(4, ...results.map((r) => r.id.length)));
+  const nameWidth = Math.min(30, Math.max(4, ...results.map((r) => r.name.length)));
+  const categoryWidth = Math.min(15, Math.max(8, ...results.map((r) => (r.category || '').length)));
 
   // Table header
   output += `  ${'#'.padEnd(3)}  ${'ID'.padEnd(idWidth)}  ${'NAME'.padEnd(nameWidth)}  ${'CATEGORY'.padEnd(categoryWidth)}  SCORE\n`;
@@ -72,7 +72,7 @@ function formatTable(results, options = {}) {
   });
 
   // Footer
-  output += '\nUse \'aiox workers info <id>\' for details.';
+  output += "\nUse 'aiox workers info <id>' for details.";
 
   // Verbose info
   if (verbose) {
@@ -89,7 +89,7 @@ function formatTable(results, options = {}) {
  * @returns {string} JSON formatted string
  */
 function formatJSON(results, options = {}) {
-  const output = results.map(result => ({
+  const output = results.map((result) => ({
     id: result.id,
     name: result.name,
     description: result.description,
@@ -110,7 +110,7 @@ function formatJSON(results, options = {}) {
  * @returns {string} YAML formatted string
  */
 function formatYAML(results, options = {}) {
-  const output = results.map(result => ({
+  const output = results.map((result) => ({
     id: result.id,
     name: result.name,
     description: result.description,
@@ -165,14 +165,14 @@ function formatWorkerDetails(worker) {
 
   if (worker.inputs && worker.inputs.length > 0) {
     output += '\n📥 Inputs:\n';
-    worker.inputs.forEach(input => {
+    worker.inputs.forEach((input) => {
       output += `   • ${input}\n`;
     });
   }
 
   if (worker.outputs && worker.outputs.length > 0) {
     output += '\n📤 Outputs:\n';
-    worker.outputs.forEach(out => {
+    worker.outputs.forEach((out) => {
       output += `   • ${out}\n`;
     });
   }
@@ -208,8 +208,7 @@ function formatWorkerDetails(worker) {
 function formatCategories(categories) {
   let output = 'Available Categories:\n\n';
 
-  const sortedCategories = Object.entries(categories)
-    .sort((a, b) => b[1].count - a[1].count);
+  const sortedCategories = Object.entries(categories).sort((a, b) => b[1].count - a[1].count);
 
   for (const [name, data] of sortedCategories) {
     output += `  ${name.padEnd(20)} ${data.count.toString().padStart(4)} workers\n`;

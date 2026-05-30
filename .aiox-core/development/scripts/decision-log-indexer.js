@@ -103,7 +103,7 @@ Total logs: ${logMetadata.length}
 |----------|------|-------|--------|----------|-----------|----------|
 `;
 
-  sorted.forEach(meta => {
+  sorted.forEach((meta) => {
     const date = meta.timestamp.toISOString().split('T')[0]; // YYYY-MM-DD
     const relativePath = path.relative('.ai', meta.logPath).replace(/\\/g, '/');
 
@@ -146,7 +146,10 @@ async function addToIndex(logPath) {
   }
 
   const indexDir = config.decisionLogging.location || '.ai/';
-  const indexFile = path.join(indexDir, config.decisionLogging.indexFile || 'decision-logs-index.md');
+  const indexFile = path.join(
+    indexDir,
+    config.decisionLogging.indexFile || 'decision-logs-index.md'
+  );
 
   try {
     // Create .ai directory if it doesn't exist
@@ -169,8 +172,11 @@ async function addToIndex(logPath) {
       if (tableMatch) {
         const rows = tableMatch[1].trim().split('\n');
         existingMetadata = rows
-          .map(row => {
-            const cells = row.split('|').map(c => c.trim()).filter(c => c);
+          .map((row) => {
+            const cells = row
+              .split('|')
+              .map((c) => c.trim())
+              .filter((c) => c);
             if (cells.length < 7) return null;
 
             return {
@@ -183,7 +189,7 @@ async function addToIndex(logPath) {
               logPath: cells[6].match(/\[View\]\((.+)\)/)?.[1] || '',
             };
           })
-          .filter(m => m !== null);
+          .filter((m) => m !== null);
       }
     } catch (_error) {
       // Index doesn't exist yet, that's okay
@@ -191,7 +197,7 @@ async function addToIndex(logPath) {
     }
 
     // Remove old entry for same story ID if exists
-    existingMetadata = existingMetadata.filter(m => m.storyId !== newMetadata.storyId);
+    existingMetadata = existingMetadata.filter((m) => m.storyId !== newMetadata.storyId);
 
     // Add new entry
     existingMetadata.push(newMetadata);
@@ -224,12 +230,15 @@ async function rebuildIndex() {
   }
 
   const indexDir = config.decisionLogging.location || '.ai/';
-  const indexFile = path.join(indexDir, config.decisionLogging.indexFile || 'decision-logs-index.md');
+  const indexFile = path.join(
+    indexDir,
+    config.decisionLogging.indexFile || 'decision-logs-index.md'
+  );
 
   try {
     // Find all decision log files
     const files = await fs.readdir(indexDir);
-    const logFiles = files.filter(f => f.startsWith('decision-log-') && f.endsWith('.md'));
+    const logFiles = files.filter((f) => f.startsWith('decision-log-') && f.endsWith('.md'));
 
     console.log(`Found ${logFiles.length} decision log files`);
 
@@ -266,7 +275,7 @@ if (require.main === module) {
   if (command === 'rebuild') {
     rebuildIndex()
       .then(() => console.log('Index rebuild complete'))
-      .catch(error => {
+      .catch((error) => {
         console.error('Index rebuild failed:', error);
         process.exit(1);
       });

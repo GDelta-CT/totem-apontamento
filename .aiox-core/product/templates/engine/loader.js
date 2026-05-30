@@ -54,7 +54,7 @@ function validateMetadata(metadata) {
   }
 
   const requiredFields = ['template_id', 'template_name', 'version'];
-  const missingFields = requiredFields.filter(field => !metadata[field]);
+  const missingFields = requiredFields.filter((field) => !metadata[field]);
 
   if (missingFields.length > 0) {
     throw new Error(`Template missing required fields: ${missingFields.join(', ')}`);
@@ -75,8 +75,8 @@ class TemplateLoader {
    * @param {string} options.templatesDir - Path to templates directory
    */
   constructor(options = {}) {
-    this.templatesDir = options.templatesDir ||
-      path.join(process.cwd(), '.aiox-core', 'product', 'templates');
+    this.templatesDir =
+      options.templatesDir || path.join(process.cwd(), '.aiox-core', 'product', 'templates');
     this.cache = new Map();
   }
 
@@ -161,11 +161,11 @@ class TemplateLoader {
    * @returns {Array} Normalized variable definitions
    */
   normalizeVariables(variables) {
-    return variables.map(variable => ({
+    return variables.map((variable) => ({
       name: variable.name,
       type: variable.type || 'string',
       // Variables with requiredIf are NOT required by default - they're conditionally required
-      required: variable.requiredIf ? false : (variable.required !== false),
+      required: variable.requiredIf ? false : variable.required !== false,
       requiredIf: variable.requiredIf,
       default: variable.default,
       prompt: variable.prompt || `Enter ${variable.name}:`,

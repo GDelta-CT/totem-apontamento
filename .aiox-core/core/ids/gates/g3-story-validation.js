@@ -79,12 +79,12 @@ class G3StoryValidationGate extends VerificationGate {
         hasCriticalIssue = true;
         warnings.push(
           `${validationResult.missingRefs.length} referenced artifacts not found in registry: ` +
-          validationResult.missingRefs.join(', '),
+            validationResult.missingRefs.join(', ')
         );
       }
       if (validationResult.foundRefs.length > 0) {
         warnings.push(
-          `${validationResult.foundRefs.length} referenced artifacts verified in registry`,
+          `${validationResult.foundRefs.length} referenced artifacts verified in registry`
         );
       }
     }
@@ -107,7 +107,7 @@ class G3StoryValidationGate extends VerificationGate {
     if (duplicates.length > 0) {
       hasCriticalIssue = true;
       warnings.push(
-        `Potential duplication detected: ${duplicates.length} highly similar entities found`,
+        `Potential duplication detected: ${duplicates.length} highly similar entities found`
       );
     }
 

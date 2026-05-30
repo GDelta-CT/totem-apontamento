@@ -73,11 +73,9 @@ function loadLicenseModules() {
       setPendingDeactivation,
       clearPendingDeactivation,
     } = require(path.join(licensePath, 'license-cache'));
-    const {
-      generateMachineId,
-      maskKey,
-      validateKeyFormat,
-    } = require(path.join(licensePath, 'license-crypto'));
+    const { generateMachineId, maskKey, validateKeyFormat } = require(
+      path.join(licensePath, 'license-crypto')
+    );
     const { ProFeatureError, LicenseActivationError } = require(path.join(licensePath, 'errors'));
 
     return {
@@ -243,7 +241,9 @@ async function activateAction(options) {
         if (scaffoldResult.success) {
           console.log(`\nPro content installed (${scaffoldResult.copiedFiles.length} files)`);
           if (scaffoldResult.skippedFiles.length > 0) {
-            console.log(`  ${scaffoldResult.skippedFiles.length} files unchanged (already up to date)`);
+            console.log(
+              `  ${scaffoldResult.skippedFiles.length} files unchanged (already up to date)`
+            );
           }
           if (scaffoldResult.warnings.length > 0) {
             for (const warning of scaffoldResult.warnings) {
@@ -265,7 +265,6 @@ async function activateAction(options) {
       console.log('Pro content will be scaffolded when the package is installed.');
       console.log('');
     }
-
   } catch (error) {
     if (error instanceof LicenseActivationError) {
       console.error(`\nActivation failed: ${error.message}`);
@@ -285,12 +284,7 @@ async function activateAction(options) {
 // ---------------------------------------------------------------------------
 
 function statusAction() {
-  const {
-    featureGate,
-    readLicenseCache,
-    maskKey,
-    hasPendingDeactivation,
-  } = loadLicenseModules();
+  const { featureGate, readLicenseCache, maskKey, hasPendingDeactivation } = loadLicenseModules();
 
   console.log('\nAIOX Pro License Status\n');
 
@@ -300,9 +294,9 @@ function statusAction() {
 
   // State display
   const stateEmoji = {
-    'Active': '\u2705',     // Green check
-    'Grace': '\u26A0\uFE0F', // Warning
-    'Expired': '\u274C',    // Red X
+    Active: '\u2705', // Green check
+    Grace: '\u26A0\uFE0F', // Warning
+    Expired: '\u274C', // Red X
     'Not Activated': '\u2796', // Minus
   };
 
@@ -337,7 +331,9 @@ function statusAction() {
     const daysRemaining = Math.ceil((expiryDate.getTime() - Date.now()) / (24 * 60 * 60 * 1000));
 
     if (daysRemaining > 0) {
-      console.log(`  Cache:         Valid until ${formatDate(expiryDate)} (${daysRemaining} days remaining)`);
+      console.log(
+        `  Cache:         Valid until ${formatDate(expiryDate)} (${daysRemaining} days remaining)`
+      );
     } else {
       console.log(`  Cache:         Expired ${formatDate(expiryDate)}`);
     }
@@ -359,7 +355,9 @@ function statusAction() {
   }
 
   // Next validation
-  console.log(`\n  Next validation: ${state === 'Active' ? 'Background (when online)' : 'Required'}`);
+  console.log(
+    `\n  Next validation: ${state === 'Active' ? 'Background (when online)' : 'Required'}`
+  );
   console.log('');
 }
 
@@ -444,7 +442,6 @@ async function deactivateAction(options) {
     console.log('');
     console.log('To reactivate: aiox pro activate --key <KEY>');
     console.log('');
-
   } catch (error) {
     console.error(`\nDeactivation error: ${error.message}`);
     process.exit(1);
@@ -470,7 +467,7 @@ function featuresAction() {
 
     for (const feature of features) {
       const status = feature.available
-        ? '\u2705'  // Green check
+        ? '\u2705' // Green check
         : '\u274C'; // Red X
 
       console.log(`  ${status} ${feature.name}`);
@@ -554,7 +551,6 @@ async function validateAction() {
     console.log(`  Valid until:  ${formatDate(result.expiresAt)}`);
     console.log(`  Cache:        Refreshed for ${result.cacheValidDays} days`);
     console.log('');
-
   } catch (error) {
     if (error instanceof LicenseActivationError) {
       console.error(`\nValidation failed: ${error.message}`);
@@ -653,8 +649,7 @@ async function setupAction(options) {
  * @returns {Command}
  */
 function createProCommand() {
-  const proCmd = new Command('pro')
-    .description('AIOX Pro license management');
+  const proCmd = new Command('pro').description('AIOX Pro license management');
 
   // aiox pro activate
   proCmd
@@ -664,10 +659,7 @@ function createProCommand() {
     .action(activateAction);
 
   // aiox pro status
-  proCmd
-    .command('status')
-    .description('Show current license status')
-    .action(statusAction);
+  proCmd.command('status').description('Show current license status').action(statusAction);
 
   // aiox pro deactivate
   proCmd

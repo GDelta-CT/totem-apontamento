@@ -45,15 +45,17 @@ class L0ConstitutionProcessor extends LayerProcessor {
     const { synapsePath, manifest } = config;
 
     // Find constitution domain in manifest
-    const domainKey = Object.keys(manifest.domains || {})
-      .find(k => k.toUpperCase() === 'CONSTITUTION');
+    const domainKey = Object.keys(manifest.domains || {}).find(
+      (k) => k.toUpperCase() === 'CONSTITUTION'
+    );
 
     const domain = domainKey ? manifest.domains[domainKey] : null;
 
     // Determine domain file path
-    const domainFile = domain && domain.file
-      ? path.join(synapsePath, domain.file)
-      : path.join(synapsePath, 'constitution');
+    const domainFile =
+      domain && domain.file
+        ? path.join(synapsePath, domain.file)
+        : path.join(synapsePath, 'constitution');
 
     // Load rules from domain file
     const rules = loadDomainFile(domainFile);

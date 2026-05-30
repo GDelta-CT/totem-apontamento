@@ -14,7 +14,12 @@ class ApprovalWorkflow {
       low: { auto_approve: true, requires_review: false },
       medium: { auto_approve: false, requires_review: true },
       high: { auto_approve: false, requires_review: true, requires_approval: true },
-      critical: { auto_approve: false, requires_review: true, requires_approval: true, requires_multiple_approvers: true }
+      critical: {
+        auto_approve: false,
+        requires_review: true,
+        requires_approval: true,
+        requires_multiple_approvers: true,
+      },
     };
     this.approvalHistory = [];
     this.pendingApprovals = new Map();
@@ -31,21 +36,21 @@ class ApprovalWorkflow {
       risk_threshold: 'medium',
       required_approvers: 1,
       timeout_hours: 24,
-      auto_approve_conditions: ['low_risk', 'has_tests', 'non_breaking']
+      auto_approve_conditions: ['low_risk', 'has_tests', 'non_breaking'],
     });
 
     this.approvalRules.set('workflow_modification', {
-      risk_threshold: 'medium', 
+      risk_threshold: 'medium',
       required_approvers: 1,
       timeout_hours: 48,
-      auto_approve_conditions: ['low_risk', 'has_tests']
+      auto_approve_conditions: ['low_risk', 'has_tests'],
     });
 
     this.approvalRules.set('core_util_modification', {
       risk_threshold: 'low',
       required_approvers: 2,
       timeout_hours: 72,
-      auto_approve_conditions: ['minimal_risk', 'comprehensive_tests']
+      auto_approve_conditions: ['minimal_risk', 'comprehensive_tests'],
     });
 
     // Modification type rules
@@ -53,14 +58,14 @@ class ApprovalWorkflow {
       risk_threshold: 'low',
       required_approvers: 2,
       timeout_hours: 168, // 1 week
-      auto_approve_conditions: [] // Never auto-approve removals
+      auto_approve_conditions: [], // Never auto-approve removals
     });
 
     this.approvalRules.set('breaking_change', {
       risk_threshold: 'low',
       required_approvers: 2,
       timeout_hours: 96,
-      auto_approve_conditions: []
+      auto_approve_conditions: [],
     });
   }
 
@@ -69,39 +74,44 @@ class ApprovalWorkflow {
    */
   async processApprovalRequest(impactReport, options = {}) {
     const requestId = `approval-${Date.now()}`;
-    
+
     try {
-      console.log(chalk.blue(`🔍 Processing approval request for: ${impactReport.targetComponent.path}`));
-      
+      console.log(
+        chalk.blue(`🔍 Processing approval request for: ${impactReport.targetComponent.path}`)
+      );
+
       const _config = {
         skip_approval: options.skip_approval || false,
         auto_approve_low_risk: options.auto_approve_low_risk !== false,
         timeout_hours: options.timeout_hours || 24,
         required_approvers: options.required_approvers,
-        ...options
+        ...options,
       };
 
       // Determine approval requirements
       const approvalRequirements = await this.determineApprovalRequirements(impactReport, config);
-      
+
       // Check if modification can be auto-approved
       const autoApprovalResult = await this.checkAutoApproval(impactReport, approvalRequirements);
-      
+
       if (autoApprovalResult.can_auto_approve) {
-        const approvalResult = await this.executeAutoApproval(impactReport, autoApprovalResult, requestId);
+        const approvalResult = await this.executeAutoApproval(
+          impactReport,
+          autoApprovalResult,
+          requestId
+        );
         return approvalResult;
       }
 
       // Manual approval required
       const approvalResult = await this.executeManualApproval(
-        impactReport, 
-        approvalRequirements, 
-        config, 
+        impactReport,
+        approvalRequirements,
+        config,
         requestId
       );
 
       return approvalResult;
-
     } catch (_error) {
       console.error(chalk.red(`Approval process failed: ${error.message}`));
       throw error;
@@ -119,7 +129,7 @@ class ApprovalWorkflow {
       required_approvers: 1,
       timeout_hours: 24,
       review_criteria: [],
-      blocking_issues: []
+      blocking_issues: [],
     };
 
     const riskLevel = impactReport.riskAssessment.overallRisk;
@@ -136,21 +146,35 @@ class ApprovalWorkflow {
     // Component-specific rules
     const componentRule = this.getComponentApprovalRule(impactReport.targetComponent);
     if (componentRule) {
-      requirements.required_approvers = Math.max(requirements.required_approvers, componentRule.required_approvers);
-      requirements.timeout_hours = Math.max(requirements.timeout_hours, componentRule.timeout_hours);
+      requirements.required_approvers = Math.max(
+        requirements.required_approvers,
+        componentRule.required_approvers
+      );
+      requirements.timeout_hours = Math.max(
+        requirements.timeout_hours,
+        componentRule.timeout_hours
+      );
     }
 
     // Modification-specific rules
     const modificationRule = this.getModificationApprovalRule(impactReport.modificationType);
     if (modificationRule) {
-      requirements.required_approvers = Math.max(requirements.required_approvers, modificationRule.required_approvers);
-      requirements.timeout_hours = Math.max(requirements.timeout_hours, modificationRule.timeout_hours);
+      requirements.required_approvers = Math.max(
+        requirements.required_approvers,
+        modificationRule.required_approvers
+      );
+      requirements.timeout_hours = Math.max(
+        requirements.timeout_hours,
+        modificationRule.timeout_hours
+      );
     }
 
     // Critical issues that block auto-approval
     if (impactReport.riskAssessment.criticalIssues.length > 0) {
       requirements.approval_needed = true;
-      requirements.blocking_issues = impactReport.riskAssessment.criticalIssues.map(issue => issue.description);
+      requirements.blocking_issues = impactReport.riskAssessment.criticalIssues.map(
+        (issue) => issue.description
+      );
     }
 
     // High-impact propagation
@@ -162,13 +186,16 @@ class ApprovalWorkflow {
     // Many affected components
     if (impactReport.summary.affectedComponents > 20) {
       requirements.approval_needed = true;
-      requirements.review_criteria.push('Large number of affected components requires careful review');
+      requirements.review_criteria.push(
+        'Large number of affected components requires careful review'
+      );
     }
 
     // Breaking changes
-    const hasBreakingChanges = impactReport.propagationAnalysis.directEffects?.some(
-      effect => effect.changeType?.severity === 'breaking'
-    ) || false;
+    const hasBreakingChanges =
+      impactReport.propagationAnalysis.directEffects?.some(
+        (effect) => effect.changeType?.severity === 'breaking'
+      ) || false;
 
     if (hasBreakingChanges) {
       requirements.approval_needed = true;
@@ -193,12 +220,14 @@ class ApprovalWorkflow {
       can_auto_approve: false,
       reasons: [],
       conditions_met: [],
-      conditions_failed: []
+      conditions_failed: [],
     };
 
     // Never auto-approve if manual approval is explicitly needed
     if (requirements.approval_needed) {
-      result.reasons.push('Manual approval explicitly required due to risk level or critical issues');
+      result.reasons.push(
+        'Manual approval explicitly required due to risk level or critical issues'
+      );
       return result;
     }
 
@@ -216,7 +245,7 @@ class ApprovalWorkflow {
 
     // Check auto-approval conditions
     const autoApprovalConditions = await this.evaluateAutoApprovalConditions(impactReport);
-    
+
     if (autoApprovalConditions.all_conditions_met) {
       result.can_auto_approve = true;
       result.conditions_met = autoApprovalConditions.met_conditions;
@@ -240,7 +269,7 @@ class ApprovalWorkflow {
       no_breaking_changes: !this.hasBreakingChanges(impactReport),
       has_tests: await this.componentHasTests(impactReport.targetComponent),
       small_change: this.isSmallChange(impactReport),
-      no_security_risk: impactReport.riskAssessment.riskDimensions?.security_risk?.score < 5
+      no_security_risk: impactReport.riskAssessment.riskDimensions?.security_risk?.score < 5,
     };
 
     const metConditions = Object.entries(conditions)
@@ -259,7 +288,7 @@ class ApprovalWorkflow {
       all_conditions_met: allConditionsMet,
       met_conditions: metConditions,
       failed_conditions: failedConditions,
-      condition_score: `${metConditions.length}/${Object.keys(conditions).length}`
+      condition_score: `${metConditions.length}/${Object.keys(conditions).length}`,
     };
   }
 
@@ -281,8 +310,8 @@ class ApprovalWorkflow {
       valid_until: this.calculateExpirationTime(24), // Auto-approvals valid for 24 hours
       metadata: {
         impact_summary: impactReport.summary,
-        approval_confidence: this.calculateApprovalConfidence(autoApprovalResult)
-      }
+        approval_confidence: this.calculateApprovalConfidence(autoApprovalResult),
+      },
     };
 
     // Log approval
@@ -303,7 +332,7 @@ class ApprovalWorkflow {
     console.log(chalk.gray(`Component: ${impactReport.targetComponent.path}`));
     console.log(chalk.gray(`Risk Level: ${impactReport.riskAssessment.overallRisk.toUpperCase()}`));
     console.log(chalk.gray(`Affected Components: ${impactReport.summary.affectedComponents}`));
-    
+
     if (requirements.blocking_issues.length > 0) {
       console.log(chalk.red(`\nBlocking Issues:`));
       requirements.blocking_issues.forEach((issue, index) => {
@@ -346,8 +375,8 @@ class ApprovalWorkflow {
       requirements_met: requirements,
       metadata: {
         impact_summary: impactReport.summary,
-        approval_answers: approvalAnswers
-      }
+        approval_answers: approvalAnswers,
+      },
     };
 
     // Add approval conditions if approved
@@ -367,7 +396,7 @@ class ApprovalWorkflow {
       console.log(chalk.green(`\n✅ Manual approval granted`));
       console.log(chalk.gray(`   Approved by: ${approval.approved_by}`));
       console.log(chalk.gray(`   Valid until: ${new Date(approval.valid_until).toLocaleString()}`));
-      
+
       if (approval.approval_conditions) {
         console.log(chalk.blue(`   Conditions: ${approval.approval_conditions}`));
       }
@@ -390,7 +419,7 @@ class ApprovalWorkflow {
       type: 'confirm',
       name: 'approved',
       message: `Approve ${impactReport.modificationType} of ${impactReport.targetComponent.path}?`,
-      default: false
+      default: false,
     });
 
     // Conditional questions based on approval
@@ -399,7 +428,7 @@ class ApprovalWorkflow {
       name: 'approver_name',
       message: 'Enter your name/identifier:',
       when: (answers) => answers.approved,
-      validate: (input) => input.length > 0 || 'Name is required'
+      validate: (input) => input.length > 0 || 'Name is required',
     });
 
     questions.push({
@@ -407,7 +436,7 @@ class ApprovalWorkflow {
       name: 'approval_reason',
       message: 'Reason for approval:',
       when: (answers) => answers.approved,
-      default: 'Impact analysis reviewed and acceptable'
+      default: 'Impact analysis reviewed and acceptable',
     });
 
     // High-risk additional questions
@@ -417,7 +446,7 @@ class ApprovalWorkflow {
         name: 'conditions_acknowledged',
         message: 'Do you acknowledge all risk factors and recommendations?',
         when: (answers) => answers.approved,
-        default: false
+        default: false,
       });
 
       questions.push({
@@ -425,7 +454,7 @@ class ApprovalWorkflow {
         name: 'approval_conditions',
         message: 'Enter any approval conditions or requirements:',
         when: (answers) => answers.approved && answers.conditions_acknowledged,
-        default: 'Standard monitoring and rollback procedures apply'
+        default: 'Standard monitoring and rollback procedures apply',
       });
 
       questions.push({
@@ -433,7 +462,7 @@ class ApprovalWorkflow {
         name: 'monitoring_required',
         message: 'Require enhanced monitoring after deployment?',
         when: (answers) => answers.approved,
-        default: true
+        default: true,
       });
 
       questions.push({
@@ -441,7 +470,7 @@ class ApprovalWorkflow {
         name: 'rollback_plan',
         message: 'Require documented rollback plan?',
         when: (answers) => answers.approved,
-        default: true
+        default: true,
       });
     }
 
@@ -451,15 +480,15 @@ class ApprovalWorkflow {
       name: 'rejection_reason',
       message: 'Reason for rejection:',
       when: (answers) => !answers.approved,
-      validate: (input) => input.length > 0 || 'Rejection reason is required'
+      validate: (input) => input.length > 0 || 'Rejection reason is required',
     });
 
     questions.push({
       type: 'input',
-      name: 'recommended_actions', 
+      name: 'recommended_actions',
       message: 'Recommended actions before resubmission:',
       when: (answers) => !answers.approved,
-      default: 'Address critical issues and reduce risk factors'
+      default: 'Address critical issues and reduce risk factors',
     });
 
     return questions;
@@ -476,21 +505,20 @@ class ApprovalWorkflow {
       status: approval.approval_status,
       risk_level: approval.risk_level,
       approved_by: approval.approved_by,
-      timestamp: approval.approved_at
+      timestamp: approval.approved_at,
     });
 
     // Write to audit log file
     try {
       const logDir = path.join(this.rootPath, '.aiox', 'audit');
       await fs.mkdir(logDir, { recursive: true });
-      
+
       const logFile = path.join(logDir, 'approval_log.jsonl');
       const logEntry = JSON.stringify(approval) + '\n';
-      
-      await fs.appendFile(logFile, logEntry);
-      
-      console.log(chalk.gray(`   Approval logged to audit trail`));
 
+      await fs.appendFile(logFile, logEntry);
+
+      console.log(chalk.gray(`   Approval logged to audit trail`));
     } catch (_error) {
       console.warn(chalk.yellow(`Failed to write approval log: ${error.message}`));
     }
@@ -517,16 +545,24 @@ class ApprovalWorkflow {
   }
 
   hasBreakingChanges(impactReport) {
-    return impactReport.propagationAnalysis.directEffects?.some(
-      effect => effect.changeType?.severity === 'breaking'
-    ) || false;
+    return (
+      impactReport.propagationAnalysis.directEffects?.some(
+        (effect) => effect.changeType?.severity === 'breaking'
+      ) || false
+    );
   }
 
   async componentHasTests(component) {
     const testPaths = [
       path.join(this.rootPath, 'tests', 'unit', component.type, `${component.name}.test.js`),
-      path.join(this.rootPath, 'tests', 'integration', component.type, `${component.name}.integration.test.js`),
-      path.join(this.rootPath, 'test', `${component.name}.test.js`)
+      path.join(
+        this.rootPath,
+        'tests',
+        'integration',
+        component.type,
+        `${component.name}.integration.test.js`
+      ),
+      path.join(this.rootPath, 'test', `${component.name}.test.js`),
     ];
 
     for (const testPath of testPaths) {
@@ -542,8 +578,9 @@ class ApprovalWorkflow {
   }
 
   isSmallChange(impactReport) {
-    return impactReport.summary.affectedComponents <= 3 && 
-           impactReport.summary.propagationDepth <= 2;
+    return (
+      impactReport.summary.affectedComponents <= 3 && impactReport.summary.propagationDepth <= 2
+    );
   }
 
   calculateExpirationTime(hours) {
@@ -574,18 +611,18 @@ class ApprovalWorkflow {
     const history = {
       total_approvals: this.approvalHistory.length,
       approval_stats: this.calculateApprovalStats(),
-      recent_approvals: this.approvalHistory.slice(-10)
+      recent_approvals: this.approvalHistory.slice(-10),
     };
 
     if (options.component) {
       history.component_approvals = this.approvalHistory.filter(
-        approval => approval.component === options.component
+        (approval) => approval.component === options.component
       );
     }
 
     if (options.risk_level) {
       history.risk_level_approvals = this.approvalHistory.filter(
-        approval => approval.risk_level === options.risk_level
+        (approval) => approval.risk_level === options.risk_level
       );
     }
 
@@ -597,10 +634,10 @@ class ApprovalWorkflow {
       approved: 0,
       rejected: 0,
       auto_approved: 0,
-      by_risk_level: { low: 0, medium: 0, high: 0, critical: 0 }
+      by_risk_level: { low: 0, medium: 0, high: 0, critical: 0 },
     };
 
-    this.approvalHistory.forEach(approval => {
+    this.approvalHistory.forEach((approval) => {
       if (approval.status === 'approved') stats.approved++;
       else if (approval.status === 'rejected') stats.rejected++;
       else if (approval.status === 'auto_approved') stats.auto_approved++;

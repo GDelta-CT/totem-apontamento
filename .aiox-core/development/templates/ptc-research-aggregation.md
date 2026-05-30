@@ -1,10 +1,12 @@
 # PTC Template: Research Aggregation Batch
 
 ---
+
 execution_mode: programmatic
-ptc_type: bash-batch  # Fallback — true PTC not available in Claude Code CLI (ADR-7)
+ptc_type: bash-batch # Fallback — true PTC not available in Claude Code CLI (ADR-7)
 adr_reference: ADR-3 (PTC native ONLY — no MCP tools in batch blocks)
 story: TOK-3
+
 ---
 
 ## Purpose
@@ -79,11 +81,11 @@ echo -e "$OUTPUT"
 
 ## Token Comparison
 
-| Approach | Tool Calls | Context Entries | Estimated Tokens |
-|----------|-----------|-----------------|-----------------|
-| Direct (N reads + N greps) | 10-20 | 10-20 results | ~8,000-15,000 |
-| Batch (1 call) | 1 | 1 (summary only) | ~3,000-5,000 |
-| **Reduction** | -90% calls | -90% entries | **~30-50%** |
+| Approach                   | Tool Calls | Context Entries  | Estimated Tokens |
+| -------------------------- | ---------- | ---------------- | ---------------- |
+| Direct (N reads + N greps) | 10-20      | 10-20 results    | ~8,000-15,000    |
+| Batch (1 call)             | 1          | 1 (summary only) | ~3,000-5,000     |
+| **Reduction**              | -90% calls | -90% entries     | **~30-50%**      |
 
 ## Notes
 

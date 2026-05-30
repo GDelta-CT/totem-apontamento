@@ -19,7 +19,7 @@ export {
   clearCache as clearConfigCache,
   getPerformanceMetrics as getConfigPerformanceMetrics,
   agentRequirements,
-  ALWAYS_LOADED
+  ALWAYS_LOADED,
 } from './config/config-loader.js';
 
 // Session management

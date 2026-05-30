@@ -61,7 +61,8 @@ const INLINE_GREETING_LOGIC = `
   - STEP 5: HALT and await user input
 `;
 
-const OLD_PATTERN = / {2}- STEP 3: Execute \/greet slash command to generate contextual greeting\n {2}- STEP 4: Display the greeting returned by \/greet command\n {2}- STEP 5: HALT and await user input/;
+const OLD_PATTERN =
+  / {2}- STEP 3: Execute \/greet slash command to generate contextual greeting\n {2}- STEP 4: Display the greeting returned by \/greet command\n {2}- STEP 5: HALT and await user input/;
 
 function updateAgent(agentFile) {
   const filePath = path.join(AGENTS_DIR, agentFile);
@@ -103,7 +104,6 @@ function updateAgent(agentFile) {
 
     console.log(`✅ ${agentFile} - Updated successfully`);
     return { updated: true };
-
   } catch (error) {
     console.error(`❌ ${agentFile} - Error: ${error.message}`);
     return { updated: false, reason: 'error', error: error.message };
@@ -119,7 +119,7 @@ function main() {
     errors: 0,
   };
 
-  AGENTS.forEach(agent => {
+  AGENTS.forEach((agent) => {
     const result = updateAgent(agent);
     if (result.updated) {
       results.updated++;

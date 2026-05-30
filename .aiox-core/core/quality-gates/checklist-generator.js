@@ -188,24 +188,24 @@ class ChecklistGenerator {
   categorizeFiles(files = []) {
     return {
       tests: files.filter((f) => f.includes('test') || f.includes('spec')),
-      configs: files.filter((f) =>
-        f.endsWith('.yaml') || f.endsWith('.yml') || f.endsWith('.json') ||
-        f.includes('config') || f.includes('.env'),
+      configs: files.filter(
+        (f) =>
+          f.endsWith('.yaml') ||
+          f.endsWith('.yml') ||
+          f.endsWith('.json') ||
+          f.includes('config') ||
+          f.includes('.env')
       ),
-      agents: files.filter((f) =>
-        f.includes('agents/') || f.includes('agent'),
+      agents: files.filter((f) => f.includes('agents/') || f.includes('agent')),
+      api: files.filter(
+        (f) => f.includes('/api/') || f.includes('routes') || f.includes('endpoints')
       ),
-      api: files.filter((f) =>
-        f.includes('/api/') || f.includes('routes') || f.includes('endpoints'),
+      database: files.filter(
+        (f) => f.includes('migration') || f.includes('schema') || f.includes('database')
       ),
-      database: files.filter((f) =>
-        f.includes('migration') || f.includes('schema') || f.includes('database'),
-      ),
-      docs: files.filter((f) =>
-        f.endsWith('.md') || f.includes('/docs/'),
-      ),
-      source: files.filter((f) =>
-        f.endsWith('.js') || f.endsWith('.ts') || f.endsWith('.jsx') || f.endsWith('.tsx'),
+      docs: files.filter((f) => f.endsWith('.md') || f.includes('/docs/')),
+      source: files.filter(
+        (f) => f.endsWith('.js') || f.endsWith('.ts') || f.endsWith('.jsx') || f.endsWith('.tsx')
       ),
     };
   }
@@ -305,9 +305,14 @@ class ChecklistGenerator {
       lines.push(`### ${this.formatCategory(category)}`);
       items.forEach((item) => {
         const checkbox = item.checked ? '[x]' : '[ ]';
-        const priority = item.priority === 'critical' ? '🔴' :
-          item.priority === 'high' ? '🟠' :
-            item.priority === 'medium' ? '🟡' : '🟢';
+        const priority =
+          item.priority === 'critical'
+            ? '🔴'
+            : item.priority === 'high'
+              ? '🟠'
+              : item.priority === 'medium'
+                ? '🟡'
+                : '🟢';
         lines.push(`- ${checkbox} ${priority} ${item.text}`);
       });
       lines.push('');

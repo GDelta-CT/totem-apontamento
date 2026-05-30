@@ -931,7 +931,7 @@ entities:
       type: task
       purpose: >-
         To identify the next logical story based on project progress and epic definitions, and then to prepare a
-        comprehensive, self-contained, and actionable story file using the `Story Template`. This task 
+        comprehensive, self-contained, and actionable story file using the `Story Template`. This task
       keywords:
         - create
         - next
@@ -2543,7 +2543,7 @@ entities:
       type: task
       purpose: >-
         This task maintains the integrity and completeness of the `docs/index.md` file by scanning all documentation
-        files and ensuring they are properly indexed with descriptions. It handles both root-level 
+        files and ensuring they are properly indexed with descriptions. It handles both root-level
       keywords:
         - index
         - docs
@@ -3003,7 +3003,7 @@ entities:
         - dev
       externalDeps: []
       plannedDeps:
-        - 'symbol: ''{symbol}'''
+        - "symbol: '{symbol}'"
         - project-context.yaml
         - files-context.yaml
       lifecycle: production
@@ -3520,7 +3520,7 @@ entities:
       path: .aiox-core/development/tasks/qa-evidence-requirements.md
       layer: L2
       type: task
-      purpose: '''Screenshot, log, or reproduction steps of the bug'''
+      purpose: "'Screenshot, log, or reproduction steps of the bug'"
       keywords:
         - qa
         - evidence
@@ -4448,7 +4448,7 @@ entities:
       type: task
       purpose: >-
         To identify the next logical story based on project progress and epic definitions, and then to prepare a
-        comprehensive, self-contained, and actionable story file using the `Story Template`. This task 
+        comprehensive, self-contained, and actionable story file using the `Story Template`. This task
       keywords:
         - sm
         - create
@@ -6954,7 +6954,7 @@ entities:
       path: .aiox-core/development/scripts/code-quality-improver.js
       layer: L2
       type: script
-      purpose: '''Apply consistent code formatting'','
+      purpose: "'Apply consistent code formatting',"
       keywords:
         - code
         - quality
@@ -6974,7 +6974,7 @@ entities:
       path: .aiox-core/development/scripts/commit-message-generator.js
       layer: L2
       type: script
-      purpose: ''';'
+      purpose: "';"
       keywords:
         - commit
         - message
@@ -6996,7 +6996,7 @@ entities:
       path: .aiox-core/development/scripts/conflict-resolver.js
       layer: L2
       type: script
-      purpose: '''No conflicts detected'','
+      purpose: "'No conflicts detected',"
       keywords:
         - conflict
         - resolver
@@ -7084,7 +7084,7 @@ entities:
       path: .aiox-core/development/scripts/decision-recorder.js
       layer: L2
       type: script
-      purpose: ''');'
+      purpose: "');"
       keywords:
         - decision
         - recorder
@@ -7485,7 +7485,7 @@ entities:
       path: .aiox-core/development/scripts/refactoring-suggester.js
       layer: L2
       type: script
-      purpose: '''Extract long methods into smaller, focused methods'','
+      purpose: "'Extract long methods into smaller, focused methods',"
       keywords:
         - refactoring
         - suggester
@@ -7710,7 +7710,7 @@ entities:
       path: .aiox-core/development/scripts/test-greeting-system.js
       layer: L2
       type: script
-      purpose: '''Show all available commands with descriptions'' },'
+      purpose: "'Show all available commands with descriptions' },"
       keywords:
         - test
         - greeting
@@ -7751,7 +7751,7 @@ entities:
       path: .aiox-core/development/scripts/unified-activation-pipeline.js
       layer: L2
       type: script
-      purpose: '''Agent identity — greeting is broken without this'','
+      purpose: "'Agent identity — greeting is broken without this',"
       keywords:
         - unified
         - activation
@@ -8021,7 +8021,7 @@ entities:
       path: .aiox-core/development/scripts/squad/squad-designer.js
       layer: L2
       type: script
-      purpose: '`Squad for ${analysis.domain.replace(/-/g, '' '')} management`,'
+      purpose: "`Squad for ${analysis.domain.replace(/-/g, ' ')} management`,"
       keywords:
         - squad
         - designer
@@ -8092,7 +8092,7 @@ entities:
         - squad
         - generator
         - '*${taskname.replace(/-/g,'
-        - '''-'')}'
+        - "'-')}"
       usedBy:
         - squad-creator-create
         - squad-creator-list
@@ -8158,7 +8158,7 @@ entities:
       path: .aiox-core/development/scripts/squad/squad-publisher.js
       layer: L2
       type: script
-      purpose: '** ${manifest.description || ''No description provided''}'
+      purpose: "** ${manifest.description || 'No description provided'}"
       keywords:
         - squad
         - publisher
@@ -8591,7 +8591,7 @@ entities:
       path: .aiox-core/core/elicitation/task-elicitation.js
       layer: L1
       type: module
-      purpose: '''Define the fundamental details of your task'','
+      purpose: "'Define the fundamental details of your task',"
       keywords:
         - task
         - elicitation
@@ -8612,7 +8612,7 @@ entities:
       path: .aiox-core/core/elicitation/workflow-elicitation.js
       layer: L1
       type: module
-      purpose: '''Where should this workflow be created?'','
+      purpose: "'Where should this workflow be created?',"
       keywords:
         - workflow
         - elicitation
@@ -9105,7 +9105,7 @@ entities:
       path: .aiox-core/core/ids/incremental-decision-engine.js
       layer: L1
       type: module
-      purpose: '{ totalEntities: 0, matchesFound: 0, decision: ''CREATE'', confidence: ''low'' },'
+      purpose: "{ totalEntities: 0, matchesFound: 0, decision: 'CREATE', confidence: 'low' },"
       keywords:
         - incremental
         - decision
@@ -9146,7 +9146,7 @@ entities:
       path: .aiox-core/core/ids/registry-healer.js
       layer: L1
       type: module
-      purpose: '''Referenced file does not exist on disk'','
+      purpose: "'Referenced file does not exist on disk',"
       keywords:
         - registry
         - healer
@@ -9750,7 +9750,7 @@ entities:
       path: .aiox-core/core/orchestration/master-orchestrator.js
       layer: L1
       type: module
-      purpose: '''Requirements → Specification generation'','
+      purpose: "'Requirements → Specification generation',"
       keywords:
         - master
         - orchestrator
@@ -9819,7 +9819,7 @@ entities:
       path: .aiox-core/core/orchestration/session-state.js
       layer: L1
       type: module
-      purpose: '''Resume from last saved state'','
+      purpose: "'Resume from last saved state',"
       keywords:
         - session
         - state
@@ -9844,7 +9844,7 @@ entities:
       path: .aiox-core/core/orchestration/skill-dispatcher.js
       layer: L1
       type: module
-      purpose: '''No result returned from skill'','
+      purpose: "'No result returned from skill',"
       keywords:
         - skill
         - dispatcher
@@ -9951,7 +9951,7 @@ entities:
       path: .aiox-core/core/orchestration/terminal-spawner.js
       layer: L1
       type: module
-      purpose: '''Apple Silicon'' },'
+      purpose: "'Apple Silicon' },"
       keywords:
         - terminal
         - spawner
@@ -10046,7 +10046,7 @@ entities:
       path: .aiox-core/core/permissions/permission-mode.js
       layer: L1
       type: module
-      purpose: '''Read-only mode - safe exploration'','
+      purpose: "'Read-only mode - safe exploration',"
       keywords:
         - permission
         - mode
@@ -10109,7 +10109,7 @@ entities:
       path: .aiox-core/core/quality-gates/focus-area-recommender.js
       layer: L1
       type: module
-      purpose: ''''','
+      purpose: "'',"
       keywords:
         - focus
         - area
@@ -10284,7 +10284,7 @@ entities:
       path: .aiox-core/core/registry/validate-registry.js
       layer: L1
       type: module
-      purpose: '''Registry file loads without errors'','
+      purpose: "'Registry file loads without errors',"
       keywords:
         - validate
         - registry
@@ -11926,7 +11926,7 @@ entities:
       path: .aiox-core/core/health-check/checks/deployment/build-config.js
       layer: L1
       type: module
-      purpose: '''Verifies build configuration'','
+      purpose: "'Verifies build configuration',"
       keywords:
         - build
         - config
@@ -11946,7 +11946,7 @@ entities:
       path: .aiox-core/core/health-check/checks/deployment/ci-config.js
       layer: L1
       type: module
-      purpose: '''Verifies CI/CD configuration'','
+      purpose: "'Verifies CI/CD configuration',"
       keywords:
         - ci
         - config
@@ -11966,7 +11966,7 @@ entities:
       path: .aiox-core/core/health-check/checks/deployment/deployment-readiness.js
       layer: L1
       type: module
-      purpose: '''Verifies project is ready for deployment'','
+      purpose: "'Verifies project is ready for deployment',"
       keywords:
         - deployment
         - readiness
@@ -11986,7 +11986,7 @@ entities:
       path: .aiox-core/core/health-check/checks/deployment/docker-config.js
       layer: L1
       type: module
-      purpose: '''Verifies Docker configuration'','
+      purpose: "'Verifies Docker configuration',"
       keywords:
         - docker
         - config
@@ -12006,7 +12006,7 @@ entities:
       path: .aiox-core/core/health-check/checks/deployment/env-file.js
       layer: L1
       type: module
-      purpose: '''Verifies .env configuration'','
+      purpose: "'Verifies .env configuration',"
       keywords:
         - env
         - file
@@ -12026,7 +12026,7 @@ entities:
       path: .aiox-core/core/health-check/checks/local/disk-space.js
       layer: L1
       type: module
-      purpose: '''Verifies sufficient disk space is available'','
+      purpose: "'Verifies sufficient disk space is available',"
       keywords:
         - disk
         - space
@@ -12046,7 +12046,7 @@ entities:
       path: .aiox-core/core/health-check/checks/local/environment-vars.js
       layer: L1
       type: module
-      purpose: '''Verifies required environment variables are set'','
+      purpose: "'Verifies required environment variables are set',"
       keywords:
         - environment
         - vars
@@ -12066,7 +12066,7 @@ entities:
       path: .aiox-core/core/health-check/checks/local/git-install.js
       layer: L1
       type: module
-      purpose: '''Verifies Git is installed and configured'','
+      purpose: "'Verifies Git is installed and configured',"
       keywords:
         - git
         - install
@@ -12086,7 +12086,7 @@ entities:
       path: .aiox-core/core/health-check/checks/local/ide-detection.js
       layer: L1
       type: module
-      purpose: '''Detects IDE/editor configuration'','
+      purpose: "'Detects IDE/editor configuration',"
       keywords:
         - ide
         - detection
@@ -12106,7 +12106,7 @@ entities:
       path: .aiox-core/core/health-check/checks/local/memory.js
       layer: L1
       type: module
-      purpose: '''Verifies sufficient memory is available'','
+      purpose: "'Verifies sufficient memory is available',"
       keywords:
         - memory
       usedBy:
@@ -12126,7 +12126,7 @@ entities:
       path: .aiox-core/core/health-check/checks/local/network.js
       layer: L1
       type: module
-      purpose: '''Verifies network connectivity for development tools'','
+      purpose: "'Verifies network connectivity for development tools',"
       keywords:
         - network
       usedBy: []
@@ -12145,7 +12145,7 @@ entities:
       path: .aiox-core/core/health-check/checks/local/npm-install.js
       layer: L1
       type: module
-      purpose: '''Verifies npm is installed and working'','
+      purpose: "'Verifies npm is installed and working',"
       keywords:
         - npm
         - install
@@ -12165,7 +12165,7 @@ entities:
       path: .aiox-core/core/health-check/checks/local/shell-environment.js
       layer: L1
       type: module
-      purpose: '''Verifies shell environment configuration'','
+      purpose: "'Verifies shell environment configuration',"
       keywords:
         - shell
         - environment
@@ -12185,7 +12185,7 @@ entities:
       path: .aiox-core/core/health-check/checks/project/agent-config.js
       layer: L1
       type: module
-      purpose: '''Verifies agent configuration files are valid'','
+      purpose: "'Verifies agent configuration files are valid',"
       keywords:
         - agent
         - config
@@ -12205,7 +12205,7 @@ entities:
       path: .aiox-core/core/health-check/checks/project/aiox-directory.js
       layer: L1
       type: module
-      purpose: '''Verifies .aiox/ directory structure'','
+      purpose: "'Verifies .aiox/ directory structure',"
       keywords:
         - aiox
         - directory
@@ -12225,7 +12225,7 @@ entities:
       path: .aiox-core/core/health-check/checks/project/dependencies.js
       layer: L1
       type: module
-      purpose: '''Verifies required dependencies are installed'','
+      purpose: "'Verifies required dependencies are installed',"
       keywords:
         - dependencies
       usedBy: []
@@ -12244,7 +12244,7 @@ entities:
       path: .aiox-core/core/health-check/checks/project/framework-config.js
       layer: L1
       type: module
-      purpose: '''AIOX core framework'' },'
+      purpose: "'AIOX core framework' },"
       keywords:
         - framework
         - config
@@ -12264,7 +12264,7 @@ entities:
       path: .aiox-core/core/health-check/checks/project/package-json.js
       layer: L1
       type: module
-      purpose: '''Verifies package.json exists and contains valid JSON'','
+      purpose: "'Verifies package.json exists and contains valid JSON',"
       keywords:
         - package
         - json
@@ -12284,7 +12284,7 @@ entities:
       path: .aiox-core/core/health-check/checks/project/task-definitions.js
       layer: L1
       type: module
-      purpose: '''Verifies task definition files are valid'','
+      purpose: "'Verifies task definition files are valid',"
       keywords:
         - task
         - definitions
@@ -12304,7 +12304,7 @@ entities:
       path: .aiox-core/core/health-check/checks/project/workflow-dependencies.js
       layer: L1
       type: module
-      purpose: '''Verifies workflow dependencies are satisfied'','
+      purpose: "'Verifies workflow dependencies are satisfied',"
       keywords:
         - workflow
         - dependencies
@@ -12324,7 +12324,7 @@ entities:
       path: .aiox-core/core/health-check/checks/repository/branch-protection.js
       layer: L1
       type: module
-      purpose: '''Verifies branch protection best practices'','
+      purpose: "'Verifies branch protection best practices',"
       keywords:
         - branch
         - protection
@@ -12344,7 +12344,7 @@ entities:
       path: .aiox-core/core/health-check/checks/repository/commit-history.js
       layer: L1
       type: module
-      purpose: '''Verifies commit history quality'','
+      purpose: "'Verifies commit history quality',"
       keywords:
         - commit
         - history
@@ -12364,7 +12364,7 @@ entities:
       path: .aiox-core/core/health-check/checks/repository/conflicts.js
       layer: L1
       type: module
-      purpose: '''Checks for unresolved merge conflicts'','
+      purpose: "'Checks for unresolved merge conflicts',"
       keywords:
         - conflicts
       usedBy: []
@@ -12383,7 +12383,7 @@ entities:
       path: .aiox-core/core/health-check/checks/repository/git-repo.js
       layer: L1
       type: module
-      purpose: '''Verifies project is a valid Git repository'','
+      purpose: "'Verifies project is a valid Git repository',"
       keywords:
         - git
         - repo
@@ -12403,7 +12403,7 @@ entities:
       path: .aiox-core/core/health-check/checks/repository/git-status.js
       layer: L1
       type: module
-      purpose: '''Checks for uncommitted changes and working directory status'','
+      purpose: "'Checks for uncommitted changes and working directory status',"
       keywords:
         - git
         - status
@@ -12423,7 +12423,7 @@ entities:
       path: .aiox-core/core/health-check/checks/repository/gitignore.js
       layer: L1
       type: module
-      purpose: '''Verifies .gitignore has required patterns'','
+      purpose: "'Verifies .gitignore has required patterns',"
       keywords:
         - gitignore
       usedBy: []
@@ -12442,7 +12442,7 @@ entities:
       path: .aiox-core/core/health-check/checks/repository/large-files.js
       layer: L1
       type: module
-      purpose: '''Checks for large files in the repository'','
+      purpose: "'Checks for large files in the repository',"
       keywords:
         - large
         - files
@@ -12462,7 +12462,7 @@ entities:
       path: .aiox-core/core/health-check/checks/repository/lockfile-integrity.js
       layer: L1
       type: module
-      purpose: '''Verifies package-lock.json integrity'','
+      purpose: "'Verifies package-lock.json integrity',"
       keywords:
         - lockfile
         - integrity
@@ -12482,7 +12482,7 @@ entities:
       path: .aiox-core/core/health-check/checks/services/api-endpoints.js
       layer: L1
       type: module
-      purpose: '''Verifies external API endpoint connectivity'','
+      purpose: "'Verifies external API endpoint connectivity',"
       keywords:
         - api
         - endpoints
@@ -12502,7 +12502,7 @@ entities:
       path: .aiox-core/core/health-check/checks/services/claude-code.js
       layer: L1
       type: module
-      purpose: '''Verifies Claude Code CLI configuration'','
+      purpose: "'Verifies Claude Code CLI configuration',"
       keywords:
         - claude
         - code
@@ -12522,7 +12522,7 @@ entities:
       path: .aiox-core/core/health-check/checks/services/gemini-cli.js
       layer: L1
       type: module
-      purpose: '''Verifies Gemini CLI installation and configuration'','
+      purpose: "'Verifies Gemini CLI installation and configuration',"
       keywords:
         - gemini
         - cli
@@ -12542,7 +12542,7 @@ entities:
       path: .aiox-core/core/health-check/checks/services/github-cli.js
       layer: L1
       type: module
-      purpose: '''Verifies GitHub CLI (gh) installation and authentication'','
+      purpose: "'Verifies GitHub CLI (gh) installation and authentication',"
       keywords:
         - github
         - cli
@@ -12562,7 +12562,7 @@ entities:
       path: .aiox-core/core/health-check/checks/services/mcp-integration.js
       layer: L1
       type: module
-      purpose: '''Verifies MCP server configuration'','
+      purpose: "'Verifies MCP server configuration',"
       keywords:
         - mcp
         - integration
@@ -12810,7 +12810,7 @@ entities:
       path: .aiox-core/development/agents/aiox-master.md
       layer: L2
       type: agent
-      purpose: '''Show all available commands with descriptions'''
+      purpose: "'Show all available commands with descriptions'"
       keywords:
         - aiox
         - master
@@ -12889,7 +12889,7 @@ entities:
       path: .aiox-core/development/agents/analyst.md
       layer: L2
       type: agent
-      purpose: '''Show all available commands with descriptions'''
+      purpose: "'Show all available commands with descriptions'"
       keywords:
         - analyst
       usedBy:
@@ -12941,7 +12941,7 @@ entities:
       path: .aiox-core/development/agents/architect.md
       layer: L2
       type: agent
-      purpose: '''Show all available commands with descriptions'''
+      purpose: "'Show all available commands with descriptions'"
       keywords:
         - architect
       usedBy:
@@ -13082,7 +13082,7 @@ entities:
       path: .aiox-core/development/agents/dev.md
       layer: L2
       type: agent
-      purpose: '''Show all available commands with descriptions'''
+      purpose: "'Show all available commands with descriptions'"
       keywords:
         - dev
       usedBy:
@@ -13195,7 +13195,7 @@ entities:
       path: .aiox-core/development/agents/devops.md
       layer: L2
       type: agent
-      purpose: '''Show all available commands with descriptions'''
+      purpose: "'Show all available commands with descriptions'"
       keywords:
         - devops
       usedBy:
@@ -13332,7 +13332,7 @@ entities:
       path: .aiox-core/development/agents/po.md
       layer: L2
       type: agent
-      purpose: '''Show all available commands with descriptions'''
+      purpose: "'Show all available commands with descriptions'"
       keywords:
         - po
       usedBy:
@@ -13395,7 +13395,7 @@ entities:
       path: .aiox-core/development/agents/qa.md
       layer: L2
       type: agent
-      purpose: '''Show all available commands with descriptions'''
+      purpose: "'Show all available commands with descriptions'"
       keywords:
         - qa
       usedBy:
@@ -13481,7 +13481,7 @@ entities:
       path: .aiox-core/development/agents/sm.md
       layer: L2
       type: agent
-      purpose: '''Show all available commands with descriptions'''
+      purpose: "'Show all available commands with descriptions'"
       keywords:
         - sm
       usedBy:
@@ -13524,7 +13524,7 @@ entities:
       path: .aiox-core/development/agents/squad-creator.md
       layer: L2
       type: agent
-      purpose: '''Show all available commands with descriptions'''
+      purpose: "'Show all available commands with descriptions'"
       keywords:
         - squad
         - creator
@@ -13563,7 +13563,7 @@ entities:
       path: .aiox-core/development/agents/ux-design-expert.md
       layer: L2
       type: agent
-      purpose: '''Complete workflow from user research to component building'''
+      purpose: "'Complete workflow from user research to component building'"
       keywords:
         - ux
         - design
@@ -13970,7 +13970,7 @@ entities:
       path: .aiox-core/data/tech-presets/csharp.md
       layer: L3
       type: data
-      purpose: '''Arquitetura para APIs em .NET 9+ com camadas claras, EF Core e testes automatizados'''
+      purpose: "'Arquitetura para APIs em .NET 9+ com camadas claras, EF Core e testes automatizados'"
       keywords:
         - csharp
         - tech
@@ -13990,7 +13990,7 @@ entities:
       path: .aiox-core/data/tech-presets/go.md
       layer: L3
       type: data
-      purpose: '''Arquitetura para APIs e workers em Go 1.24+ com boundaries claros e alta testabilidade'''
+      purpose: "'Arquitetura para APIs e workers em Go 1.24+ com boundaries claros e alta testabilidade'"
       keywords:
         - go
         - tech
@@ -14010,7 +14010,7 @@ entities:
       path: .aiox-core/data/tech-presets/java.md
       layer: L3
       type: data
-      purpose: '''Arquitetura para backend Java 21+ com Spring Boot 3+, DDD tatico e testes robustos'''
+      purpose: "'Arquitetura para backend Java 21+ com Spring Boot 3+, DDD tatico e testes robustos'"
       keywords:
         - java
         - tech
@@ -14079,7 +14079,7 @@ entities:
       path: .aiox-core/data/tech-presets/rust.md
       layer: L3
       type: data
-      purpose: '''Arquitetura para APIs e workers em Rust 1.77+ com contratos por traits, errors tipados e testes confiaveis'''
+      purpose: "'Arquitetura para APIs e workers em Rust 1.77+ com contratos por traits, errors tipados e testes confiaveis'"
       keywords:
         - rust
         - tech
@@ -14099,7 +14099,7 @@ entities:
       path: .aiox-core/data/tech-presets/_template.md
       layer: L3
       type: data
-      purpose: '''Brief description of when to use this preset'''
+      purpose: "'Brief description of when to use this preset'"
       keywords:
         - template
         - tech
@@ -14650,7 +14650,7 @@ entities:
       path: .aiox-core/infrastructure/scripts/batch-creator.js
       layer: L2
       type: script
-      purpose: '''Create multiple related components'','
+      purpose: "'Create multiple related components',"
       keywords:
         - batch
         - creator
@@ -14733,7 +14733,7 @@ entities:
       path: .aiox-core/infrastructure/scripts/cicd-discovery.js
       layer: L2
       type: script
-      purpose: '''Integrate AIOX build orchestrator for intelligent parallel builds'','
+      purpose: "'Integrate AIOX build orchestrator for intelligent parallel builds',"
       keywords:
         - cicd
         - discovery
@@ -14774,7 +14774,7 @@ entities:
       path: .aiox-core/infrastructure/scripts/code-quality-improver.js
       layer: L2
       type: script
-      purpose: '''Apply consistent code formatting'','
+      purpose: "'Apply consistent code formatting',"
       keywords:
         - code
         - quality
@@ -14835,7 +14835,7 @@ entities:
       path: .aiox-core/infrastructure/scripts/commit-message-generator.js
       layer: L2
       type: script
-      purpose: ''';'
+      purpose: "';"
       keywords:
         - commit
         - message
@@ -14987,7 +14987,7 @@ entities:
       path: .aiox-core/infrastructure/scripts/conflict-resolver.js
       layer: L2
       type: script
-      purpose: '''No conflicts detected'','
+      purpose: "'No conflicts detected',"
       keywords:
         - conflict
         - resolver
@@ -15007,7 +15007,7 @@ entities:
       path: .aiox-core/infrastructure/scripts/coverage-analyzer.js
       layer: L2
       type: script
-      purpose: '''Component has no test files'','
+      purpose: "'Component has no test files',"
       keywords:
         - coverage
         - analyzer
@@ -15114,7 +15114,7 @@ entities:
       path: .aiox-core/infrastructure/scripts/documentation-synchronizer.js
       layer: L2
       type: script
-      purpose: '''Sync JSDoc comments with markdown documentation'','
+      purpose: "'Sync JSDoc comments with markdown documentation',"
       keywords:
         - documentation
         - synchronizer
@@ -15321,7 +15321,7 @@ entities:
       path: .aiox-core/infrastructure/scripts/modification-risk-assessment.js
       layer: L2
       type: script
-      purpose: '''Risk from component dependencies and dependents'','
+      purpose: "'Risk from component dependencies and dependents',"
       keywords:
         - modification
         - risk
@@ -15408,7 +15408,7 @@ entities:
       path: .aiox-core/infrastructure/scripts/pattern-extractor.js
       layer: L2
       type: script
-      purpose: '''State management with persistence across browser sessions using Zustand and persist middleware.'','
+      purpose: "'State management with persistence across browser sessions using Zustand and persist middleware.',"
       keywords:
         - pattern
         - extractor
@@ -15470,7 +15470,7 @@ entities:
       path: .aiox-core/infrastructure/scripts/performance-optimizer.js
       layer: L2
       type: script
-      purpose: '''Optimize algorithms with high time complexity'','
+      purpose: "'Optimize algorithms with high time complexity',"
       keywords:
         - performance
         - optimizer
@@ -15559,7 +15559,7 @@ entities:
       path: .aiox-core/infrastructure/scripts/pm-adapter.js
       layer: L2
       type: script
-      purpose: '''Remove hard-coded ClickUp dependency'''
+      purpose: "'Remove hard-coded ClickUp dependency'"
       keywords:
         - pm
         - adapter
@@ -15578,7 +15578,7 @@ entities:
       path: .aiox-core/infrastructure/scripts/pr-review-ai.js
       layer: L2
       type: script
-      purpose: '''AI review failed'','
+      purpose: "'AI review failed',"
       keywords:
         - pr
         - review
@@ -15686,7 +15686,7 @@ entities:
       path: .aiox-core/infrastructure/scripts/refactoring-suggester.js
       layer: L2
       type: script
-      purpose: '''Extract long methods into smaller, focused methods'','
+      purpose: "'Extract long methods into smaller, focused methods',"
       keywords:
         - refactoring
         - suggester
@@ -16104,7 +16104,7 @@ entities:
       path: .aiox-core/infrastructure/scripts/validate-agents.js
       layer: L2
       type: script
-      purpose: '''...'' } - explicit format (preferred)'
+      purpose: "'...' } - explicit format (preferred)"
       keywords:
         - validate
         - agents
@@ -16394,7 +16394,7 @@ entities:
       path: .aiox-core/infrastructure/scripts/documentation-integrity/brownfield-analyzer.js
       layer: L2
       type: script
-      purpose: ''''','
+      purpose: "'',"
       keywords:
         - brownfield
         - analyzer
@@ -16496,7 +16496,7 @@ entities:
       path: .aiox-core/infrastructure/scripts/documentation-integrity/mode-detector.js
       layer: L2
       type: script
-      purpose: '''For AIOX contributors working on the framework'','
+      purpose: "'For AIOX contributors working on the framework',"
       keywords:
         - mode
         - detector
@@ -16696,7 +16696,7 @@ entities:
       path: .aiox-core/infrastructure/scripts/ide-sync/transformers/github-copilot.js
       layer: L2
       type: script
-      purpose: '''${description}''`,'
+      purpose: "'${description}'`,"
       keywords:
         - github
         - copilot
@@ -17093,7 +17093,7 @@ entities:
       type: checklist
       purpose: >-
         ** To systematically guide the selected Agent and user through the analysis and planning required when a
-        significant change (pivot, tech issue, missing requirement, failed story) is identified during 
+        significant change (pivot, tech issue, missing requirement, failed story) is identified during
       keywords:
         - change
         - checklist

@@ -15,8 +15,10 @@ const yaml = require('js-yaml');
  */
 class SkillValidator {
   constructor(config = {}) {
-    this.agentsDir = config.agentsDir || path.join(process.cwd(), '.aiox-core', 'development', 'agents');
-    this.tasksDir = config.tasksDir || path.join(process.cwd(), '.aiox-core', 'development', 'tasks');
+    this.agentsDir =
+      config.agentsDir || path.join(process.cwd(), '.aiox-core', 'development', 'agents');
+    this.tasksDir =
+      config.tasksDir || path.join(process.cwd(), '.aiox-core', 'development', 'tasks');
     this.errors = [];
     this.warnings = [];
   }
@@ -185,7 +187,11 @@ class SkillValidator {
     const validTypes = ['tasks', 'templates', 'checklists', 'data', 'scripts', 'tools'];
 
     for (const [type, items] of Object.entries(deps)) {
-      if (!validTypes.includes(type) && type !== 'git_restrictions' && type !== 'coderabbit_integration') {
+      if (
+        !validTypes.includes(type) &&
+        type !== 'git_restrictions' &&
+        type !== 'coderabbit_integration'
+      ) {
         result.warnings.push(`Unknown dependency type: ${type}`);
       }
 

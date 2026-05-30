@@ -52,7 +52,9 @@ const BatchCreator = safeRequire('./scripts/batch-creator');
 const AioxValidator = safeRequire('./scripts/aiox-validator');
 const TemplateValidator = safeRequire('./scripts/template-validator');
 const validateOutputPatternModule = safeRequire('./scripts/validate-output-pattern');
-const validateOutputPattern = validateOutputPatternModule ? validateOutputPatternModule.validateOutputPattern : null;
+const validateOutputPattern = validateOutputPatternModule
+  ? validateOutputPatternModule.validateOutputPattern
+  : null;
 const SpotCheckValidator = safeRequire('./scripts/spot-check-validator');
 
 // Analysis
@@ -190,7 +192,7 @@ const moduleExports = {
 };
 
 // Remove null exports for cleaner API
-Object.keys(moduleExports).forEach(key => {
+Object.keys(moduleExports).forEach((key) => {
   if (moduleExports[key] === null) {
     delete moduleExports[key];
   }

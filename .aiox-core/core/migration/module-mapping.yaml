@@ -1,13 +1,13 @@
 # AIOX Module Mapping v2.0 → v4.0.4
 # Story 2.14 - Migration Script
 
-version: "1.0.0"
+version: '1.0.0'
 
 # Mapping of v2.0 directories to v4.0.4 modules
 mapping:
   core:
-    source: ".aiox-core/"
-    target: ".aiox-core/core/"
+    source: '.aiox-core/'
+    target: '.aiox-core/core/'
     files:
       - registry/**
       - quality-gates/**
@@ -19,11 +19,11 @@ mapping:
       - mcp/**
       - data/**
       - docs/**
-    root_files: true  # Include root-level files
+    root_files: true # Include root-level files
 
   development:
-    source: ".aiox-core/"
-    target: ".aiox-core/development/"
+    source: '.aiox-core/'
+    target: '.aiox-core/development/'
     files:
       - agents/**
       - tasks/**
@@ -33,15 +33,15 @@ mapping:
       - personas/**
 
   product:
-    source: ".aiox-core/"
-    target: ".aiox-core/product/"
+    source: '.aiox-core/'
+    target: '.aiox-core/product/'
     files:
       - cli/**
       - api/**
 
   infrastructure:
-    source: ".aiox-core/"
-    target: ".aiox-core/infrastructure/"
+    source: '.aiox-core/'
+    target: '.aiox-core/infrastructure/'
     files:
       - hooks/**
       - telemetry/**
@@ -51,16 +51,16 @@ mapping:
 import_transforms:
   patterns:
     # Old pattern → New pattern
-    - from: "../../registry/"
-      to: "../../core/registry/"
-    - from: "../../agents/"
-      to: "../../development/agents/"
-    - from: "../../tasks/"
-      to: "../../development/tasks/"
-    - from: "../../cli/"
-      to: "../../product/cli/"
-    - from: "../utils/"
-      to: "../core/utils/"
+    - from: '../../registry/'
+      to: '../../core/registry/'
+    - from: '../../agents/'
+      to: '../../development/agents/'
+    - from: '../../tasks/'
+      to: '../../development/tasks/'
+    - from: '../../cli/'
+      to: '../../product/cli/'
+    - from: '../utils/'
+      to: '../core/utils/'
 
   file_extensions:
     - .js
@@ -73,9 +73,9 @@ import_transforms:
 # Files to skip during migration
 exclusions:
   files:
-    - "*.md"           # Documentation stays in place
-    - "*.yaml"         # Config files handled separately
-    - "*.json"         # JSON configs handled separately
+    - '*.md' # Documentation stays in place
+    - '*.yaml' # Config files handled separately
+    - '*.json' # JSON configs handled separately
   directories:
     - node_modules
     - .git

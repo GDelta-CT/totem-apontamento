@@ -1,19 +1,23 @@
 # Ap
+
 ## Execution Modes
 
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -181,6 +185,7 @@ token_usage: ~1,000-3,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Parallelize independent operations; reuse atom results; implement early exits
 
 ---
@@ -207,6 +212,7 @@ This task provides instructions for applying fixes based on QA feedback and gate
 ## Purpose
 
 When a story receives QA feedback, this task helps developers:
+
 - Review QA gate findings systematically
 - Prioritize issues by severity
 - Apply fixes while maintaining code quality
@@ -215,14 +221,12 @@ When a story receives QA feedback, this task helps developers:
 ## Instructions
 
 1. **Load QA Gate Report**
-
    - If user provides a gate file path, load it directly
    - Otherwise, check the story file for `gate_file` reference in `qa_results` section
    - If no gate file specified, ask user for the QA gate file path
    - Load the QA gate YAML file from docs/qa/gates/
 
 2. **Review Findings**
-
    - Read through all issues identified in the QA gate report
    - Note the quality score and gate status
    - Categorize issues by type:
@@ -232,7 +236,6 @@ When a story receives QA feedback, this task helps developers:
    - Prioritize issues by severity and impact
 
 3. **Create Fix Plan**
-
    - For each BLOCKING issue:
      - Identify affected files
      - Determine root cause
@@ -259,7 +262,6 @@ When a story receives QA feedback, this task helps developers:
    - Check that quality score improvements are expected
 
 6. **Update Story Record**
-
    - Update the story's Dev Agent Record section:
      - Add completion note about QA fixes applied
      - Update file list with any new/modified files
@@ -267,7 +269,6 @@ When a story receives QA feedback, this task helps developers:
    - Do NOT modify the qa_results section (that's for QA reviewer)
 
 7. **Re-submission**
-
    - Confirm all BLOCKING issues resolved
    - Verify regression tests still pass
    - Inform user that story is ready for QA re-review
@@ -285,6 +286,7 @@ When a story receives QA feedback, this task helps developers:
 ## Common QA Issue Types
 
 ### Code Quality Issues
+
 - Linting errors or warnings
 - Code style inconsistencies
 - Missing error handling
@@ -292,18 +294,21 @@ When a story receives QA feedback, this task helps developers:
 - Complex functions needing refactoring
 
 ### Testing Issues
+
 - Missing test cases
 - Failing tests
 - Insufficient test coverage
 - Flaky tests
 
 ### Documentation Issues
+
 - Missing or incomplete comments
 - Outdated documentation
 - Missing or incorrect README updates
 - Incomplete story file updates
 
 ### Architecture Issues
+
 - Violations of coding standards
 - Improper dependency usage
 - Performance concerns
@@ -312,6 +317,7 @@ When a story receives QA feedback, this task helps developers:
 ## Exit Criteria
 
 This task is complete when:
+
 - ✅ All BLOCKING issues from QA gate are resolved
 - ✅ All tests pass (linting, unit, integration)
 - ✅ Story file is updated with changes

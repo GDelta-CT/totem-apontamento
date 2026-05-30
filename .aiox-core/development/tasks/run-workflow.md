@@ -260,7 +260,6 @@ ELSE (mode == "guided" or not specified):
 
 ---
 
-
 ### Action: `start`
 
 Initialize a new workflow execution.
@@ -280,6 +279,7 @@ Initialize a new workflow execution.
    - Writes state to `.aiox/{instance-id}-state.yaml`
 
 4. **Show step 1 instructions:**
+
    ```text
    === Workflow Started: {workflow_name} ===
    Instance: {instance_id}
@@ -309,6 +309,7 @@ Resume from current step.
    - On no: re-display current step instructions
 
 5. **Show next step instructions** with pre-populated agent/command:
+
    ```text
    Step {N}/{total}: {phase}
    Agent: @{agent}
@@ -351,6 +352,7 @@ Abort workflow execution.
 1. **Load state**
 2. **Set status to 'aborted'**
 3. **Generate cleanup notes:**
+
    ```text
    === Workflow Aborted: {workflow_name} ===
    Instance: {instance_id}
@@ -362,6 +364,7 @@ Abort workflow execution.
    State file preserved at: .aiox/{instance-id}-state.yaml
    (Delete manually if no longer needed)
    ```
+
 4. **Save final state**
 
 ## Multi-Session Continuity
@@ -380,6 +383,7 @@ The `generateHandoffContext()` method produces markdown suitable for inclusion i
 ## Output Format
 
 All actions produce structured output with:
+
 - Status header
 - Progress indicator
 - Current step details

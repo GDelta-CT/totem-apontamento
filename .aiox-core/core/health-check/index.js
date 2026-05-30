@@ -163,7 +163,7 @@ class HealthCheck {
     if (mode === 'quick') {
       // Quick mode: only CRITICAL and HIGH severity
       checks = checks.filter(
-        (c) => c.severity === CheckSeverity.CRITICAL || c.severity === CheckSeverity.HIGH,
+        (c) => c.severity === CheckSeverity.CRITICAL || c.severity === CheckSeverity.HIGH
       );
     }
 
@@ -237,7 +237,7 @@ class HealthCheck {
 
       const passedCount = results.filter((r) => r.status === CheckStatus.PASS).length;
       const failedCount = results.filter(
-        (r) => r.status === CheckStatus.FAIL || r.status === CheckStatus.ERROR,
+        (r) => r.status === CheckStatus.FAIL || r.status === CheckStatus.ERROR
       ).length;
       const warningCount = results.filter((r) => r.status === CheckStatus.WARNING).length;
 
@@ -311,7 +311,7 @@ class HealthCheck {
       .filter(
         (r) =>
           r.status === CheckStatus.WARNING ||
-          (r.severity === CheckSeverity.LOW && r.status !== CheckStatus.PASS),
+          (r.severity === CheckSeverity.LOW && r.status !== CheckStatus.PASS)
       )
       .map((r) => ({
         id: r.checkId,

@@ -18,8 +18,16 @@ const path = require('path');
  * Roman numeral to Arabic number map (I-X)
  */
 const ROMAN_TO_ARABIC = {
-  'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5,
-  'VI': 6, 'VII': 7, 'VIII': 8, 'IX': 9, 'X': 10,
+  I: 1,
+  II: 2,
+  III: 3,
+  IV: 4,
+  V: 5,
+  VI: 6,
+  VII: 7,
+  VIII: 8,
+  IX: 9,
+  X: 10,
 };
 
 /**
@@ -63,11 +71,12 @@ function parseConstitution(content) {
 
   for (let i = 0; i < articlePositions.length; i++) {
     const start = articlePositions[i].startIndex;
-    const end = i + 1 < articlePositions.length
-      ? articlePositions[i + 1].startIndex
-      : content.indexOf('## Governance', start) !== -1
-        ? content.indexOf('## Governance', start)
-        : content.length;
+    const end =
+      i + 1 < articlePositions.length
+        ? articlePositions[i + 1].startIndex
+        : content.indexOf('## Governance', start) !== -1
+          ? content.indexOf('## Governance', start)
+          : content.length;
 
     const articleContent = content.substring(start, end);
     const rules = extractRules(articleContent);
@@ -153,7 +162,8 @@ function generateConstitution(articles) {
  */
 function main(options = {}) {
   const projectRoot = options.projectRoot || path.resolve(__dirname, '..', '..', '..', '..');
-  const constitutionPath = options.constitutionPath || path.join(projectRoot, '.aiox-core', 'constitution.md');
+  const constitutionPath =
+    options.constitutionPath || path.join(projectRoot, '.aiox-core', 'constitution.md');
   const outputPath = options.outputPath || path.join(projectRoot, '.synapse', 'constitution');
 
   // Read source
@@ -201,4 +211,11 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { parseConstitution, extractRules, generateConstitution, cleanText, main, ROMAN_TO_ARABIC };
+module.exports = {
+  parseConstitution,
+  extractRules,
+  generateConstitution,
+  cleanText,
+  main,
+  ROMAN_TO_ARABIC,
+};

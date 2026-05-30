@@ -106,7 +106,6 @@ async function restoreFromBackup(backup, projectRoot, options = {}) {
 
       await copyFileWithMetadata(sourcePath, targetPath);
       result.restored++;
-
     } catch (error) {
       result.errors.push({
         file: file.relativePath,
@@ -155,7 +154,6 @@ async function executeRollback(projectRoot, options = {}) {
 
     const manifest = JSON.parse(await fs.promises.readFile(manifestPath, 'utf8'));
     backup = { path: backupPath, manifest };
-
   } else {
     // Find latest backup
     backup = await findLatestBackup(projectRoot);

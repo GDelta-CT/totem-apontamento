@@ -41,4 +41,5 @@ Use `*` prefix for commands:
 **I collaborate with:**
 
 ---
-*AIOX Agent - Synced from .aiox-core/development/agents/analyst.md*
+
+_AIOX Agent - Synced from .aiox-core/development/agents/analyst.md_

@@ -8,13 +8,13 @@
 # User profile mode (REQUIRED)
 # - bob: Simplified mode — only Bob visible, orchestrates internally
 # - advanced: Full access to all agents and commands
-user_profile: "bob"
+user_profile: 'bob'
 
 # Default AI model for agent operations
-default_model: "claude-sonnet"
+default_model: 'claude-sonnet'
 
 # Default language for agent responses
-default_language: "pt-BR"
+default_language: 'pt-BR'
 
 # CodeRabbit automated review integration
 coderabbit_integration: true

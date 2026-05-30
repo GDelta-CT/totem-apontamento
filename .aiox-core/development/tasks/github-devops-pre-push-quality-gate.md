@@ -11,16 +11,19 @@
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -127,7 +130,7 @@ constitutional_gate:
 
   bypass:
     allowed: false
-    reason: "Quality First is NON-NEGOTIABLE per Constitution"
+    reason: 'Quality First is NON-NEGOTIABLE per Constitution'
 ```
 
 ---
@@ -245,6 +248,7 @@ token_usage: ~3,000-10,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Break into smaller workflows; implement checkpointing; use async processing where possible
 
 ---
@@ -264,8 +268,8 @@ updated_at: 2025-11-17
 
 ---
 
-
 ## Prerequisites
+
 - Git repository with changes to push
 - package.json with npm scripts (gracefully handles missing scripts)
 - Repository context detected (run `aiox init` if needed)
@@ -297,6 +301,7 @@ git status --porcelain
 ```
 
 If output is not empty, fail with message:
+
 ```
 ❌ Uncommitted changes detected!
 
@@ -312,6 +317,7 @@ git diff --check
 ```
 
 If conflicts detected, fail with message:
+
 ```
 ❌ Merge conflicts detected!
 
@@ -333,7 +339,7 @@ function runNpmScript(scriptName, projectRoot) {
   try {
     execSync(`npm run ${scriptName}`, {
       cwd: projectRoot,
-      stdio: 'inherit'
+      stdio: 'inherit',
     });
     console.log(`✓ ${scriptName} PASSED`);
     return { passed: true };
@@ -381,7 +387,7 @@ function runCodeRabbitReview(projectRoot) {
       encoding: 'utf8',
       timeout: 900000, // 15 minutes
       stdio: 'pipe',
-      maxBuffer: 10 * 1024 * 1024 // 10MB buffer
+      maxBuffer: 10 * 1024 * 1024, // 10MB buffer
     });
 
     // Parse CodeRabbit output
@@ -479,6 +485,7 @@ function determineCodeRabbitGate(results) {
 ```
 
 **Usage in pre-push flow:**
+
 ```javascript
 const coderabbitResult = runCodeRabbitReview(process.cwd());
 
@@ -489,12 +496,14 @@ if (coderabbitResult.gateImpact === 'FAIL') {
 
 if (coderabbitResult.gateImpact === 'CONCERNS') {
   // Ask user for confirmation
-  const { confirm } = await inquirer.prompt([{
-    type: 'confirm',
-    name: 'confirm',
-    message: 'CodeRabbit found HIGH issues. Continue anyway?',
-    default: false
-  }]);
+  const { confirm } = await inquirer.prompt([
+    {
+      type: 'confirm',
+      name: 'confirm',
+      message: 'CodeRabbit found HIGH issues. Continue anyway?',
+      default: false,
+    },
+  ]);
 
   if (!confirm) {
     console.log('Push cancelled - please address HIGH issues');
@@ -520,7 +529,7 @@ function runSecurityScan(storyId, storyPath, projectRoot) {
     const results = {
       audit: runNpmAudit(projectRoot),
       eslint: runESLintSecurity(projectRoot),
-      secrets: runSecretDetection(projectRoot)
+      secrets: runSecretDetection(projectRoot),
     };
 
     // Determine gate impact
@@ -538,7 +547,7 @@ function runSecurityScan(storyId, storyPath, projectRoot) {
 function runNpmAudit(projectRoot) {
   try {
     const output = execSync('npm audit --audit-level=moderate --json', {
-      cwd: projectRoot
+      cwd: projectRoot,
     }).toString();
 
     const results = JSON.parse(output);
@@ -549,7 +558,7 @@ function runNpmAudit(projectRoot) {
       high: vulns.high || 0,
       moderate: vulns.moderate || 0,
       low: vulns.low || 0,
-      gate: vulns.critical > 0 ? 'FAIL' : (vulns.high > 0 ? 'CONCERNS' : 'PASS')
+      gate: vulns.critical > 0 ? 'FAIL' : vulns.high > 0 ? 'CONCERNS' : 'PASS',
     };
   } catch (error) {
     // npm audit exits with 1 if vulnerabilities found
@@ -562,7 +571,7 @@ function runNpmAudit(projectRoot) {
         high: vulns.high || 0,
         moderate: vulns.moderate || 0,
         low: vulns.low || 0,
-        gate: vulns.critical > 0 ? 'FAIL' : (vulns.high > 0 ? 'CONCERNS' : 'PASS')
+        gate: vulns.critical > 0 ? 'FAIL' : vulns.high > 0 ? 'CONCERNS' : 'PASS',
       };
     }
 
@@ -583,7 +592,7 @@ function runESLintSecurity(projectRoot) {
   try {
     execSync('npx eslint . --ext .js,.ts --config .eslintrc.security.json', {
       cwd: projectRoot,
-      stdio: 'pipe'
+      stdio: 'pipe',
     });
 
     return { gate: 'PASS', issues: 0 };
@@ -594,9 +603,9 @@ function runESLintSecurity(projectRoot) {
     const warningCount = (output.match(/warning/g) || []).length;
 
     return {
-      gate: errorCount > 0 ? 'FAIL' : (warningCount > 0 ? 'CONCERNS' : 'PASS'),
+      gate: errorCount > 0 ? 'FAIL' : warningCount > 0 ? 'CONCERNS' : 'PASS',
       errors: errorCount,
-      warnings: warningCount
+      warnings: warningCount,
     };
   }
 }
@@ -605,7 +614,7 @@ function runSecretDetection(projectRoot) {
   try {
     execSync('npx secretlint "**/*"', {
       cwd: projectRoot,
-      stdio: 'pipe'
+      stdio: 'pipe',
     });
 
     return { gate: 'PASS', secretsFound: 0 };
@@ -636,7 +645,10 @@ function determineSecurityGate(results) {
 > **Behavior:** Advisory only — NEVER blocks push. Auto-skips if code intelligence unavailable.
 
 ```javascript
-const { assessPrePushImpact, classifyRiskLevel } = require('.aiox-core/core/code-intel/helpers/devops-helper');
+const {
+  assessPrePushImpact,
+  classifyRiskLevel,
+} = require('.aiox-core/core/code-intel/helpers/devops-helper');
 
 async function runImpactAnalysis(changedFiles) {
   // Auto-skip if code intelligence unavailable
@@ -823,11 +835,12 @@ async function requestPushApproval(gateStatus) {
     {
       type: 'confirm',
       name: 'confirm',
-      message: gateStatus === 'PASS'
-        ? 'Proceed with push to remote?'
-        : 'Quality gate has CONCERNS. Proceed anyway?',
-      default: gateStatus === 'PASS'
-    }
+      message:
+        gateStatus === 'PASS'
+          ? 'Proceed with push to remote?'
+          : 'Quality gate has CONCERNS. Proceed anyway?',
+      default: gateStatus === 'PASS',
+    },
   ]);
 
   return confirm;
@@ -853,8 +866,10 @@ Called via `@github-devops *pre-push` command.
 - Detailed logging for troubleshooting
 
 ## Handoff
+
 next_agent: @devops
-next_command: *push
+next_command: \*push
 condition: All quality checks PASS
 alternatives:
-  - agent: @dev, command: *run-tests, condition: Quality checks FAIL, needs fixes
+
+- agent: @dev, command: \*run-tests, condition: Quality checks FAIL, needs fixes

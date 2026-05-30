@@ -37,6 +37,7 @@ def cluster_colors(colors, threshold=0.05):
 ```
 
 **Example:**
+
 ```
 Input: #0066CC, #0065CB, #0067CD, #0064CA
 HSL distance: All within 2% of each other
@@ -115,6 +116,7 @@ def generate_spacing_scale(spacing_values):
 ```
 
 **Example:**
+
 ```
 Input: 2, 4, 6, 8, 12, 16, 20, 24, 32
 Base unit: 4px
@@ -126,6 +128,7 @@ Output: xs=4, sm=8, md=16, lg=24, xl=32, 2xl=48, 3xl=64
 ## Consolidation Targets
 
 **Brad's Targets:**
+
 - Colors: >85% reduction
 - Buttons: >90% reduction
 - Spacing: >60% reduction

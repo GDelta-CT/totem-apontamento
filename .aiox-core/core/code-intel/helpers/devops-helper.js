@@ -75,7 +75,9 @@ async function generateImpactSummary(files) {
       if (tests) {
         testCoverage = tests;
       }
-    } catch { /* skip — partial result ok */ }
+    } catch {
+      /* skip — partial result ok */
+    }
 
     const riskLevel = classifyRiskLevel(impact.blastRadius);
     const fileCount = impact.references ? impact.references.length : 0;
@@ -141,9 +143,7 @@ function _formatImpactReport(impact, riskLevel) {
     `   Avg Complexity: ${impact.complexity ? impact.complexity.average.toFixed(1) : 'N/A'}`,
   ];
 
-  const topFiles = (impact.references || [])
-    .map((r) => r.file || r.path || 'unknown')
-    .slice(0, 10);
+  const topFiles = (impact.references || []).map((r) => r.file || r.path || 'unknown').slice(0, 10);
 
   if (topFiles.length > 0) {
     lines.push('   Top affected files:');

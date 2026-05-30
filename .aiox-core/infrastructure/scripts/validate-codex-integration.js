@@ -35,8 +35,7 @@ function countSkillFiles(skillsDir) {
   const entries = fs.readdirSync(skillsDir, { withFileTypes: true });
   return entries
     .filter((entry) => entry.isDirectory() && entry.name.startsWith('aiox-'))
-    .filter((entry) => fs.existsSync(path.join(skillsDir, entry.name, 'SKILL.md')))
-    .length;
+    .filter((entry) => fs.existsSync(path.join(skillsDir, entry.name, 'SKILL.md'))).length;
 }
 
 function validateCodexIntegration(options = {}) {
@@ -48,23 +47,28 @@ function validateCodexIntegration(options = {}) {
     instructionsFile: options.instructionsFile || path.join(projectRoot, 'AGENTS.md'),
     agentsDir: options.agentsDir || path.join(projectRoot, '.codex', 'agents'),
     skillsDir: options.skillsDir || path.join(projectRoot, '.codex', 'skills'),
-    sourceAgentsDir: options.sourceAgentsDir || path.join(projectRoot, '.aiox-core', 'development', 'agents'),
+    sourceAgentsDir:
+      options.sourceAgentsDir || path.join(projectRoot, '.aiox-core', 'development', 'agents'),
   };
   const errors = [];
   const warnings = [];
 
   if (!fs.existsSync(resolved.instructionsFile)) {
     warnings.push(
-      `Codex instructions file not found yet: ${path.relative(resolved.projectRoot, resolved.instructionsFile)}`,
+      `Codex instructions file not found yet: ${path.relative(resolved.projectRoot, resolved.instructionsFile)}`
     );
   }
 
   if (!fs.existsSync(resolved.agentsDir)) {
-    errors.push(`Missing Codex agents dir: ${path.relative(resolved.projectRoot, resolved.agentsDir)}`);
+    errors.push(
+      `Missing Codex agents dir: ${path.relative(resolved.projectRoot, resolved.agentsDir)}`
+    );
   }
 
   if (!fs.existsSync(resolved.skillsDir)) {
-    errors.push(`Missing Codex skills dir: ${path.relative(resolved.projectRoot, resolved.skillsDir)}`);
+    errors.push(
+      `Missing Codex skills dir: ${path.relative(resolved.projectRoot, resolved.skillsDir)}`
+    );
   }
 
   const sourceCount = countMarkdownFiles(resolved.sourceAgentsDir);

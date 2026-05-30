@@ -36,7 +36,9 @@ function createSearchCommand() {
     .option('--semantic', 'Force semantic search (requires OPENAI_API_KEY)')
     .option('--keyword', 'Force keyword search')
     .option('-v, --verbose', 'Show verbose output')
-    .addHelpText('after', `
+    .addHelpText(
+      'after',
+      `
 Examples:
   $ aiox workers search "json csv"
   $ aiox workers search "data transformation" --category=etl
@@ -44,7 +46,8 @@ Examples:
   $ aiox workers search "api" --format=json --limit=5
   $ aiox workers search "transform" --semantic
   $ aiox workers search "convert" --keyword
-`)
+`
+    )
     .action(executeSearch);
 
   return search;
@@ -67,7 +70,7 @@ async function executeSearch(query, options) {
 
     const trimmedQuery = query.trim();
     const limit = parseInt(options.limit, 10) || 10;
-    const tags = options.tags ? options.tags.split(',').map(t => t.trim()) : [];
+    const tags = options.tags ? options.tags.split(',').map((t) => t.trim()) : [];
 
     if (options.verbose) {
       console.log(`Searching for: "${trimmedQuery}"`);
@@ -138,7 +141,6 @@ async function executeSearch(query, options) {
     if (durationMs > 30000) {
       console.warn(`\nWarning: Search took ${(durationMs / 1000).toFixed(1)}s (target: < 30s)`);
     }
-
   } catch (error) {
     console.error(`Search error: ${error.message}`);
     if (options.verbose) {

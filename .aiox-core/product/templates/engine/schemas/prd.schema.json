@@ -89,7 +89,15 @@
         "properties": {
           "category": {
             "type": "string",
-            "enum": ["Performance", "Security", "Scalability", "Reliability", "Usability", "Accessibility", "Compliance"]
+            "enum": [
+              "Performance",
+              "Security",
+              "Scalability",
+              "Reliability",
+              "Usability",
+              "Accessibility",
+              "Compliance"
+            ]
           },
           "requirement": { "type": "string" },
           "metric": { "type": "string" }

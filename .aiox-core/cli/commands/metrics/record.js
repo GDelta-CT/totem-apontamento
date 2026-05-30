@@ -73,7 +73,8 @@ function createRecordCommand() {
         if (layerNum === 2) {
           if (options.coderabbit) {
             result.coderabbit = {
-              findingsCount: parseInt(options.crCritical, 10) +
+              findingsCount:
+                parseInt(options.crCritical, 10) +
                 parseInt(options.crHigh, 10) +
                 parseInt(options.crMedium, 10) +
                 parseInt(options.crLow, 10),

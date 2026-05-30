@@ -15,7 +15,9 @@ const path = require('path');
 const os = require('os');
 
 let input = '';
-process.stdin.on('data', (chunk) => { input += chunk; });
+process.stdin.on('data', (chunk) => {
+  input += chunk;
+});
 
 process.stdin.on('end', () => {
   try {
@@ -62,7 +64,9 @@ function buildStatusLine(data) {
     const totalTokens = totalIn + totalOut;
     const inStr = fmtTokens(totalIn);
     const outStr = fmtTokens(totalOut);
-    parts.push(`${bar} ${pctColor}${Math.round(usedPct)}%${reset} ${white}${fmtTokens(totalTokens)}${reset} ${dim}(\u2b07${inStr}/\u2b06${outStr})${reset}`);
+    parts.push(
+      `${bar} ${pctColor}${Math.round(usedPct)}%${reset} ${white}${fmtTokens(totalTokens)}${reset} ${dim}(\u2b07${inStr}/\u2b06${outStr})${reset}`
+    );
   }
 
   // 4. Time
@@ -92,7 +96,9 @@ function buildStatusLine(data) {
   const filesChanged = gitInfo.filesChanged;
   if (linesAdded > 0 || linesRemoved > 0 || filesChanged > 0) {
     const fc = filesChanged > 0 ? `${filesChanged}f ` : '';
-    parts.push(`\ud83d\udcdd ${white}${fc}${reset}${green}+${linesAdded}${reset} ${red}-${linesRemoved}${reset}`);
+    parts.push(
+      `\ud83d\udcdd ${white}${fc}${reset}${green}+${linesAdded}${reset} ${red}-${linesRemoved}${reset}`
+    );
   }
 
   // 9. Message count (from transcript JSONL)
@@ -150,7 +156,7 @@ function simpleHash(str) {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
+    hash = (hash << 5) - hash + char;
     hash |= 0;
   }
   return Math.abs(hash).toString(16);
@@ -159,12 +165,21 @@ function simpleHash(str) {
 function getGitInfo() {
   const result = { project: '', branch: '', filesChanged: 0 };
   try {
-    const toplevel = execSync('git rev-parse --show-toplevel 2>/dev/null', { encoding: 'utf8', timeout: 3000 }).trim();
+    const toplevel = execSync('git rev-parse --show-toplevel 2>/dev/null', {
+      encoding: 'utf8',
+      timeout: 3000,
+    }).trim();
     result.project = path.basename(toplevel);
-    result.branch = execSync('git rev-parse --abbrev-ref HEAD 2>/dev/null', { encoding: 'utf8', timeout: 3000 }).trim();
-    const status = execSync('git status --porcelain 2>/dev/null', { encoding: 'utf8', timeout: 3000 }).trim();
+    result.branch = execSync('git rev-parse --abbrev-ref HEAD 2>/dev/null', {
+      encoding: 'utf8',
+      timeout: 3000,
+    }).trim();
+    const status = execSync('git status --porcelain 2>/dev/null', {
+      encoding: 'utf8',
+      timeout: 3000,
+    }).trim();
     if (status) {
-      result.filesChanged = status.split('\n').filter(l => l.trim()).length;
+      result.filesChanged = status.split('\n').filter((l) => l.trim()).length;
     }
   } catch {}
   return result;

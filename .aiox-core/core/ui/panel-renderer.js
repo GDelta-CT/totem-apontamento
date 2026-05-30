@@ -137,9 +137,7 @@ class PanelRenderer {
     };
 
     return {
-      story: state.elapsed.story_start
-        ? formatDuration(now - state.elapsed.story_start)
-        : '--',
+      story: state.elapsed.story_start ? formatDuration(now - state.elapsed.story_start) : '--',
       session: state.elapsed.session_start
         ? formatDuration(now - state.elapsed.session_start)
         : '--',
@@ -210,16 +208,16 @@ class PanelRenderer {
       .map((t) => t.agent)
       .slice(0, 3)
       .join(', ');
-    const termStr = termCount > 0
-      ? `${termCount} active (${termAgents})`
-      : chalk.gray('none');
+    const termStr = termCount > 0 ? `${termCount} active (${termAgents})` : chalk.gray('none');
     lines.push(this.contentLine(`Terminals: ${termStr}`, w));
 
     // Elapsed Time
-    lines.push(this.contentLine(
-      `Elapsed:  ${chalk.cyan(elapsed.story)} (story) | ${chalk.cyan(elapsed.session)} (session)`,
-      w,
-    ));
+    lines.push(
+      this.contentLine(
+        `Elapsed:  ${chalk.cyan(elapsed.story)} (story) | ${chalk.cyan(elapsed.session)} (session)`,
+        w
+      )
+    );
 
     // Errors (if any)
     if (state.errors.length > 0) {
@@ -259,15 +257,16 @@ class PanelRenderer {
     const agentId = state.current_agent.id || '--';
     const agentName = state.current_agent.name || '';
     const agentTask = state.current_agent.task || 'idle';
-    lines.push(this.contentLine(
-      `  ${chalk.yellow(agentId)} ${agentName ? `(${agentName})` : ''} ${agentTask}`,
-      w,
-    ));
+    lines.push(
+      this.contentLine(
+        `  ${chalk.yellow(agentId)} ${agentName ? `(${agentName})` : ''} ${agentTask}`,
+        w
+      )
+    );
     if (state.current_agent.reason) {
-      lines.push(this.contentLine(
-        `  ${chalk.gray(`Por que ${agentId}?`)} ${state.current_agent.reason}`,
-        w,
-      ));
+      lines.push(
+        this.contentLine(`  ${chalk.gray(`Por que ${agentId}?`)} ${state.current_agent.reason}`, w)
+      );
     }
     lines.push(this.contentLine('', w));
 
@@ -276,10 +275,12 @@ class PanelRenderer {
     if (state.active_terminals.list.length > 0) {
       state.active_terminals.list.slice(0, 4).forEach((terminal) => {
         const pidStr = terminal.pid ? `(PID ${terminal.pid})` : '';
-        lines.push(this.contentLine(
-          `  ${STATUS.bullet} ${chalk.yellow(terminal.agent.padEnd(12))} ${chalk.gray(pidStr)} — ${terminal.task}`,
-          w,
-        ));
+        lines.push(
+          this.contentLine(
+            `  ${STATUS.bullet} ${chalk.yellow(terminal.agent.padEnd(12))} ${chalk.gray(pidStr)} — ${terminal.task}`,
+            w
+          )
+        );
       });
     } else {
       lines.push(this.contentLine(`  ${chalk.gray('No active terminals')}`, w));
@@ -288,20 +289,24 @@ class PanelRenderer {
 
     // Elapsed Time section
     lines.push(this.contentLine(chalk.bold('Elapsed:'), w));
-    lines.push(this.contentLine(
-      `  Story: ${chalk.cyan(elapsed.story)} | Session: ${chalk.cyan(elapsed.session)}`,
-      w,
-    ));
+    lines.push(
+      this.contentLine(
+        `  Story: ${chalk.cyan(elapsed.story)} | Session: ${chalk.cyan(elapsed.session)}`,
+        w
+      )
+    );
     lines.push(this.contentLine('', w));
 
     // Trade-offs section (if any)
     if (state.tradeoffs.length > 0) {
       lines.push(this.contentLine(chalk.bold('Trade-offs considerados:'), w));
       state.tradeoffs.slice(-3).forEach((tradeoff) => {
-        lines.push(this.contentLine(
-          `  ${STATUS.bullet} ${tradeoff.choice}: ${chalk.green(tradeoff.selected)} (${tradeoff.reason})`,
-          w,
-        ));
+        lines.push(
+          this.contentLine(
+            `  ${STATUS.bullet} ${tradeoff.choice}: ${chalk.green(tradeoff.selected)} (${tradeoff.reason})`,
+            w
+          )
+        );
       });
       lines.push(this.contentLine('', w));
     }
@@ -319,7 +324,9 @@ class PanelRenderer {
       lines.push(this.separator(w));
       lines.push(this.contentLine(chalk.bold.red('Errors:'), w));
       state.errors.slice(-2).forEach((error) => {
-        lines.push(this.contentLine(`  ${STATUS.error} ${chalk.red(error.message.slice(0, 45))}`, w));
+        lines.push(
+          this.contentLine(`  ${STATUS.error} ${chalk.red(error.message.slice(0, 45))}`, w)
+        );
       });
     }
 

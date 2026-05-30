@@ -53,7 +53,7 @@ async function getEmbedding(text) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
         model: 'text-embedding-3-small',
@@ -68,7 +68,9 @@ async function getEmbedding(text) {
       // Handle rate limiting with Retry-After header
       if (response.status === 429) {
         const retryAfter = response.headers.get('Retry-After');
-        throw new Error(`OpenAI rate limit exceeded. Retry after ${retryAfter || 'a few'} seconds.`);
+        throw new Error(
+          `OpenAI rate limit exceeded. Retry after ${retryAfter || 'a few'} seconds.`
+        );
       }
       const error = await response.json().catch(() => ({ error: { message: 'Unknown error' } }));
       throw new Error(`OpenAI API error: ${error.error?.message || response.statusText}`);
@@ -119,14 +121,14 @@ async function loadWorkerEmbeddings() {
   const now = Date.now();
 
   // Return cached if valid
-  if (embeddingsCache && (now - embeddingsCacheTimestamp) < EMBEDDINGS_CACHE_TTL) {
+  if (embeddingsCache && now - embeddingsCacheTimestamp < EMBEDDINGS_CACHE_TTL) {
     return embeddingsCache;
   }
 
   // Check for pre-computed embeddings file
   const embeddingsPath = path.join(
     process.cwd(),
-    '.aiox-core/core/registry/worker-embeddings.json',
+    '.aiox-core/core/registry/worker-embeddings.json'
   );
 
   if (fs.existsSync(embeddingsPath)) {
@@ -185,7 +187,9 @@ function buildSearchText(worker) {
     ...(worker.tags || []),
     ...(worker.inputs || []),
     ...(worker.outputs || []),
-  ].filter(Boolean).join(' ');
+  ]
+    .filter(Boolean)
+    .join(' ');
 }
 
 /**
@@ -260,7 +264,7 @@ async function precomputeEmbeddings() {
 
     // Rate limiting - OpenAI Free tier allows 100 RPM, so 600ms delay
     // Configurable via RATE_LIMIT_DELAY_MS environment variable
-    await new Promise(resolve => setTimeout(resolve, RATE_LIMIT_DELAY_MS));
+    await new Promise((resolve) => setTimeout(resolve, RATE_LIMIT_DELAY_MS));
   }
 
   console.log(`\nEmbeddings computed: ${computed}, failed: ${failed}`);
@@ -268,7 +272,7 @@ async function precomputeEmbeddings() {
   // Save to file
   const embeddingsPath = path.join(
     process.cwd(),
-    '.aiox-core/core/registry/worker-embeddings.json',
+    '.aiox-core/core/registry/worker-embeddings.json'
   );
 
   const data = {

@@ -38,7 +38,7 @@ async function run(context) {
   }
 
   const skills = entries.filter(
-    (d) => d.isDirectory() && fs.existsSync(path.join(skillsDir, d.name, 'SKILL.md')),
+    (d) => d.isDirectory() && fs.existsSync(path.join(skillsDir, d.name, 'SKILL.md'))
   );
 
   const count = skills.length;

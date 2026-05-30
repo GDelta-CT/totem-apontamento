@@ -33,7 +33,7 @@ async function calculateChecksum(filePath) {
     const hash = crypto.createHash('md5');
     const stream = fs.createReadStream(filePath);
 
-    stream.on('data', data => hash.update(data));
+    stream.on('data', (data) => hash.update(data));
     stream.on('end', () => resolve(hash.digest('hex')));
     stream.on('error', reject);
   });
@@ -129,7 +129,9 @@ async function createBackup(projectRoot, options = {}) {
 
   // Check if backup already exists
   if (fs.existsSync(backupDir)) {
-    throw new Error(`Backup directory ${backupDirName} already exists. Remove it or use a different name.`);
+    throw new Error(
+      `Backup directory ${backupDirName} already exists. Remove it or use a different name.`
+    );
   }
 
   onProgress({ phase: 'start', message: 'Creating backup directory...' });
@@ -150,7 +152,11 @@ async function createBackup(projectRoot, options = {}) {
     checksums: {},
   };
 
-  onProgress({ phase: 'copying', message: `Backing up ${files.length} files...`, total: files.length });
+  onProgress({
+    phase: 'copying',
+    message: `Backing up ${files.length} files...`,
+    total: files.length,
+  });
 
   // Copy each file
   for (let i = 0; i < files.length; i++) {
@@ -170,17 +176,17 @@ async function createBackup(projectRoot, options = {}) {
     manifest.totalSize += result.size;
 
     if (verbose) {
-      onProgress({ phase: 'file', message: `  → ${relativePath}`, current: i + 1, total: files.length });
+      onProgress({
+        phase: 'file',
+        message: `  → ${relativePath}`,
+        current: i + 1,
+        total: files.length,
+      });
     }
   }
 
   // Backup config files if they exist
-  const configFiles = [
-    'aiox.config.js',
-    'aiox.config.json',
-    '.aiox/config.yaml',
-    '.mcp.json',
-  ];
+  const configFiles = ['aiox.config.js', 'aiox.config.json', '.aiox/config.yaml', '.mcp.json'];
 
   for (const configFile of configFiles) {
     const srcPath = path.join(projectRoot, configFile);
@@ -274,8 +280,8 @@ async function findLatestBackup(projectRoot) {
   const entries = await fs.promises.readdir(projectRoot, { withFileTypes: true });
 
   const backups = entries
-    .filter(entry => entry.isDirectory() && entry.name.startsWith('.aiox-backup-'))
-    .map(entry => ({
+    .filter((entry) => entry.isDirectory() && entry.name.startsWith('.aiox-backup-'))
+    .map((entry) => ({
       name: entry.name,
       path: path.join(projectRoot, entry.name),
       date: entry.name.replace('.aiox-backup-', ''),

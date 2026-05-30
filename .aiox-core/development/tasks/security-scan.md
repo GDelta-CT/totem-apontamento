@@ -19,16 +19,19 @@ Executa análise estática de segurança (SAST) no código do projeto/story. Aut
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Experienced developers, simple tasks, time-sensitive work
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions, collaborative work
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Questionnaire before execution
 - Zero ambiguity execution
@@ -112,12 +115,14 @@ pre-conditions:
 **Purpose:** Ensure all required security scanning tools are installed and configured
 
 **Actions:**
+
 1. Check for npm audit availability
 2. Install ESLint security plugins if missing
 3. Configure ESLint security rules
 4. Verify secretlint availability (optional)
 
 **Validation:**
+
 - npm audit command available
 - ESLint security plugins installed
 - Configuration files created
@@ -129,12 +134,14 @@ pre-conditions:
 **Purpose:** Scan npm dependencies for known vulnerabilities
 
 **Actions:**
+
 1. Execute `npm audit --audit-level=moderate --json`
 2. Parse audit results
 3. Categorize vulnerabilities by severity
 4. Determine gate impact
 
 **Validation:**
+
 - Audit report generated
 - Vulnerabilities categorized correctly
 - Gate impact calculated
@@ -146,12 +153,14 @@ pre-conditions:
 **Purpose:** Analyze code for insecure patterns using ESLint security plugins
 
 **Actions:**
+
 1. Run ESLint with security plugins
 2. Parse ESLint results
 3. Identify security issues by severity
 4. Determine gate impact
 
 **Validation:**
+
 - ESLint scan completed
 - Security issues identified
 - Gate impact calculated
@@ -163,12 +172,14 @@ pre-conditions:
 **Purpose:** Detect exposed secrets, API keys, and passwords in codebase
 
 **Actions:**
+
 1. Run secretlint scan
 2. Parse secret detection results
 3. Categorize findings
 4. Determine gate impact
 
 **Validation:**
+
 - Secret scan completed
 - Secrets identified (if any)
 - Gate impact calculated
@@ -180,12 +191,14 @@ pre-conditions:
 **Purpose:** Create comprehensive security scan report
 
 **Actions:**
+
 1. Aggregate all scan results
 2. Calculate overall risk score
 3. Generate markdown report
 4. Save report to `.ai/security/` directory
 
 **Validation:**
+
 - Report file created
 - All sections included
 - Gate decision documented
@@ -312,6 +325,7 @@ token_usage: ~2,000-8,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Iterative analysis with depth limits
 - Cache intermediate results
 - Batch similar operations
@@ -363,6 +377,7 @@ This task requires the following configuration keys from `core-config.yaml`:
 - **`utils.registry`**: Utility registry location for framework utilities
 
 **Loading Config:**
+
 ```javascript
 const yaml = require('js-yaml');
 const fs = require('fs');
@@ -391,9 +406,9 @@ function ensureSecurityTools(projectRoot) {
   const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 
   const requiredDevDeps = {
-    'eslint': '^8.0.0',
+    eslint: '^8.0.0',
     'eslint-plugin-security': '^1.7.1',
-    'eslint-plugin-no-secrets': '^0.8.9'
+    'eslint-plugin-no-secrets': '^0.8.9',
   };
 
   let needsInstall = false;
@@ -409,7 +424,7 @@ function ensureSecurityTools(projectRoot) {
   if (needsInstall) {
     execSync('npm install --save-dev eslint eslint-plugin-security eslint-plugin-no-secrets', {
       cwd: projectRoot,
-      stdio: 'inherit'
+      stdio: 'inherit',
     });
   }
 
@@ -433,6 +448,7 @@ npm audit --audit-level=moderate --json > audit-report.json
 ```
 
 **Análise de Resultados**:
+
 ```javascript
 function analyzeAuditResults(auditJson) {
   const results = JSON.parse(auditJson);
@@ -443,7 +459,7 @@ function analyzeAuditResults(auditJson) {
     high: 0,
     moderate: 0,
     low: 0,
-    info: 0
+    info: 0,
   };
 
   for (const [pkg, vuln] of Object.entries(vulnerabilities)) {
@@ -456,8 +472,7 @@ function analyzeAuditResults(auditJson) {
   return {
     summary,
     details: vulnerabilities,
-    gateImpact: summary.critical > 0 ? 'FAIL' :
-                summary.high > 0 ? 'CONCERNS' : 'PASS'
+    gateImpact: summary.critical > 0 ? 'FAIL' : summary.high > 0 ? 'CONCERNS' : 'PASS',
   };
 }
 ```
@@ -473,6 +488,7 @@ npx eslint . --ext .js,.ts \
 ```
 
 **Regras Verificadas**:
+
 - `security/detect-object-injection` - Injeção de propriedades
 - `security/detect-eval-with-expression` - Uso de eval()
 - `security/detect-child-process` - Execução de comandos
@@ -482,6 +498,7 @@ npx eslint . --ext .js,.ts \
 - `no-secrets/no-secrets` - API keys, tokens, passwords
 
 **Análise de Resultados**:
+
 ```javascript
 function analyzeESLintResults(eslintJson) {
   const results = JSON.parse(eslintJson);
@@ -492,16 +509,17 @@ function analyzeESLintResults(eslintJson) {
 
   for (const file of results) {
     for (const message of file.messages) {
-      if (message.ruleId && message.ruleId.startsWith('security/') ||
-          message.ruleId === 'no-secrets/no-secrets') {
-
+      if (
+        (message.ruleId && message.ruleId.startsWith('security/')) ||
+        message.ruleId === 'no-secrets/no-secrets'
+      ) {
         issues.push({
           file: file.filePath,
           line: message.line,
           column: message.column,
           rule: message.ruleId,
           severity: message.severity === 2 ? 'error' : 'warning',
-          message: message.message
+          message: message.message,
         });
 
         if (message.severity === 2) errorCount++;
@@ -514,8 +532,7 @@ function analyzeESLintResults(eslintJson) {
     issues,
     errorCount,
     warningCount,
-    gateImpact: errorCount > 0 ? 'FAIL' :
-                warningCount > 0 ? 'CONCERNS' : 'PASS'
+    gateImpact: errorCount > 0 ? 'FAIL' : warningCount > 0 ? 'CONCERNS' : 'PASS',
   };
 }
 ```
@@ -530,6 +547,7 @@ npx secretlint "**/*" \
 ```
 
 **Análise de Resultados**:
+
 ```javascript
 function analyzeSecretResults(secretsJson) {
   const results = JSON.parse(secretsJson);
@@ -538,12 +556,12 @@ function analyzeSecretResults(secretsJson) {
 
   return {
     secretsFound: secrets.length,
-    secrets: secrets.map(s => ({
+    secrets: secrets.map((s) => ({
       file: s.filePath,
       type: s.ruleId,
-      message: s.message
+      message: s.message,
     })),
-    gateImpact: secrets.length > 0 ? 'FAIL' : 'PASS'
+    gateImpact: secrets.length > 0 ? 'FAIL' : 'PASS',
   };
 }
 ```
@@ -573,11 +591,11 @@ Cria arquivo em: `qa.qaLocation/security/{epic}.{story}-sast-{YYYYMMDD}.md`
 
 ## Executive Summary
 
-| Category | Critical | High | Medium | Low | Status |
-|----------|----------|------|--------|-----|--------|
-| Dependencies | {count} | {count} | {count} | {count} | {PASS/FAIL} |
-| Code Patterns | {count} | {count} | {count} | {count} | {PASS/FAIL} |
-| Secrets | {count} | - | - | - | {PASS/FAIL} |
+| Category      | Critical | High    | Medium  | Low     | Status      |
+| ------------- | -------- | ------- | ------- | ------- | ----------- |
+| Dependencies  | {count}  | {count} | {count} | {count} | {PASS/FAIL} |
+| Code Patterns | {count}  | {count} | {count} | {count} | {PASS/FAIL} |
+| Secrets       | {count}  | -       | -       | -       | {PASS/FAIL} |
 
 **Gate Impact**: {FAIL|CONCERNS|PASS}
 
@@ -586,11 +604,12 @@ Cria arquivo em: `qa.qaLocation/security/{epic}.{story}-sast-{YYYYMMDD}.md`
 ## 1. Dependency Vulnerabilities (npm audit)
 
 {if vulnerabilities found}
+
 ### Critical Vulnerabilities
 
-| Package | Version | CVE | Severity | Fix Available |
-|---------|---------|-----|----------|---------------|
-| lodash | 4.17.15 | CVE-2020-8203 | CRITICAL | Yes (4.17.21) |
+| Package | Version | CVE           | Severity | Fix Available |
+| ------- | ------- | ------------- | -------- | ------------- |
+| lodash  | 4.17.15 | CVE-2020-8203 | CRITICAL | Yes (4.17.21) |
 
 ### Recommendations
 
@@ -607,18 +626,19 @@ Cria arquivo em: `qa.qaLocation/security/{epic}.{story}-sast-{YYYYMMDD}.md`
 ## 2. Code Security Issues (ESLint + Plugins)
 
 {if issues found}
+
 ### High Severity
 
-| File | Line | Rule | Issue | Recommendation |
-|------|------|------|-------|----------------|
-| src/api.js | 42 | security/detect-eval-with-expression | Use of eval() | Refactor to JSON.parse() or safe alternatives |
-| src/db.js | 128 | security/detect-object-injection | Object injection risk | Validate user input before property access |
+| File       | Line | Rule                                 | Issue                 | Recommendation                                |
+| ---------- | ---- | ------------------------------------ | --------------------- | --------------------------------------------- |
+| src/api.js | 42   | security/detect-eval-with-expression | Use of eval()         | Refactor to JSON.parse() or safe alternatives |
+| src/db.js  | 128  | security/detect-object-injection     | Object injection risk | Validate user input before property access    |
 
 ### Medium Severity
 
-| File | Line | Rule | Issue | Recommendation |
-|------|------|------|-------|----------------|
-| lib/utils.js | 67 | security/detect-non-literal-require | Dynamic require() | Use static imports or whitelist |
+| File         | Line | Rule                                | Issue             | Recommendation                  |
+| ------------ | ---- | ----------------------------------- | ----------------- | ------------------------------- |
+| lib/utils.js | 67   | security/detect-non-literal-require | Dynamic require() | Use static imports or whitelist |
 
 ### Recommendations
 
@@ -635,12 +655,13 @@ Cria arquivo em: `qa.qaLocation/security/{epic}.{story}-sast-{YYYYMMDD}.md`
 ## 3. Secrets Detection (secretlint)
 
 {if secrets found}
+
 ### ⚠️ SECRETS DETECTED - ACTION REQUIRED
 
-| File | Secret Type | Action |
-|------|-------------|--------|
-| .env.example | API Key Pattern | Verify it's example only (not real key) |
-| config/db.js | Password Pattern | Move to environment variables |
+| File         | Secret Type      | Action                                  |
+| ------------ | ---------------- | --------------------------------------- |
+| .env.example | API Key Pattern  | Verify it's example only (not real key) |
+| config/db.js | Password Pattern | Move to environment variables           |
 
 ### Recommendations
 
@@ -658,12 +679,13 @@ Cria arquivo em: `qa.qaLocation/security/{epic}.{story}-sast-{YYYYMMDD}.md`
 ## 4. Advanced Analysis (Semgrep) [OPTIONAL]
 
 {if semgrep ran}
+
 ### Findings
 
-| Rule | Severity | Count | Description |
-|------|----------|-------|-------------|
-| sql-injection | ERROR | 2 | Potential SQL injection vectors |
-| xss-risk | WARNING | 1 | Unescaped user input in HTML |
+| Rule          | Severity | Count | Description                     |
+| ------------- | -------- | ----- | ------------------------------- |
+| sql-injection | ERROR    | 2     | Potential SQL injection vectors |
+| xss-risk      | WARNING  | 1     | Unescaped user input in HTML    |
 
 {else}
 ℹ️ Semgrep not available - skipped advanced analysis.
@@ -677,6 +699,7 @@ Cria arquivo em: `qa.qaLocation/security/{epic}.{story}-sast-{YYYYMMDD}.md`
 
 **Reasoning**:
 {if FAIL}
+
 - ❌ {count} CRITICAL dependency vulnerabilities found
 - ❌ {count} secrets detected in codebase
 - ❌ {count} high-severity code security issues
@@ -684,12 +707,14 @@ Cria arquivo em: `qa.qaLocation/security/{epic}.{story}-sast-{YYYYMMDD}.md`
 **Action Required**: Address all CRITICAL and HIGH issues before merging.
 
 {else if CONCERNS}
+
 - ⚠️ {count} HIGH dependency vulnerabilities found
 - ⚠️ {count} medium-severity code security issues
 
 **Recommendation**: Address issues before production deployment.
 
 {else}
+
 - ✅ No critical or high-severity vulnerabilities found
 - ✅ Codebase passes security standards
 
@@ -701,17 +726,21 @@ Cria arquivo em: `qa.qaLocation/security/{epic}.{story}-sast-{YYYYMMDD}.md`
 ## Next Steps
 
 ### Immediate Actions (Block Merge)
+
 {immediate actions list}
 
 ### Short-term Actions (Before Production)
+
 {short-term actions list}
 
 ### Long-term Actions (Technical Debt)
+
 {long-term actions list}
 
 ---
 
 **Scan Tool Versions**:
+
 - npm: v{version}
 - ESLint: v{version}
 - eslint-plugin-security: v{version}
@@ -740,6 +769,7 @@ Quando `@qa *review {story}` é executado, **automaticamente** chama `security-s
 **C. Security Scan (SAST) - AUTOMATIC**
 
 Execute security-scan.md task:
+
 - Run npm audit
 - Run ESLint security plugins
 - Run secret detection
@@ -747,6 +777,7 @@ Execute security-scan.md task:
 - Update gate decision based on findings
 
 Gate Impact Rules:
+
 - Any CRITICAL vulnerability → Gate = FAIL
 - Any secret detected → Gate = FAIL
 - Any HIGH vulnerability → Gate = CONCERNS

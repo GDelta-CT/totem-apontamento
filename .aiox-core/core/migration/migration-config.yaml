@@ -1,38 +1,38 @@
 # AIOX Migration Configuration
 # Story 2.14 - Migration Script v2.0 → v4.0.4
 
-version: "1.0.0"
-story: "2.14"
+version: '1.0.0'
+story: '2.14'
 
 # Supported migration paths
 migrations:
-  - from: "2.0"
-    to: "2.1"
-    description: "Migrate from flat to modular structure"
-    status: "supported"
+  - from: '2.0'
+    to: '2.1'
+    description: 'Migrate from flat to modular structure'
+    status: 'supported'
 
 # Backup configuration
 backup:
-  prefix: ".aiox-backup-"
-  format: "YYYY-MM-DD"
+  prefix: '.aiox-backup-'
+  format: 'YYYY-MM-DD'
   include:
-    - ".aiox-core/**"
-    - "aiox.config.js"
-    - "aiox.config.json"
-    - ".aiox/config.yaml"
-    - ".mcp.json"
+    - '.aiox-core/**'
+    - 'aiox.config.js'
+    - 'aiox.config.json'
+    - '.aiox/config.yaml'
+    - '.mcp.json'
   exclude:
-    - "node_modules/**"
-    - ".git/**"
-    - "*.log"
+    - 'node_modules/**'
+    - '.git/**'
+    - '*.log'
   verification:
-    algorithm: "md5"
+    algorithm: 'md5'
     parallel: true
 
 # Module configuration for v4.0.4
 modules:
   core:
-    description: "Core framework utilities and runtime"
+    description: 'Core framework utilities and runtime'
     directories:
       - registry
       - quality-gates
@@ -45,7 +45,7 @@ modules:
       - data
       - docs
   development:
-    description: "Development tools and workflows"
+    description: 'Development tools and workflows'
     directories:
       - agents
       - tasks
@@ -54,12 +54,12 @@ modules:
       - scripts
       - personas
   product:
-    description: "Product interfaces and APIs"
+    description: 'Product interfaces and APIs'
     directories:
       - cli
       - api
   infrastructure:
-    description: "Infrastructure and deployment"
+    description: 'Infrastructure and deployment'
     directories:
       - hooks
       - telemetry
@@ -72,8 +72,8 @@ validation:
   lint: true
   tests: true
   timeout:
-    lint: 60000      # 1 minute
-    tests: 300000    # 5 minutes
+    lint: 60000 # 1 minute
+    tests: 300000 # 5 minutes
 
 # Safety settings
 safety:

@@ -107,7 +107,7 @@ class EnvironmentVarsCheck extends BaseCheck {
             missingRecommended,
             aioxVars,
           },
-        },
+        }
       );
     }
 

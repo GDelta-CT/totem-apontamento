@@ -51,13 +51,15 @@ class L1GlobalProcessor extends LayerProcessor {
     const globalDomain = this._findDomain(manifest, 'GLOBAL');
     const contextDomain = this._findDomain(manifest, 'CONTEXT');
 
-    const globalFile = globalDomain && globalDomain.file
-      ? path.join(synapsePath, globalDomain.file)
-      : path.join(synapsePath, 'global');
+    const globalFile =
+      globalDomain && globalDomain.file
+        ? path.join(synapsePath, globalDomain.file)
+        : path.join(synapsePath, 'global');
 
-    const contextFile = contextDomain && contextDomain.file
-      ? path.join(synapsePath, contextDomain.file)
-      : path.join(synapsePath, 'context');
+    const contextFile =
+      contextDomain && contextDomain.file
+        ? path.join(synapsePath, contextDomain.file)
+        : path.join(synapsePath, 'context');
 
     // Load rules from both domain files
     const globalRules = loadDomainFile(globalFile);
@@ -93,8 +95,9 @@ class L1GlobalProcessor extends LayerProcessor {
    * @private
    */
   _findDomain(manifest, name) {
-    const key = Object.keys(manifest.domains || {})
-      .find(k => k.toUpperCase() === name.toUpperCase());
+    const key = Object.keys(manifest.domains || {}).find(
+      (k) => k.toUpperCase() === name.toUpperCase()
+    );
     return key ? manifest.domains[key] : null;
   }
 }

@@ -114,7 +114,6 @@ class ClickUpAdapter extends PMAdapter {
           error: `ClickUp task not found for story ${story.id}. Use createStory() to create it first.`,
         };
       }
-
     } catch (error) {
       console.error('❌ Error syncing story to ClickUp:', error);
       return {
@@ -156,9 +155,8 @@ class ClickUpAdapter extends PMAdapter {
 
       return {
         success: true,
-        updates: null,  // No updates for now
+        updates: null, // No updates for now
       };
-
     } catch (error) {
       console.error('❌ Error pulling story from ClickUp:', error);
       return {
@@ -212,7 +210,6 @@ class ClickUpAdapter extends PMAdapter {
         success: true,
         url: `https://app.clickup.com/t/${result.id}`,
       };
-
     } catch (error) {
       console.error('❌ Error creating story in ClickUp:', error);
       return {
@@ -247,7 +244,6 @@ class ClickUpAdapter extends PMAdapter {
       console.log(`✅ Story ${storyId} status updated to ${status}`);
 
       return { success: true };
-
     } catch (error) {
       console.error('❌ Error updating story status:', error);
       return {
@@ -283,7 +279,6 @@ class ClickUpAdapter extends PMAdapter {
       console.log('✅ ClickUp connection successful');
 
       return { success: true };
-
     } catch (error) {
       console.error('❌ ClickUp connection failed:', error);
       return {

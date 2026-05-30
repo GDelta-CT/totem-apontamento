@@ -64,14 +64,18 @@ async function suggestRelevantFiles(description) {
       if (refs) {
         files = refs;
       }
-    } catch { /* skip — partial result ok */ }
+    } catch {
+      /* skip — partial result ok */
+    }
 
     try {
       const analysis = await client.analyzeCodebase('.');
       if (analysis) {
         codebaseContext = analysis;
       }
-    } catch { /* skip — partial result ok */ }
+    } catch {
+      /* skip — partial result ok */
+    }
 
     // Return null only if we got nothing at all
     if (!files && !codebaseContext) return null;
@@ -113,7 +117,9 @@ async function validateNoDuplicates(description) {
     return {
       hasDuplicates,
       matches: result.matches || [],
-      suggestion: hasDuplicates ? 'Consider ADAPT instead of CREATE — similar functionality exists' : null,
+      suggestion: hasDuplicates
+        ? 'Consider ADAPT instead of CREATE — similar functionality exists'
+        : null,
     };
   } catch {
     return null;

@@ -41,6 +41,6 @@ steps:
     depends_on: [process]
 
 error_handling:
-  on_validation_error: "Invalid input: {{error.message}}"
-  on_process_error: "Processing failed: {{error.message}}"
+  on_validation_error: 'Invalid input: {{error.message}}'
+  on_process_error: 'Processing failed: {{error.message}}'
   retry_count: 1

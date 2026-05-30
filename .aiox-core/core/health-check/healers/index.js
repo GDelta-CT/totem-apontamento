@@ -77,7 +77,7 @@ class HealerManager {
     // Filter healable issues
     const healableResults = checkResults.filter(
       (r) =>
-        r.healable && r.healingTier > 0 && r.healingTier <= maxTier && r.status !== CheckStatus.PASS,
+        r.healable && r.healingTier > 0 && r.healingTier <= maxTier && r.status !== CheckStatus.PASS
     );
 
     for (const result of healableResults) {

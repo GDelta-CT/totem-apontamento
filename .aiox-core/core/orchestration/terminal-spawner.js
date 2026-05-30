@@ -92,7 +92,11 @@ function detectEnvironment() {
     // Check cgroup for docker/containerd/kubepods
     if (fsSync.existsSync('/proc/1/cgroup')) {
       const cgroup = fsSync.readFileSync('/proc/1/cgroup', 'utf8');
-      if (cgroup.includes('docker') || cgroup.includes('containerd') || cgroup.includes('kubepods')) {
+      if (
+        cgroup.includes('docker') ||
+        cgroup.includes('containerd') ||
+        cgroup.includes('kubepods')
+      ) {
         return {
           type: ENVIRONMENT_TYPE.DOCKER,
           supportsVisualTerminal: false,
@@ -663,7 +667,8 @@ async function cleanupOldFiles(outputDir = os.tmpdir(), maxAgeMs = 3600000) {
   try {
     const files = await fs.readdir(outputDir);
     const aioxFiles = files.filter(
-      (f) => f.startsWith('aiox-output-') || f.startsWith('aiox-lock-') || f.startsWith('aiox-context-'),
+      (f) =>
+        f.startsWith('aiox-output-') || f.startsWith('aiox-lock-') || f.startsWith('aiox-context-')
     );
 
     for (const file of aioxFiles) {
@@ -697,13 +702,24 @@ const OS_COMPATIBILITY_MATRIX = {
   must_pass: [
     { os: 'macOS Sonoma', arch: 'arm64', docker: 'Docker Desktop', description: 'Apple Silicon' },
     { os: 'macOS Sonoma', arch: 'x64', docker: 'Docker Desktop', description: 'Intel' },
-    { os: 'Windows 11', arch: 'x64', docker: 'Docker Desktop', wsl: 'Ubuntu 22.04', description: 'WSL2' },
+    {
+      os: 'Windows 11',
+      arch: 'x64',
+      docker: 'Docker Desktop',
+      wsl: 'Ubuntu 22.04',
+      description: 'WSL2',
+    },
     { os: 'Ubuntu 22.04', arch: 'x64', docker: 'Docker Engine', description: 'Native Linux' },
   ],
   should_pass: [
     { os: 'Windows 10', arch: 'x64', wsl: 'Ubuntu', description: 'WSL2' },
     { os: 'macOS Ventura', arch: 'arm64', docker: 'Docker Desktop', description: 'Previous macOS' },
-    { os: 'macOS Ventura', arch: 'x64', docker: 'Docker Desktop', description: 'Previous macOS Intel' },
+    {
+      os: 'macOS Ventura',
+      arch: 'x64',
+      docker: 'Docker Desktop',
+      description: 'Previous macOS Intel',
+    },
     { os: 'Ubuntu 24.04', arch: 'x64', docker: 'Docker Engine', description: 'Latest Ubuntu' },
   ],
 };
@@ -750,14 +766,19 @@ function getSystemInfo() {
   if (platform === 'darwin') {
     try {
       const swVers = execSync('sw_vers -productName 2>/dev/null', { encoding: 'utf8' }).trim();
-      const swVersion = execSync('sw_vers -productVersion 2>/dev/null', { encoding: 'utf8' }).trim();
+      const swVersion = execSync('sw_vers -productVersion 2>/dev/null', {
+        encoding: 'utf8',
+      }).trim();
       osName = `${swVers} ${swVersion}`;
     } catch {
       osName = `macOS ${release}`;
     }
   } else if (platform === 'linux') {
     try {
-      const lsbRelease = execSync('lsb_release -d 2>/dev/null || cat /etc/os-release 2>/dev/null | grep PRETTY_NAME | cut -d= -f2 | tr -d \'"\'', { encoding: 'utf8' }).trim();
+      const lsbRelease = execSync(
+        "lsb_release -d 2>/dev/null || cat /etc/os-release 2>/dev/null | grep PRETTY_NAME | cut -d= -f2 | tr -d '\"'",
+        { encoding: 'utf8' }
+      ).trim();
       osName = lsbRelease.replace('Description:\t', '') || `Linux ${release}`;
     } catch {
       osName = `Linux ${release}`;
@@ -807,11 +828,11 @@ function generateCompatibilityReport(testResults = []) {
   const total = testResults.length;
 
   // Determine matrix classification
-  const matchesMustPass = OS_COMPATIBILITY_MATRIX.must_pass.some(
-    (m) => systemInfo.os_name.toLowerCase().includes(m.os.toLowerCase().split(' ')[0]),
+  const matchesMustPass = OS_COMPATIBILITY_MATRIX.must_pass.some((m) =>
+    systemInfo.os_name.toLowerCase().includes(m.os.toLowerCase().split(' ')[0])
   );
-  const matchesShouldPass = OS_COMPATIBILITY_MATRIX.should_pass.some(
-    (m) => systemInfo.os_name.toLowerCase().includes(m.os.toLowerCase().split(' ')[0]),
+  const matchesShouldPass = OS_COMPATIBILITY_MATRIX.should_pass.some((m) =>
+    systemInfo.os_name.toLowerCase().includes(m.os.toLowerCase().split(' ')[0])
   );
 
   return {
@@ -822,7 +843,11 @@ function generateCompatibilityReport(testResults = []) {
       supportsVisualTerminal: environment.supportsVisualTerminal,
       reason: environment.reason,
     },
-    matrixClassification: matchesMustPass ? 'must_pass' : matchesShouldPass ? 'should_pass' : 'not_in_matrix',
+    matrixClassification: matchesMustPass
+      ? 'must_pass'
+      : matchesShouldPass
+        ? 'should_pass'
+        : 'not_in_matrix',
     tests: testResults,
     summary: {
       total,

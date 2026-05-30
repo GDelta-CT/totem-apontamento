@@ -24,10 +24,10 @@ class RegistryProvider extends CodeIntelProvider {
     this._registryMtime = null;
 
     // In-memory indexes (built on first load)
-    this._byName = null;   // Map<string, Array<Entity>>
-    this._byPath = null;   // Map<string, Entity>
+    this._byName = null; // Map<string, Array<Entity>>
+    this._byPath = null; // Map<string, Entity>
     this._byCategory = null; // Map<string, Array<Entity>>
-    this._byKeyword = null;  // Map<string, Array<Entity>> (inverted index)
+    this._byKeyword = null; // Map<string, Array<Entity>> (inverted index)
   }
 
   /**

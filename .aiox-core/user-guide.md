@@ -167,18 +167,21 @@ npx aiox-core@latest install --help
 O futuro comando `aiox init` permitirá escolher explicitamente entre dois modos:
 
 #### Framework Development Mode
+
 - Para desenvolvedores contribuindo ao AIOX-FullStack
 - `.aiox-core/` é código fonte (commitado)
 - Mudanças afetam o framework
 - Quality gates testam integridade do framework
 
 #### Project Development Mode
+
 - Para desenvolvedores usando AIOX em seus projetos
 - `.aiox-core/` é dependência (gitignored)
 - Mudanças NÃO modificam o framework
 - Quality gates testam seu projeto
 
 **Quando disponível** (após Story 3.14):
+
 ```bash
 # Após instalação, configure o modo
 npx aiox init
@@ -196,6 +199,7 @@ npx aiox init
 **Causa**: Versão RC antiga (RC.8 ou inferior)
 
 **Solução**:
+
 ```bash
 # Limpar cache NPX
 npm cache clean --force
@@ -209,6 +213,7 @@ npx aiox-core@1.0.0-rc.10 install --force-upgrade
 **Causa**: RC.7 ou anterior (path resolution bug)
 
 **Solução**: Usar RC.8 ou superior
+
 ```bash
 npx aiox-core@latest install
 ```
@@ -218,6 +223,7 @@ npx aiox-core@latest install
 **Causa**: Normal - versioning schemes diferentes
 
 **Solução**: Escolher "Upgrade" ou usar `--force-upgrade`
+
 ```bash
 npx aiox-core@latest install --force-upgrade
 # Migra de v4.31.1 para v1.0.0-rc.10 (novo scheme)
@@ -237,7 +243,6 @@ Use o agente de IA na interface web (Claude.ai, ChatGPT, Gemini, etc.) para:
 4. **Design UX** (opcional) - Trabalhe com **ux-expert** para experiência do usuário
 
 ### Fase 2: Desenvolvimento (IDE)
-
 
 1. **Fragmentação de Histórias** - Use o **sm** (Scrum Master) para criar histórias de desenvolvimento
 2. **Implementação** - Trabalhe com o **dev** para codificar as features
@@ -273,12 +278,14 @@ graph TD
 #### 1. analyst - Analista de Negócios
 
 O agente **analyst** ajuda você a:
+
 - Entender e documentar requisitos de negócio
 - Identificar stakeholders e suas necessidades
 - Criar briefings detalhados do projeto
 - Definir objetivos e métricas de sucesso
 
 **Comandos comuns**:
+
 - `*help` - Mostrar comandos disponíveis
 - `*create-brief` - Criar novo briefing
 - `*analyze-requirements` - Analisar requisitos
@@ -287,12 +294,14 @@ O agente **analyst** ajuda você a:
 #### 2. pm - Product Manager
 
 O **pm** (Product Manager) é responsável por:
+
 - Transformar briefings em PRDs estruturados
 - Definir features e prioridades
 - Criar roadmaps de produto
 - Estabelecer critérios de aceitação
 
 **Fluxo típico**:
+
 1. Recebe o briefing do analyst
 2. Faz perguntas de esclarecimento
 3. Cria PRD fragmentado por seções
@@ -301,6 +310,7 @@ O **pm** (Product Manager) é responsável por:
 #### 3. architect - Arquiteto de Sistema
 
 O agente **architect** desenha:
+
 - Arquitetura técnica do sistema
 - Escolha de tecnologias e frameworks
 - Estrutura de dados e modelos
@@ -308,6 +318,7 @@ O agente **architect** desenha:
 - Diagramas de componentes e fluxos
 
 **Responsabilidades**:
+
 - Criar documentos de arquitetura técnica
 - Definir stack tecnológico
 - Estabelecer padrões de código
@@ -316,6 +327,7 @@ O agente **architect** desenha:
 #### 4. ux-expert - Especialista em UX (Opcional)
 
 O **ux-expert** foca em:
+
 - Design de interface do usuário
 - Fluxos de usuário e jornadas
 - Wireframes e mockups conceituais
@@ -381,6 +393,7 @@ graph TD
 O **sm** (Scrum Master) é crucial para organizar o trabalho:
 
 **Responsabilidades principais**:
+
 - Fragmentar PRD e Arquitetura em histórias de desenvolvimento
 - Criar arquivos de story em `docs/stories/`
 - Definir tarefas e checkboxes para cada story
@@ -388,30 +401,37 @@ O **sm** (Scrum Master) é crucial para organizar o trabalho:
 - Organizar dependências entre stories
 
 **Estrutura de uma Story**:
+
 ```markdown
 # Story 1.1: Configuração Inicial do Projeto
 
 ## Descrição
+
 Configurar a estrutura inicial do projeto...
 
 ## Contexto
+
 [Referências ao PRD e Arquitetura]
 
 ## Tarefas
+
 - [ ] Inicializar repositório Git
 - [ ] Configurar package.json
 - [ ] Instalar dependências base
 - [ ] Criar estrutura de diretórios
 
 ## Critérios de Aceitação
+
 - [ ] Projeto inicializa sem erros
 - [ ] Todas as dependências instaladas
 - [ ] Estrutura de pastas criada
 
 ## Arquivos Criados/Modificados
+
 [Atualizado pelo dev durante implementação]
 
 ## Notas
+
 [Anotações do dev e qa]
 ```
 
@@ -420,6 +440,7 @@ Configurar a estrutura inicial do projeto...
 O agente **dev** é responsável pela implementação:
 
 **Fluxo de trabalho**:
+
 1. Lê a story atual
 2. Entende o contexto do PRD e Arquitetura
 3. Implementa o código seguindo os padrões
@@ -428,6 +449,7 @@ O agente **dev** é responsável pela implementação:
 6. Adiciona notas sobre decisões técnicas
 
 **Boas práticas**:
+
 - Sempre ler a story completamente antes de começar
 - Seguir padrões definidos na Arquitetura
 - Escrever código limpo e auto-documentado
@@ -435,6 +457,7 @@ O agente **dev** é responsável pela implementação:
 - Documentar decisões importantes nas Notas
 
 **Comandos no IDE**:
+
 - `*read-story {id}` - Ler uma story específica
 - `*update-story` - Atualizar progresso da story
 - `*complete-task {id}` - Marcar tarefa como completa
@@ -444,6 +467,7 @@ O agente **dev** é responsável pela implementação:
 O agente **qa** valida a implementação:
 
 **Responsabilidades**:
+
 - Revisar código implementado
 - Executar testes
 - Validar critérios de aceitação
@@ -451,6 +475,7 @@ O agente **qa** valida a implementação:
 - Sugerir melhorias
 
 **Processo de validação**:
+
 1. Revisar código do dev
 2. Executar suite de testes
 3. Validar critérios de aceitação
@@ -458,6 +483,7 @@ O agente **qa** valida a implementação:
 5. Documentar resultados nas Notas da story
 
 **Tipos de validação**:
+
 - ✅ **Testes unitários** - Funções individuais
 - ✅ **Testes de integração** - Componentes juntos
 - ✅ **Testes E2E** - Fluxos completos
@@ -469,6 +495,7 @@ O agente **qa** valida a implementação:
 O **po** (Product Owner) gerencia o backlog:
 
 **Funções**:
+
 - Priorizar stories no backlog
 - Clarificar requisitos quando necessário
 - Validar que implementação atende o PRD
@@ -482,6 +509,7 @@ O agente **qa** do Synkra AIOX inclui capacidades avançadas de arquitetura de t
 ### 1. Perfil de Risco e Priorização
 
 O QA Agent pode:
+
 - Analisar o código para identificar áreas de alto risco
 - Priorizar esforços de teste baseado em complexidade
 - Sugerir estratégias de teste apropriadas
@@ -490,6 +518,7 @@ O QA Agent pode:
 ### 2. Geração Automática de Testes
 
 **Testes Unitários**:
+
 ```javascript
 // Exemplo gerado pelo qa agent
 describe('UserService', () => {
@@ -502,19 +531,20 @@ describe('UserService', () => {
 
   it('should reject invalid email', async () => {
     const userData = { name: 'Test', email: 'invalid' };
-    await expect(userService.create(userData))
-      .rejects.toThrow('Invalid email');
+    await expect(userService.create(userData)).rejects.toThrow('Invalid email');
   });
 });
 ```
 
 **Testes de Integração**:
+
 - Testes de API endpoints
 - Testes de banco de dados
 - Testes de serviços externos
 - Testes de autenticação/autorização
 
 **Testes E2E**:
+
 - Fluxos completos de usuário
 - Navegação entre páginas
 - Submissão de formulários
@@ -525,11 +555,13 @@ describe('UserService', () => {
 O QA Agent sugere estratégias baseadas em:
 
 **Complexidade do Código**:
+
 - Código complexo → Testes abrangentes + edge cases
 - Código simples → Testes básicos de happy path
 - Código crítico → Testes exaustivos + stress tests
 
 **Tipo de Funcionalidade**:
+
 - **CRUD básico** → Testes unitários + integração
 - **Lógica de negócio** → Testes unitários extensivos
 - **UI/UX** → Testes E2E + acessibilidade
@@ -538,6 +570,7 @@ O QA Agent sugere estratégias baseadas em:
 ### 4. Cobertura e Métricas
 
 O agente **qa** monitora:
+
 - Cobertura de código (linha, branch, função)
 - Cobertura de features (vs. PRD)
 - Cobertura de cenários de usuário
@@ -545,12 +578,12 @@ O agente **qa** monitora:
 
 ## Integração com IDE
 
-
 1. **Configurar regras globais**:
    - Abrir Settings → Global Rules
    - Salvar configuração
 
 2. **Ativar agentes**:
+
    ```
    @dev
    *help
@@ -597,22 +630,26 @@ Crie um arquivo `docs/tech-preferences.md`:
 # Preferências Técnicas do Projeto
 
 ## Stack Principal
+
 - **Backend**: Node.js + Express
 - **Frontend**: React + TypeScript
 - **Banco de Dados**: PostgreSQL
 - **ORM**: Prisma
 
 ## Padrões de Código
+
 - **Style Guide**: Airbnb JavaScript Style Guide
 - **Linting**: ESLint + Prettier
 - **Testing**: Jest + React Testing Library
 
 ## Arquitetura
+
 - **Pattern**: Clean Architecture
 - **API**: RESTful + GraphQL
 - **Auth**: JWT + OAuth2
 
 ## DevOps
+
 - **CI/CD**: GitHub Actions
 - **Hosting**: Vercel (Frontend) + Railway (Backend)
 - **Monitoring**: Sentry + LogRocket
@@ -621,16 +658,19 @@ Crie um arquivo `docs/tech-preferences.md`:
 ### Como os Agentes Usam as Preferências
 
 **architect**:
+
 - Usa preferências para desenhar arquitetura consistente
 - Sugere tecnologias alinhadas com o stack definido
 - Aplica padrões especificados
 
 **dev**:
+
 - Implementa usando frameworks e bibliotecas preferidos
 - Segue style guides e padrões definidos
 - Usa ferramentas de desenvolvimento especificadas
 
 **qa**:
+
 - Configura testes com frameworks escolhidos
 - Valida conformidade com padrões
 - Verifica integração com ferramentas de CI/CD
@@ -754,12 +794,14 @@ O AIOX-FullStack impõe integridade de repositório através de um agente centra
 #### Por Que Isso Importa
 
 Sem controle centralizado:
+
 - ❌ Código não testado chega à produção
 - ❌ Builds quebrados na branch main
 - ❌ Conflitos de versão
 - ❌ Gerenciamento de release inconsistente
 
 Com @github-devops:
+
 - ✅ Quality gates automatizados antes do push
 - ✅ Gerenciamento de versão sistemático
 - ✅ Criação de PR automatizada
@@ -768,12 +810,14 @@ Com @github-devops:
 #### Usando @github-devops
 
 **Ativar o agente**:
+
 ```
 @github-devops
 *help
 ```
 
 **Comandos comuns**:
+
 - `*detect-repo` - Mostra repositório e modo detectados
 - `*pre-push` - Executa quality gates e faz push para GitHub
 - `*create-pr` - Cria pull request da branch atual
@@ -787,6 +831,7 @@ Com @github-devops:
 2. **Commit localmente** (git commit)
 3. **Ative @github-devops**
 4. **Execute pre-push quality gate**:
+
    ```
    @github-devops
    *pre-push
@@ -806,12 +851,14 @@ Com @github-devops:
 #### Design Repository-Agnostic
 
 O agente @github-devops funciona com QUALQUER repositório git:
+
 - Detecta seu repositório automaticamente
 - Adapta quality gates aos seus npm scripts
 - Funciona em framework-dev E project-dev modes (quando disponível)
 - Sem assumptions hard-coded de repositório
 
 **Modo Framework Development** (futuro):
+
 ```bash
 # No repositório aiox-core
 @github-devops
@@ -823,6 +870,7 @@ O agente @github-devops funciona com QUALQUER repositório git:
 ```
 
 **Modo Project Development** (futuro):
+
 ```bash
 # No seu projeto
 @github-devops
@@ -846,6 +894,7 @@ git push origin main
 ```
 
 **Para fazer push de mudanças**:
+
 1. Ative @github-devops
 2. Execute `*pre-push`
 3. Siga o workflow do quality gate
@@ -858,6 +907,7 @@ git push origin main
 ```
 
 O agente irá:
+
 - Criar feature branch do story ID
 - Gerar descrição do PR do contexto da story
 - Linkar PR à story
@@ -872,6 +922,7 @@ O agente irá:
 ```
 
 Instala workflows em .github/workflows/:
+
 - ci.yml - Testes em PRs
 - cd.yml - Deploy em merge para main
 - quality-gate.yml - Lint + Test + Build
@@ -889,18 +940,21 @@ O AIOX-FullStack oferece três modos de desenvolvimento para acomodar diferentes
 **Melhor para**: Desenvolvedores experientes, stories simples, restrições de tempo
 
 **Características**:
+
 - Tomada de decisão autônoma
 - Prompts mínimos ao usuário (0-1)
 - Execução rápida
 - Log automático de todas as decisões
 
 **Como usar**:
+
 ```
 @dev
 *develop-yolo "Story 2.5"
 ```
 
 **O que acontece**:
+
 - Agente lê story completamente
 - Toma todas as decisões técnicas autonomamente
 - Loga decisões para revisão
@@ -908,6 +962,7 @@ O AIOX-FullStack oferece três modos de desenvolvimento para acomodar diferentes
 - Gera relatório de decisões no final
 
 **Exemplo de Log de Decisão**:
+
 ```markdown
 ## Decisões YOLO Mode - Story 2.5
 
@@ -926,12 +981,14 @@ O AIOX-FullStack oferece três modos de desenvolvimento para acomodar diferentes
 **Melhor para**: Aprendizado, stories complexas, decisões importantes
 
 **Características**:
+
 - Checkpoints explícitos de decisão
 - Explicações educacionais
 - Velocidade e controle balanceados
 - Usuário confirma decisões chave
 
 **Como usar**:
+
 ```
 @dev
 *develop-story "Story 2.5"
@@ -940,6 +997,7 @@ O AIOX-FullStack oferece três modos de desenvolvimento para acomodar diferentes
 ```
 
 **Checkpoints de Decisão**:
+
 - Seleção de padrão arquitetural
 - Escolhas de biblioteca/framework
 - Abordagens de implementação de algoritmos
@@ -947,6 +1005,7 @@ O AIOX-FullStack oferece três modos de desenvolvimento para acomodar diferentes
 - Estratégia de testes
 
 **Exemplo de Interação**:
+
 ```
 Agente: Preciso escolher uma abordagem de state management.
 
@@ -968,12 +1027,14 @@ Sua escolha [1/2/3]: _
 **Melhor para**: Stories ambíguas, features críticas, evitar scope drift
 
 **Características**:
+
 - Planejamento abrangente upfront
 - Questionário completo antes do desenvolvimento
 - Execução com zero ambiguidade
 - Controle máximo
 
 **Como usar**:
+
 ```
 @dev
 *develop-preflight "Story 2.5"
@@ -982,11 +1043,13 @@ Sua escolha [1/2/3]: _
 **Workflow**:
 
 **Fase 1: Análise da Story**
+
 - Agente lê story completamente
 - Identifica TODAS as ambiguidades e questões abertas
 - Gera questionário abrangente
 
 **Fase 2: Coleta de Input em Batch**
+
 ```
 Questionário Pre-Flight Planning - Story 2.5
 
@@ -1011,12 +1074,14 @@ RESTful | Service layer | Axios | Yup | 80% | Fixtures | Ambos | Spinner
 ```
 
 **Fase 3: Execução com Contexto Completo**
+
 - Agente tem TODAS as respostas upfront
 - Sem perguntas durante desenvolvimento
 - Sem scope drift
 - Sem alucinações em requisitos ambíguos
 
 **Fase 4: Registro de Decisão**
+
 ```markdown
 ## Decisões Pre-Flight - Story 2.5
 
@@ -1036,27 +1101,27 @@ Implementação prosseguiu com zero ambiguidade.
 
 ### Escolhendo o Modo Certo
 
-| Cenário | Modo Recomendado | Razão |
-|---------|------------------|-------|
-| Feature CRUD simples | YOLO | Padrões standard, baixo risco |
-| Aprender novo framework | Interactive | Valor educacional |
-| Sistema de autenticação crítico | Pre-Flight | Evitar erros de segurança |
-| Correção de bug | YOLO | Rápido, baixa ambiguidade |
-| Algoritmo complexo | Pre-Flight | Muitas escolhas de design |
-| Refatoração de rotina | Interactive | Bom balanço |
-| Spike/prototype | YOLO | Velocidade importa |
-| Feature de produção | Pre-Flight | Qualidade importa |
+| Cenário                         | Modo Recomendado | Razão                         |
+| ------------------------------- | ---------------- | ----------------------------- |
+| Feature CRUD simples            | YOLO             | Padrões standard, baixo risco |
+| Aprender novo framework         | Interactive      | Valor educacional             |
+| Sistema de autenticação crítico | Pre-Flight       | Evitar erros de segurança     |
+| Correção de bug                 | YOLO             | Rápido, baixa ambiguidade     |
+| Algoritmo complexo              | Pre-Flight       | Muitas escolhas de design     |
+| Refatoração de rotina           | Interactive      | Bom balanço                   |
+| Spike/prototype                 | YOLO             | Velocidade importa            |
+| Feature de produção             | Pre-Flight       | Qualidade importa             |
 
 ### Comparação de Modos
 
-| Aspecto | YOLO | Interactive | Pre-Flight |
-|---------|------|-------------|------------|
-| Prompts ao Usuário | 0-1 | 5-10 | 10-30 |
-| Velocidade | Mais Rápido | Médio | Mais Lento |
-| Controle | Mais Baixo | Médio | Mais Alto |
-| Aprendizado | Baixo | Alto | Médio |
+| Aspecto              | YOLO         | Interactive  | Pre-Flight |
+| -------------------- | ------------ | ------------ | ---------- |
+| Prompts ao Usuário   | 0-1          | 5-10         | 10-30      |
+| Velocidade           | Mais Rápido  | Médio        | Mais Lento |
+| Controle             | Mais Baixo   | Médio        | Mais Alto  |
+| Aprendizado          | Baixo        | Alto         | Médio      |
 | Qualidade de Decisão | Automatizada | Colaborativa | Abrangente |
-| Risco de Scope Drift | Médio | Baixo | Mais Baixo |
+| Risco de Scope Drift | Médio        | Baixo        | Mais Baixo |
 
 **Nota**: Esta funcionalidade está planejada para Story 3.13. O agente @dev atual usa modo interativo padrão.
 
@@ -1065,6 +1130,7 @@ Implementação prosseguiu com zero ambiguidade.
 ### Para Fase de Planejamento
 
 ✅ **Faça**:
+
 - Seja específico e detalhado no briefing inicial
 - Responda completamente às perguntas dos agentes
 - Revise e refine documentos iterativamente
@@ -1072,6 +1138,7 @@ Implementação prosseguiu com zero ambiguidade.
 - Documente decisões importantes e suas razões
 
 ❌ **Evite**:
+
 - Pular etapas do planejamento
 - Criar PRDs vagos ou incompletos
 - Ignorar considerações de arquitetura
@@ -1080,6 +1147,7 @@ Implementação prosseguiu com zero ambiguidade.
 ### Para Fase de Desenvolvimento
 
 ✅ **Faça**:
+
 - Trabalhe uma story por vez, do início ao fim
 - Atualize checkboxes imediatamente após completar tarefas
 - Mantenha a lista "Arquivos Criados/Modificados" atualizada
@@ -1088,6 +1156,7 @@ Implementação prosseguiu com zero ambiguidade.
 - Siga os padrões definidos na Arquitetura
 
 ❌ **Evite**:
+
 - Começar múltiplas stories simultaneamente
 - Pular testes ou validação de QA
 - Ignorar critérios de aceitação
@@ -1109,23 +1178,27 @@ As stories servem como **meio de comunicação** entre agentes:
 ## Notas
 
 ### [dev - 2025-01-15]
+
 Implementei autenticação usando JWT com refresh tokens.
 Escolhi bcrypt para hash de senhas (10 rounds).
 Tokens expiram em 15min, refresh em 7 dias.
 
 ### [qa - 2025-01-16]
+
 ✅ Testes unitários passando (12/12)
 ✅ Testes de integração OK (5/5)
 ⚠️ Encontrado: Token não é invalidado no logout
-   Severity: HIGH
-   Precisa fix antes de aprovar
+Severity: HIGH
+Precisa fix antes de aprovar
 
 ### [dev - 2025-01-16]
+
 ✅ Fix aplicado: Implementado blacklist de tokens
 ✅ Novos testes adicionados para logout
 Pronto para nova validação
 
 ### [qa - 2025-01-17]
+
 ✅ Story aprovada
 Todos os critérios atendidos
 ```
@@ -1180,6 +1253,7 @@ Ao integrar Synkra AIOX em projetos existentes:
 **Problema**: Agente ignora parte do PRD ou Arquitetura
 
 **Solução**:
+
 1. Verifique se o documento está fragmentado corretamente
 2. Certifique-se de que o contexto está explícito na story
 3. Use notas na story para dar contexto adicional
@@ -1190,6 +1264,7 @@ Ao integrar Synkra AIOX em projetos existentes:
 **Problema**: Story tem muitas tarefas e se torna difícil de gerenciar
 
 **Solução**:
+
 ```
 @sm
 *split-story 3.1
@@ -1204,6 +1279,7 @@ Ao integrar Synkra AIOX em projetos existentes:
 **Problema**: PRD pede feature que conflita com arquitetura
 
 **Solução**:
+
 1. Volte para a interface web
 2. Trabalhe com pm e architect para resolver
 3. Atualize os documentos
@@ -1214,6 +1290,7 @@ Ao integrar Synkra AIOX em projetos existentes:
 **Problema**: Cliente/stakeholder muda requisitos no meio do projeto
 
 **Solução**:
+
 ```
 1. @po
    *update-prd "Nova feature X necessária"
@@ -1237,12 +1314,14 @@ O Synkra AIOX inclui meta-agentes para orquestração:
 O **aiox-master** é o agente de orquestração principal:
 
 **Capacidades**:
+
 - Coordenar múltiplos agentes
 - Executar workflows complexos
 - Gerenciar estado do projeto
 - Tomar decisões de alto nível
 
 **Quando usar**:
+
 - Operações que envolvem múltiplos agentes
 - Workflows automatizados
 - Situações que requerem decisões contextuais
@@ -1252,6 +1331,7 @@ O **aiox-master** é o agente de orquestração principal:
 O **aiox-orchestrator** gerencia fluxos de trabalho:
 
 **Funções**:
+
 - Sequenciar tarefas entre agentes
 - Gerenciar dependências
 - Monitorar progresso
@@ -1262,6 +1342,7 @@ O **aiox-orchestrator** gerencia fluxos de trabalho:
 O **aiox-developer** é o meta-agente para o próprio AIOX:
 
 **Uso**:
+
 - Criar novos agentes
 - Modificar workflows
 - Estender o framework
@@ -1281,12 +1362,14 @@ O **aiox-developer** é o meta-agente para o próprio AIOX:
 O Synkra AIOX suporta squads para domínios específicos:
 
 **Disponíveis durante instalação**:
+
 - **hybrid-ops** - Metodologia Pedro Valério (operações híbridas humano-agente)
 - **expansion-creator** - Ferramentas para criar novos squads
 - **aiox-infrastructure-devops** - Utilities de DevOps e infraestrutura
 - **meeting-notes** - Assistente de notas e atas de reuniões
 
 **Configurar squads na instalação**:
+
 ```bash
 # Durante a instalação, o wizard pergunta quais squads instalar
 npx aiox-core@latest install
@@ -1300,6 +1383,7 @@ npx aiox-core@latest install
 ```
 
 **Adicionar squads depois**:
+
 ```bash
 # Re-execute o instalador
 npx aiox-core@latest install
@@ -1337,6 +1421,7 @@ description: Template personalizado para X
 # Título do Template
 
 ## Seções
+
 ...
 ```
 
@@ -1345,6 +1430,7 @@ description: Template personalizado para X
 Use este checklist para garantir que está seguindo o workflow corretamente:
 
 ### Fase de Planejamento (Web UI)
+
 - [ ] Briefing criado com analyst
 - [ ] PRD completo desenvolvido com pm
 - [ ] Arquitetura técnica definida com architect
@@ -1354,6 +1440,7 @@ Use este checklist para garantir que está seguindo o workflow corretamente:
 - [ ] Pronto para mudança ao IDE
 
 ### Fase de Desenvolvimento (IDE)
+
 - [ ] Stories criadas pelo sm
 - [ ] Dependências entre stories identificadas
 - [ ] Stories priorizadas pelo po
@@ -1362,6 +1449,7 @@ Use este checklist para garantir que está seguindo o workflow corretamente:
 - [ ] IDE configurado com regras AIOX
 
 ### Para Cada Story
+
 - [ ] Story lida completamente
 - [ ] Contexto do PRD/Arquitetura entendido
 - [ ] Implementação seguindo padrões
@@ -1374,6 +1462,7 @@ Use este checklist para garantir que está seguindo o workflow corretamente:
 - [ ] Story aprovada pelo qa
 
 ### Antes do Release
+
 - [ ] Todas as stories completas
 - [ ] Suite completa de testes passando
 - [ ] Documentação atualizada
@@ -1386,16 +1475,20 @@ Use este checklist para garantir que está seguindo o workflow corretamente:
 ## Recursos Adicionais
 
 ### Documentação
+
 - [Guia de Instalação](../docs/getting-started.md)
 - [Arquitetura do AIOX](../docs/architecture.md)
 - [Guia de Squads](../docs/Squads.md)
 - [Trabalhando em Brownfield](./working-in-the-brownfield.md)
 
 ### Suporte
+
 - [GitHub Issues](https://github.com/SynkraAI/aiox-core/issues)
 
 ### Exemplos
+
 Veja `Squads/` para exemplos de:
+
 - Agentes customizados
 - Workflows especializados
 - Templates de documentos
@@ -1405,5 +1498,5 @@ Veja `Squads/` para exemplos de:
 
 **Nota**: Este guia é uma visão geral. Para detalhes específicos de implementação, consulte a documentação técnica na pasta `docs/`.
 
-*Synkra AIOX User Guide v2.0*
-*Última atualização: Janeiro 2025*
+_Synkra AIOX User Guide v2.0_
+_Última atualização: Janeiro 2025_

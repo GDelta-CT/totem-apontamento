@@ -5,8 +5,8 @@ agent: aiox-master
 category: collaboration
 complexity: medium
 tools:
-  - clickup        # Capture ideas and organize them
-  - mcp            # Call specialized agents for domain expertise
+  - clickup # Capture ideas and organize them
+  - mcp # Call specialized agents for domain expertise
 checklists:
   - aiox-master-checklist.md
 ---
@@ -216,6 +216,7 @@ To conduct a structured brainstorming session with multiple AI agents (and optio
 ### By Category
 
 {categories.map(cat => `
+
 #### ${cat.name} (${cat.ideas_count} ideas)
 
 ${cat.top_ideas.map(idea => `- ${idea.text} (by ${idea.source_agent})`).join('\n')}
@@ -224,6 +225,7 @@ ${cat.top_ideas.map(idea => `- ${idea.text} (by ${idea.source_agent})`).join('\n
 ## Top Recommendations
 
 {prioritized_recommendations.map((rec, i) => `
+
 ### ${i+1}. ${rec.idea.text}
 
 **Value Score**: ${rec.value_score}/10
@@ -294,16 +296,19 @@ ${rec.next_steps.map(step => `- ${step}`).join('\n')}
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -457,6 +462,7 @@ token_usage: ~2,000-8,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Iterative analysis with depth limits; cache intermediate results; batch similar operations
 
 ---
@@ -475,7 +481,6 @@ updated_at: 2025-11-17
 ```
 
 ---
-
 
 ## Usage Examples
 
@@ -513,6 +518,6 @@ aiox brainstorm "What should be our open-source expansion strategy for Q1 2026?"
 ---
 
 **Related Tasks:**
+
 - `create-next-story` - Convert ideas into actionable stories
 - `analyze-framework` - Analyze framework capabilities for improvement ideas
-

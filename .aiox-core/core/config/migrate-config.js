@@ -36,12 +36,7 @@ const USER_FIELDS = [
  * Fields that belong in L2 Project config (.aiox-core/project-config.yaml).
  * These are project-specific, team-shared settings.
  */
-const PROJECT_FIELDS = [
-  'project_name',
-  'project_type',
-  'environments',
-  'deploy_target',
-];
+const PROJECT_FIELDS = ['project_name', 'project_type', 'environments', 'deploy_target'];
 
 /**
  * Check if legacy core-config.yaml exists and framework-config.yaml does NOT.

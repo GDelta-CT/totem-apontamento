@@ -1,6 +1,6 @@
 ---
 task: Design Squad from Documentation
-responsavel: "@squad-creator"
+responsavel: '@squad-creator'
 responsavel_type: agent
 atomic_layer: task
 elicit: true
@@ -13,17 +13,17 @@ Saida: |
   - summary: Human-readable summary of recommendations
   - confidence: Overall confidence score (0-1)
 Checklist:
-  - "[ ] Collect documentation input"
-  - "[ ] Analyze domain and extract concepts"
-  - "[ ] Generate agent recommendations"
-  - "[ ] Generate task recommendations"
-  - "[ ] Present recommendations for refinement"
-  - "[ ] Apply user adjustments"
-  - "[ ] Generate blueprint file"
-  - "[ ] Display next steps"
+  - '[ ] Collect documentation input'
+  - '[ ] Analyze domain and extract concepts'
+  - '[ ] Generate agent recommendations'
+  - '[ ] Generate task recommendations'
+  - '[ ] Present recommendations for refinement'
+  - '[ ] Apply user adjustments'
+  - '[ ] Generate blueprint file'
+  - '[ ] Display next steps'
 ---
 
-# *design-squad
+# \*design-squad
 
 Analyzes documentation and guides the user through designing a squad structure with intelligent recommendations for agents and tasks.
 
@@ -47,13 +47,13 @@ Analyzes documentation and guides the user through designing a squad structure w
 
 ## Parameters
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `--docs` | string | - | Comma-separated paths to documentation files |
-| `--domain` | string | - | Domain hint to guide analysis |
-| `--output` | string | ./squads/.designs/ | Output directory for blueprint |
-| `--quick` | flag | false | Accept all recommendations without review |
-| `--verbose` | flag | false | Show detailed analysis output |
+| Parameter   | Type   | Default            | Description                                  |
+| ----------- | ------ | ------------------ | -------------------------------------------- |
+| `--docs`    | string | -                  | Comma-separated paths to documentation files |
+| `--domain`  | string | -                  | Domain hint to guide analysis                |
+| `--output`  | string | ./squads/.designs/ | Output directory for blueprint               |
+| `--quick`   | flag   | false              | Accept all recommendations without review    |
+| `--verbose` | flag   | false              | Show detailed analysis output                |
 
 ## Interactive Flow
 
@@ -225,7 +225,7 @@ Next steps:
 # squad-design.yaml
 squad:
   name: my-domain-squad
-  description: "Generated from documentation analysis"
+  description: 'Generated from documentation analysis'
   domain: domain-name
 
 analysis:
@@ -237,7 +237,7 @@ analysis:
 recommendations:
   agents:
     - id: agent-id
-      role: "Agent role description"
+      role: 'Agent role description'
       commands: [cmd1, cmd2]
       confidence: 0.92
       user_added: false
@@ -254,21 +254,22 @@ recommendations:
   config_mode: extend | override | none
 
 metadata:
-  created_at: "2025-12-18T00:00:00Z"
-  source_docs: ["./path/to/doc1.md"]
+  created_at: '2025-12-18T00:00:00Z'
+  source_docs: ['./path/to/doc1.md']
   user_adjustments: 2
   overall_confidence: 0.87
 ```
 
-## Integration with *create-squad
+## Integration with \*create-squad
 
-After generating a blueprint, use it with *create-squad:
+After generating a blueprint, use it with \*create-squad:
 
 ```bash
 *create-squad my-domain-squad --from-design ./squads/.designs/my-domain-squad-design.yaml
 ```
 
 This will:
+
 1. Load the blueprint
 2. Validate against schema
 3. Generate squad structure with custom agents/tasks from blueprint
@@ -276,12 +277,12 @@ This will:
 
 ## Error Handling
 
-| Error | Cause | Resolution |
-|-------|-------|------------|
-| `NO_DOCUMENTATION` | No input provided | Provide docs via --docs or interactively |
-| `PARSE_ERROR` | Cannot read/parse file | Check file format (md, yaml, json) |
-| `EMPTY_ANALYSIS` | No domain concepts extracted | Provide more detailed documentation |
-| `BLUEPRINT_EXISTS` | Blueprint already exists | Use --force to overwrite |
+| Error              | Cause                        | Resolution                               |
+| ------------------ | ---------------------------- | ---------------------------------------- |
+| `NO_DOCUMENTATION` | No input provided            | Provide docs via --docs or interactively |
+| `PARSE_ERROR`      | Cannot read/parse file       | Check file format (md, yaml, json)       |
+| `EMPTY_ANALYSIS`   | No domain concepts extracted | Provide more detailed documentation      |
+| `BLUEPRINT_EXISTS` | Blueprint already exists     | Use --force to overwrite                 |
 
 ## Implementation
 
@@ -300,7 +301,7 @@ async function designSquad(options) {
   // 3. Generate recommendations
   const recommendations = {
     agents: designer.generateAgentRecommendations(analysis),
-    tasks: designer.generateTaskRecommendations(analysis)
+    tasks: designer.generateTaskRecommendations(analysis),
   };
 
   // 4. Interactive refinement (unless --quick)
@@ -314,8 +315,8 @@ async function designSquad(options) {
     recommendations,
     metadata: {
       source_docs: options.docs,
-      created_at: new Date().toISOString()
-    }
+      created_at: new Date().toISOString(),
+    },
   });
 
   // 6. Save blueprint
@@ -330,5 +331,5 @@ async function designSquad(options) {
 - **Agent:** @squad-creator (Craft)
 - **Script:** squad-designer.js
 - **Schema:** squad-design-schema.json
-- **Integration:** *create-squad --from-design
+- **Integration:** \*create-squad --from-design
 - **Story:** SQS-9 (Squad Designer)

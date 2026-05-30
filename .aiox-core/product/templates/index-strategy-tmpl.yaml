@@ -1,13 +1,13 @@
 ---
-template_name: "Indexing Strategy"
-template_version: "1.0.0"
-output_format: "markdown"
-destination: "index-strategy.md"
-description: "Purpose-built index plan tied to access patterns"
+template_name: 'Indexing Strategy'
+template_version: '1.0.0'
+output_format: 'markdown'
+destination: 'index-strategy.md'
+description: 'Purpose-built index plan tied to access patterns'
 
 sections:
   - id: overview
-    title: "Indexing Overview"
+    title: 'Indexing Overview'
     instruction: |
       - Goals: latency targets, load profile
       - Read/Write trade-offs
@@ -15,7 +15,7 @@ sections:
     elicit: true
 
   - id: patterns
-    title: "Access Patterns Mapping"
+    title: 'Access Patterns Mapping'
     instruction: |
       For each frequent query:
       - Query shape & filters
@@ -25,7 +25,7 @@ sections:
     elicit: true
 
   - id: catalog
-    title: "Index Catalog"
+    title: 'Index Catalog'
     instruction: |
       For each table:
       ## table_name
@@ -37,7 +37,7 @@ sections:
     elicit: true
 
   - id: fulltext
-    title: "Full-Text & Search"
+    title: 'Full-Text & Search'
     instruction: |
       - tsvector generated columns
       - GIN/Trigram usage
@@ -45,7 +45,7 @@ sections:
     elicit: true
 
   - id: maintenance
-    title: "Monitoring & Maintenance"
+    title: 'Monitoring & Maintenance'
     instruction: |
       - pg_stat_user_indexes + idx scan ratio targets
       - Unused index detection policy

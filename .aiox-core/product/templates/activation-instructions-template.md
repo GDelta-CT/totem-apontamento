@@ -1,4 +1,5 @@
 # Agent Activation Instructions Template
+
 **Story**: 6.1.2.5 - Contextual Agent Load System Integration
 **Version**: 2.0 (GreetingBuilder Integration)
 **Last Updated**: 2025-11-16
@@ -39,6 +40,7 @@ activation-instructions:
 ## What Changed (Story 6.1.2.5)
 
 ### BEFORE (Manual/Mechanical)
+
 ```yaml
 - STEP 2.5: Load project status using .aiox-core/infrastructure/scripts/project-status-loader.js
 - STEP 2.6: Load session context using .aiox-core/scripts/session-context-loader.js
@@ -52,6 +54,7 @@ activation-instructions:
 **Problem**: Claude interpreted these as literal instructions → mechanical, rigid output
 
 ### AFTER (Intelligent/Adaptive)
+
 ```yaml
 - STEP 3: Build intelligent greeting using greeting-builder.js
 - STEP 4: Display the greeting returned by GreetingBuilder
@@ -63,20 +66,26 @@ activation-instructions:
 ## GreetingBuilder Parameters
 
 ### Input: `agentDefinition`
+
 The complete agent object containing:
+
 - `agent.name`, `agent.id`, `agent.title`, `agent.icon`
 - `persona_profile.greeting_levels` (minimal, named, archetypal)
 - `persona.identity` (role description)
 - `commands[]` with visibility metadata
 
 ### Input: `conversationHistory`
+
 Session context provided by Claude Code, containing:
+
 - Previous messages in the conversation
 - Previous agent activations
 - Recent commands executed
 
 ### Output: Formatted Greeting String
+
 Returns complete greeting including:
+
 - Presentation (adapted to session type)
 - Role description (new sessions only)
 - Project status (if git configured)
@@ -90,24 +99,30 @@ Returns complete greeting including:
 GreetingBuilder automatically detects three session types:
 
 ### 1. New Session (Minimal Context)
+
 **Detection**: No conversation history or very short history
 **Greeting Style**: Full
+
 - ✅ Complete greeting with role description
 - ✅ Up to 12 commands (visibility: full, quick, key)
 - ✅ Project status or git warning
-- ✅ Help text: "Type *help for all commands"
+- ✅ Help text: "Type \*help for all commands"
 
 ### 2. Existing Context (Active Session)
+
 **Detection**: Conversation history exists, agent switch detected
 **Greeting Style**: Quick
+
 - ✅ Quick greeting (no role description)
 - ✅ 6-8 commands (visibility: quick, key)
 - ✅ Current Context section (previous agent)
 - ✅ Compact project status
 
 ### 3. Workflow (Recurring Pattern)
+
 **Detection**: Workflow pattern matched in conversation history
 **Greeting Style**: Minimal
+
 - ✅ Minimal greeting (e.g., "🎯 Pax ready")
 - ✅ 3-5 commands (visibility: key only)
 - ✅ Workflow Context section
@@ -121,19 +136,20 @@ Commands must include visibility metadata for filtering:
 ```yaml
 commands:
   - name: help
-    visibility: [full, quick, key]  # Always shown
-    description: "Show all available commands"
+    visibility: [full, quick, key] # Always shown
+    description: 'Show all available commands'
 
   - name: create-story
-    visibility: [full, quick]  # Shown in new and existing sessions
-    description: "Create user story"
+    visibility: [full, quick] # Shown in new and existing sessions
+    description: 'Create user story'
 
   - name: validate-story-draft
-    visibility: [key]  # Shown only in workflow sessions
-    description: "Validate story quality"
+    visibility: [key] # Shown only in workflow sessions
+    description: 'Validate story quality'
 ```
 
 **Visibility Levels:**
+
 - `full`: Show in new sessions (up to 12 total)
 - `quick`: Show in existing sessions (6-8 total)
 - `key`: Show in workflow sessions (3-5 total)
@@ -149,10 +165,11 @@ If git is not configured, GreetingBuilder automatically appends:
 ```
 
 **Configuration** (core-config.yaml):
+
 ```yaml
 git:
-  showConfigWarning: true  # User can disable
-  cacheTimeSeconds: 300    # 5 minutes cache
+  showConfigWarning: true # User can disable
+  cacheTimeSeconds: 300 # 5 minutes cache
 ```
 
 ## Performance Characteristics
@@ -162,6 +179,7 @@ git:
 - **Fallback**: Simple greeting on timeout or error
 
 **Optimizations:**
+
 - Git config cached for 5 minutes (0ms after first check)
 - Context analysis ~20ms
 - Parallel execution of checks
@@ -189,6 +207,7 @@ When creating new agents or updating existing ones:
 ## Examples
 
 ### New Agent Creation
+
 ```yaml
 agent:
   name: Nova
@@ -198,19 +217,20 @@ agent:
 
 persona_profile:
   greeting_levels:
-    minimal: "🆕 Nova ready"
+    minimal: '🆕 Nova ready'
     named: "🆕 Nova (Archetype) ready. Let's work together!"
 
 commands:
   - name: help
     visibility: [full, quick, key]
-    description: "Show all commands"
+    description: 'Show all commands'
   - name: do-thing
     visibility: [full, quick]
-    description: "Do the thing"
+    description: 'Do the thing'
 ```
 
 ### Testing
+
 1. Activate agent in fresh session → Should show full greeting
 2. Activate different agent, then return → Should show quick greeting
 3. Execute workflow command, activate next agent → Should show workflow greeting
@@ -227,32 +247,36 @@ commands:
 ## Troubleshooting
 
 ### Greeting appears mechanical
+
 - Check that GreetingBuilder call is in STEP 3
 - Verify old STEPs 2.5-5 are removed
 - Test with fresh Claude Code session
 
 ### Commands not filtered
+
 - Check command visibility metadata exists
 - Verify session type detection is working
 - Check conversation history is being passed
 
 ### Git warning not showing
+
 - Check `git.showConfigWarning: true` in core-config.yaml
 - Verify project has no git remote configured
 - Check git config cache (may be cached from previous check)
 
 ### Performance issues
+
 - Verify greeting displays in < 150ms
 - Check git cache is enabled
 - Monitor for timeout fallbacks in logs
 
 ## Version History
 
-| Version | Date | Changes | Story |
-|---------|------|---------|-------|
-| 2.0 | 2025-11-16 | GreetingBuilder integration | 6.1.2.5 |
-| 1.0 | 2025-01-15 | Manual activation STEPs | N/A |
+| Version | Date       | Changes                     | Story   |
+| ------- | ---------- | --------------------------- | ------- |
+| 2.0     | 2025-11-16 | GreetingBuilder integration | 6.1.2.5 |
+| 1.0     | 2025-01-15 | Manual activation STEPs     | N/A     |
 
 ---
 
-*Template maintained by AIOX Framework Team*
+_Template maintained by AIOX Framework Team_

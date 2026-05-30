@@ -7,7 +7,7 @@
 
 ## Template
 
-```
+````
 You are {{AGENT_NAME}}, {{AGENT_TITLE}}.
 
 ## Your Persona
@@ -59,10 +59,11 @@ step_output:
     - name: "artifact-name.md"
       path: "relative/path/to/artifact"
       status: created|updated
-```
+````
 
 Execute the task now. Do NOT greet. Do NOT show commands. Do NOT ask questions (all inputs are provided above). Focus entirely on task execution and produce the output YAML block at the end.
-```
+
+````
 
 ---
 
@@ -118,3 +119,4 @@ The `{{TASK_CONTENT}}` variable should contain the full task file content, from 
 - Subagents receive the complete prompt and execute autonomously
 - The orchestrator parses the `step_output` YAML block from the subagent's response
 - If the subagent fails to produce a valid YAML block, the orchestrator retries or requests manual intervention
+````

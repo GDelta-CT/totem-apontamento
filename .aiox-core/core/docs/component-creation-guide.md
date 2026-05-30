@@ -71,7 +71,7 @@ The meta-agent will guide you through:
 ```yaml
 # Data Analysis Expert
 
-**Agent ID:** data-analyst  
+**Agent ID:** data-analyst
 **Agent Name:** data-analyst
 
 ## When to Use
@@ -86,11 +86,11 @@ When users need help analyzing data, creating visualizations, or understanding p
 - `*generate-report`: Generate analysis reports
 
 ## Persona
-**Tone:** professional  
+**Tone:** professional
 **Verbosity:** detailed
 
 ## Security Configuration
-**Level:** medium  
+**Level:** medium
 **Requires Approval:** true
 ```
 
@@ -144,9 +144,11 @@ When users need help analyzing data, creating visualizations, or understanding p
 **Version:** 1.0
 
 ## Description
+
 Analyzes provided dataset to identify patterns and insights
 
 ## Context Required
+
 - Dataset location or content
 - Analysis objectives
 - Output format preferences
@@ -154,25 +156,31 @@ Analyzes provided dataset to identify patterns and insights
 ## Process Flow
 
 ### Step 1: Load and Validate Data
+
 Load the dataset and validate its structure.
 
 **Actions:**
+
 - Read data from specified source
 - Validate data format
 - Check for missing values
 
 ### Step 2: Perform Analysis
+
 Execute statistical analysis and pattern detection.
 
 **Actions:**
+
 - Calculate summary statistics
 - Identify correlations
 - Detect anomalies
 
 ### Step 3: Generate Results
+
 Create analysis output in requested format.
 
 **Actions:**
+
 - Format findings
 - Create visualizations
 - Generate report
@@ -216,17 +224,17 @@ steps:
   - id: load-data
     task: load-dataset
     agent: data-analyst
-    
+
   - id: clean-data
     task: clean-data
     agent: data-analyst
     dependsOn: [load-data]
-    
+
   - id: analyze
     task: analyze-data
     agent: data-analyst
     dependsOn: [clean-data]
-    
+
   - id: report
     task: generate-report
     agent: data-analyst
@@ -242,6 +250,7 @@ steps:
 ```
 
 Choose "Complete Agent Package" to create:
+
 - Agent definition
 - Associated tasks
 - Optional workflow
@@ -249,6 +258,7 @@ Choose "Complete Agent Package" to create:
 ### Creating Related Components
 
 The batch creator ensures:
+
 - Consistent naming
 - Proper dependencies
 - Atomic creation (all or nothing)
@@ -265,6 +275,7 @@ The batch creator ensures:
 ```
 
 This creates:
+
 - `agents/api-tester.md`
 - `tasks/analyze-api.md`
 - `tasks/create-api-test.md`
@@ -320,11 +331,13 @@ This creates:
 #### Component Creation Fails
 
 **Problem**: Security validation error
+
 ```
 ❌ Security check failed: Potential code injection detected
 ```
 
-**Solution**: 
+**Solution**:
+
 - Review input for special characters
 - Avoid executable code in descriptions
 - Use plain text for content
@@ -332,11 +345,13 @@ This creates:
 #### Duplicate Component Names
 
 **Problem**: Component already exists
+
 ```
 ❌ Error: Agent 'data-analyst' already exists
 ```
 
 **Solution**:
+
 - Choose unique names
 - Check existing components first
 - Use version suffixes if needed
@@ -344,11 +359,13 @@ This creates:
 #### Missing Dependencies
 
 **Problem**: Required task not found
+
 ```
 ⚠️ Warning: Task 'analyze-data' references missing agent
 ```
 
 **Solution**:
+
 - Create dependencies first
 - Use batch creation for related components
 - Run dependency validation
@@ -356,11 +373,13 @@ This creates:
 #### Template Processing Errors
 
 **Problem**: Variables not replaced
+
 ```
 Generated content contains: {{AGENT_NAME}}
 ```
 
 **Solution**:
+
 - Check variable names in elicitation
 - Verify template file exists
 - Enable debug mode for details
@@ -368,11 +387,13 @@ Generated content contains: {{AGENT_NAME}}
 ### Debug Mode
 
 Enable detailed logging:
+
 ```bash
 DEBUG=aiox:* *create-agent
 ```
 
 This shows:
+
 - Template processing steps
 - Variable resolution
 - Validation checks
@@ -381,16 +402,19 @@ This shows:
 ### Recovery Options
 
 #### Rollback Last Operation
+
 ```bash
 *undo-last
 ```
 
 #### List Recent Transactions
+
 ```bash
 *list-transactions
 ```
 
 #### Selective Rollback
+
 ```bash
 *rollback --transaction-id=txn-123
 ```
@@ -438,6 +462,7 @@ Use configuration files:
 ```
 
 Config file format:
+
 ```json
 {
   "agentName": "automated-agent",

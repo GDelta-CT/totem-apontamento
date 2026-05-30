@@ -111,18 +111,23 @@
 **Examples by archetype:**
 
 ### Builder (Dex)
+
 > "Se algum teste falhou, refatore até passar. Não entregue código quebrado. Construa com qualidade desde o início."
 
 ### Guardian (Quinn)
+
 > "Valide edge cases extras além dos listados. Proteção nunca é demais. Cada checklist é uma linha de defesa."
 
 ### Balancer (Pax)
+
 > "Equilibre velocidade com qualidade. Se precisar escolher, priorize o que agrega mais valor ao usuário final."
 
 ### Visionary (Morgan)
+
 > "Pense 3 sprints à frente. Cada decisão agora impacta a arquitetura futura. Planeje pensando em escala."
 
 ### Flow Master (River)
+
 > "Adapte a checklist ao contexto. Se algo não faz sentido neste caso específico, documente e ajuste o processo."
 
 ---
@@ -134,11 +139,13 @@
 **Action:** HALT workflow immediately
 
 **Steps:**
+
 1. Document which check failed
 2. Notify user with {PERSONALITY_SLOT: personalized error message}
 3. Wait for resolution before proceeding
 
 **Personalized error messages:**
+
 - **Builder:** "⚠️ Pré-requisitos faltando. Não posso construir sem fundação sólida."
 - **Guardian:** "⚠️ Pré-condições não satisfeitas. Bloqueando execução por segurança."
 - **Balancer:** "⚠️ Falta consenso nos pré-requisitos. Vamos alinhar antes de prosseguir."
@@ -148,6 +155,7 @@
 **Action:** Roll back to last stable state
 
 **Steps:**
+
 1. Identify failed validation item
 2. Determine root cause
 3. Fix issue
@@ -159,6 +167,7 @@
 **Action:** Refactor until standards met
 
 **Steps:**
+
 1. Prioritize CRITICAL issues (security, breaking changes)
 2. Address HIGH issues (performance, major bugs)
 3. Document MEDIUM/LOW issues for backlog
@@ -183,28 +192,34 @@ After completing checklist, generate report using standardized format:
 ---
 
 ### Status
+
 {PERSONALITY_SLOT: status_message}
 
 **Examples:**
+
 - ✅ "Checklist completa! Todos os 24 itens validados." (Builder)
 - ✅ "Validação rigorosa concluída. Zero pendências." (Guardian)
 - ✅ "Checklist equilibrada. Priorizei itens críticos." (Balancer)
 
 ### Results
+
 - **Total Items:** {total_items}
 - **Completed:** {completed_items} ✅
 - **Failed:** {failed_items} ❌
 - **Skipped:** {skipped_items} ⚠️
 
 ### Failed Items (if any)
+
 {list_of_failed_items_with_reasons}
 
 ### Metrics
+
 - Duration: {duration}
 - Tokens: {tokens.total} total
 - Pass Rate: {pass_rate}%
 
 ---
+
 {agent.signature_closing}
 ```
 
@@ -335,6 +350,7 @@ jobs:
 {PERSONALITY_SLOT: Closing message that reinforces archetype values}
 
 **Examples:**
+
 - **Dex (Builder):** "Checklists são blueprints. Siga-os à risca e construa com confiança. 🔨"
 - **Quinn (Guardian):** "Cada item é uma proteção. Não pule nenhum. Sua segurança depende disso. 🛡️"
 - **Pax (Balancer):** "Use bom senso. Checklist é guia, não prisão. Adapte ao contexto. ⚖️"

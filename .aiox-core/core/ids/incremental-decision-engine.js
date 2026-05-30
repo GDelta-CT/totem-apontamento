@@ -13,11 +13,50 @@
  */
 
 const STOP_WORDS = new Set([
-  'the', 'a', 'an', 'is', 'are', 'for', 'to', 'of', 'in', 'on',
-  'and', 'or', 'but', 'not', 'with', 'that', 'this', 'it', 'be',
-  'as', 'at', 'by', 'from', 'has', 'have', 'had', 'was', 'were',
-  'will', 'would', 'can', 'could', 'should', 'do', 'does', 'did',
-  'i', 'we', 'you', 'my', 'our', 'your', 'its', 'their',
+  'the',
+  'a',
+  'an',
+  'is',
+  'are',
+  'for',
+  'to',
+  'of',
+  'in',
+  'on',
+  'and',
+  'or',
+  'but',
+  'not',
+  'with',
+  'that',
+  'this',
+  'it',
+  'be',
+  'as',
+  'at',
+  'by',
+  'from',
+  'has',
+  'have',
+  'had',
+  'was',
+  'were',
+  'will',
+  'would',
+  'can',
+  'could',
+  'should',
+  'do',
+  'does',
+  'did',
+  'i',
+  'we',
+  'you',
+  'my',
+  'our',
+  'your',
+  'its',
+  'their',
 ]);
 
 const MIN_KEYWORD_LENGTH = 3;
@@ -27,7 +66,7 @@ const PURPOSE_SIMILARITY_WEIGHT = 0.4;
 const THRESHOLD_MINIMUM = 0.4;
 const MAX_RESULTS = 20;
 const CACHE_TTL_MS = 300_000; // 300 seconds
-const ADAPT_IMPACT_THRESHOLD = 0.30; // Calibrate after 90 days (ADR-IDS-001 Roundtable #2)
+const ADAPT_IMPACT_THRESHOLD = 0.3; // Calibrate after 90 days (ADR-IDS-001 Roundtable #2)
 
 class IncrementalDecisionEngine {
   /**
@@ -103,12 +142,12 @@ class IncrementalDecisionEngine {
     let candidates = allEntities;
     if (context.type) {
       candidates = candidates.filter(
-        (e) => e.type && e.type.toLowerCase() === context.type.toLowerCase(),
+        (e) => e.type && e.type.toLowerCase() === context.type.toLowerCase()
       );
     }
     if (context.category) {
       candidates = candidates.filter(
-        (e) => e.category && e.category.toLowerCase() === context.category.toLowerCase(),
+        (e) => e.category && e.category.toLowerCase() === context.category.toLowerCase()
       );
     }
 
@@ -236,7 +275,7 @@ class IncrementalDecisionEngine {
 
       // Partial/prefix match (fuzzy fallback)
       const partialMatch = entityKeywords.some(
-        (ekw) => ekw.startsWith(intentKw) || intentKw.startsWith(ekw),
+        (ekw) => ekw.startsWith(intentKw) || intentKw.startsWith(ekw)
       );
       if (partialMatch) {
         overlapScore += idf * 0.5;
@@ -404,13 +443,13 @@ class IncrementalDecisionEngine {
     if (decision.action === 'REUSE') {
       parts.push(`Strong match (${this._pct(relevanceScore)} relevance).`);
       parts.push(
-        `Keywords align (${this._pct(keywordScore)}), purpose matches (${this._pct(purposeScore)}).`,
+        `Keywords align (${this._pct(keywordScore)}), purpose matches (${this._pct(purposeScore)}).`
       );
       parts.push(`Recommendation: Use "${entity.id}" directly without modification.`);
     } else if (decision.action === 'ADAPT') {
       parts.push(`Good match (${this._pct(relevanceScore)} relevance) with adaptation potential.`);
       parts.push(
-        `Adaptability: ${canAdapt.score}, impact: ${this._pct(impact.percentage)} of entities affected.`,
+        `Adaptability: ${canAdapt.score}, impact: ${this._pct(impact.percentage)} of entities affected.`
       );
       if (canAdapt.extensionPoints && canAdapt.extensionPoints.length > 0) {
         parts.push(`Adaptation points: ${canAdapt.extensionPoints.join(', ')}.`);
@@ -424,7 +463,7 @@ class IncrementalDecisionEngine {
         parts.push(`Relevance adequate but adaptability too low (${canAdapt.score}).`);
       } else if (relevanceScore >= 0.6 && impact.percentage >= ADAPT_IMPACT_THRESHOLD) {
         parts.push(
-          `Relevance adequate but adaptation impact too high (${this._pct(impact.percentage)}).`,
+          `Relevance adequate but adaptation impact too high (${this._pct(impact.percentage)}).`
         );
       }
     }
@@ -447,7 +486,8 @@ class IncrementalDecisionEngine {
     const parts = [`Found ${evaluations.length} match(es) above threshold.`];
     if (reuseCount > 0) parts.push(`${reuseCount} can be reused directly.`);
     if (adaptCount > 0) parts.push(`${adaptCount} can be adapted.`);
-    if (createCount > 0) parts.push(`${createCount} evaluated but insufficient for reuse/adaptation.`);
+    if (createCount > 0)
+      parts.push(`${createCount} evaluated but insufficient for reuse/adaptation.`);
     parts.push(`Top recommendation: ${topDecision} "${recommendations[0].entityId}".`);
 
     return parts.join(' ');
@@ -582,9 +622,10 @@ class IncrementalDecisionEngine {
     }
 
     // Check if 60 days have passed since creation/last verification
-    const referenceDate = entity.createdAt
-      || (entity.createJustification && entity.createJustification.created_at)
-      || entity.lastVerified;
+    const referenceDate =
+      entity.createdAt ||
+      (entity.createJustification && entity.createJustification.created_at) ||
+      entity.lastVerified;
 
     if (referenceDate) {
       const refDate = new Date(referenceDate);

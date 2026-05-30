@@ -19,9 +19,7 @@ function detectRepositoryContext() {
   // Detect git remote URL
   let remoteUrl = null;
   try {
-    remoteUrl = execSync('git config --get remote.origin.url', { cwd })
-      .toString()
-      .trim();
+    remoteUrl = execSync('git config --get remote.origin.url', { cwd }).toString().trim();
   } catch (error) {
     console.warn('⚠️  No git repository detected');
     return null;
@@ -52,8 +50,9 @@ function detectRepositoryContext() {
 
   return {
     repositoryUrl: remoteUrl,
-    mode: installConfig?.installation?.mode ||
-          (isFrameworkRepo ? 'framework-development' : 'project-development'),
+    mode:
+      installConfig?.installation?.mode ||
+      (isFrameworkRepo ? 'framework-development' : 'project-development'),
     projectRoot: cwd,
     frameworkLocation: isFrameworkRepo ? cwd : path.join(cwd, 'node_modules/@aiox/fullstack'),
     packageName: packageJson.name,

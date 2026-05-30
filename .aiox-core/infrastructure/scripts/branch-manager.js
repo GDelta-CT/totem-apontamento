@@ -20,20 +20,15 @@ class BranchManager {
    * @returns {Promise<Object>} Branch creation result
    */
   async createModificationBranch(modification) {
-    const {
-      type,
-      target,
-      action,
-      ticketId,
-    } = modification;
+    const { type, target, action, ticketId } = modification;
 
     // Generate branch name
     const timestamp = Date.now();
     const sanitizedTarget = target.replace(/[^a-zA-Z0-9-]/g, '-').toLowerCase();
     const sanitizedAction = action.replace(/[^a-zA-Z0-9-]/g, '-').toLowerCase();
-    
+
     let branchName = `${this.branchPrefix}${type}/${sanitizedTarget}-${sanitizedAction}-${timestamp}`;
-    
+
     if (ticketId) {
       branchName = `${this.branchPrefix}${ticketId}/${type}-${sanitizedTarget}`;
     }
@@ -42,7 +37,9 @@ class BranchManager {
       // Ensure we're on the default branch first
       const currentBranch = await this.git.getCurrentBranch();
       if (currentBranch !== this.git.defaultBranch) {
-        console.log(chalk.yellow(`Switching to ${this.git.defaultBranch} before creating new branch`));
+        console.log(
+          chalk.yellow(`Switching to ${this.git.defaultBranch} before creating new branch`)
+        );
         await this.git.checkoutBranch(this.git.defaultBranch);
       }
 
@@ -71,15 +68,16 @@ class BranchManager {
   async getModificationBranches() {
     try {
       const output = await this.git.execGit('branch -a');
-      const branches = output.split('\n')
-        .map(line => line.trim().replace('* ', ''))
-        .filter(branch => branch.startsWith(this.branchPrefix));
+      const branches = output
+        .split('\n')
+        .map((line) => line.trim().replace('* ', ''))
+        .filter((branch) => branch.startsWith(this.branchPrefix));
 
       const branchDetails = [];
       for (const branch of branches) {
         const lastCommit = await this.git.execGit(`log -1 --format="%H|%at|%s" ${branch}`);
         const [hash, timestamp, subject] = lastCommit.split('|');
-        
+
         branchDetails.push({
           name: branch,
           lastCommitHash: hash,
@@ -106,16 +104,18 @@ class BranchManager {
       // Check for uncommitted changes
       const status = await this.git.getStatus();
       if (!status.clean) {
-        const { action } = await inquirer.prompt([{
-          type: 'list',
-          name: 'action',
-          message: 'You have uncommitted changes. What would you like to do?',
-          choices: [
-            { name: 'Stash changes and switch', value: 'stash' },
-            { name: 'Commit changes first', value: 'commit' },
-            { name: 'Cancel', value: 'cancel' },
-          ],
-        }]);
+        const { action } = await inquirer.prompt([
+          {
+            type: 'list',
+            name: 'action',
+            message: 'You have uncommitted changes. What would you like to do?',
+            choices: [
+              { name: 'Stash changes and switch', value: 'stash' },
+              { name: 'Commit changes first', value: 'commit' },
+              { name: 'Cancel', value: 'cancel' },
+            ],
+          },
+        ]);
 
         if (action === 'cancel') {
           return { success: false, reason: 'User cancelled' };
@@ -159,7 +159,7 @@ class BranchManager {
         if (options.deleteBranch) {
           await this.deleteBranch(branchName);
         }
-        
+
         return {
           success: true,
           message: 'Branch merged successfully',
@@ -190,7 +190,7 @@ class BranchManager {
     try {
       const flag = force ? '-D' : '-d';
       await this.git.execGit(`branch ${flag} ${branchName}`);
-      
+
       console.log(chalk.green(`✅ Deleted branch: ${branchName}`));
       return { success: true };
     } catch (error) {
@@ -212,9 +212,8 @@ class BranchManager {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysOld);
 
-    const toDelete = branches.filter(branch =>
-      branch.lastCommitDate < cutoffDate &&
-      branch.name !== currentBranch,
+    const toDelete = branches.filter(
+      (branch) => branch.lastCommitDate < cutoffDate && branch.name !== currentBranch
     );
 
     if (toDelete.length === 0) {
@@ -223,16 +222,18 @@ class BranchManager {
     }
 
     console.log(chalk.blue(`Found ${toDelete.length} branches older than ${daysOld} days:`));
-    toDelete.forEach(branch => {
+    toDelete.forEach((branch) => {
       console.log(chalk.gray(`  - ${branch.name} (${branch.age})`));
     });
 
-    const { confirm } = await inquirer.prompt([{
-      type: 'confirm',
-      name: 'confirm',
-      message: `Delete ${toDelete.length} old branches?`,
-      default: false,
-    }]);
+    const { confirm } = await inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'confirm',
+        message: `Delete ${toDelete.length} old branches?`,
+        default: false,
+      },
+    ]);
 
     if (!confirm) {
       return { deleted: 0, cancelled: true };
@@ -255,11 +256,7 @@ class BranchManager {
   async protectBranch(branchName) {
     // This would integrate with GitHub/GitLab API for real protection
     // For now, we'll track it locally
-    const protectionFile = path.join(
-      this.git.rootPath,
-      '.git',
-      'aiox-branch-protection.json',
-    );
+    const protectionFile = path.join(this.git.rootPath, '.git', 'aiox-branch-protection.json');
 
     try {
       let protections = {};
@@ -278,10 +275,7 @@ class BranchManager {
         protectedAt: new Date().toISOString(),
       };
 
-      await require('fs').promises.writeFile(
-        protectionFile,
-        JSON.stringify(protections, null, 2),
-      );
+      await require('fs').promises.writeFile(protectionFile, JSON.stringify(protections, null, 2));
 
       console.log(chalk.green(`✅ Branch protection enabled for: ${branchName}`));
       return { success: true, protection: protections[branchName] };
@@ -298,15 +292,11 @@ class BranchManager {
    */
   async compareBranches(branch1, branch2 = null) {
     const targetBranch = branch2 || this.git.defaultBranch;
-    
+
     try {
       // Get commits ahead/behind
-      const ahead = await this.git.execGit(
-        `rev-list --count ${targetBranch}..${branch1}`,
-      );
-      const behind = await this.git.execGit(
-        `rev-list --count ${branch1}..${targetBranch}`,
-      );
+      const ahead = await this.git.execGit(`rev-list --count ${targetBranch}..${branch1}`);
+      const behind = await this.git.execGit(`rev-list --count ${branch1}..${targetBranch}`);
 
       // Get changed files
       const changedFiles = await this.git.getDiff({
@@ -340,7 +330,7 @@ class BranchManager {
     const diff = now - timestamp;
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    
+
     if (days > 0) {
       return `${days} day${days > 1 ? 's' : ''} ago`;
     } else if (hours > 0) {

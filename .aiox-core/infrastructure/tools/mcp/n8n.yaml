@@ -151,7 +151,7 @@ tool:
       - id: extract-workflow-state
         language: javascript
         runtime: isolated_vm
-        description: "Extract current state from workflow execution"
+        description: 'Extract current state from workflow execution'
         function: |
           (function() {
             const { execution } = args;
@@ -169,7 +169,7 @@ tool:
       - id: validate-node-connections
         language: javascript
         runtime: isolated_vm
-        description: "Validate node connections in workflow"
+        description: 'Validate node connections in workflow'
         function: |
           (function() {
             const { nodes, connections } = args;
@@ -213,7 +213,7 @@ tool:
       - id: format-workflow-data
         language: javascript
         runtime: isolated_vm
-        description: "Format input data for workflow execution"
+        description: 'Format input data for workflow execution'
         function: |
           (function() {
             const { data, workflowData } = args;
@@ -245,7 +245,7 @@ tool:
       - id: parse-execution-error
         language: javascript
         runtime: isolated_vm
-        description: "Parse and format execution errors"
+        description: 'Parse and format execution errors'
         function: |
           (function() {
             const { error, execution } = args;
@@ -262,7 +262,7 @@ tool:
       - id: validate-credential-type
         language: javascript
         runtime: isolated_vm
-        description: "Validate credential type is supported"
+        description: 'Validate credential type is supported'
         function: |
           (function() {
             const { type } = args;
@@ -290,7 +290,7 @@ tool:
       - id: build-workflow-structure
         language: javascript
         runtime: isolated_vm
-        description: "Build workflow structure from nodes and connections"
+        description: 'Build workflow structure from nodes and connections'
         function: |
           (function() {
             const { name, nodes, connections } = args;
@@ -312,7 +312,7 @@ tool:
       - id: calculate-workflow-complexity
         language: javascript
         runtime: isolated_vm
-        description: "Calculate workflow complexity score"
+        description: 'Calculate workflow complexity score'
         function: |
           (function() {
             const { nodes, connections } = args;
@@ -347,63 +347,63 @@ tool:
   api_complexity:
     workflow_execution_state:
       - state: waiting
-        description: "Workflow is queued for execution"
+        description: 'Workflow is queued for execution'
         next_states: [running, failed]
 
       - state: running
-        description: "Workflow is currently executing"
+        description: 'Workflow is currently executing'
         next_states: [finished, stopped, error]
 
       - state: finished
-        description: "Workflow completed successfully"
+        description: 'Workflow completed successfully'
         terminal: true
 
       - state: stopped
-        description: "Workflow was manually stopped"
+        description: 'Workflow was manually stopped'
         terminal: true
 
       - state: error
-        description: "Workflow encountered an error"
+        description: 'Workflow encountered an error'
         terminal: true
         retry_allowed: true
 
     credential_types:
       - type: httpBasicAuth
         fields: [username, password]
-        description: "HTTP Basic Authentication"
+        description: 'HTTP Basic Authentication'
 
       - type: httpHeaderAuth
         fields: [name, value]
-        description: "HTTP Header Authentication"
+        description: 'HTTP Header Authentication'
 
       - type: oAuth2Api
         fields: [clientId, clientSecret, authUrl, accessTokenUrl]
-        description: "OAuth 2.0 Authentication"
+        description: 'OAuth 2.0 Authentication'
 
       - type: apiKey
         fields: [apiKey]
-        description: "API Key Authentication"
+        description: 'API Key Authentication'
 
     node_execution_patterns:
       - pattern: sequential
-        description: "Nodes execute in order, one after another"
-        use_case: "Simple linear workflows"
+        description: 'Nodes execute in order, one after another'
+        use_case: 'Simple linear workflows'
 
       - pattern: parallel
-        description: "Multiple nodes execute simultaneously"
-        use_case: "Independent data processing"
+        description: 'Multiple nodes execute simultaneously'
+        use_case: 'Independent data processing'
 
       - pattern: conditional
-        description: "Execution path depends on node conditions"
+        description: 'Execution path depends on node conditions'
         nodes: [n8n-nodes-base.if, n8n-nodes-base.switch]
 
       - pattern: loop
-        description: "Repeated execution over data items"
+        description: 'Repeated execution over data items'
         nodes: [n8n-nodes-base.splitInBatches]
 
   anti_patterns:
     - pattern: missing_error_handling
-      description: "Not handling node execution errors"
+      description: 'Not handling node execution errors'
       category: reliability
       severity: high
       wrong: |
@@ -421,10 +421,10 @@ tool:
           // ✅ Handle error appropriately
           handle_execution_error(result)
         }
-      rationale: "Always check execution status and handle errors gracefully."
+      rationale: 'Always check execution status and handle errors gracefully.'
 
     - pattern: invalid_node_connections
-      description: "Creating workflows with disconnected or invalid nodes"
+      description: 'Creating workflows with disconnected or invalid nodes'
       category: workflow_structure
       severity: medium
       wrong: |
@@ -447,7 +447,7 @@ tool:
             }
           }
         })
-      rationale: "Use validate-node-connections helper to verify connections before workflow creation."
+      rationale: 'Use validate-node-connections helper to verify connections before workflow creation.'
 
     - pattern: missing_credentials
       description: "Referencing credentials that don't exist"
@@ -479,35 +479,35 @@ tool:
             }
           }]
         })
-      rationale: "Always create and verify credentials before referencing them in workflows."
+      rationale: 'Always create and verify credentials before referencing them in workflows.'
 
   examples:
     execute_workflow:
       - scenario: success
-        description: "Execute workflow and wait for completion"
+        description: 'Execute workflow and wait for completion'
         input:
-          workflow_id: "wf_abc123"
+          workflow_id: 'wf_abc123'
           wait_for_completion: true
-          data: { key: "value" }
+          data: { key: 'value' }
         output:
-          execution_id: "exec_xyz789"
-          status: "finished"
-          data: { result: "success" }
+          execution_id: 'exec_xyz789'
+          status: 'finished'
+          data: { result: 'success' }
 
       - scenario: failure_invalid_param
-        description: "Missing required workflow_id"
+        description: 'Missing required workflow_id'
         input:
-          data: { key: "value" }
+          data: { key: 'value' }
         error:
           code: VALIDATION_ERROR
-          message: "workflow_id is required"
+          message: 'workflow_id is required'
           validator: validate-execute-workflow
 
     create_workflow:
       - scenario: success
-        description: "Create simple workflow"
+        description: 'Create simple workflow'
         input:
-          name: "Data Processor"
+          name: 'Data Processor'
           nodes:
             - type: n8n-nodes-base.start
               name: Start
@@ -515,37 +515,37 @@ tool:
             - type: n8n-nodes-base.httpRequest
               name: Fetch Data
               parameters:
-                url: "https://api.example.com/data"
+                url: 'https://api.example.com/data'
           connections:
             Start:
-              main: [[{node: "Fetch Data", type: "main", index: 0}]]
+              main: [[{ node: 'Fetch Data', type: 'main', index: 0 }]]
         output:
-          workflow_id: "wf_new123"
-          name: "Data Processor"
+          workflow_id: 'wf_new123'
+          name: 'Data Processor'
           active: false
 
       - scenario: failure_invalid_param
-        description: "Invalid node structure"
+        description: 'Invalid node structure'
         input:
-          name: "Test Workflow"
-          nodes: "not an array"
+          name: 'Test Workflow'
+          nodes: 'not an array'
         error:
           code: VALIDATION_ERROR
-          message: "nodes must be an array"
+          message: 'nodes must be an array'
           validator: validate-create-workflow
 
   mcp_specific:
-    server_command: "npx -y @illuminaresolutions/n8n-mcp-server"
+    server_command: 'npx -y @illuminaresolutions/n8n-mcp-server'
     transport: stdio
     environment_variables:
       - name: N8N_HOST
         required: true
-        description: "n8n instance URL (e.g., https://your-n8n-instance.com)"
+        description: 'n8n instance URL (e.g., https://your-n8n-instance.com)'
       - name: N8N_API_KEY
         required: true
-        description: "n8n API key for authentication"
+        description: 'n8n API key for authentication'
     health_check:
       method: tool_call
       command: list_workflows
-      expected_response: "Array of workflows"
+      expected_response: 'Array of workflows'
       timeout_ms: 5000

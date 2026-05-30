@@ -8,7 +8,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   Area,
-  AreaChart
+  AreaChart,
 } from 'recharts';
 import './Chart.css';
 
@@ -16,7 +16,7 @@ const STATUS_COLORS = {
   healthy: '#22c55e',
   degraded: '#eab308',
   warning: '#f97316',
-  critical: '#ef4444'
+  critical: '#ef4444',
 };
 
 /**
@@ -42,9 +42,9 @@ function TrendChart({ data, height = 200, showArea = true }) {
   }
 
   // Add color to each data point
-  const chartData = data.map(point => ({
+  const chartData = data.map((point) => ({
     ...point,
-    color: getScoreColor(point.score)
+    color: getScoreColor(point.score),
   }));
 
   const latestScore = chartData[chartData.length - 1]?.score || 0;
@@ -81,7 +81,7 @@ function TrendChart({ data, height = 200, showArea = true }) {
               contentStyle={{
                 backgroundColor: '#1e293b',
                 border: '1px solid #334155',
-                borderRadius: '8px'
+                borderRadius: '8px',
               }}
               labelFormatter={(value) => new Date(value).toLocaleDateString()}
               formatter={(value) => [`${value}%`, 'Score']}
@@ -116,7 +116,7 @@ function TrendChart({ data, height = 200, showArea = true }) {
               contentStyle={{
                 backgroundColor: '#1e293b',
                 border: '1px solid #334155',
-                borderRadius: '8px'
+                borderRadius: '8px',
               }}
               labelFormatter={(value) => new Date(value).toLocaleDateString()}
               formatter={(value) => [`${value}%`, 'Score']}

@@ -461,5 +461,7 @@ Type `*help` to see all commands, or `*kb` to enable KB mode.
 Use specialized agents for specific tasks - this agent is for orchestration and framework operations only.
 
 ---
+
 ---
-*AIOX Agent - Synced from .aiox-core/development/agents/aiox-master.md*
+
+_AIOX Agent - Synced from .aiox-core/development/agents/aiox-master.md_

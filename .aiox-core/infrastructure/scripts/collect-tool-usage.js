@@ -41,7 +41,7 @@ function createEvent(toolName, invocationCount, tokenCostInput, tokenCostOutput,
     token_cost_input: Number(tokenCostInput) || 0,
     token_cost_output: Number(tokenCostOutput) || 0,
     session_id: String(sessionId),
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   };
 }
 
@@ -54,16 +54,25 @@ function sanitizeEvent(event) {
     token_cost_input: Math.max(0, Math.floor(Number(event.token_cost_input) || 0)),
     token_cost_output: Math.max(0, Math.floor(Number(event.token_cost_output) || 0)),
     session_id: String(event.session_id || '').replace(/[^a-zA-Z0-9_-]/g, ''),
-    timestamp: event.timestamp || new Date().toISOString()
+    timestamp: event.timestamp || new Date().toISOString(),
   };
 }
 
 // --- Validate event schema (AC 10) ---
 function validateEvent(event) {
-  const required = ['tool_name', 'invocation_count', 'token_cost_input', 'token_cost_output', 'session_id', 'timestamp'];
-  const missing = required.filter(field => event[field] === undefined || event[field] === null || event[field] === '');
+  const required = [
+    'tool_name',
+    'invocation_count',
+    'token_cost_input',
+    'token_cost_output',
+    'session_id',
+    'timestamp',
+  ];
+  const missing = required.filter(
+    (field) => event[field] === undefined || event[field] === null || event[field] === ''
+  );
   if (missing.length > 0) {
-    return { valid: false, errors: missing.map(f => `Missing required field: ${f}`) };
+    return { valid: false, errors: missing.map((f) => `Missing required field: ${f}`) };
   }
   if (typeof event.invocation_count !== 'number' || event.invocation_count < 0) {
     return { valid: false, errors: ['invocation_count must be a non-negative number'] };
@@ -78,11 +87,11 @@ function pruneOldEntries(sessions) {
   const cutoffISO = cutoff.toISOString();
 
   const before = sessions.length;
-  const pruned = sessions.filter(session => {
+  const pruned = sessions.filter((session) => {
     // Keep sessions where at least one event is within retention window
     if (session.timestamp && session.timestamp >= cutoffISO) return true;
     if (session.events && session.events.length > 0) {
-      return session.events.some(e => e.timestamp >= cutoffISO);
+      return session.events.some((e) => e.timestamp >= cutoffISO);
     }
     return false;
   });
@@ -107,7 +116,7 @@ function loadUsageData() {
     version: '1.0.0',
     schema: 'tool-usage-analytics',
     description: 'Tool usage tracking data for AIOX token optimization (TOK-5)',
-    sessions: []
+    sessions: [],
   };
 }
 
@@ -137,7 +146,9 @@ function collectFromStdin() {
     }
     let data = '';
     process.stdin.setEncoding('utf8');
-    process.stdin.on('data', chunk => { data += chunk; });
+    process.stdin.on('data', (chunk) => {
+      data += chunk;
+    });
     process.stdin.on('end', () => {
       try {
         resolve(JSON.parse(data));
@@ -162,18 +173,12 @@ function generateSampleData(sessionId) {
     { name: 'Task', inputCost: 400, outputCost: 300 },
     { name: 'git', inputCost: 100, outputCost: 50 },
     { name: 'coderabbit', inputCost: 300, outputCost: 200 },
-    { name: 'context7', inputCost: 200, outputCost: 150 }
+    { name: 'context7', inputCost: 200, outputCost: 150 },
   ];
 
-  return tools.map(t => {
+  return tools.map((t) => {
     const count = Math.floor(Math.random() * 20) + 1;
-    return createEvent(
-      t.name,
-      count,
-      t.inputCost * count,
-      t.outputCost * count,
-      sessionId
-    );
+    return createEvent(t.name, count, t.inputCost * count, t.outputCost * count, sessionId);
   });
 }
 
@@ -185,9 +190,8 @@ async function main() {
   const jsonOutput = args.includes('--json');
   const sampleMode = args.includes('--sample');
   const sessionIdIdx = args.indexOf('--session-id');
-  const sessionId = sessionIdIdx >= 0 && args[sessionIdIdx + 1]
-    ? args[sessionIdIdx + 1]
-    : generateSessionId();
+  const sessionId =
+    sessionIdIdx >= 0 && args[sessionIdIdx + 1] ? args[sessionIdIdx + 1] : generateSessionId();
 
   // Load existing data
   const data = loadUsageData();
@@ -204,7 +208,9 @@ async function main() {
     if (jsonOutput) {
       console.log(JSON.stringify(result, null, 2));
     } else {
-      console.log(`[TOK-5] Pruned ${removed} sessions older than ${RETENTION_DAYS} days. ${data.sessions.length} remaining.`);
+      console.log(
+        `[TOK-5] Pruned ${removed} sessions older than ${RETENTION_DAYS} days. ${data.sessions.length} remaining.`
+      );
       if (dryRun) console.log('[TOK-5] Dry run — no changes written.');
     }
     return;
@@ -217,17 +223,21 @@ async function main() {
   } else {
     const stdinData = await collectFromStdin();
     if (stdinData && Array.isArray(stdinData)) {
-      events = stdinData.map(e => createEvent(
-        e.tool_name,
-        e.invocation_count,
-        e.token_cost_input,
-        e.token_cost_output,
-        sessionId
-      ));
+      events = stdinData.map((e) =>
+        createEvent(
+          e.tool_name,
+          e.invocation_count,
+          e.token_cost_input,
+          e.token_cost_output,
+          sessionId
+        )
+      );
     } else {
       // No stdin data — show usage
       if (!jsonOutput) {
-        console.log('Usage: echo \'[{"tool_name":"Read","invocation_count":5,"token_cost_input":1000,"token_cost_output":500}]\' | node collect-tool-usage.js');
+        console.log(
+          'Usage: echo \'[{"tool_name":"Read","invocation_count":5,"token_cost_input":1000,"token_cost_output":500}]\' | node collect-tool-usage.js'
+        );
         console.log('       node collect-tool-usage.js --sample --session-id my-session');
         console.log('       node collect-tool-usage.js --prune-only');
       }
@@ -241,13 +251,13 @@ async function main() {
 
   // Sanitize and validate (AC 10, 12)
   const sanitized = events.map(sanitizeEvent);
-  const validationResults = sanitized.map(e => ({ event: e, ...validateEvent(e) }));
-  const invalid = validationResults.filter(r => !r.valid);
-  const valid = validationResults.filter(r => r.valid).map(r => r.event);
+  const validationResults = sanitized.map((e) => ({ event: e, ...validateEvent(e) }));
+  const invalid = validationResults.filter((r) => !r.valid);
+  const valid = validationResults.filter((r) => r.valid).map((r) => r.event);
 
   if (invalid.length > 0 && !jsonOutput) {
     console.warn(`[TOK-5] Warning: ${invalid.length} events failed validation and were skipped.`);
-    invalid.forEach(r => console.warn(`  - ${r.event.tool_name}: ${r.errors.join(', ')}`));
+    invalid.forEach((r) => console.warn(`  - ${r.event.tool_name}: ${r.errors.join(', ')}`));
   }
 
   // Create session entry
@@ -258,7 +268,7 @@ async function main() {
     total_invocations: valid.reduce((sum, e) => sum + e.invocation_count, 0),
     total_token_cost_input: valid.reduce((sum, e) => sum + e.token_cost_input, 0),
     total_token_cost_output: valid.reduce((sum, e) => sum + e.token_cost_output, 0),
-    events: valid
+    events: valid,
   };
 
   data.sessions.push(session);
@@ -278,13 +288,15 @@ async function main() {
     total_tokens: session.total_token_cost_input + session.total_token_cost_output,
     pruned_sessions: removed,
     total_sessions: data.sessions.length,
-    dryRun
+    dryRun,
   };
 
   if (jsonOutput) {
     console.log(JSON.stringify(result, null, 2));
   } else {
-    console.log(`[TOK-5] Session ${sessionId}: ${valid.length} tools tracked, ${session.total_invocations} invocations, ${session.total_token_cost_input + session.total_token_cost_output} tokens total.`);
+    console.log(
+      `[TOK-5] Session ${sessionId}: ${valid.length} tools tracked, ${session.total_invocations} invocations, ${session.total_token_cost_input + session.total_token_cost_output} tokens total.`
+    );
     if (removed > 0) console.log(`[TOK-5] Pruned ${removed} old sessions.`);
     if (dryRun) console.log('[TOK-5] Dry run — no changes written.');
     else console.log(`[TOK-5] Data saved to ${USAGE_FILE}`);
@@ -293,7 +305,7 @@ async function main() {
 
 // Run main only when executed directly (not when required as module)
 if (require.main === module) {
-  main().catch(err => {
+  main().catch((err) => {
     console.error('[TOK-5] Error:', err.message);
     process.exit(1);
   });
@@ -307,5 +319,5 @@ module.exports = {
   pruneOldEntries,
   loadUsageData,
   generateSampleData,
-  RETENTION_DAYS
+  RETENTION_DAYS,
 };

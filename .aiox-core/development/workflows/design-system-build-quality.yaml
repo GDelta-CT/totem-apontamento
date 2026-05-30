@@ -1,7 +1,7 @@
 workflow:
   id: design-system-build-quality
   name: Design System Build Quality Pipeline
-  version: "1.0"
+  version: '1.0'
   description: >-
     Pipeline pós-migração para Design System. Encadeia sequencialmente as etapas de
     build, documentação, auditoria de acessibilidade e cálculo de ROI para garantir
@@ -27,7 +27,7 @@ workflow:
       default: true
     - mode: preflight
       description: Planejamento completo antes da execução - análise upfront de todos os componentes e dependências
-      prompts: "10-15"
+      prompts: '10-15'
 
   phases:
     - phase_1: Build & Compile

@@ -11,16 +11,19 @@
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -188,6 +191,7 @@ token_usage: ~800-2,500 tokens
 ```
 
 **Optimization Notes:**
+
 - Validate configuration early; use atomic writes; implement rollback checkpoints
 
 ---
@@ -206,7 +210,6 @@ updated_at: 2025-11-17
 ```
 
 ---
-
 
 ## Inputs
 
@@ -437,12 +440,14 @@ Next steps:
 ### CSV Format Requirements
 
 **Required:**
+
 - UTF-8 encoding
 - Consistent delimiters (comma recommended)
 - Header row with column names
 - Quoted strings if they contain delimiters
 
 **Example:**
+
 ```csv
 id,name,email,created_at
 "user-1","John Doe","john@example.com","2024-01-01 00:00:00"
@@ -454,11 +459,13 @@ id,name,email,created_at
 For CSV files > 100MB or > 1M rows:
 
 1. **Split the file:**
+
 ```bash
 split -l 100000 large.csv chunk_
 ```
 
 2. **Import in batches:**
+
 ```bash
 for file in chunk_*; do
   *load-csv {table} $file
@@ -466,6 +473,7 @@ done
 ```
 
 3. **Or use streaming COPY:**
+
 ```bash
 cat large.csv | psql "$SUPABASE_DB_URL" -c \
   "COPY {table} FROM STDIN WITH (FORMAT csv, HEADER true);"
@@ -494,6 +502,7 @@ FROM {table}_staging
 **Error:** `invalid byte sequence for encoding "UTF8"`
 
 **Fix:**
+
 ```bash
 # Convert to UTF-8
 iconv -f ISO-8859-1 -t UTF-8 input.csv > output.csv
@@ -504,6 +513,7 @@ iconv -f ISO-8859-1 -t UTF-8 input.csv > output.csv
 **Error:** `unterminated CSV quoted field`
 
 **Fix:** Adjust COPY parameters:
+
 ```sql
 COPY table FROM 'file.csv' WITH (
   DELIMITER ';',    -- Change delimiter
@@ -517,6 +527,7 @@ COPY table FROM 'file.csv' WITH (
 **Error:** `null value in column "id" violates not-null constraint`
 
 **Fix:** Define NULL representation:
+
 ```sql
 COPY table FROM 'file.csv' WITH (
   NULL 'NULL',      -- Treat literal "NULL" as NULL
@@ -539,6 +550,7 @@ COPY table FROM 'file.csv' WITH (
 ## Performance Tips
 
 1. **Disable triggers during bulk load:**
+
 ```sql
 ALTER TABLE {table} DISABLE TRIGGER ALL;
 -- Load data
@@ -546,6 +558,7 @@ ALTER TABLE {table} ENABLE TRIGGER ALL;
 ```
 
 2. **Drop indexes, load, recreate:**
+
 ```sql
 -- Only for initial loads, not updates!
 DROP INDEX idx_name;
@@ -554,12 +567,14 @@ CREATE INDEX CONCURRENTLY idx_name ON {table}(column);
 ```
 
 3. **Use UNLOGGED tables for staging:**
+
 ```sql
 CREATE UNLOGGED TABLE {table}_staging (...);
 -- Faster writes, but not crash-safe
 ```
 
 4. **Batch commits:**
+
 ```sql
 -- For very large loads
 BEGIN;
@@ -578,9 +593,7 @@ For small datasets (<1000 rows), can use regular INSERT:
 
 ```javascript
 // Supabase client example
-const { data, error } = await supabase
-  .from('table')
-  .upsert(csvData, { onConflict: 'id' })
+const { data, error } = await supabase.from('table').upsert(csvData, { onConflict: 'id' });
 ```
 
 But COPY is **10-100x faster** for bulk loads!

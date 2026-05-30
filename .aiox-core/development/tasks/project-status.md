@@ -28,10 +28,10 @@ Display a comprehensive, **100% accurate** panorama of all epics and stories in 
 
 ### Arguments
 
-| Argument  | Required | Description                            |
-| --------- | -------- | -------------------------------------- |
-| epic-id   | No       | Show only specific epic (e.g. epic-7)  |
-| --summary | No       | Show only epic-level counts            |
+| Argument  | Required | Description                           |
+| --------- | -------- | ------------------------------------- |
+| epic-id   | No       | Show only specific epic (e.g. epic-7) |
+| --summary | No       | Show only epic-level counts           |
 
 ---
 
@@ -150,15 +150,15 @@ Próximo: {next story recommendation}
 
 ### Status Icons
 
-| Icon | Status      | Description                    |
-| ---- | ----------- | ------------------------------ |
-| ✅   | Done        | Story completed and QA passed  |
-| 🔄   | InProgress  | Story being implemented        |
-| ⏳   | Ready       | Story validated, ready for dev |
-| 📝   | Draft       | Story created, not validated   |
-| 🔍   | InReview    | Story in QA review             |
-| 📄   | —           | No story file exists           |
-| ⚠️   | DIVERGENCE  | Epic metadata doesn't match    |
+| Icon | Status     | Description                    |
+| ---- | ---------- | ------------------------------ |
+| ✅   | Done       | Story completed and QA passed  |
+| 🔄   | InProgress | Story being implemented        |
+| ⏳   | Ready      | Story validated, ready for dev |
+| 📝   | Draft      | Story created, not validated   |
+| 🔍   | InReview   | Story in QA review             |
+| 📄   | —          | No story file exists           |
+| ⚠️   | DIVERGENCE | Epic metadata doesn't match    |
 
 ---
 

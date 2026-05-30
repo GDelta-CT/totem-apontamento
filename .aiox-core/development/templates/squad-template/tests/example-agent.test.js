@@ -27,7 +27,7 @@ describe('example-agent', () => {
 
   describe('commands', () => {
     test('should have example-command registered', () => {
-      const command = agent.commands.find(c => c.name === 'example-command');
+      const command = agent.commands.find((c) => c.name === 'example-command');
       expect(command).toBeDefined();
       expect(command.workflow).toBe('example-workflow');
     });
@@ -36,7 +36,7 @@ describe('example-agent', () => {
   describe('execution', () => {
     test('should execute example-command successfully', async () => {
       const result = await executeCommand(agent, '*example-command', {
-        input1: 'test-input'
+        input1: 'test-input',
       });
 
       expect(result.success).toBe(true);

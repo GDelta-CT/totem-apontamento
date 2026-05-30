@@ -20,12 +20,14 @@ This document defines HOW to choose the appropriate executor type (Agente, Worke
 **Definition:** AI agent that uses Large Language Models to perform creative, analytical, or generative tasks.
 
 **When to use:**
+
 - Task requires creativity or subjective judgment
 - Task involves natural language understanding/generation
 - Task needs contextual analysis
 - Task has no deterministic algorithm
 
 **Examples:**
+
 - Analyze brief and extract key insights
 - Generate ad copy from brief
 - Design component styles based on brand
@@ -42,12 +44,14 @@ This document defines HOW to choose the appropriate executor type (Agente, Worke
 **Definition:** Deterministic script or function that transforms data using predefined logic.
 
 **When to use:**
+
 - Task is deterministic (same input → same output)
 - Task is a data transformation or validation
 - Task reads/writes files or databases
 - Task calls external APIs with no AI
 
 **Examples:**
+
 - Load configuration from JSON file
 - Validate HTML structure
 - Export PNG from HTML using Puppeteer
@@ -64,12 +68,14 @@ This document defines HOW to choose the appropriate executor type (Agente, Worke
 **Definition:** Human operator who performs the task manually, often requiring subjective judgment or approval.
 
 **When to use:**
+
 - Task requires human subjective judgment
 - Task is a quality gate or approval step
 - Task involves sensitive decisions
 - Task cannot be automated (yet)
 
 **Examples:**
+
 - Review ad quality and approve/reject
 - Make strategic campaign decisions
 - Handle edge cases that AI can't resolve
@@ -86,12 +92,14 @@ This document defines HOW to choose the appropriate executor type (Agente, Worke
 **Definition:** AI agent augmented with personality heuristics and domain axioms to emulate a specific person's methodology.
 
 **When to use:**
+
 - Task requires specific domain expertise
 - Task must follow a specific methodology (e.g., Atomic Design)
 - Task needs validation against established principles
 - Task benefits from "personality-driven" execution
 
 **Examples:**
+
 - Validate components against Atomic Design principles (Brad Frost)
 - Review copy using specific writing methodology (Alex Hormozi)
 - Evaluate design system consistency (Design System Specialist)
@@ -108,31 +116,31 @@ This document defines HOW to choose the appropriate executor type (Agente, Worke
 ```mermaid
 graph TD
     Start[Task to Execute] --> Q1{Requires<br/>Creativity or<br/>Subjectivity?}
-    
+
     Q1 -->|No| Q2{Deterministic<br/>Algorithm<br/>Exists?}
     Q1 -->|Yes| Q3{Human<br/>Judgment<br/>Required?}
-    
+
     Q2 -->|Yes| Q4{External<br/>API Call?}
     Q2 -->|No| Q3
-    
+
     Q3 -->|Yes| Q5{Critical<br/>Decision<br/>with Legal/Financial<br/>Impact?}
     Q3 -->|No| Q6{Specific<br/>Methodology<br/>Required?}
-    
+
     Q4 -->|Yes| Worker[Worker<br/>with API]
     Q4 -->|No| Worker2[Worker<br/>Script]
-    
+
     Q5 -->|Yes| Humano[Humano]
     Q5 -->|No| Q6
-    
+
     Q6 -->|Yes<br/>Brad Frost,<br/>Alex Hormozi,<br/>etc.| Clone[Clone<br/>with Heuristics]
     Q6 -->|No| Agente[Agente<br/>Generic AI]
-    
+
     Worker --> End[Execute Task]
     Worker2 --> End
     Humano --> End
     Clone --> End
     Agente --> End
-    
+
     style Worker fill:#90EE90
     style Worker2 fill:#90EE90
     style Humano fill:#FFB6C1
@@ -150,13 +158,13 @@ graph TD
 
 **Examples:**
 
-| Task | Requires Creativity? | Why? |
-|------|---------------------|------|
-| Analyze brief and extract insights | ✅ Yes | Requires understanding nuance, context, emotional triggers |
-| Load brand config from JSON | ❌ No | Deterministic file read |
-| Generate ad copy | ✅ Yes | Requires creativity, brand voice adaptation |
-| Calculate content area height | ❌ No | Simple math: `canvas.height - safeZones.top - safeZones.bottom` |
-| Select optimal template | ✅ Yes | Requires matching brief goals with template strengths |
+| Task                               | Requires Creativity? | Why?                                                            |
+| ---------------------------------- | -------------------- | --------------------------------------------------------------- |
+| Analyze brief and extract insights | ✅ Yes               | Requires understanding nuance, context, emotional triggers      |
+| Load brand config from JSON        | ❌ No                | Deterministic file read                                         |
+| Generate ad copy                   | ✅ Yes               | Requires creativity, brand voice adaptation                     |
+| Calculate content area height      | ❌ No                | Simple math: `canvas.height - safeZones.top - safeZones.bottom` |
+| Select optimal template            | ✅ Yes               | Requires matching brief goals with template strengths           |
 
 **If YES → Consider Agente, Clone, or Humano**  
 **If NO → Consider Worker**
@@ -169,12 +177,12 @@ graph TD
 
 **Examples:**
 
-| Task | Deterministic Algorithm? | Algorithm |
-|------|-------------------------|-----------|
-| Validate email format | ✅ Yes | Regex: `/^[^\s@]+@[^\s@]+\.[^\s@]+$/` |
-| Decide if urgency is "high" | ❌ No | Subjective (depends on context, emotional triggers) |
-| Calculate color contrast ratio | ✅ Yes | Formula: `(L1 + 0.05) / (L2 + 0.05)` (WCAG) |
-| Choose between 3 templates | ❌ No | Depends on brief goals, brand, campaign type |
+| Task                           | Deterministic Algorithm? | Algorithm                                           |
+| ------------------------------ | ------------------------ | --------------------------------------------------- |
+| Validate email format          | ✅ Yes                   | Regex: `/^[^\s@]+@[^\s@]+\.[^\s@]+$/`               |
+| Decide if urgency is "high"    | ❌ No                    | Subjective (depends on context, emotional triggers) |
+| Calculate color contrast ratio | ✅ Yes                   | Formula: `(L1 + 0.05) / (L2 + 0.05)` (WCAG)         |
+| Choose between 3 templates     | ❌ No                    | Depends on brief goals, brand, campaign type        |
 
 **If YES → Worker**  
 **If NO → Consider Agente, Clone, or Humano**
@@ -187,13 +195,13 @@ graph TD
 
 **Examples:**
 
-| Task | External API? | API |
-|------|--------------|-----|
-| Face detection | ✅ Yes (AI) | OpenRouter (Gemini Vision) → **Agente** |
-| Image search | ✅ Yes (AI) | Semantic search with embeddings → **Agente** |
-| File upload | ✅ Yes (Storage) | AWS S3, Supabase Storage → **Worker** |
-| Send email | ✅ Yes (Email) | SendGrid, Mailgun → **Worker** |
-| Webhook trigger | ✅ Yes (HTTP) | Generic HTTP POST → **Worker** |
+| Task            | External API?    | API                                          |
+| --------------- | ---------------- | -------------------------------------------- |
+| Face detection  | ✅ Yes (AI)      | OpenRouter (Gemini Vision) → **Agente**      |
+| Image search    | ✅ Yes (AI)      | Semantic search with embeddings → **Agente** |
+| File upload     | ✅ Yes (Storage) | AWS S3, Supabase Storage → **Worker**        |
+| Send email      | ✅ Yes (Email)   | SendGrid, Mailgun → **Worker**               |
+| Webhook trigger | ✅ Yes (HTTP)    | Generic HTTP POST → **Worker**               |
 
 **If YES (AI API) → Agente**  
 **If YES (Non-AI API) → Worker**  
@@ -207,13 +215,13 @@ graph TD
 
 **Examples:**
 
-| Task | Human Judgment Required? | Why? |
-|------|--------------------------|------|
-| Quality review of final ad | ⚠️ Maybe | Can be automated, but human review adds confidence |
-| Legal compliance check | ✅ Yes | Legal liability, requires human accountability |
-| Approve $10k media spend | ✅ Yes | Financial decision, requires human authorization |
-| Brand alignment validation | ⚠️ Maybe | AI can check, but human can catch nuances |
-| Emergency bug fix decision | ✅ Yes | High stakes, requires human judgment |
+| Task                       | Human Judgment Required? | Why?                                               |
+| -------------------------- | ------------------------ | -------------------------------------------------- |
+| Quality review of final ad | ⚠️ Maybe                 | Can be automated, but human review adds confidence |
+| Legal compliance check     | ✅ Yes                   | Legal liability, requires human accountability     |
+| Approve $10k media spend   | ✅ Yes                   | Financial decision, requires human authorization   |
+| Brand alignment validation | ⚠️ Maybe                 | AI can check, but human can catch nuances          |
+| Emergency bug fix decision | ✅ Yes                   | High stakes, requires human judgment               |
 
 **If YES (critical/legal/financial) → Humano**  
 **If MAYBE → Consider Agente or Clone (with human review as acceptance criteria)**  
@@ -227,13 +235,13 @@ graph TD
 
 **Examples:**
 
-| Task | Specific Methodology? | Whose? |
-|------|-----------------------|--------|
-| Validate Atomic Design compliance | ✅ Yes | Brad Frost (Atomic Design creator) |
-| Write high-converting ad copy | ✅ Yes | Alex Hormozi (copywriting methodology) |
-| Evaluate UX usability | ✅ Yes | Jakob Nielsen (Usability heuristics) |
-| Generic ad brief analysis | ❌ No | Any AI strategist can do it |
-| Generic component design | ❌ No | Standard design principles |
+| Task                              | Specific Methodology? | Whose?                                 |
+| --------------------------------- | --------------------- | -------------------------------------- |
+| Validate Atomic Design compliance | ✅ Yes                | Brad Frost (Atomic Design creator)     |
+| Write high-converting ad copy     | ✅ Yes                | Alex Hormozi (copywriting methodology) |
+| Evaluate UX usability             | ✅ Yes                | Jakob Nielsen (Usability heuristics)   |
+| Generic ad brief analysis         | ❌ No                 | Any AI strategist can do it            |
+| Generic component design          | ❌ No                 | Standard design principles             |
 
 **If YES → Clone (with heuristics + axioms of that person)**  
 **If NO → Agente (generic AI)**
@@ -244,16 +252,17 @@ graph TD
 
 ### Executor Cost Comparison
 
-| Executor | Cost per Execution | Speed | Deterministic | When to Use |
-|----------|-------------------|-------|---------------|-------------|
-| **Worker** | $ Low<br/>($0 - $0.001) | ⚡ Fast<br/>(< 1s) | ✅ Yes | - Config loading<br/>- File I/O<br/>- Simple calculations<br/>- API calls (non-AI) |
-| **Agente** | $$$$ High<br/>($0.001 - $0.01) | 🐌 Slow<br/>(3-10s) | ❌ No | - Creative tasks<br/>- Analysis<br/>- Generation<br/>- AI API calls |
-| **Humano** | $$$ Medium<br/>($5 - $50) | 🐢 Very Slow<br/>(minutes-hours) | ❌ No | - Legal/financial decisions<br/>- Quality gates<br/>- Strategic decisions<br/>- Edge cases |
-| **Clone** | $$$$ High<br/>($0.002 - $0.015) | 🐌 Slow<br/>(5-15s) | ⚠️ Partial | - Methodology validation<br/>- Expert review<br/>- Domain-specific tasks<br/>- Personality-driven execution |
+| Executor   | Cost per Execution              | Speed                            | Deterministic | When to Use                                                                                                 |
+| ---------- | ------------------------------- | -------------------------------- | ------------- | ----------------------------------------------------------------------------------------------------------- |
+| **Worker** | $ Low<br/>($0 - $0.001)         | ⚡ Fast<br/>(< 1s)               | ✅ Yes        | - Config loading<br/>- File I/O<br/>- Simple calculations<br/>- API calls (non-AI)                          |
+| **Agente** | $$$$ High<br/>($0.001 - $0.01)  | 🐌 Slow<br/>(3-10s)              | ❌ No         | - Creative tasks<br/>- Analysis<br/>- Generation<br/>- AI API calls                                         |
+| **Humano** | $$$ Medium<br/>($5 - $50)       | 🐢 Very Slow<br/>(minutes-hours) | ❌ No         | - Legal/financial decisions<br/>- Quality gates<br/>- Strategic decisions<br/>- Edge cases                  |
+| **Clone**  | $$$$ High<br/>($0.002 - $0.015) | 🐌 Slow<br/>(5-15s)              | ⚠️ Partial    | - Methodology validation<br/>- Expert review<br/>- Domain-specific tasks<br/>- Personality-driven execution |
 
 ### ROI Calculation
 
 **Formula:**
+
 ```
 ROI = (Time Saved × Hourly Rate - Executor Cost) / Executor Cost × 100%
 ```
@@ -271,7 +280,7 @@ Humano:
   Cost: $12.50
   Time: 15 minutes
   ROI: N/A (baseline)
-  
+
 Decision: ✅ Agente (massive ROI)
 ```
 
@@ -288,7 +297,7 @@ Agente:
   Cost: $0.005
   Time: 5 seconds
   ROI: Negative (slower and more expensive)
-  
+
 Decision: ✅ Worker (no reason to use AI)
 ```
 
@@ -308,7 +317,7 @@ Agente:
 Trade-off:
   - Agente is 500x cheaper, 36x faster
   - But 10% less accurate
-  
+
 Decision: Depends on use case:
   - High-volume batch: ✅ Agente (with spot-check by Humano)
   - Critical campaign: ✅ Humano (stakes too high)
@@ -320,17 +329,17 @@ Decision: Depends on use case:
 
 ### What Each Executor CAN Do
 
-| Capability | Agente | Worker | Humano | Clone |
-|------------|--------|--------|--------|-------|
-| **AI Model Calls** | ✅ Yes | ❌ No | ❌ No | ✅ Yes |
-| **Script Execution** | ⚠️ Limited<br/>(via tools) | ✅ Yes | ❌ No | ⚠️ Limited<br/>(via tools) |
-| **File I/O** | ⚠️ Limited<br/>(via tools) | ✅ Yes | ❌ No | ⚠️ Limited<br/>(via tools) |
-| **Database Access** | ⚠️ Limited<br/>(via tools) | ✅ Yes | ✅ Yes<br/>(via UI) | ⚠️ Limited<br/>(via tools) |
-| **External APIs** | ✅ Yes<br/>(AI APIs) | ✅ Yes<br/>(Non-AI) | ❌ No | ✅ Yes<br/>(AI APIs) |
-| **Creative Thinking** | ✅ Yes | ❌ No | ✅ Yes | ✅ Yes<br/>(guided by heuristics) |
-| **Subjective Judgment** | ⚠️ Simulated | ❌ No | ✅ Yes | ✅ Yes<br/>(via axioms) |
-| **Deterministic** | ❌ No | ✅ Yes | ❌ No | ⚠️ Partial |
-| **Legal Accountability** | ❌ No | ❌ No | ✅ Yes | ❌ No |
+| Capability               | Agente                     | Worker              | Humano              | Clone                             |
+| ------------------------ | -------------------------- | ------------------- | ------------------- | --------------------------------- |
+| **AI Model Calls**       | ✅ Yes                     | ❌ No               | ❌ No               | ✅ Yes                            |
+| **Script Execution**     | ⚠️ Limited<br/>(via tools) | ✅ Yes              | ❌ No               | ⚠️ Limited<br/>(via tools)        |
+| **File I/O**             | ⚠️ Limited<br/>(via tools) | ✅ Yes              | ❌ No               | ⚠️ Limited<br/>(via tools)        |
+| **Database Access**      | ⚠️ Limited<br/>(via tools) | ✅ Yes              | ✅ Yes<br/>(via UI) | ⚠️ Limited<br/>(via tools)        |
+| **External APIs**        | ✅ Yes<br/>(AI APIs)       | ✅ Yes<br/>(Non-AI) | ❌ No               | ✅ Yes<br/>(AI APIs)              |
+| **Creative Thinking**    | ✅ Yes                     | ❌ No               | ✅ Yes              | ✅ Yes<br/>(guided by heuristics) |
+| **Subjective Judgment**  | ⚠️ Simulated               | ❌ No               | ✅ Yes              | ✅ Yes<br/>(via axioms)           |
+| **Deterministic**        | ❌ No                      | ✅ Yes              | ❌ No               | ⚠️ Partial                        |
+| **Legal Accountability** | ❌ No                      | ❌ No               | ✅ Yes              | ❌ No                             |
 
 ---
 
@@ -343,6 +352,7 @@ Decision: Depends on use case:
 **Condition:** If task becomes deterministic after enough training data.
 
 **Example:**
+
 ```yaml
 # BEFORE: Agente (creative)
 Step 4: Select Template
@@ -368,6 +378,7 @@ Step 4: Select Template
 **Condition:** If task can be automated with acceptable accuracy drop.
 
 **Example:**
+
 ```yaml
 # BEFORE: Humano (manual review)
 Step 15: Quality Review
@@ -397,6 +408,7 @@ Step 15: Quality Review
 **Condition:** If task benefits from specific domain expertise or methodology.
 
 **Example:**
+
 ```yaml
 # BEFORE: Agente (generic design validation)
 Step 7c: Validate Components
@@ -421,6 +433,7 @@ Step 7c: Validate Components
 **Condition:** If specific methodology is not critical to task success.
 
 **Example:**
+
 ```yaml
 # BEFORE: Clone (overkill for simple task)
 Step 5: Craft Ad Copy
@@ -486,12 +499,12 @@ acceptance-criteria:
 
 logic: |
   const aiReview = await agente.reviewQuality(ad);
-  
+
   if (aiReview.score < 80) {
     # Escalate to human
     return await humano.reviewQuality(ad);
   }
-  
+
   return aiReview;
 
 cost:
@@ -515,17 +528,17 @@ validator_executor: Clone
 logic: |
   # 1. Agente designs component (creative)
   const component = await agente.designCTA(adCopy, brand);
-  
+
   # 2. Clone validates (methodology)
   const validation = await clone.validateAtomicDesign(component);
-  
+
   if (!validation.valid) {
     # 3. Retry with corrections
     component = await agente.designCTA(adCopy, brand, {
       corrections: validation.violations
     });
   }
-  
+
   return component;
 
 cost:
@@ -650,11 +663,9 @@ Use this checklist to decide executor type for any task:
 - [ ] Is task deterministic? (same input → same output)
   - ✅ YES → **Worker**
   - ❌ NO → Continue
-  
 - [ ] Does task call external AI API?
   - ✅ YES → **Agente**
   - ❌ NO → Continue
-  
 - [ ] Is task critical legal/financial decision?
   - ✅ YES → **Humano**
   - ❌ NO → Continue
@@ -682,16 +693,16 @@ Use this checklist to decide executor type for any task:
 
 ## Version History
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0.0 | 2025-11-13 | Brad Frost Clone | Initial decision tree |
+| Version | Date       | Author           | Changes               |
+| ------- | ---------- | ---------------- | --------------------- |
+| 1.0.0   | 2025-11-13 | Brad Frost Clone | Initial decision tree |
 
 ---
 
 **END OF EXECUTOR DECISION TREE**
 
 **Related Documents:**
+
 - `TASK-FORMAT-SPECIFICATION-V1.md` - Task format with executor type
 - `CLONE-ARCHITECTURE-GUIDE.md` - How to implement Clones
 - `WORKFLOW-ORCHESTRATION-GUIDE.md` - Executor execution patterns
-

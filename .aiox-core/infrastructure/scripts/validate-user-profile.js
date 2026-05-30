@@ -76,11 +76,7 @@ function validateUserProfile(value) {
  * @returns {Object} Result with { valid, profile, error, warning }
  */
 function loadAndValidateUserProfile(configPath) {
-  const defaultConfigPath = path.join(
-    process.cwd(),
-    '.aiox-core',
-    'core-config.yaml'
-  );
+  const defaultConfigPath = path.join(process.cwd(), '.aiox-core', 'core-config.yaml');
   const resolvedPath = configPath || defaultConfigPath;
 
   try {
@@ -209,14 +205,14 @@ if (require.main === module) {
 
       // Test 1: Valid values
       console.log('Test 1: Valid values');
-      ['bob', 'advanced', 'BOB', 'ADVANCED', ' bob ', ' advanced '].forEach(v => {
+      ['bob', 'advanced', 'BOB', 'ADVANCED', ' bob ', ' advanced '].forEach((v) => {
         const r = validateUserProfile(v);
         console.log(`  "${v}" → ${r.valid ? '✅' : '❌'} ${r.value || r.error}`);
       });
 
       // Test 2: Invalid values
       console.log('\nTest 2: Invalid values');
-      ['invalid', 'admin', '', 123, null, undefined].forEach(v => {
+      ['invalid', 'admin', '', 123, null, undefined].forEach((v) => {
         const r = validateUserProfile(v);
         const display = v === null ? 'null' : v === undefined ? 'undefined' : `"${v}"`;
         console.log(`  ${display} → ${r.valid ? `✅ ${r.value}` : `❌ ${r.error}`}`);

@@ -104,14 +104,10 @@ class G2StoryCreationGate extends VerificationGate {
     opportunities.sort((a, b) => b.relevance - a.relevance);
 
     if (taskMatches.length > 0) {
-      warnings.push(
-        `Found ${taskMatches.length} existing tasks matching story work`,
-      );
+      warnings.push(`Found ${taskMatches.length} existing tasks matching story work`);
     }
     if (templateMatches.length > 0) {
-      warnings.push(
-        `Found ${templateMatches.length} existing templates matching story output`,
-      );
+      warnings.push(`Found ${templateMatches.length} existing templates matching story output`);
     }
 
     if (taskAnalysis.warnings) {

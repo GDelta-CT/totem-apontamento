@@ -43,15 +43,13 @@ function createValidateCommand() {
 
         // Exit with error code if validation failed
         const hasErrors = results.summary.invalid > 0;
-        const hasWarningsAsErrors = options.strict && (
-          results.summary.missing.length > 0 ||
-          results.summary.orphan.length > 0
-        );
+        const hasWarningsAsErrors =
+          options.strict &&
+          (results.summary.missing.length > 0 || results.summary.orphan.length > 0);
 
         if (hasErrors || hasWarningsAsErrors) {
           process.exit(1);
         }
-
       } catch (error) {
         console.error(`Error: ${error.message}`);
         process.exit(1);

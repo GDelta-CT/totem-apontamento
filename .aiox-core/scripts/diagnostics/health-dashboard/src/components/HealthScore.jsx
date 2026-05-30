@@ -22,7 +22,7 @@ function HealthScore({ score, size = 'lg', showLabel = true, animate = true }) {
     sm: { width: 80, strokeWidth: 6, fontSize: '1.25rem' },
     md: { width: 120, strokeWidth: 8, fontSize: '1.75rem' },
     lg: { width: 180, strokeWidth: 10, fontSize: '2.5rem' },
-    xl: { width: 220, strokeWidth: 12, fontSize: '3rem' }
+    xl: { width: 220, strokeWidth: 12, fontSize: '3rem' },
   };
 
   const config = sizes[size] || sizes.lg;
@@ -62,16 +62,11 @@ function HealthScore({ score, size = 'lg', showLabel = true, animate = true }) {
         />
       </svg>
       <div className="health-score-content">
-        <span
-          className="health-score-value"
-          style={{ fontSize: config.fontSize, color }}
-        >
+        <span className="health-score-value" style={{ fontSize: config.fontSize, color }}>
           {score}
         </span>
         {showLabel && (
-          <span className={`health-score-label health-score-label--${status}`}>
-            {label}
-          </span>
+          <span className={`health-score-label health-score-label--${status}`}>{label}</span>
         )}
       </div>
     </div>

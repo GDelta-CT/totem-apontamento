@@ -40,21 +40,29 @@ function validateGeminiIntegration(options = {}) {
     rulesFile: options.rulesFile || path.join(projectRoot, '.gemini', 'rules.md'),
     agentsDir: options.agentsDir || path.join(projectRoot, '.gemini', 'rules', 'AIOX', 'agents'),
     commandsDir: options.commandsDir || path.join(projectRoot, '.gemini', 'commands'),
-    extensionDir: options.extensionDir || path.join(projectRoot, 'packages', 'gemini-aiox-extension'),
-    sourceAgentsDir: options.sourceAgentsDir || path.join(projectRoot, '.aiox-core', 'development', 'agents'),
+    extensionDir:
+      options.extensionDir || path.join(projectRoot, 'packages', 'gemini-aiox-extension'),
+    sourceAgentsDir:
+      options.sourceAgentsDir || path.join(projectRoot, '.aiox-core', 'development', 'agents'),
   };
   const errors = [];
   const warnings = [];
 
   if (!fs.existsSync(resolved.rulesFile)) {
-    warnings.push(`Gemini rules file not found yet: ${path.relative(resolved.projectRoot, resolved.rulesFile)}`);
+    warnings.push(
+      `Gemini rules file not found yet: ${path.relative(resolved.projectRoot, resolved.rulesFile)}`
+    );
   }
 
   if (!fs.existsSync(resolved.agentsDir)) {
-    errors.push(`Missing Gemini agents dir: ${path.relative(resolved.projectRoot, resolved.agentsDir)}`);
+    errors.push(
+      `Missing Gemini agents dir: ${path.relative(resolved.projectRoot, resolved.agentsDir)}`
+    );
   }
   if (!fs.existsSync(resolved.commandsDir)) {
-    errors.push(`Missing Gemini commands dir: ${path.relative(resolved.projectRoot, resolved.commandsDir)}`);
+    errors.push(
+      `Missing Gemini commands dir: ${path.relative(resolved.projectRoot, resolved.commandsDir)}`
+    );
   }
 
   const sourceCount = countMarkdownFiles(resolved.sourceAgentsDir);
@@ -65,10 +73,14 @@ function validateGeminiIntegration(options = {}) {
   const expectedCommandCount = sourceCount > 0 ? sourceCount + 1 : 0;
 
   if (sourceCount > 0 && commandFiles.length !== expectedCommandCount) {
-    warnings.push(`Gemini command count differs from source (${commandFiles.length}/${expectedCommandCount})`);
+    warnings.push(
+      `Gemini command count differs from source (${commandFiles.length}/${expectedCommandCount})`
+    );
   }
   if (!commandFiles.includes('aiox-menu.toml')) {
-    errors.push(`Missing Gemini command file: ${path.relative(resolved.projectRoot, path.join(resolved.commandsDir, 'aiox-menu.toml'))}`);
+    errors.push(
+      `Missing Gemini command file: ${path.relative(resolved.projectRoot, path.join(resolved.commandsDir, 'aiox-menu.toml'))}`
+    );
   }
   if (sourceCount > 0 && geminiCount !== sourceCount) {
     warnings.push(`Gemini agent count differs from source (${geminiCount}/${sourceCount})`);

@@ -6,7 +6,7 @@ import {
   DomainCard,
   IssuesList,
   TechDebtList,
-  AutoFixLog
+  AutoFixLog,
 } from '../components';
 import { useHealthData, useAutoRefresh } from '../hooks';
 import './Dashboard.css';
@@ -18,7 +18,7 @@ function Dashboard() {
   const { data, loading, error, lastUpdated, refresh } = useHealthData();
   const autoRefresh = useAutoRefresh({
     interval: 30000,
-    onRefresh: refresh
+    onRefresh: refresh,
   });
 
   if (loading && !data) {
@@ -50,26 +50,16 @@ function Dashboard() {
           <h1>System Health</h1>
           <div className="dashboard-meta">
             {lastUpdated && (
-              <span className="last-updated">
-                Last updated: {lastUpdated.toLocaleTimeString()}
-              </span>
+              <span className="last-updated">Last updated: {lastUpdated.toLocaleTimeString()}</span>
             )}
-            <button
-              className="refresh-btn"
-              onClick={refresh}
-              disabled={autoRefresh.isRefreshing}
-            >
+            <button className="refresh-btn" onClick={refresh} disabled={autoRefresh.isRefreshing}>
               {autoRefresh.isRefreshing ? 'Refreshing...' : 'Refresh'}
             </button>
           </div>
         </div>
         <div className="auto-refresh-toggle">
           <label className="toggle-label">
-            <input
-              type="checkbox"
-              checked={autoRefresh.isEnabled}
-              onChange={autoRefresh.toggle}
-            />
+            <input type="checkbox" checked={autoRefresh.isEnabled} onChange={autoRefresh.toggle} />
             <span>Auto-refresh</span>
           </label>
           {autoRefresh.isEnabled && (
@@ -93,9 +83,12 @@ function Dashboard() {
                 <span className="stat-label">Auto-Fixed</span>
               </div>
               {history?.scoreDelta !== undefined && (
-                <div className={`stat ${history.scoreDelta >= 0 ? 'stat--success' : 'stat--danger'}`}>
+                <div
+                  className={`stat ${history.scoreDelta >= 0 ? 'stat--success' : 'stat--danger'}`}
+                >
                   <span className="stat-value">
-                    {history.scoreDelta >= 0 ? '+' : ''}{history.scoreDelta}
+                    {history.scoreDelta >= 0 ? '+' : ''}
+                    {history.scoreDelta}
                   </span>
                   <span className="stat-label">vs Previous</span>
                 </div>
@@ -113,13 +106,10 @@ function Dashboard() {
       <section className="dashboard-section">
         <h2 className="section-title">Health by Domain</h2>
         <div className="domain-grid">
-          {domains && Object.entries(domains).map(([domainId, domainData]) => (
-            <DomainCard
-              key={domainId}
-              domain={domainId}
-              data={domainData}
-            />
-          ))}
+          {domains &&
+            Object.entries(domains).map(([domainId, domainData]) => (
+              <DomainCard key={domainId} domain={domainId} data={domainData} />
+            ))}
         </div>
       </section>
 
@@ -141,9 +131,8 @@ function Dashboard() {
       {/* Footer */}
       <footer className="dashboard-footer">
         <p>
-          AIOX Health Check v{data?.version || '1.0.0'} |
-          Mode: {data?.mode || 'full'} |
-          Duration: {data?.duration || 'N/A'}
+          AIOX Health Check v{data?.version || '1.0.0'} | Mode: {data?.mode || 'full'} | Duration:{' '}
+          {data?.duration || 'N/A'}
         </p>
       </footer>
     </div>

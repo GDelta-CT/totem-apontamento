@@ -14,10 +14,7 @@ const {
   listServers,
   readGlobalConfig,
 } = require('../../../core/mcp/global-config-manager');
-const {
-  checkLinkStatus,
-  LINK_STATUS,
-} = require('../../../core/mcp/symlink-manager');
+const { checkLinkStatus, LINK_STATUS } = require('../../../core/mcp/symlink-manager');
 const {
   getGlobalConfigPath,
   getGlobalMcpDir,

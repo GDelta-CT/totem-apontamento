@@ -75,7 +75,7 @@ class Layer2PRAutomation extends BaseLayer {
       const summary = this.getSummary();
       const icon = summary.pass ? '✅' : '⚠️';
       console.log(
-        `\n${icon} Layer 2 ${summary.pass ? 'PASSED' : 'HAS ISSUES'} (${this.formatDuration(summary.duration)})`,
+        `\n${icon} Layer 2 ${summary.pass ? 'PASSED' : 'HAS ISSUES'} (${this.formatDuration(summary.duration)})`
       );
     }
 
@@ -137,7 +137,7 @@ class Layer2PRAutomation extends BaseLayer {
       if (verbose) {
         const icon = pass ? '✓' : '⚠️';
         console.log(
-          `  ${icon} CodeRabbit: ${criticalCount} CRITICAL, ${highCount} HIGH, ${mediumCount} MEDIUM`,
+          `  ${icon} CodeRabbit: ${criticalCount} CRITICAL, ${highCount} HIGH, ${mediumCount} MEDIUM`
         );
       }
 
@@ -213,7 +213,7 @@ class Layer2PRAutomation extends BaseLayer {
       const suggestions = await this.generateQuinnSuggestions(context);
 
       const blockingSuggestions = suggestions.filter((s) =>
-        this.quinn.severity?.block?.includes(s.severity),
+        this.quinn.severity?.block?.includes(s.severity)
       );
 
       const pass = blockingSuggestions.length === 0;
@@ -232,7 +232,7 @@ class Layer2PRAutomation extends BaseLayer {
       if (verbose) {
         const icon = pass ? '✓' : '⚠️';
         console.log(
-          `  ${icon} Quinn: ${suggestions.length} suggestions, ${blockingSuggestions.length} blocking`,
+          `  ${icon} Quinn: ${suggestions.length} suggestions, ${blockingSuggestions.length} blocking`
         );
       }
 

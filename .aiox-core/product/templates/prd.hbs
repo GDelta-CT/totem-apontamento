@@ -6,12 +6,12 @@ variables:
   - name: title
     type: string
     required: true
-    prompt: "Product/Feature title:"
+    prompt: 'Product/Feature title:'
   - name: version
     type: string
     required: true
-    default: "1.0"
-    prompt: "Document version:"
+    default: '1.0'
+    prompt: 'Document version:'
   - name: status
     type: choice
     required: true
@@ -20,182 +20,197 @@ variables:
   - name: owner
     type: string
     required: true
-    prompt: "Product owner name:"
+    prompt: 'Product owner name:'
   - name: stakeholders
     type: array
     required: false
-    prompt: "Stakeholders (comma-separated):"
+    prompt: 'Stakeholders (comma-separated):'
   - name: problem_statement
     type: text
     required: true
-    prompt: "What problem does this solve?"
+    prompt: 'What problem does this solve?'
   - name: goals
     type: array
     required: true
-    prompt: "Product goals (comma-separated):"
+    prompt: 'Product goals (comma-separated):'
 ---
 
-# {{title}}
+#
+{{title}}
 
-**Version:** {{version}}
-**Status:** {{status}}
-**Owner:** {{owner}}
-**Date:** {{formatDate now "YYYY-MM-DD"}}
+**Version:**
+{{version}}
+**Status:**
+{{status}}
+**Owner:**
+{{owner}}
+**Date:**
+{{formatDate now 'YYYY-MM-DD'}}
 
----
-
-## Stakeholders
+--- ## Stakeholders
 
 {{#if stakeholders}}
-{{#each stakeholders}}
-- {{this}}
-{{/each}}
+  {{#each stakeholders}}
+    -
+    {{this}}
+  {{/each}}
 {{else}}
-_No stakeholders listed._
+  _No stakeholders listed._
 {{/if}}
 
----
-
-## Problem Statement
+--- ## Problem Statement
 
 {{problem_statement}}
 
----
-
-## Goals
+--- ## Goals
 
 {{#each goals}}
-- {{this}}
+  -
+  {{this}}
 {{/each}}
 
 {{#if non_goals}}
-## Non-Goals
+  ## Non-Goals
 
-{{#each non_goals}}
-- {{this}}
-{{/each}}
+  {{#each non_goals}}
+    -
+    {{this}}
+  {{/each}}
 {{/if}}
 
----
-
-## User Stories
+--- ## User Stories
 
 {{#if user_stories}}
-{{#each user_stories}}
-### {{add @index 1}}. {{this.persona}}
+  {{#each user_stories}}
+    ###
+    {{add @index 1}}.
+    {{this.persona}}
 
-**As a** {{this.persona}},
-**I want** {{this.want}},
-**So that** {{this.so_that}}.
+    **As a**
+    {{this.persona}}, **I want**
+    {{this.want}}, **So that**
+    {{this.so_that}}.
 
-{{#if this.priority}}**Priority:** {{this.priority}}{{/if}}
+    {{#if this.priority}}**Priority:** {{this.priority}}{{/if}}
 
-{{/each}}
+  {{/each}}
 {{else}}
-_User stories to be defined._
+  _User stories to be defined._
 {{/if}}
 
----
-
-## Functional Requirements
+--- ## Functional Requirements
 
 {{#if functional_requirements}}
-| ID | Requirement | Priority |
-|----|-------------|----------|
-{{#each functional_requirements}}
-| {{this.id}} | {{this.description}} | {{default this.priority "P1"}} |
-{{/each}}
+  | ID | Requirement | Priority | |----|-------------|----------|
+  {{#each functional_requirements}}
+    |
+    {{this.id}}
+    |
+    {{this.description}}
+    |
+    {{default this.priority 'P1'}}
+    |
+  {{/each}}
 
-{{#each functional_requirements}}
-{{#if this.acceptance_criteria}}
-### {{this.id}}: Acceptance Criteria
+  {{#each functional_requirements}}
+    {{#if this.acceptance_criteria}}
+      ###
+      {{this.id}}: Acceptance Criteria
 
-{{#each this.acceptance_criteria}}
-- [ ] {{this}}
-{{/each}}
-{{/if}}
-{{/each}}
+      {{#each this.acceptance_criteria}}
+        - [ ]
+        {{this}}
+      {{/each}}
+    {{/if}}
+  {{/each}}
 {{else}}
-_Functional requirements to be defined._
+  _Functional requirements to be defined._
 {{/if}}
 
----
-
-## Non-Functional Requirements
+--- ## Non-Functional Requirements
 
 {{#if non_functional_requirements}}
-| Category | Requirement | Metric |
-|----------|-------------|--------|
-{{#each non_functional_requirements}}
-| {{this.category}} | {{this.requirement}} | {{default this.metric "N/A"}} |
-{{/each}}
+  | Category | Requirement | Metric | |----------|-------------|--------|
+  {{#each non_functional_requirements}}
+    |
+    {{this.category}}
+    |
+    {{this.requirement}}
+    |
+    {{default this.metric 'N/A'}}
+    |
+  {{/each}}
 {{else}}
-_Non-functional requirements to be defined._
+  _Non-functional requirements to be defined._
 {{/if}}
 
----
-
-## Success Metrics
+--- ## Success Metrics
 
 {{#if success_metrics}}
-| Metric | Current | Target | Timeline |
-|--------|---------|--------|----------|
-{{#each success_metrics}}
-| {{this.metric}} | {{default this.current "N/A"}} | {{this.target}} | {{default this.timeline "TBD"}} |
-{{/each}}
+  | Metric | Current | Target | Timeline | |--------|---------|--------|----------|
+  {{#each success_metrics}}
+    |
+    {{this.metric}}
+    |
+    {{default this.current 'N/A'}}
+    |
+    {{this.target}}
+    |
+    {{default this.timeline 'TBD'}}
+    |
+  {{/each}}
 {{else}}
-_Success metrics to be defined._
+  _Success metrics to be defined._
 {{/if}}
 
----
-
-## Milestones
+--- ## Milestones
 
 {{#if milestones}}
-{{#each milestones}}
-### {{this.name}}
+  {{#each milestones}}
+    ###
+    {{this.name}}
 
-{{this.description}}
+    {{this.description}}
 
-{{#if this.deliverables}}
-**Deliverables:**
-{{#each this.deliverables}}
-- {{this}}
-{{/each}}
-{{/if}}
+    {{#if this.deliverables}}
+      **Deliverables:**
+      {{#each this.deliverables}}
+        -
+        {{this}}
+      {{/each}}
+    {{/if}}
 
-{{/each}}
+  {{/each}}
 {{else}}
-_Milestones to be defined._
+  _Milestones to be defined._
 {{/if}}
 
----
-
-## Risks
+--- ## Risks
 
 {{#if risks}}
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-{{#each risks}}
-| {{this.risk}} | {{default this.impact "Medium"}} | {{default this.mitigation "TBD"}} |
-{{/each}}
+  | Risk | Impact | Mitigation | |------|--------|------------|
+  {{#each risks}}
+    |
+    {{this.risk}}
+    |
+    {{default this.impact 'Medium'}}
+    |
+    {{default this.mitigation 'TBD'}}
+    |
+  {{/each}}
 {{else}}
-_No risks identified._
+  _No risks identified._
 {{/if}}
 
----
-
-## Open Questions
+--- ## Open Questions
 
 {{#if open_questions}}
-{{#each open_questions}}
-- [ ] {{this}}
-{{/each}}
+  {{#each open_questions}}
+    - [ ]
+    {{this}}
+  {{/each}}
 {{else}}
-_No open questions._
+  _No open questions._
 {{/if}}
 
----
-
-**Generated by:** AIOX Template Engine v2.0
-**Template Version:** prd-2.0
+--- **Generated by:** AIOX Template Engine v2.0 **Template Version:** prd-2.0

@@ -72,7 +72,7 @@ function installLLMRouting(options = {}) {
     templatesDir = path.join(__dirname, 'templates'),
     enableTracking = true,
     onProgress = console.log,
-    onError = console.error
+    onError = console.error,
   } = options;
 
   const result = {
@@ -80,7 +80,7 @@ function installLLMRouting(options = {}) {
     installDir: null,
     filesInstalled: [],
     envCreated: false,
-    errors: []
+    errors: [],
   };
 
   // Check templates exist
@@ -187,7 +187,7 @@ function updateClaudeConfig(trackingEnabled = true) {
       version: LLM_ROUTING_VERSION,
       installedAt: new Date().toISOString(),
       commands: ['claude-max', 'claude-free', 'deepseek-usage', 'deepseek-proxy'],
-      trackingEnabled
+      trackingEnabled,
     };
 
     fs.writeFileSync(claudeConfigPath, JSON.stringify(config, null, 2));
@@ -204,11 +204,15 @@ function isLLMRoutingInstalled() {
   const installDir = getInstallDir();
 
   if (isWindows) {
-    return fs.existsSync(path.join(installDir, 'claude-max.cmd')) &&
-           fs.existsSync(path.join(installDir, 'claude-free.cmd'));
+    return (
+      fs.existsSync(path.join(installDir, 'claude-max.cmd')) &&
+      fs.existsSync(path.join(installDir, 'claude-free.cmd'))
+    );
   } else {
-    return fs.existsSync(path.join(installDir, 'claude-max')) &&
-           fs.existsSync(path.join(installDir, 'claude-free'));
+    return (
+      fs.existsSync(path.join(installDir, 'claude-max')) &&
+      fs.existsSync(path.join(installDir, 'claude-free'))
+    );
   }
 }
 
@@ -250,7 +254,7 @@ function getInstallationSummary(result) {
   } else {
     summary.push('');
     summary.push('❌ LLM Routing installation failed:');
-    result.errors.forEach(err => summary.push(`   • ${err}`));
+    result.errors.forEach((err) => summary.push(`   • ${err}`));
     summary.push('');
   }
 
@@ -263,7 +267,7 @@ module.exports = {
   isLLMRoutingInstalled,
   getInstallDir,
   getInstallationSummary,
-  LLM_ROUTING_VERSION
+  LLM_ROUTING_VERSION,
 };
 
 // Run if executed directly
@@ -272,9 +276,9 @@ if (require.main === module) {
 
   const result = installLLMRouting({
     projectRoot: process.cwd(),
-    templatesDir: path.join(__dirname, 'templates')
+    templatesDir: path.join(__dirname, 'templates'),
   });
 
   const summary = getInstallationSummary(result);
-  summary.forEach(line => console.log(line));
+  summary.forEach((line) => console.log(line));
 }

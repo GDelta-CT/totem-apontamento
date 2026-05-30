@@ -10,22 +10,22 @@ Load AIOX project context before task execution. Provides git state, gotchas fil
 
 ## Input
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `category` | string | No | `null` | Filter gotchas by category (e.g., `supabase`, `frontend`, `auth`) |
-| `include_git` | boolean | No | `true` | Include git status and recent commits |
-| `include_gotchas` | boolean | No | `true` | Load gotchas from memory |
-| `include_preferences` | boolean | No | `true` | Load technical preferences |
+| Parameter             | Type    | Required | Default | Description                                                       |
+| --------------------- | ------- | -------- | ------- | ----------------------------------------------------------------- |
+| `category`            | string  | No       | `null`  | Filter gotchas by category (e.g., `supabase`, `frontend`, `auth`) |
+| `include_git`         | boolean | No       | `true`  | Include git status and recent commits                             |
+| `include_gotchas`     | boolean | No       | `true`  | Load gotchas from memory                                          |
+| `include_preferences` | boolean | No       | `true`  | Load technical preferences                                        |
 
 ## Output
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `git.status` | string | Output of `git status --short` |
-| `git.recentCommits` | string[] | Last 5 commits (oneline format) |
-| `gotchas` | Gotcha[] | Filtered gotchas relevant to current task |
-| `preferences` | object | Technical preferences from data file |
-| `config` | object | Core configuration keys |
+| Field               | Type     | Description                               |
+| ------------------- | -------- | ----------------------------------------- |
+| `git.status`        | string   | Output of `git status --short`            |
+| `git.recentCommits` | string[] | Last 5 commits (oneline format)           |
+| `gotchas`           | Gotcha[] | Filtered gotchas relevant to current task |
+| `preferences`       | object   | Technical preferences from data file      |
+| `config`            | object   | Core configuration keys                   |
 
 ## Execution Steps
 
@@ -76,7 +76,7 @@ const context = await loadContext({
   category: 'supabase',
   include_git: true,
   include_gotchas: true,
-  include_preferences: true
+  include_preferences: true,
 });
 
 // Access loaded context
@@ -87,19 +87,19 @@ console.log(context.config.devLoadAlwaysFiles);
 
 ## Files Accessed
 
-| File | Purpose |
-|------|---------|
-| `.aiox/gotchas.json` | Known issues and workarounds |
-| `.aiox-core/data/technical-preferences.md` | User-defined patterns |
-| `.aiox-core/core-config.yaml` | Project configuration |
+| File                                       | Purpose                      |
+| ------------------------------------------ | ---------------------------- |
+| `.aiox/gotchas.json`                       | Known issues and workarounds |
+| `.aiox-core/data/technical-preferences.md` | User-defined patterns        |
+| `.aiox-core/core-config.yaml`              | Project configuration        |
 
 ## Error Handling
 
-| Error | Behavior |
-|-------|----------|
-| File not found | Log warning, continue with empty value |
-| Parse error | Log error, use empty default |
-| Git not available | Skip git context, log info |
+| Error             | Behavior                               |
+| ----------------- | -------------------------------------- |
+| File not found    | Log warning, continue with empty value |
+| Parse error       | Log error, use empty default           |
+| Git not available | Skip git context, log info             |
 
 ## Notes
 

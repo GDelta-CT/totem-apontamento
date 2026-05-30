@@ -7,14 +7,14 @@
  * - Permite injetar logging/telemetria sem espalhar pelo app.
  */
 
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   throw new Error(
-    "[GDelta] Variáveis NEXT_PUBLIC_SUPABASE_URL ou NEXT_PUBLIC_SUPABASE_ANON_KEY ausentes. Verifique o .env.local e reinicie o dev server (Ctrl+C e npm run dev).",
+    '[GDelta] Variáveis NEXT_PUBLIC_SUPABASE_URL ou NEXT_PUBLIC_SUPABASE_ANON_KEY ausentes. Verifique o .env.local e reinicie o dev server (Ctrl+C e npm run dev).'
   );
 }
 
@@ -28,7 +28,7 @@ export function getSupabase(): SupabaseClient {
       autoRefreshToken: false,
     },
     global: {
-      headers: { "x-client-info": "gdelta-totem/1.0" },
+      headers: { 'x-client-info': 'gdelta-totem/1.0' },
     },
   });
   return _client;
@@ -52,7 +52,7 @@ export type OrdemServico = {
   data_entrada?: string | null;
 };
 
-export type StatusTarefa = "Em andamento" | "Pausado" | "Finalizado";
+export type StatusTarefa = 'Em andamento' | 'Pausado' | 'Finalizado';
 
 export type Apontamento = {
   id: string;
@@ -75,14 +75,14 @@ export type ApontamentoComOS = Apontamento & {
 // ---------- Etapas operacionais (Fase 2) ----------
 
 export type EtapaId =
-  | "Desmontagem"
-  | "Funilaria"
-  | "Preparacao"
-  | "Pintura"
-  | "Polimento"
-  | "Montagem"
-  | "Qualidade"
-  | "Entrega";
+  | 'Desmontagem'
+  | 'Funilaria'
+  | 'Preparacao'
+  | 'Pintura'
+  | 'Polimento'
+  | 'Montagem'
+  | 'Qualidade'
+  | 'Entrega';
 
 export type EtapaInfo = {
   id: EtapaId;
@@ -93,14 +93,38 @@ export type EtapaInfo = {
 };
 
 export const ETAPAS: EtapaInfo[] = [
-  { id: "Desmontagem", nome: "Desmontagem", icone: "⚙", descricao: "Remover peças e analisar danos", ordem: 1 },
-  { id: "Funilaria", nome: "Funilaria", icone: "🔨", descricao: "Conserto da lataria", ordem: 2 },
-  { id: "Preparacao", nome: "Preparação", icone: "✨", descricao: "Lixar, mascarar, preparar superfícies", ordem: 3 },
-  { id: "Pintura", nome: "Pintura", icone: "🎨", descricao: "Aplicação da tinta", ordem: 4 },
-  { id: "Polimento", nome: "Polimento", icone: "💎", descricao: "Acabamento e brilho", ordem: 5 },
-  { id: "Montagem", nome: "Montagem", icone: "🔧", descricao: "Recolocar peças", ordem: 6 },
-  { id: "Qualidade", nome: "Análise de Qualidade", icone: "🔍", descricao: "Checagem final antes da entrega", ordem: 7 },
-  { id: "Entrega", nome: "Entrega ao Cliente", icone: "🚗", descricao: "Cliente busca o carro", ordem: 8 },
+  {
+    id: 'Desmontagem',
+    nome: 'Desmontagem',
+    icone: '⚙',
+    descricao: 'Remover peças e analisar danos',
+    ordem: 1,
+  },
+  { id: 'Funilaria', nome: 'Funilaria', icone: '🔨', descricao: 'Conserto da lataria', ordem: 2 },
+  {
+    id: 'Preparacao',
+    nome: 'Preparação',
+    icone: '✨',
+    descricao: 'Lixar, mascarar, preparar superfícies',
+    ordem: 3,
+  },
+  { id: 'Pintura', nome: 'Pintura', icone: '🎨', descricao: 'Aplicação da tinta', ordem: 4 },
+  { id: 'Polimento', nome: 'Polimento', icone: '💎', descricao: 'Acabamento e brilho', ordem: 5 },
+  { id: 'Montagem', nome: 'Montagem', icone: '🔧', descricao: 'Recolocar peças', ordem: 6 },
+  {
+    id: 'Qualidade',
+    nome: 'Análise de Qualidade',
+    icone: '🔍',
+    descricao: 'Checagem final antes da entrega',
+    ordem: 7,
+  },
+  {
+    id: 'Entrega',
+    nome: 'Entrega ao Cliente',
+    icone: '🚗',
+    descricao: 'Cliente busca o carro',
+    ordem: 8,
+  },
 ];
 
 export function buscarEtapa(id: string | null | undefined): EtapaInfo | null {
@@ -111,65 +135,65 @@ export function buscarEtapa(id: string | null | undefined): EtapaInfo | null {
 // ---------- Motivos de pausa (Fase 4) ----------
 
 export type MotivoPausaId =
-  | "secagem"
-  | "falta_peca"
-  | "problema_tecnico"
-  | "orcamento_extra"
-  | "almoco"
-  | "fim_expediente";
+  | 'secagem'
+  | 'falta_peca'
+  | 'problema_tecnico'
+  | 'orcamento_extra'
+  | 'almoco'
+  | 'fim_expediente';
 
 export type MotivoPausaInfo = {
   id: MotivoPausaId;
   nome: string;
   icone: string;
   descricao: string;
-  categoria: "tecnica" | "pessoal";
+  categoria: 'tecnica' | 'pessoal';
   alerta?: boolean;
 };
 
 export const MOTIVOS_PAUSA: MotivoPausaInfo[] = [
   {
-    id: "secagem",
-    nome: "Tempo de secagem/cura",
-    icone: "⏳",
-    descricao: "Carro precisa esperar tinta secar, massa curar, etc.",
-    categoria: "tecnica",
+    id: 'secagem',
+    nome: 'Tempo de secagem/cura',
+    icone: '⏳',
+    descricao: 'Carro precisa esperar tinta secar, massa curar, etc.',
+    categoria: 'tecnica',
   },
   {
-    id: "falta_peca",
-    nome: "Faltou peça ou material",
-    icone: "📦",
-    descricao: "Aguardando peça do estoque ou compras",
-    categoria: "tecnica",
+    id: 'falta_peca',
+    nome: 'Faltou peça ou material',
+    icone: '📦',
+    descricao: 'Aguardando peça do estoque ou compras',
+    categoria: 'tecnica',
     alerta: true,
   },
   {
-    id: "problema_tecnico",
-    nome: "Problema técnico",
-    icone: "🛠",
-    descricao: "Ferramenta quebrou, falta luz, ar comprimido, etc.",
-    categoria: "tecnica",
+    id: 'problema_tecnico',
+    nome: 'Problema técnico',
+    icone: '🛠',
+    descricao: 'Ferramenta quebrou, falta luz, ar comprimido, etc.',
+    categoria: 'tecnica',
   },
   {
-    id: "orcamento_extra",
-    nome: "Aguardando orçamento extra",
-    icone: "💰",
-    descricao: "Descobriu serviço a mais, esperando aprovação",
-    categoria: "tecnica",
+    id: 'orcamento_extra',
+    nome: 'Aguardando orçamento extra',
+    icone: '💰',
+    descricao: 'Descobriu serviço a mais, esperando aprovação',
+    categoria: 'tecnica',
   },
   {
-    id: "almoco",
-    nome: "Almoço / refeição",
-    icone: "🍽",
-    descricao: "Pausa para refeição",
-    categoria: "pessoal",
+    id: 'almoco',
+    nome: 'Almoço / refeição',
+    icone: '🍽',
+    descricao: 'Pausa para refeição',
+    categoria: 'pessoal',
   },
   {
-    id: "fim_expediente",
-    nome: "Fim do expediente",
-    icone: "🌅",
-    descricao: "Vou retomar amanhã",
-    categoria: "pessoal",
+    id: 'fim_expediente',
+    nome: 'Fim do expediente',
+    icone: '🌅',
+    descricao: 'Vou retomar amanhã',
+    categoria: 'pessoal',
   },
 ];
 
@@ -180,52 +204,48 @@ export function buscarMotivoPausa(id: string | null | undefined): MotivoPausaInf
 
 // ---------- Ponto Eletrônico (Fase 5) ----------
 
-export type TipoPontoId =
-  | "entrada"
-  | "almoco_saida"
-  | "almoco_volta"
-  | "fim_expediente";
+export type TipoPontoId = 'entrada' | 'almoco_saida' | 'almoco_volta' | 'fim_expediente';
 
 export type TipoPontoInfo = {
   id: TipoPontoId;
   nome: string;
   icone: string;
   descricao: string;
-  cor: "ok" | "warn" | "info" | "danger";
+  cor: 'ok' | 'warn' | 'info' | 'danger';
   ordem: number;
 };
 
 export const TIPOS_PONTO: TipoPontoInfo[] = [
   {
-    id: "entrada",
-    nome: "ENTRADA",
-    icone: "▶",
-    descricao: "Cheguei pra trabalhar",
-    cor: "ok",
+    id: 'entrada',
+    nome: 'ENTRADA',
+    icone: '▶',
+    descricao: 'Cheguei pra trabalhar',
+    cor: 'ok',
     ordem: 1,
   },
   {
-    id: "almoco_saida",
-    nome: "SAIR PRO ALMOÇO",
-    icone: "🍽",
-    descricao: "Saída pro almoço",
-    cor: "warn",
+    id: 'almoco_saida',
+    nome: 'SAIR PRO ALMOÇO',
+    icone: '🍽',
+    descricao: 'Saída pro almoço',
+    cor: 'warn',
     ordem: 2,
   },
   {
-    id: "almoco_volta",
-    nome: "VOLTAR DO ALMOÇO",
-    icone: "▶",
-    descricao: "Voltei do almoço",
-    cor: "info",
+    id: 'almoco_volta',
+    nome: 'VOLTAR DO ALMOÇO',
+    icone: '▶',
+    descricao: 'Voltei do almoço',
+    cor: 'info',
     ordem: 3,
   },
   {
-    id: "fim_expediente",
-    nome: "FIM DO EXPEDIENTE",
-    icone: "🌅",
-    descricao: "Vou embora, até amanhã",
-    cor: "danger",
+    id: 'fim_expediente',
+    nome: 'FIM DO EXPEDIENTE',
+    icone: '🌅',
+    descricao: 'Vou embora, até amanhã',
+    cor: 'danger',
     ordem: 4,
   },
 ];

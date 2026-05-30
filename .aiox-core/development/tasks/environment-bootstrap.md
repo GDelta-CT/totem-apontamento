@@ -952,6 +952,7 @@ Escolha [1/2]:
 **YOLO Mode Behavior:** Auto-select `advanced` (developer running in autonomous mode is advanced by definition)
 
 **Profile Mapping:**
+
 - Option 1 (Modo Assistido) → `user_profile: "bob"`
 - Option 2 (Modo Avançado) → `user_profile: "advanced"`
 
@@ -975,7 +976,10 @@ EOF
 **Programmatic (Node.js):**
 
 ```javascript
-const { setUserConfigValue, ensureUserConfigDir } = require('.aiox-core/core/config/config-resolver');
+const {
+  setUserConfigValue,
+  ensureUserConfigDir,
+} = require('.aiox-core/core/config/config-resolver');
 
 // Ensure directory exists with permissions 700
 ensureUserConfigDir();
@@ -986,6 +990,7 @@ setUserConfigValue('default_language', 'pt-BR');
 ```
 
 **Validation:**
+
 - Profile must be either `bob` or `advanced`
 - `~/.aiox/` directory must have permissions 700
 - `~/.aiox/user-config.yaml` must be valid YAML after write

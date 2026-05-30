@@ -84,7 +84,11 @@ class ContextDetector {
       }
 
       // Check for active workflow
-      if (sessionData.workflowActive && sessionData.lastCommands && sessionData.lastCommands.length > 0) {
+      if (
+        sessionData.workflowActive &&
+        sessionData.lastCommands &&
+        sessionData.lastCommands.length > 0
+      ) {
         return 'workflow';
       }
 
@@ -163,7 +167,7 @@ class ContextDetector {
    */
   _matchesPattern(commands, pattern) {
     // Simple containment check - commands contain at least 2 from pattern
-    const matchCount = pattern.filter(p => commands.includes(p)).length;
+    const matchCount = pattern.filter((p) => commands.includes(p)).length;
     return matchCount >= 2;
   }
 

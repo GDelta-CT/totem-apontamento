@@ -117,8 +117,7 @@ function analyzeConfigNeeds(agentData) {
   }
 
   // Registry needed for meta operations
-  if (agentData.agentId === 'aiox-master' ||
-      agentData.customization?.includes('registry')) {
+  if (agentData.agentId === 'aiox-master' || agentData.customization?.includes('registry')) {
     needs.lazy.push('registry');
   }
 
@@ -130,11 +129,11 @@ function analyzeConfigNeeds(agentData) {
  */
 function estimateConfigSize(sectionName) {
   const sizes = {
-    pvMindContext: 75,        // 75KB
-    expansionPacks: 20,       // 20KB
-    registry: 15,             // 15KB
-    toolConfigurations: 10,   // 10KB
-    hybridOpsConfig: 25,      // 25KB
+    pvMindContext: 75, // 75KB
+    expansionPacks: 20, // 20KB
+    registry: 15, // 15KB
+    toolConfigurations: 10, // 10KB
+    hybridOpsConfig: 25, // 25KB
     frameworkDocsLocation: 0.1,
     projectDocsLocation: 0.1,
     devLoadAlwaysFiles: 1,
@@ -152,16 +151,16 @@ function calculateSavings(agentNeeds) {
   let totalWithLazy = 0;
 
   // Without lazy loading: everyone loads everything
-  LAZY_LOADABLE_SECTIONS.forEach(section => {
+  LAZY_LOADABLE_SECTIONS.forEach((section) => {
     totalWithoutLazy += estimateConfigSize(section);
   });
 
   // With lazy loading: only load what's needed
-  agentNeeds.always.forEach(section => {
+  agentNeeds.always.forEach((section) => {
     totalWithLazy += estimateConfigSize(section);
   });
 
-  agentNeeds.lazy.forEach(section => {
+  agentNeeds.lazy.forEach((section) => {
     totalWithLazy += estimateConfigSize(section);
   });
 
@@ -169,7 +168,7 @@ function calculateSavings(agentNeeds) {
     without: totalWithoutLazy,
     with: totalWithLazy,
     savings: totalWithoutLazy - totalWithLazy,
-    savingsPercent: ((totalWithoutLazy - totalWithLazy) / totalWithoutLazy * 100).toFixed(1),
+    savingsPercent: (((totalWithoutLazy - totalWithLazy) / totalWithoutLazy) * 100).toFixed(1),
   };
 }
 
@@ -192,7 +191,7 @@ function generateAuditReport(auditResults) {
   let totalSavingKB = 0;
   let agentsWithSavings = 0;
 
-  auditResults.forEach(result => {
+  auditResults.forEach((result) => {
     if (result.savings.savings > 0) {
       totalSavingKB += result.savings.savings;
       agentsWithSavings++;
@@ -202,7 +201,7 @@ function generateAuditReport(auditResults) {
   const avgSavings = (totalSavingKB / auditResults.length).toFixed(1);
 
   report += `**Lazy Loading Impact:**
-- Average savings per agent: **${avgSavings} KB** (${((totalSavingKB / auditResults.length) / 145 * 100).toFixed(1)}% reduction)
+- Average savings per agent: **${avgSavings} KB** (${((totalSavingKB / auditResults.length / 145) * 100).toFixed(1)}% reduction)
 - Agents benefiting from lazy loading: **${agentsWithSavings}/${auditResults.length}**
 - Total config saved across all agents: **${totalSavingKB.toFixed(1)} KB**
 
@@ -215,9 +214,9 @@ function generateAuditReport(auditResults) {
   // Sort by savings (highest first)
   auditResults.sort((a, b) => b.savings.savings - a.savings.savings);
 
-  auditResults.forEach(result => {
-    const savingsEmoji = result.savings.savings > 50 ? '🟢' :
-      result.savings.savings > 20 ? '🟡' : '🔴';
+  auditResults.forEach((result) => {
+    const savingsEmoji =
+      result.savings.savings > 50 ? '🟢' : result.savings.savings > 20 ? '🟡' : '🔴';
 
     report += `### ${savingsEmoji} ${result.agent.name} (@${result.agent.agentId})
 
@@ -226,10 +225,10 @@ function generateAuditReport(auditResults) {
 **Config Needs:**
 `;
 
-    report += `- **Always Loaded:** ${result.needs.always.length} sections (${result.needs.always.map(s => `\`${s}\``).join(', ')})\n`;
+    report += `- **Always Loaded:** ${result.needs.always.length} sections (${result.needs.always.map((s) => `\`${s}\``).join(', ')})\n`;
 
     if (result.needs.lazy.length > 0) {
-      report += `- **Lazy Loaded:** ${result.needs.lazy.length} sections (${result.needs.lazy.map(s => `\`${s}\``).join(', ')})\n`;
+      report += `- **Lazy Loaded:** ${result.needs.lazy.length} sections (${result.needs.lazy.map((s) => `\`${s}\``).join(', ')})\n`;
     }
 
     report += `
@@ -259,9 +258,9 @@ function generateAuditReport(auditResults) {
 ### High Priority (Agents with >50KB savings)
 `;
 
-  const highPriority = auditResults.filter(r => r.savings.savings > 50);
+  const highPriority = auditResults.filter((r) => r.savings.savings > 50);
   if (highPriority.length > 0) {
-    highPriority.forEach(r => {
+    highPriority.forEach((r) => {
       report += `- **@${r.agent.agentId}**: ${r.savings.savings.toFixed(1)} KB savings\n`;
     });
   } else {
@@ -270,9 +269,11 @@ function generateAuditReport(auditResults) {
 
   report += '\n### Medium Priority (Agents with 20-50KB savings)\n';
 
-  const mediumPriority = auditResults.filter(r => r.savings.savings >= 20 && r.savings.savings <= 50);
+  const mediumPriority = auditResults.filter(
+    (r) => r.savings.savings >= 20 && r.savings.savings <= 50
+  );
   if (mediumPriority.length > 0) {
-    mediumPriority.forEach(r => {
+    mediumPriority.forEach((r) => {
       report += `- **@${r.agent.agentId}**: ${r.savings.savings.toFixed(1)} KB savings\n`;
     });
   } else {
@@ -281,9 +282,9 @@ function generateAuditReport(auditResults) {
 
   report += '\n### Low Priority (Agents with <20KB savings)\n';
 
-  const lowPriority = auditResults.filter(r => r.savings.savings < 20);
+  const lowPriority = auditResults.filter((r) => r.savings.savings < 20);
   if (lowPriority.length > 0) {
-    lowPriority.forEach(r => {
+    lowPriority.forEach((r) => {
       report += `- **@${r.agent.agentId}**: ${r.savings.savings.toFixed(1)} KB savings\n`;
     });
   }
@@ -360,7 +361,6 @@ if (require.main === module) {
 
       console.log(`💾 Average savings: ${avgSavings.toFixed(1)} KB per agent`);
       console.log(`🎯 Target: 18% reduction (current: ${((avgSavings / 145) * 100).toFixed(1)}%)`);
-
     } catch (error) {
       console.error('❌ Audit failed:', error);
       process.exit(1);

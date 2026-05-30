@@ -227,7 +227,9 @@ class SessionState {
    */
   async updateSessionState(updates) {
     if (!this.state) {
-      throw new Error('Session state not initialized. Call loadSessionState() or createSessionState() first.');
+      throw new Error(
+        'Session state not initialized. Call loadSessionState() or createSessionState() first.'
+      );
     }
 
     const now = new Date().toISOString();
@@ -328,12 +330,12 @@ class SessionState {
   async recordStoryCompleted(storyId, nextStoryId = null) {
     const storiesDone = [...this.state.session_state.progress.stories_done, storyId];
     const storiesPending = this.state.session_state.progress.stories_pending.filter(
-      (id) => id !== storyId,
+      (id) => id !== storyId
     );
 
     return this.updateSessionState({
       progress: {
-        current_story: nextStoryId || (storiesPending[0] || null),
+        current_story: nextStoryId || storiesPending[0] || null,
         stories_done: storiesDone,
         stories_pending: storiesPending,
       },
@@ -376,7 +378,9 @@ class SessionState {
    */
   async setSessionOverride(key, value) {
     if (!this.state) {
-      throw new Error('Session state not initialized. Call loadSessionState() or createSessionState() first.');
+      throw new Error(
+        'Session state not initialized. Call loadSessionState() or createSessionState() first.'
+      );
     }
 
     const now = new Date().toISOString();
@@ -481,7 +485,8 @@ class SessionState {
     // - last_updated > 30 min AND
     // - last_action.type is NOT PAUSE or COMPLETE (STORY_COMPLETED)
     const normalEndStates = [ActionType.PAUSE, ActionType.STORY_COMPLETED, ActionType.ABORT];
-    const isCrash = minutesSinceUpdate > CRASH_THRESHOLD_MINUTES && !normalEndStates.includes(lastActionType);
+    const isCrash =
+      minutesSinceUpdate > CRASH_THRESHOLD_MINUTES && !normalEndStates.includes(lastActionType);
 
     return {
       isCrash,
@@ -618,9 +623,10 @@ O que você quer fazer?
       progress: {
         completed: progress.stories_done.length,
         total: epic.total_stories,
-        percentage: epic.total_stories > 0
-          ? Math.round((progress.stories_done.length / epic.total_stories) * 100)
-          : 0,
+        percentage:
+          epic.total_stories > 0
+            ? Math.round((progress.stories_done.length / epic.total_stories) * 100)
+            : 0,
         storiesDone: progress.stories_done,
         storiesPending: progress.stories_pending,
         currentStory: progress.current_story,
@@ -658,14 +664,16 @@ O que você quer fazer?
       }
 
       if (this.options.debug) {
-        console.log(`[SessionState] Found ${stateFiles.length} legacy workflow state files to migrate`);
+        console.log(
+          `[SessionState] Found ${stateFiles.length} legacy workflow state files to migrate`
+        );
       }
 
       // Read the most recent state file
       const latestStateFile = stateFiles.sort().pop();
       const legacyContent = await fs.readFile(
         path.join(this.legacyStatePath, latestStateFile),
-        'utf8',
+        'utf8'
       );
       const legacyState = yaml.load(legacyContent);
 
@@ -811,8 +819,14 @@ O que você quer fazer?
     }
 
     // Validate progress (AC3)
-    if (!ss.progress || !Array.isArray(ss.progress.stories_done) || !Array.isArray(ss.progress.stories_pending)) {
-      errors.push('Invalid progress field: requires current_story, stories_done[], stories_pending[]');
+    if (
+      !ss.progress ||
+      !Array.isArray(ss.progress.stories_done) ||
+      !Array.isArray(ss.progress.stories_pending)
+    ) {
+      errors.push(
+        'Invalid progress field: requires current_story, stories_done[], stories_pending[]'
+      );
     }
 
     // Validate last_action (AC4)
@@ -822,7 +836,9 @@ O que você quer fazer?
 
     // Validate context_snapshot (AC5)
     if (ss.context_snapshot?.files_modified === undefined) {
-      errors.push('Invalid context_snapshot field: requires files_modified, executor_distribution, branch');
+      errors.push(
+        'Invalid context_snapshot field: requires files_modified, executor_distribution, branch'
+      );
     }
 
     return {

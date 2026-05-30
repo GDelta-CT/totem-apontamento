@@ -28,12 +28,16 @@ const PROFILE_POLICIES = {
 };
 
 function normalizeProfile(profile) {
-  const value = String(profile || '').trim().toLowerCase();
+  const value = String(profile || '')
+    .trim()
+    .toLowerCase();
   return VALID_PROFILES.includes(value) ? value : null;
 }
 
 function normalizeContext(context) {
-  const value = String(context || '').trim().toLowerCase();
+  const value = String(context || '')
+    .trim()
+    .toLowerCase();
   return VALID_CONTEXTS.includes(value) ? value : 'development';
 }
 

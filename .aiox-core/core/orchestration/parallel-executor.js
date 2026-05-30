@@ -31,7 +31,11 @@ class ParallelExecutor {
     const results = [];
     const errors = [];
 
-    console.log(chalk.yellow(`\n⚡ Executing ${phases.length} phases in parallel (max ${maxConcurrency} concurrent)`));
+    console.log(
+      chalk.yellow(
+        `\n⚡ Executing ${phases.length} phases in parallel (max ${maxConcurrency} concurrent)`
+      )
+    );
 
     // Use Promise.allSettled for resilient parallel execution
     const promises = phases.map(async (phase) => {
@@ -150,7 +154,7 @@ class ParallelExecutor {
       if (Date.now() - startTime > timeout) {
         throw new Error('Timeout waiting for parallel tasks to complete');
       }
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     }
   }
 

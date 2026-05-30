@@ -20,9 +20,9 @@ const { createRegenerateCommand } = require('./regenerate');
 function createManifestCommand() {
   const manifest = new Command('manifest');
 
-  manifest
-    .description('Manage AIOX manifest files for agents, workers, and tasks')
-    .addHelpText('after', `
+  manifest.description('Manage AIOX manifest files for agents, workers, and tasks').addHelpText(
+    'after',
+    `
 Commands:
   validate          Validate all manifest files
   regenerate        Regenerate manifests from source files
@@ -32,7 +32,8 @@ Examples:
   $ aiox manifest validate --verbose
   $ aiox manifest regenerate
   $ aiox manifest regenerate --force
-`);
+`
+  );
 
   // Add subcommands
   manifest.addCommand(createValidateCommand());

@@ -9,16 +9,19 @@
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -186,6 +189,7 @@ token_usage: ~2,000-8,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Iterative analysis with depth limits; cache intermediate results; batch similar operations
 
 ---
@@ -205,7 +209,6 @@ updated_at: 2025-11-17
 
 ---
 
-
 ## Description
 
 Analyze an squad's data requirements and design database integration strategy. Maps pack inputs/outputs/state to database schema, proposes tables/relationships, and generates migration plan.
@@ -213,7 +216,7 @@ Analyze an squad's data requirements and design database integration strategy. M
 ## Prerequisites
 
 - Squad installed and accessible
-- Database connection configured (*env-check passed)
+- Database connection configured (\*env-check passed)
 - Current schema documented or accessible
 
 ## Workflow
@@ -221,10 +224,12 @@ Analyze an squad's data requirements and design database integration strategy. M
 ### Step 1: Identify Target Squad
 
 **Elicit from user:**
+
 - Which squad? (mmos, creator-os, innerlens, etc.)
 - Path to squad directory
 
 **Actions:**
+
 - Verify pack exists and has config.yaml
 - Load pack metadata (name, version, description)
 
@@ -338,7 +343,6 @@ current_schema:
 ```yaml
 proposed_schema:
   new_tables:
-
     # MMOS example
     - name: minds
       purpose: Store cognitive clone definitions
@@ -355,7 +359,7 @@ proposed_schema:
       indexes:
         - (user_id, slug) UNIQUE
         - (status) WHERE status = 'active'
-      rls: "Users can only access their own minds"
+      rls: 'Users can only access their own minds'
 
     - name: mind_system_prompts
       purpose: Version-controlled system prompts
@@ -369,7 +373,7 @@ proposed_schema:
         - created_at: timestamptz
       indexes:
         - (mind_id, version, prompt_type) UNIQUE
-      rls: "Inherit from minds table via mind_id"
+      rls: 'Inherit from minds table via mind_id'
 
     - name: mind_knowledge_chunks
       purpose: RAG-ready knowledge base
@@ -377,13 +381,13 @@ proposed_schema:
         - id: uuid PRIMARY KEY
         - mind_id: uuid REFERENCES minds(id) ON DELETE CASCADE
         - chunk_text: text NOT NULL
-        - embedding: vector(1536)  # OpenAI embeddings
+        - embedding: vector(1536) # OpenAI embeddings
         - metadata: jsonb (source_file, chunk_index, etc.)
         - created_at: timestamptz
       indexes:
         - (mind_id)
         - GiST (embedding vector_cosine_ops) # For similarity search
-      rls: "Inherit from minds table"
+      rls: 'Inherit from minds table'
 
   modified_tables: []
 
@@ -473,25 +477,29 @@ supabase/migrations/20251027_004_add_vector_search.sql
 
 **Create docs/mmos/database-integration.md:**
 
-```markdown
+````markdown
 # MMOS Database Integration
 
 ## Overview
+
 MMOS cognitive clones are now persisted in Supabase with full RLS, versioning, and vector search.
 
 ## Schema
 
 ### minds table
+
 - Stores core mind definition
 - One per cognitive clone
 - User-scoped via RLS
 
 ### mind_system_prompts table
+
 - Version-controlled prompts
 - Many per mind
 - Allows A/B testing and rollback
 
 ### mind_knowledge_chunks table
+
 - RAG-ready knowledge base
 - Vector embeddings for similarity search
 - Efficient retrieval during clone interaction
@@ -499,18 +507,22 @@ MMOS cognitive clones are now persisted in Supabase with full RLS, versioning, a
 ## Usage
 
 ### Creating a mind
+
 ```sql
 INSERT INTO minds (user_id, slug, name, personality_type)
 VALUES (auth.uid(), 'joao-lozano', 'João Lozano', 'ENTJ');
 ```
+````
 
 ### Storing system prompt
+
 ```sql
 INSERT INTO mind_system_prompts (mind_id, version, prompt_type, content)
 VALUES (:mind_id, 1, 'generalista', :prompt_content);
 ```
 
 ### Searching knowledge base
+
 ```sql
 SELECT * FROM search_mind_knowledge(
   :mind_id,
@@ -525,7 +537,8 @@ LIMIT 10;
 2. Backfill existing minds from outputs/ directory
 3. Update MMOS scripts to read/write database
 4. Keep filesystem outputs as backup during transition
-```
+
+````
 
 ---
 
@@ -572,7 +585,7 @@ next_steps:
   - [ ] Deploy to staging
   - [ ] Monitor for 48h
   - [ ] Deploy to production
-```
+````
 
 ---
 

@@ -203,12 +203,15 @@ updated_at: 2025-11-17
  Powered by AIOX™ Core -->
 
 ---
+
 tools:
-  - github-cli        # PR review and quality gate management
-  - context7          # Research testing best practices and standards
-checklists:
-  - qa-master-checklist.md
-execution_mode: programmatic  # TOK-3: PTC-eligible — batch lint+typecheck+test in single Bash block
+
+- github-cli # PR review and quality gate management
+- context7 # Research testing best practices and standards
+  checklists:
+- qa-master-checklist.md
+  execution_mode: programmatic # TOK-3: PTC-eligible — batch lint+typecheck+test in single Bash block
+
 ---
 
 # qa-gate
@@ -421,10 +424,11 @@ Gate: CONCERNS → qa.qaLocation/gates/{epic}.{story}-{slug}.yml
 - Clear, actionable findings
 
 ## Handoff
+
 next_agent: @devops
-next_command: *push
+next_command: \*push
 condition: QA gate verdict is PASS
 alternatives:
-  - agent: @dev, command: *apply-qa-fixes, condition: QA gate verdict is FAIL or CONCERNS
-  - agent: @po, command: *close-story {story-id}, condition: QA gate verdict is WAIVED
- 
+
+- agent: @dev, command: \*apply-qa-fixes, condition: QA gate verdict is FAIL or CONCERNS
+- agent: @po, command: \*close-story {story-id}, condition: QA gate verdict is WAIVED

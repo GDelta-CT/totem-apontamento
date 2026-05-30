@@ -4,52 +4,52 @@
 // Source of truth: pro-design-migration/apps/dashboard/src/app/globals.css
 const THEME = {
   bg: {
-    base: '#000000',       // --bg-base
-    surface: '#0A0A0A',    // --bg-surface
+    base: '#000000', // --bg-base
+    surface: '#0A0A0A', // --bg-surface
     overlay: 'rgba(10,10,10,0.9)', // --bg-surface + opacity
   },
   text: {
-    primary: '#E8E8DF',    // --text-primary
-    secondary: '#B8B8AC',  // --text-secondary
-    tertiary: '#8A8A7F',   // --text-tertiary
-    muted: '#6B6B63',      // --text-muted
+    primary: '#E8E8DF', // --text-primary
+    secondary: '#B8B8AC', // --text-secondary
+    tertiary: '#8A8A7F', // --text-tertiary
+    muted: '#6B6B63', // --text-muted
   },
   status: {
-    success: '#4ADE80',    // --status-success
-    warning: '#FBBF24',    // --status-warning
-    error: '#F87171',      // --status-error
-    info: '#60A5FA',       // --status-info
+    success: '#4ADE80', // --status-success
+    warning: '#FBBF24', // --status-warning
+    error: '#F87171', // --status-error
+    info: '#60A5FA', // --status-info
   },
   border: {
     default: 'rgba(255,255,255,0.06)', // --border
-    subtle: 'rgba(255,255,255,0.04)',  // --border-subtle (card-refined)
+    subtle: 'rgba(255,255,255,0.04)', // --border-subtle (card-refined)
     highlight: 'rgba(201,178,152,0.25)', // --border-gold
-    gold: 'rgba(201,178,152,0.25)',    // --border-gold (alias for highlight)
+    gold: 'rgba(201,178,152,0.25)', // --border-gold (alias for highlight)
     goldStrong: 'rgba(201,178,152,0.5)', // --border-gold-strong (selection)
   },
   accent: {
-    gold: '#C9B298',       // --accent-gold
+    gold: '#C9B298', // --accent-gold
   },
   agent: {
-    dev: '#22c55e',        // --agent-dev
-    sm: '#f472b6',         // --agent-sm
-    po: '#f97316',         // --agent-po
-    qa: '#eab308',         // --agent-qa
-    architect: '#8b5cf6',  // --agent-architect
-    devops: '#ec4899',     // --agent-devops
-    analyst: '#06b6d4',    // --agent-analyst
+    dev: '#22c55e', // --agent-dev
+    sm: '#f472b6', // --agent-sm
+    po: '#f97316', // --agent-po
+    qa: '#eab308', // --agent-qa
+    architect: '#8b5cf6', // --agent-architect
+    devops: '#ec4899', // --agent-devops
+    analyst: '#06b6d4', // --agent-analyst
   },
   tooltip: {
-    bg: '#0A0A0A',         // = bg.surface (card-refined)
+    bg: '#0A0A0A', // = bg.surface (card-refined)
     border: 'rgba(255,255,255,0.04)', // = border.subtle
     shadow: '0 4px 12px rgba(0,0,0,0.5)', // --tooltip-shadow
   },
   radius: {
-    md: '4px',             // --radius-md
+    md: '4px', // --radius-md
   },
   controls: {
-    sliderThumb: '#C9B298',                // = accent.gold
-    sliderTrack: 'rgba(255,255,255,0.1)',  // slider track background
+    sliderThumb: '#C9B298', // = accent.gold
+    sliderTrack: 'rgba(255,255,255,0.1)', // slider track background
   },
 };
 
@@ -103,9 +103,10 @@ function _buildVisNodes(nodes) {
     seen.add(node.id);
 
     const category = (node.group || node.category || '').toLowerCase();
-    const style = CATEGORY_COLORS[category]
-      || (category === 'scripts' ? CATEGORY_COLORS['scripts/task'] : null)
-      || DEFAULT_COLOR;
+    const style =
+      CATEGORY_COLORS[category] ||
+      (category === 'scripts' ? CATEGORY_COLORS['scripts/task'] : null) ||
+      DEFAULT_COLOR;
     const lifecycle = node.lifecycle || 'production';
     const lcStyle = LIFECYCLE_STYLES[lifecycle] || LIFECYCLE_STYLES.production;
     const nodeColor = lcStyle.colorOverride || style.color;
@@ -155,23 +156,27 @@ function _buildSidebar(nodes) {
     categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
   });
 
-  const categoryItems = Object.entries(CATEGORY_COLORS).map(([name, style]) => {
-    const count = categoryCounts[name] || 0;
-    return `<label class="filter-item">
+  const categoryItems = Object.entries(CATEGORY_COLORS)
+    .map(([name, style]) => {
+      const count = categoryCounts[name] || 0;
+      return `<label class="filter-item">
       <input type="checkbox" data-filter="category" value="${name}" checked>
       <span class="status-dot" style="color:${style.color}"></span>
       <span style="color:${THEME.text.secondary};font-size:11px">${name}</span>
       <span style="color:${THEME.text.tertiary};font-size:11px;margin-left:auto">${count}</span>
     </label>`;
-  }).join('\n');
+    })
+    .join('\n');
 
-  const lifecycleItems = Object.entries(LIFECYCLE_STYLES).map(([name, style]) => {
-    const opacity = style.opacity;
-    return `<label class="filter-item">
+  const lifecycleItems = Object.entries(LIFECYCLE_STYLES)
+    .map(([name, style]) => {
+      const opacity = style.opacity;
+      return `<label class="filter-item">
       <input type="checkbox" data-filter="lifecycle" value="${name}" checked>
       <span style="opacity:${opacity}">&#9679;</span> ${name}
     </label>`;
-  }).join('\n');
+    })
+    .join('\n');
 
   return `<div id="sidebar">
     <div class="sidebar-header">

@@ -17,16 +17,19 @@ Enable the meta-agent to improve its own capabilities with comprehensive safegua
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -110,12 +113,14 @@ pre-conditions:
 **Purpose:** Validate improvement request against safety rules
 
 **Actions:**
+
 1. Parse improvement request
 2. Check against safety rules
 3. Verify scope limitations
 4. Detect recursive improvements
 
 **Validation:**
+
 - Request is valid
 - No safety violations
 - Scope within limits
@@ -128,12 +133,14 @@ pre-conditions:
 **Purpose:** Analyze current implementation and identify improvement opportunities
 
 **Actions:**
+
 1. Analyze current implementation
 2. Identify improvement opportunities
 3. Assess feasibility and risks
 4. Generate capability report
 
 **Validation:**
+
 - Analysis completed
 - Opportunities identified
 - Risks assessed
@@ -146,12 +153,14 @@ pre-conditions:
 **Purpose:** Generate specific improvement plan with implementation details
 
 **Actions:**
+
 1. Generate specific changes
 2. Create implementation plan
 3. Identify affected components
 4. Estimate impact and benefits
 
 **Validation:**
+
 - Plan generated
 - Changes specified
 - Components identified
@@ -164,12 +173,14 @@ pre-conditions:
 **Purpose:** Validate improvement plan against safety constraints
 
 **Actions:**
+
 1. Check for breaking changes
 2. Verify interface preservation
 3. Validate security implications
 4. Ensure rollback capability
 
 **Validation:**
+
 - No breaking changes
 - Interfaces preserved
 - Security validated
@@ -182,12 +193,14 @@ pre-conditions:
 **Purpose:** Create full backup before applying changes
 
 **Actions:**
+
 1. Full backup of affected files
 2. State snapshot for recovery
 3. Version control checkpoint
 4. Recovery plan documentation
 
 **Validation:**
+
 - Backup created
 - State saved
 - Checkpoint created
@@ -200,12 +213,14 @@ pre-conditions:
 **Purpose:** Test improvements in isolated environment
 
 **Actions:**
+
 1. Create isolated test environment
 2. Apply changes in sandbox
 3. Run comprehensive test suite
 4. Validate functionality
 
 **Validation:**
+
 - Sandbox created
 - Changes applied
 - Tests passed
@@ -218,12 +233,14 @@ pre-conditions:
 **Purpose:** Request explicit user approval before applying changes
 
 **Actions:**
+
 1. Present improvement plan
 2. Show test results
 3. Display risk assessment
 4. Request explicit approval
 
 **Validation:**
+
 - Plan presented
 - Results shown
 - Risks disclosed
@@ -236,12 +253,14 @@ pre-conditions:
 **Purpose:** Apply approved improvements to production
 
 **Actions:**
+
 1. Apply approved changes
 2. Monitor for issues
 3. Validate in production
 4. Track performance metrics
 
 **Validation:**
+
 - Changes applied
 - No issues detected
 - Production validated
@@ -383,6 +402,7 @@ token_usage: ~2,000-5,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Cache capability analysis results
 - Parallelize sandbox tests where possible
 - Implement early exits on safety violations
@@ -413,23 +433,23 @@ graph TD
     A[User Request] --> B{Validate Request}
     B -->|Valid| C[Capability Analysis]
     B -->|Invalid| X[Reject with Explanation]
-    
+
     C --> D[Generate Improvement Plan]
     D --> E[Safety Validation]
     E -->|Pass| F[Create Backup]
     E -->|Fail| X
-    
+
     F --> G[Sandbox Testing]
     G -->|Success| H[User Approval]
     G -->|Failure| I[Rollback & Report]
-    
+
     H -->|Approved| J[Apply Changes]
     H -->|Rejected| K[Log & Exit]
-    
+
     J --> L[Validation Testing]
     L -->|Pass| M[Commit Changes]
     L -->|Fail| N[Emergency Rollback]
-    
+
     M --> O[Update Metrics]
     N --> P[Restore Backup]
     P --> Q[Generate Report]
@@ -438,14 +458,14 @@ graph TD
 ## Required Input
 
 ```yaml
-request: "Description of desired self-improvement"
-scope: "specific|general"  # specific = targeted improvement, general = broad optimization
-target_areas:  # Optional list of areas to improve
+request: 'Description of desired self-improvement'
+scope: 'specific|general' # specific = targeted improvement, general = broad optimization
+target_areas: # Optional list of areas to improve
   - performance
   - error_handling
   - capabilities
   - code_quality
-constraints:  # Optional safety constraints
+constraints: # Optional safety constraints
   max_files: 10
   require_tests: true
   preserve_interfaces: true
@@ -510,28 +530,28 @@ constraints:  # Optional safety constraints
 ## Output Format
 
 ```yaml
-improvement_id: "self-imp-{timestamp}-{hash}"
-status: "completed|failed|rolled_back"
+improvement_id: 'self-imp-{timestamp}-{hash}'
+status: 'completed|failed|rolled_back'
 analysis:
   current_capabilities:
-    - capability: "error handling"
+    - capability: 'error handling'
       score: 7.5
-      issues: ["no retry logic", "basic error messages"]
+      issues: ['no retry logic', 'basic error messages']
   proposed_improvements:
-    - area: "error handling"
-      changes: ["add retry mechanism", "enhance error context"]
-      impact: "medium"
-      risk: "low"
+    - area: 'error handling'
+      changes: ['add retry mechanism', 'enhance error context']
+      impact: 'medium'
+      risk: 'low'
 modifications:
-  - file: "utils/error-handler.js"
-    type: "enhancement"
+  - file: 'utils/error-handler.js'
+    type: 'enhancement'
     changes: 15
     tests_added: 3
 validation:
   sandbox_results:
     tests_passed: 45
     tests_failed: 0
-    performance_impact: "+5%"
+    performance_impact: '+5%'
   safety_checks:
     breaking_changes: false
     interface_preserved: true
@@ -541,13 +561,14 @@ metrics:
   risk_score: 2.1
   confidence: 0.87
 rollback_info:
-  backup_id: "backup-123"
-  restore_command: "node restore.js backup-123"
+  backup_id: 'backup-123'
+  restore_command: 'node restore.js backup-123'
 ```
 
 ## Safety Rules
 
 ### Mandatory Safeguards
+
 1. **No Core System Modifications**
    - Cannot modify bootstrap files
    - Cannot change security validators
@@ -579,6 +600,7 @@ rollback_info:
    - Rollback plan available
 
 ### Safe Mode Fallback
+
 ```javascript
 // Always maintain safe mode entry point
 if (process.env.AIOX_SAFE_MODE === 'true') {
@@ -599,110 +621,110 @@ const BackupManager = require('../scripts/backup-manager');
 module.exports = {
   name: 'improve-self',
   description: 'Enable meta-agent self-improvement with safeguards',
-  
+
   async execute(params) {
     const { request, scope = 'specific', target_areas = [], constraints = {} } = params;
-    
+
     // Initialize safety systems
     const validator = new ImprovementValidator();
     const analyzer = new CapabilityAnalyzer();
     const sandbox = new SandboxTester();
     const backup = new BackupManager();
     // const metrics = new MetricsTracker(); // Archived in Story 3.18
-    
+
     try {
       // Step 1: Validate request
       const validation = await validator.validateRequest({
         request,
         scope,
-        constraints
+        constraints,
       });
-      
+
       if (!validation.valid) {
         return {
           success: false,
           reason: validation.reason,
-          suggestions: validation.suggestions
+          suggestions: validation.suggestions,
         };
       }
-      
+
       // Step 2: Analyze capabilities
       const analysis = await analyzer.analyzeCapabilities({
         target_areas,
-        currentImplementation: './aiox-core'
+        currentImplementation: './aiox-core',
       });
-      
+
       // Step 3: Generate improvement plan
       const plan = await analyzer.generateImprovementPlan({
         analysis,
         request,
-        constraints
+        constraints,
       });
-      
+
       // Step 4: Safety validation
       const safety = await validator.validateSafety(plan);
       if (!safety.safe) {
         return {
           success: false,
           reason: 'Safety validation failed',
-          risks: safety.risks
+          risks: safety.risks,
         };
       }
-      
+
       // Step 5: Create backup
       const backupId = await backup.createFullBackup({
         files: plan.affectedFiles,
         metadata: {
           improvement_id: plan.id,
-          timestamp: new Date().toISOString()
-        }
+          timestamp: new Date().toISOString(),
+        },
       });
-      
+
       // Step 6: Sandbox testing
       const sandboxResults = await sandbox.testImprovements({
         plan,
-        backupId
+        backupId,
       });
-      
+
       if (!sandboxResults.success) {
         await backup.restoreBackup(backupId);
         return {
           success: false,
           reason: 'Sandbox testing failed',
-          results: sandboxResults
+          results: sandboxResults,
         };
       }
-      
+
       // Step 7: User approval
       const approval = await this.requestUserApproval({
         plan,
         analysis,
         sandboxResults,
-        safety
+        safety,
       });
-      
+
       if (!approval.approved) {
         return {
           success: false,
           reason: 'User rejected improvements',
-          user_feedback: approval.feedback
+          user_feedback: approval.feedback,
         };
       }
-      
+
       // Step 8: Apply changes
       const application = await this.applyImprovements({
         plan,
-        backupId
+        backupId,
       });
-      
+
       // Step 9: Post-implementation
       await metrics.recordImprovement({
         improvement_id: plan.id,
         metrics: application.metrics,
         analysis,
-        plan
+        plan,
       });
-      
+
       return {
         success: true,
         improvement_id: plan.id,
@@ -711,66 +733,70 @@ module.exports = {
         metrics: application.metrics,
         rollback_info: {
           backup_id: backupId,
-          restore_command: `*restore-backup ${backupId}`
-        }
+          restore_command: `*restore-backup ${backupId}`,
+        },
       };
-      
     } catch (error) {
       // Emergency rollback
       if (backup.hasActiveBackup()) {
         await backup.emergencyRestore();
       }
-      
+
       return {
         success: false,
         error: error.message,
-        emergency_rollback: true
+        emergency_rollback: true,
       };
     }
   },
-  
+
   async requestUserApproval({ plan, analysis, sandboxResults, safety }) {
     console.log(chalk.yellow('\n=== SELF-IMPROVEMENT APPROVAL REQUEST ===\n'));
-    
+
     console.log(chalk.blue('Improvement Plan:'));
     console.log(`- Target: ${plan.target_areas.join(', ')}`);
     console.log(`- Files affected: ${plan.affectedFiles.length}`);
     console.log(`- Risk level: ${safety.risk_level}`);
-    
+
     console.log(chalk.blue('\nProposed Changes:'));
-    plan.changes.forEach(change => {
+    plan.changes.forEach((change) => {
       console.log(`- ${change.description}`);
       console.log(`  Impact: ${change.impact}, Risk: ${change.risk}`);
     });
-    
+
     console.log(chalk.green('\nSandbox Test Results:'));
     console.log(`- Tests passed: ${sandboxResults.tests_passed}/${sandboxResults.total_tests}`);
     console.log(`- Performance impact: ${sandboxResults.performance_impact}`);
     console.log(`- No breaking changes: ${sandboxResults.no_breaking_changes}`);
-    
-    const { approve } = await inquirer.prompt([{
-      type: 'confirm',
-      name: 'approve',
-      message: 'Do you approve these self-improvements?',
-      default: false
-    }]);
-    
+
+    const { approve } = await inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'approve',
+        message: 'Do you approve these self-improvements?',
+        default: false,
+      },
+    ]);
+
     if (approve) {
-      const { feedback } = await inquirer.prompt([{
-        type: 'input',
-        name: 'feedback',
-        message: 'Any additional constraints or feedback?'
-      }]);
-      
+      const { feedback } = await inquirer.prompt([
+        {
+          type: 'input',
+          name: 'feedback',
+          message: 'Any additional constraints or feedback?',
+        },
+      ]);
+
       return { approved: true, feedback };
     }
-    
+
     return { approved: false };
-  }
+  },
 };
 ```
 
 ## Dependencies
+
 - capability-analyzer.js
 - improvement-validator.js
 - sandbox-tester.js
@@ -779,6 +805,7 @@ module.exports = {
 - git-wrapper.js
 
 ## Test Requirements
+
 - Sandbox environment setup
 - Mock improvement scenarios
 - Safety validation tests
@@ -786,6 +813,7 @@ module.exports = {
 - Metrics accuracy tests
 
 ## Security Considerations
+
 - All improvements require explicit approval
 - Sandbox testing mandatory
 - Full backup before changes
@@ -794,6 +822,7 @@ module.exports = {
 - Safe mode bypass available
 
 ## Common Improvements
+
 1. **Error Handling Enhancement**
    - Add retry logic
    - Improve error messages
@@ -815,9 +844,10 @@ module.exports = {
    - Enhance documentation
 
 ## Metrics Tracked
+
 - Improvement success rate
 - Performance impact
 - Code quality scores
 - Test coverage changes
 - User satisfaction
-- Rollback frequency 
+- Rollback frequency

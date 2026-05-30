@@ -24,7 +24,9 @@ class WorkspaceAdapter {
         timeout: 10000,
       });
       const extensions = JSON.parse(output);
-      this.enabled = extensions.some((e) => e.name === 'workspace' || e.name === 'google-workspace');
+      this.enabled = extensions.some(
+        (e) => e.name === 'workspace' || e.name === 'google-workspace'
+      );
       return this.enabled;
     } catch {
       this.enabled = false;
@@ -66,7 +68,9 @@ class WorkspaceAdapter {
   async createPresentation(title, slides) {
     if (!this.enabled) throw new Error('Workspace extension not available');
 
-    const slidesDesc = slides.map((s, i) => `Slide ${i + 1}: ${s.title}\n${s.content}`).join('\n\n');
+    const slidesDesc = slides
+      .map((s, i) => `Slide ${i + 1}: ${s.title}\n${s.content}`)
+      .join('\n\n');
     const prompt = `Use Google Workspace to create a new Google Slides presentation titled "${title}" with these slides:\n\n${slidesDesc}`;
     return this._executeWorkspace(prompt);
   }

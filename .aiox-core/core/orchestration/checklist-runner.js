@@ -122,7 +122,7 @@ class ChecklistRunner {
     while ((checkboxMatch = checkboxPattern.exec(content)) !== null) {
       const description = checkboxMatch[1].trim();
       // Skip if already parsed from YAML
-      if (!items.some(i => i.description.includes(description.substring(0, 30)))) {
+      if (!items.some((i) => i.description.includes(description.substring(0, 30)))) {
         items.push({
           description,
           tipo: 'manual',
@@ -215,7 +215,7 @@ class ChecklistRunner {
       for (const targetPath of paths) {
         if (targetPath) {
           const fullPath = path.join(this.projectRoot, targetPath);
-          if (!await fs.pathExists(fullPath)) {
+          if (!(await fs.pathExists(fullPath))) {
             return false;
           }
         }
@@ -261,7 +261,7 @@ class ChecklistRunner {
         if (targetPath) {
           const fullPath = path.join(this.projectRoot, targetPath);
           // Missing file = validation failure (file must exist to contain content)
-          if (!await fs.pathExists(fullPath)) {
+          if (!(await fs.pathExists(fullPath))) {
             return false;
           }
           const content = await fs.readFile(fullPath, 'utf8');
@@ -281,7 +281,7 @@ class ChecklistRunner {
         if (targetPath) {
           const fullPath = path.join(this.projectRoot, targetPath);
           // Missing file = validation failure (file must exist to have size)
-          if (!await fs.pathExists(fullPath)) {
+          if (!(await fs.pathExists(fullPath))) {
             return false;
           }
           const stats = await fs.stat(fullPath);
@@ -313,12 +313,12 @@ class ChecklistRunner {
     return {
       name: checklistName,
       totalItems: items.length,
-      blockers: items.filter(i => i.blocker).length,
+      blockers: items.filter((i) => i.blocker).length,
       categories: {
-        preConditions: items.filter(i => i.tipo === 'pre-conditions').length,
-        postConditions: items.filter(i => i.tipo === 'post-conditions').length,
-        acceptanceCriteria: items.filter(i => i.tipo === 'acceptance-criteria').length,
-        manual: items.filter(i => i.tipo === 'manual').length,
+        preConditions: items.filter((i) => i.tipo === 'pre-conditions').length,
+        postConditions: items.filter((i) => i.tipo === 'post-conditions').length,
+        acceptanceCriteria: items.filter((i) => i.tipo === 'acceptance-criteria').length,
+        manual: items.filter((i) => i.tipo === 'manual').length,
       },
     };
   }

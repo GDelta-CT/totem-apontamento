@@ -26,7 +26,9 @@ function createInfoCommand() {
     .argument('<id>', 'Worker ID to display')
     .option('-f, --format <format>', 'Output format: pretty, json, yaml', 'pretty')
     .option('-v, --verbose', 'Show verbose/debug output')
-    .addHelpText('after', `
+    .addHelpText(
+      'after',
+      `
 Examples:
   $ aiox workers info json-csv-transformer
   $ aiox workers info architect-checklist --format=json
@@ -37,7 +39,8 @@ Output Formats:
   pretty   Formatted text with sections and boxes (default)
   json     JSON object with all metadata
   yaml     YAML document with all metadata
-`)
+`
+    )
     .action(executeInfo);
 
   return info;
@@ -99,7 +102,6 @@ async function executeInfo(id, options) {
     if (duration > 500) {
       console.warn(`\nWarning: Info command took ${duration}ms (target: < 500ms)`);
     }
-
   } catch (error) {
     console.error(`Error: ${error.message}`);
     if (options.verbose) {
@@ -131,7 +133,7 @@ async function findSuggestions(registry, invalidId) {
     // Check Levenshtein distance for similar IDs
     const distance = levenshteinDistance(invalidId, idLower);
     const maxLen = Math.max(invalidId.length, idLower.length);
-    const similarity = 1 - (distance / maxLen);
+    const similarity = 1 - distance / maxLen;
 
     if (similarity >= 0.5) {
       suggestions.push({ worker, score: Math.round(similarity * 100) });
@@ -140,7 +142,7 @@ async function findSuggestions(registry, invalidId) {
 
   // Sort by score descending and return top 5
   suggestions.sort((a, b) => b.score - a.score);
-  return suggestions.slice(0, 5).map(s => s.worker);
+  return suggestions.slice(0, 5).map((s) => s.worker);
 }
 
 /**
@@ -180,10 +182,9 @@ async function findRelatedWorkers(registry, worker) {
   }
 
   // Sort by score descending
-  const sorted = Array.from(related.values())
-    .sort((a, b) => b.score - a.score);
+  const sorted = Array.from(related.values()).sort((a, b) => b.score - a.score);
 
-  return sorted.slice(0, 5).map(r => r.worker);
+  return sorted.slice(0, 5).map((r) => r.worker);
 }
 
 module.exports = {

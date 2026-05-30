@@ -78,7 +78,7 @@ class MemoryCheck extends BaseCheck {
           healable: false,
           healingTier: 3,
           details,
-        },
+        }
       );
     }
 

@@ -222,7 +222,10 @@ function addServer(serverName, serverConfig = null) {
   if (!serverConfig && SERVER_TEMPLATES[serverName]) {
     serverConfig = { ...SERVER_TEMPLATES[serverName] };
   } else if (!serverConfig) {
-    return { success: false, error: `No template available for "${serverName}". Provide server configuration.` };
+    return {
+      success: false,
+      error: `No template available for "${serverName}". Provide server configuration.`,
+    };
   }
 
   // Check if server already exists
@@ -329,7 +332,7 @@ function listServers() {
   return {
     servers,
     total: servers.length,
-    enabled: servers.filter(s => s.enabled).length,
+    enabled: servers.filter((s) => s.enabled).length,
   };
 }
 

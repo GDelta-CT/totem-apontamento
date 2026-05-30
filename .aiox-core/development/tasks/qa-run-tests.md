@@ -15,16 +15,19 @@ Execute test suite and validate code quality before marking tests complete.
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -192,6 +195,7 @@ token_usage: ~800-2,500 tokens
 ```
 
 **Optimization Notes:**
+
 - Validate configuration early; use atomic writes; implement rollback checkpoints
 
 ---
@@ -211,10 +215,10 @@ updated_at: 2025-11-17
 
 ---
 
-
 ## Steps
 
 ### 1. Run Unit Tests
+
 ```bash
 cd api
 npm run test
@@ -223,17 +227,20 @@ npm run test
 **Expected**: All tests pass, coverage >= 80%
 
 ### 2. Run Integration Tests
+
 ```bash
 npm run test:integration
 ```
 
 ### 3. Code Quality Review
+
 ```bash
 # Review code that was tested
 coderabbit --prompt-only -t uncommitted
 ```
 
 **Parse output**:
+
 - If CRITICAL or HIGH issues found → FAIL
 - If only MEDIUM/LOW → WARN but PASS
 
@@ -242,6 +249,7 @@ coderabbit --prompt-only -t uncommitted
 Use template: `qa-gate-tmpl.yaml`
 
 Include:
+
 - Test results (pass/fail, coverage %)
 - CodeRabbit summary (issues by severity)
 - Recommendation (approve/reject story)
@@ -249,11 +257,13 @@ Include:
 ### 5. Update Story Status
 
 If all pass:
+
 - [ ] Mark story testing complete
 - [ ] Add QA approval comment
 - [ ] Move to "Ready for Deploy"
 
 If failures:
+
 - [ ] Document failures in story
 - [ ] Create tech debt issues for MEDIUM
 - [ ] Request fixes from @dev
@@ -261,6 +271,7 @@ If failures:
 ## Integration with CodeRabbit
 
 **CodeRabbit helps @qa agent**:
+
 - Catch issues tests might miss (logic errors, race conditions)
 - Validate security patterns (SQL injection, hardcoded secrets)
 - Enforce coding standards automatically
@@ -272,6 +283,6 @@ If failures:
 codeRabbit:
   enabled: true
   severity_threshold: high
-  auto_fix: false  # QA reviews but doesn't auto-fix
+  auto_fix: false # QA reviews but doesn't auto-fix
   report_location: docs/qa/coderabbit-reports/
 ```

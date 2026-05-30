@@ -182,6 +182,7 @@ token_usage: ~3,000-10,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Break into smaller workflows; implement checkpointing; use async processing where possible
 
 ---
@@ -202,9 +203,11 @@ updated_at: 2025-11-17
 ---
 
 tools:
-  - github-cli
-checklists:
-  - po-master-checklist.md
+
+- github-cli
+  checklists:
+- po-master-checklist.md
+
 ---
 
 # Create Brownfield Story Task
@@ -295,6 +298,7 @@ This task requires the following configuration keys from `core-config.yaml`:
 - **`qaLocation`**: QA output directory (typically docs/qa) - Required to write quality reports
 
 **Loading Config:**
+
 ```javascript
 const yaml = require('js-yaml');
 const fs = require('fs');
@@ -355,7 +359,7 @@ Critical: For brownfield, ALWAYS include criteria about maintaining existing fun
 Standard structure:
 
 1. New functionality works as specified
-2. Existing {{affected feature}} continues to work unchanged  
+2. Existing {{affected feature}} continues to work unchanged
 3. Integration with {{existing system}} maintains current behavior
 4. No regression in {{related area}}
 5. Performance remains within acceptable bounds
@@ -366,16 +370,19 @@ Critical: This is where you'll need to be interactive with the user if informati
 
 Create Dev Technical Guidance section with available information:
 
-```markdown
+````markdown
 ## Dev Technical Guidance
 
 ### Existing System Context
+
 [Extract from available documentation]
 
 ### Integration Approach
+
 [Based on patterns found or ask user]
 
 ### Technical Constraints
+
 [From documentation or user input]
 
 ### Missing Information
@@ -418,6 +425,7 @@ Example task structure for brownfield:
   - [ ] Integration test for {{integration point}}
   - [ ] Update existing tests if needed
 ```
+````
 
 #### 4.4 Predict Quality Requirements and Agent Assignment
 
@@ -426,6 +434,7 @@ Example task structure for brownfield:
 **Integration Point Analysis:**
 
 Analyze the story's integration risks based on:
+
 - What existing functionality will be modified?
 - How many integration points are affected?
 - Is this touching core/critical functionality?
@@ -434,6 +443,7 @@ Analyze the story's integration risks based on:
 **Brownfield-Specific Agent Assignment Rules:**
 
 **If modifying existing database:**
+
 - **Assign**: @db-sage, @dev
 - **Rationale**: Database changes in brownfield require expert review for:
   - Existing data migration impacts
@@ -443,6 +453,7 @@ Analyze the story's integration risks based on:
 - **Quality Gates**: Pre-Commit (schema validation), Pre-PR (SQL review), Pre-Deployment (migration testing)
 
 **If changing existing APIs:**
+
 - **Assign**: @architect, @dev
 - **Rationale**: API changes risk breaking existing clients:
   - Backward compatibility validation
@@ -452,6 +463,7 @@ Analyze the story's integration risks based on:
 - **Quality Gates**: Pre-Commit (contract validation), Pre-PR (backward compat check)
 
 **If touching deployment/infrastructure:**
+
 - **Assign**: @github-devops, @dev
 - **Rationale**: Infrastructure changes need rollback safety:
   - Environment-specific configuration validation
@@ -461,6 +473,7 @@ Analyze the story's integration risks based on:
 - **Quality Gates**: Pre-Commit (config validation), Pre-Deployment (deep scan with rollback plan)
 
 **If affecting existing UI/UX:**
+
 - **Assign**: @ux-expert, @dev
 - **Rationale**: UI changes must maintain user experience consistency:
   - Design system compliance
@@ -472,6 +485,7 @@ Analyze the story's integration risks based on:
 **Risk-Based Quality Gate Determination:**
 
 **HIGH RISK** (affects core functionality, many integration points, production-critical):
+
 - **Quality Gates**: Pre-Commit + Pre-PR + Pre-Deployment
 - **Additional Requirements**:
   - Feature flag implementation recommended
@@ -485,6 +499,7 @@ Analyze the story's integration risks based on:
   - Performance impact (no degradation to existing features)
 
 **MEDIUM RISK** (new feature with isolated scope, some integration):
+
 - **Quality Gates**: Pre-Commit + Pre-PR
 - **Additional Requirements**:
   - Integration testing with existing features
@@ -496,6 +511,7 @@ Analyze the story's integration risks based on:
   - Error handling comprehensive
 
 **LOW RISK** (documentation, tests only, isolated bug fix):
+
 - **Quality Gates**: Pre-Commit
 - **Additional Requirements**:
   - Standard code review
@@ -596,22 +612,27 @@ Regardless of story type, ALL brownfield stories must include these focus areas:
 When story involves specific integration patterns:
 
 **Database Integration:**
+
 - Focus: Existing data compatibility, migration safety, RLS policy consistency
 - Validation: Run migration on production-like data, verify all existing queries still work
 
 **API Integration:**
+
 - Focus: Contract versioning, backward compatibility, client impact assessment
 - Validation: Integration tests with existing API clients, contract testing
 
 **Frontend Integration:**
+
 - Focus: User workflow continuity, design system compliance, accessibility preservation
 - Validation: Visual regression testing, user acceptance testing on existing flows
 
 **External System Integration:**
+
 - Focus: Graceful degradation, retry logic, error handling, monitoring
 - Validation: Failure scenario testing, circuit breaker validation
 
 **Log Completion:**
+
 - After populating this section, log: "✅ Brownfield story analysis complete: [Primary Type] | Risk Level: [RISK] | Integration Points: [count] | Agents assigned: [agent list]"
 
 ### 5. Risk Assessment and Mitigation
@@ -624,14 +645,17 @@ Add section for brownfield-specific risks:
 ## Risk Assessment
 
 ### Implementation Risks
+
 - **Primary Risk**: {{main risk to existing system}}
 - **Mitigation**: {{how to address}}
 - **Verification**: {{how to confirm safety}}
 
 ### Rollback Plan
+
 - {{Simple steps to undo changes if needed}}
 
 ### Safety Checks
+
 - [ ] Existing {{feature}} tested before changes
 - [ ] Changes can be feature-flagged or isolated
 - [ ] Rollback procedure documented
@@ -674,6 +698,7 @@ Include header noting documentation context:
 <!-- Context: Brownfield enhancement to {{existing system}} -->
 
 ## Status: Draft
+
 [Rest of story content...]
 ```
 
@@ -694,7 +719,7 @@ Key Integration Points Identified:
 Risks Noted:
 - {{primary risk}}
 
-{{If missing info}}: 
+{{If missing info}}:
 Note: Some technical details were unclear. The story includes exploration tasks to gather needed information during implementation.
 
 Next Steps:
@@ -724,4 +749,3 @@ The brownfield story creation is successful when:
 - It's better to ask the user for clarification than make assumptions
 - Each story should be self-contained for the dev agent
 - Include references to existing code patterns when available
- 

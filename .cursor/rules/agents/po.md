@@ -21,4 +21,5 @@
 **I collaborate with:**
 
 ---
-*AIOX Agent - Synced from .aiox-core/development/agents/po.md*
+
+_AIOX Agent - Synced from .aiox-core/development/agents/po.md_

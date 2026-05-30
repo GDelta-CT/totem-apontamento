@@ -13,19 +13,69 @@ const REGISTRY_PATH = path.resolve(__dirname, '../../data/entity-registry.yaml')
 
 const SCAN_CONFIG = [
   { category: 'tasks', basePath: '.aiox-core/development/tasks', glob: '**/*.md', type: 'task' },
-  { category: 'templates', basePath: '.aiox-core/product/templates', glob: '**/*.{yaml,yml,md}', type: 'template' },
-  { category: 'scripts', basePath: '.aiox-core/development/scripts', glob: '**/*.{js,mjs}', type: 'script' },
+  {
+    category: 'templates',
+    basePath: '.aiox-core/product/templates',
+    glob: '**/*.{yaml,yml,md}',
+    type: 'template',
+  },
+  {
+    category: 'scripts',
+    basePath: '.aiox-core/development/scripts',
+    glob: '**/*.{js,mjs}',
+    type: 'script',
+  },
   { category: 'modules', basePath: '.aiox-core/core', glob: '**/*.{js,mjs}', type: 'module' },
-  { category: 'agents', basePath: '.aiox-core/development/agents', glob: '**/*.{md,yaml,yml}', type: 'agent' },
-  { category: 'checklists', basePath: '.aiox-core/development/checklists', glob: '**/*.md', type: 'checklist' },
+  {
+    category: 'agents',
+    basePath: '.aiox-core/development/agents',
+    glob: '**/*.{md,yaml,yml}',
+    type: 'agent',
+  },
+  {
+    category: 'checklists',
+    basePath: '.aiox-core/development/checklists',
+    glob: '**/*.md',
+    type: 'checklist',
+  },
   { category: 'data', basePath: '.aiox-core/data', glob: '**/*.{yaml,yml,md}', type: 'data' },
-  { category: 'workflows', basePath: '.aiox-core/development/workflows', glob: '**/*.{yaml,yml}', type: 'workflow' },
+  {
+    category: 'workflows',
+    basePath: '.aiox-core/development/workflows',
+    glob: '**/*.{yaml,yml}',
+    type: 'workflow',
+  },
   { category: 'utils', basePath: '.aiox-core/core/utils', glob: '**/*.js', type: 'util' },
-  { category: 'tools', basePath: '.aiox-core/development/tools', glob: '**/*.{md,js,sh}', type: 'tool' },
-  { category: 'infra-scripts', basePath: '.aiox-core/infrastructure/scripts', glob: '**/*.js', type: 'script' },
-  { category: 'infra-tools', basePath: '.aiox-core/infrastructure/tools', glob: '**/*.{yaml,yml,md}', type: 'tool' },
-  { category: 'product-checklists', basePath: '.aiox-core/product/checklists', glob: '**/*.md', type: 'checklist' },
-  { category: 'product-data', basePath: '.aiox-core/product/data', glob: '**/*.{yaml,yml,md}', type: 'data' }
+  {
+    category: 'tools',
+    basePath: '.aiox-core/development/tools',
+    glob: '**/*.{md,js,sh}',
+    type: 'tool',
+  },
+  {
+    category: 'infra-scripts',
+    basePath: '.aiox-core/infrastructure/scripts',
+    glob: '**/*.js',
+    type: 'script',
+  },
+  {
+    category: 'infra-tools',
+    basePath: '.aiox-core/infrastructure/tools',
+    glob: '**/*.{yaml,yml,md}',
+    type: 'tool',
+  },
+  {
+    category: 'product-checklists',
+    basePath: '.aiox-core/product/checklists',
+    glob: '**/*.md',
+    type: 'checklist',
+  },
+  {
+    category: 'product-data',
+    basePath: '.aiox-core/product/data',
+    glob: '**/*.{yaml,yml,md}',
+    type: 'data',
+  },
 ];
 
 const ADAPTABILITY_DEFAULTS = {
@@ -38,14 +88,32 @@ const ADAPTABILITY_DEFAULTS = {
   task: 0.8,
   workflow: 0.4,
   util: 0.6,
-  tool: 0.7
+  tool: 0.7,
 };
 
 const EXTERNAL_TOOLS = new Set([
-  'coderabbit', 'git', 'github-cli', 'docker', 'supabase', 'browser',
-  'ffmpeg', 'n8n', 'context7', 'playwright', 'apify', 'clickup',
-  'jira', 'slack', 'exa', 'eslint', 'jest', 'npm', 'node',
-  'docker-gateway', 'desktop-commander', 'railway'
+  'coderabbit',
+  'git',
+  'github-cli',
+  'docker',
+  'supabase',
+  'browser',
+  'ffmpeg',
+  'n8n',
+  'context7',
+  'playwright',
+  'apify',
+  'clickup',
+  'jira',
+  'slack',
+  'exa',
+  'eslint',
+  'jest',
+  'npm',
+  'node',
+  'docker-gateway',
+  'desktop-commander',
+  'railway',
 ]);
 
 const DEPRECATED_PATTERNS = [/^old[-_]/, /^backup[-_]/, /deprecated/i, /^legacy[-_]/];
@@ -85,7 +153,9 @@ function extractKeywords(filePath, content) {
     const headerWords = headerMatch[1]
       .toLowerCase()
       .split(/\s+/)
-      .filter((w) => w.length > 2 && !['the', 'and', 'for', 'with', 'this', 'that', 'from'].includes(w));
+      .filter(
+        (w) => w.length > 2 && !['the', 'and', 'for', 'with', 'this', 'that', 'from'].includes(w)
+      );
     parts.push(...headerWords.slice(0, 5));
   }
 
@@ -114,9 +184,7 @@ function extractPurpose(content, filePath) {
 const YAML_DEP_FIELDS = {
   agent: {
     nested: ['tasks', 'templates', 'checklists', 'tools', 'scripts'],
-    arrayFields: [
-      { arrayPath: 'commands', field: 'task' },
-    ],
+    arrayFields: [{ arrayPath: 'commands', field: 'task' }],
   },
   workflow: {
     nested: [],
@@ -131,8 +199,17 @@ const YAML_DEP_FIELDS = {
 };
 
 const KNOWN_AGENTS = [
-  'dev', 'qa', 'pm', 'po', 'sm', 'architect', 'devops',
-  'analyst', 'data-engineer', 'ux-design-expert', 'aiox-master'
+  'dev',
+  'qa',
+  'pm',
+  'po',
+  'sm',
+  'architect',
+  'devops',
+  'analyst',
+  'data-engineer',
+  'ux-design-expert',
+  'aiox-master',
 ];
 
 // Pattern A: YAML dependency block items (- name.md)
@@ -188,11 +265,13 @@ function extractYamlDependencies(filePath, entityType, verbose = false) {
           const cleaned = item.replace(/#.*$/, '').trim().replace(/\.md$/, '');
           if (!cleaned) continue;
           if (isSentinel(cleaned)) {
-            if (verbose) console.log(`[IDS] Filtered sentinel "${cleaned}" from YAML deps in "${filePath}"`);
+            if (verbose)
+              console.log(`[IDS] Filtered sentinel "${cleaned}" from YAML deps in "${filePath}"`);
             continue;
           }
           if (isNoise(cleaned)) {
-            if (verbose) console.log(`[IDS] Filtered noise "${cleaned}" from YAML deps in "${filePath}"`);
+            if (verbose)
+              console.log(`[IDS] Filtered noise "${cleaned}" from YAML deps in "${filePath}"`);
             continue;
           }
           deps.add(cleaned);
@@ -225,7 +304,8 @@ function extractMarkdownCrossReferences(content, entityId, verbose = false) {
   const addDep = (ref) => {
     if (ref === entityId) return;
     if (isSentinel(ref)) {
-      if (verbose) console.log(`[IDS] Filtered sentinel "${ref}" from MD cross-refs in "${entityId}"`);
+      if (verbose)
+        console.log(`[IDS] Filtered sentinel "${ref}" from MD cross-refs in "${entityId}"`);
       return;
     }
     if (isNoise(ref)) {
@@ -327,7 +407,9 @@ function scanCategory(config, verbose = false) {
     const entityId = extractEntityId(filePath);
 
     if (seenIds.has(entityId)) {
-      console.warn(`[IDS] Duplicate entity ID "${entityId}" at ${path.relative(REPO_ROOT, filePath)} — skipping`);
+      console.warn(
+        `[IDS] Duplicate entity ID "${entityId}" at ${path.relative(REPO_ROOT, filePath)} — skipping`
+      );
       continue;
     }
     seenIds.add(entityId);
@@ -396,10 +478,10 @@ function scanCategory(config, verbose = false) {
       adaptability: {
         score: defaultScore,
         constraints: [],
-        extensionPoints: []
+        extensionPoints: [],
       },
       checksum,
-      lastVerified: new Date().toISOString()
+      lastVerified: new Date().toISOString(),
     };
 
     if (lifecycleOverride) {
@@ -503,7 +585,8 @@ function detectLifecycle(entityId, entity) {
   for (const pat of DEPRECATED_PATTERNS) {
     if (pat.test(entityId)) return 'deprecated';
   }
-  const hasDeps = entity.dependencies.length > 0 ||
+  const hasDeps =
+    entity.dependencies.length > 0 ||
     (entity.externalDeps && entity.externalDeps.length > 0) ||
     (entity.plannedDeps && entity.plannedDeps.length > 0);
   const hasUsedBy = entity.usedBy.length > 0;
@@ -521,7 +604,8 @@ function assignLifecycles(allEntities) {
 }
 
 function populate(options = {}) {
-  const verbose = options.verbose || process.argv.includes('--verbose') || process.env.AIOX_DEBUG === 'true';
+  const verbose =
+    options.verbose || process.argv.includes('--verbose') || process.env.AIOX_DEBUG === 'true';
 
   console.log('[IDS] Starting entity registry population...');
 
@@ -547,9 +631,15 @@ function populate(options = {}) {
       for (const [category, entities] of Object.entries(existingRegistry.entities)) {
         if (!allEntities[category]) continue;
         for (const [entityId, entity] of Object.entries(entities)) {
-          if (entity.invocationExamples && Array.isArray(entity.invocationExamples) && allEntities[category][entityId]) {
+          if (
+            entity.invocationExamples &&
+            Array.isArray(entity.invocationExamples) &&
+            allEntities[category][entityId]
+          ) {
             // Enforce limits: max 3 examples, each max 200 chars
-            const examples = entity.invocationExamples.slice(0, 3).map((e) => String(e).slice(0, 200));
+            const examples = entity.invocationExamples
+              .slice(0, 3)
+              .map((e) => String(e).slice(0, 200));
             allEntities[category][entityId].invocationExamples = examples;
           }
         }
@@ -574,13 +664,15 @@ function populate(options = {}) {
 
   // Resolution rate metric (uses internal deps only after classification)
   const { total, resolved, unresolved } = countResolution(allEntities, nameIndex);
-  const rate = total > 0 ? Math.round(resolved / total * 100) : 0;
-  console.log(`[IDS] Resolution rate: ${rate}% (${resolved}/${total} deps resolved, ${unresolved} unresolved)`);
+  const rate = total > 0 ? Math.round((resolved / total) * 100) : 0;
+  console.log(
+    `[IDS] Resolution rate: ${rate}% (${resolved}/${total} deps resolved, ${unresolved} unresolved)`
+  );
 
   const categories = SCAN_CONFIG.map((c) => ({
     id: c.category,
     description: getCategoryDescription(c.category),
-    basePath: c.basePath
+    basePath: c.basePath,
   }));
 
   const registry = {
@@ -589,16 +681,16 @@ function populate(options = {}) {
       lastUpdated: new Date().toISOString(),
       entityCount: totalCount,
       checksumAlgorithm: 'sha256',
-      resolutionRate: rate
+      resolutionRate: rate,
     },
     entities: allEntities,
-    categories
+    categories,
   };
 
   const yamlContent = yaml.dump(registry, {
     lineWidth: 120,
     noRefs: true,
-    sortKeys: false
+    sortKeys: false,
   });
 
   try {
@@ -627,7 +719,7 @@ function getCategoryDescription(category) {
     'infra-scripts': 'Infrastructure automation and utility scripts',
     'infra-tools': 'Infrastructure tool definitions and configurations',
     'product-checklists': 'Product validation and review checklists',
-    'product-data': 'Product reference data and configuration files'
+    'product-data': 'Product reference data and configuration files',
   };
   return descriptions[category] || category;
 }
@@ -669,5 +761,5 @@ module.exports = {
   EXTERNAL_TOOLS,
   DEPRECATED_PATTERNS,
   REPO_ROOT,
-  REGISTRY_PATH
+  REGISTRY_PATH,
 };

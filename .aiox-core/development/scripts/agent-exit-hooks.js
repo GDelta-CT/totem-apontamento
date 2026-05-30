@@ -38,18 +38,21 @@ function onCommandComplete(agent, command, result, context) {
     const detector = new ContextDetector();
     const workflowState = detectWorkflowState(command, result);
 
-    detector.updateSessionState({
-      workflowActive: workflowState?.workflow || null,
-      lastCommands: [command],
-      agentSequence: [agent],
-      context: {
-        story_path: context.story_path || '',
-        branch: context.branch || '',
-        epic: context.epic || '',
-        lastCommand: command,
-        lastAgent: agent,
+    detector.updateSessionState(
+      {
+        workflowActive: workflowState?.workflow || null,
+        lastCommands: [command],
+        agentSequence: [agent],
+        context: {
+          story_path: context.story_path || '',
+          branch: context.branch || '',
+          epic: context.epic || '',
+          lastCommand: command,
+          lastAgent: agent,
+        },
       },
-    }, SESSION_STATE_PATH);
+      SESSION_STATE_PATH
+    );
   } catch (error) {
     // Graceful degradation - hook failures must not break command execution
     console.warn('[AgentExitHooks] Hook failed:', error.message);
@@ -66,7 +69,7 @@ function detectWorkflowState(command, _result) {
   // Map commands to workflow states
   const stateMap = {
     'validate-story-draft': { workflow: 'story_development', state: 'validated' },
-    'develop': { workflow: 'story_development', state: 'in_development' },
+    develop: { workflow: 'story_development', state: 'in_development' },
     'review-qa': { workflow: 'story_development', state: 'qa_reviewed' },
     'create-epic': { workflow: 'epic_creation', state: 'epic_created' },
   };

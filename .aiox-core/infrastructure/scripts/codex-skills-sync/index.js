@@ -32,7 +32,9 @@ function getDefaultOptions() {
 }
 
 function trimText(text, max = 220) {
-  const normalized = String(text || '').replace(/\s+/g, ' ').trim();
+  const normalized = String(text || '')
+    .replace(/\s+/g, ' ')
+    .trim();
   if (normalized.length <= max) return normalized;
   return `${normalized.slice(0, max - 3).trim()}...`;
 }
@@ -52,9 +54,9 @@ function buildSkillContent(agentData) {
   const allCommands = normalizeCommands(agentData.commands || []);
   const quick = getVisibleCommands(allCommands, 'quick');
   const key = getVisibleCommands(allCommands, 'key');
-  const commands = [...quick, ...key.filter(k => !quick.some(q => q.name === k.name))]
+  const commands = [...quick, ...key.filter((k) => !quick.some((q) => q.name === k.name))]
     .slice(0, 8)
-    .map(c => `- \`*${c.name}\` - ${c.description || 'No description'}`)
+    .map((c) => `- \`*${c.name}\` - ${c.description || 'No description'}`)
     .join('\n');
 
   const skillName = getSkillId(agentData.id);
@@ -88,8 +90,8 @@ ${commands || '- `*help` - List available commands'}
 
 function buildSkillPlan(agents, skillsDir) {
   return agents
-    .filter(a => !a.error || a.error === 'YAML parse failed, using fallback extraction')
-    .map(agentData => {
+    .filter((a) => !a.error || a.error === 'YAML parse failed, using fallback extraction')
+    .map((agentData) => {
       const skillId = getSkillId(agentData.id);
       const targetDir = path.join(skillsDir, skillId);
       const targetFile = path.join(targetDir, 'SKILL.md');
@@ -110,7 +112,9 @@ function writeSkillPlan(plan, options) {
         fs.ensureDirSync(item.targetDir);
         fs.writeFileSync(item.targetFile, item.content, 'utf8');
       } catch (error) {
-        throw new Error(`Failed to write skill ${item.skillId} at ${item.targetFile}: ${error.message}`);
+        throw new Error(
+          `Failed to write skill ${item.skillId} at ${item.targetFile}: ${error.message}`
+        );
       }
     }
   }

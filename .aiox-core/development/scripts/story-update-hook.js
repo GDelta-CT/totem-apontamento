@@ -1,6 +1,10 @@
 // File: common/utils/story-update-hook.js
 
-const { updateTaskDescription, updateStoryStatus, addTaskComment } = require('../../infrastructure/scripts/clickup-helpers');
+const {
+  updateTaskDescription,
+  updateStoryStatus,
+  addTaskComment,
+} = require('../../infrastructure/scripts/clickup-helpers');
 const yaml = require('js-yaml');
 
 /**
@@ -45,10 +49,10 @@ function detectChanges(oldContent, newContent) {
   const oldTasks = extractTasks(oldContent);
   const newTasks = extractTasks(newContent);
 
-  newTasks.forEach(task => {
+  newTasks.forEach((task) => {
     if (task.completed) {
       const wasCompleted = oldTasks.some(
-        oldTask => oldTask.text === task.text && oldTask.completed,
+        (oldTask) => oldTask.text === task.text && oldTask.completed
       );
       if (!wasCompleted) {
         changes.tasksCompleted.push(task.text);
@@ -60,7 +64,7 @@ function detectChanges(oldContent, newContent) {
   const oldFiles = extractFileList(oldContent);
   const newFiles = extractFileList(newContent);
 
-  changes.filesAdded = newFiles.filter(file => !oldFiles.includes(file));
+  changes.filesAdded = newFiles.filter((file) => !oldFiles.includes(file));
 
   // Detect dev notes changes
   const oldDevNotes = extractSection(oldContent, '## Dev Notes');
@@ -102,7 +106,7 @@ function extractStatus(content) {
  */
 function extractTasks(content) {
   const taskMatches = content.matchAll(/^- \[([ x])\] (.+)$/gm);
-  return Array.from(taskMatches).map(match => ({
+  return Array.from(taskMatches).map((match) => ({
     completed: match[1] === 'x',
     text: match[2],
   }));
@@ -115,8 +119,10 @@ function extractFileList(content) {
   const fileListSection = extractSection(content, '## File List');
   if (!fileListSection) return [];
 
-  const fileMatches = fileListSection.matchAll(/^- (.+\.(?:js|ts|jsx|tsx|json|yaml|md|test\.js))$/gm);
-  return Array.from(fileMatches).map(match => match[1]);
+  const fileMatches = fileListSection.matchAll(
+    /^- (.+\.(?:js|ts|jsx|tsx|json|yaml|md|test\.js))$/gm
+  );
+  return Array.from(fileMatches).map((match) => match[1]);
 }
 
 /**
@@ -153,14 +159,14 @@ function generateChangelog(changes) {
 
   if (changes.tasksCompleted.length > 0) {
     markdown += '- Completed tasks:\n';
-    changes.tasksCompleted.forEach(task => {
+    changes.tasksCompleted.forEach((task) => {
       markdown += `  • ${task}\n`;
     });
   }
 
   if (changes.filesAdded.length > 0) {
     markdown += '- Files added:\n';
-    changes.filesAdded.forEach(file => {
+    changes.filesAdded.forEach((file) => {
       markdown += `  • ${file}\n`;
     });
   }
@@ -180,11 +186,13 @@ function generateChangelog(changes) {
  * Check if there are any changes
  */
 function hasChanges(changes) {
-  return changes.status.changed ||
-         changes.tasksCompleted.length > 0 ||
-         changes.filesAdded.length > 0 ||
-         changes.devNotesAdded ||
-         changes.acceptanceCriteriaChanged;
+  return (
+    changes.status.changed ||
+    changes.tasksCompleted.length > 0 ||
+    changes.filesAdded.length > 0 ||
+    changes.devNotesAdded ||
+    changes.acceptanceCriteriaChanged
+  );
 }
 
 /**
@@ -241,7 +249,10 @@ function updateFrontmatterTimestamp(content) {
     let newFrontmatterYaml = yaml.dump(frontmatter);
 
     // Remove quotes from timestamp value (YAML adds them to ISO date strings)
-    newFrontmatterYaml = newFrontmatterYaml.replace(/last_updated: ["']([^"']+)["']/, 'last_updated: $1');
+    newFrontmatterYaml = newFrontmatterYaml.replace(
+      /last_updated: ["']([^"']+)["']/,
+      'last_updated: $1'
+    );
 
     const contentAfterFrontmatter = content.substring(frontmatterMatch[0].length);
 

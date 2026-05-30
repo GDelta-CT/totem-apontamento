@@ -49,11 +49,11 @@ function createRegenerateCommand() {
             const verb = options.dryRun ? 'Would generate' : 'Generated';
             console.log(`✓ ${verb} ${name}.csv (${result.count} entries)`);
             if (result.errors.length > 0) {
-              result.errors.forEach(e => console.log(`  ⚠ ${e}`));
+              result.errors.forEach((e) => console.log(`  ⚠ ${e}`));
             }
           } else {
             console.log(`✗ Failed to generate ${name}.csv`);
-            result.errors.forEach(e => console.log(`  ✗ ${e}`));
+            result.errors.forEach((e) => console.log(`  ✗ ${e}`));
           }
         };
 
@@ -65,13 +65,12 @@ function createRegenerateCommand() {
 
         if (results.errors.length > 0) {
           console.log('❌ Errors during generation:');
-          results.errors.forEach(e => console.log(`  ✗ ${e}`));
+          results.errors.forEach((e) => console.log(`  ✗ ${e}`));
           process.exit(1);
         }
 
-        const allSuccess = results.agents.success &&
-                          results.workers.success &&
-                          results.tasks.success;
+        const allSuccess =
+          results.agents.success && results.workers.success && results.tasks.success;
 
         if (allSuccess) {
           const verb = options.dryRun ? 'Would be generated' : 'regenerated';
@@ -81,7 +80,6 @@ function createRegenerateCommand() {
           console.log('❌ Some manifests failed to generate');
           process.exit(1);
         }
-
       } catch (error) {
         console.error(`Error: ${error.message}`);
         process.exit(1);

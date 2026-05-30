@@ -55,9 +55,7 @@ function deepMerge(target, source) {
       const baseKey = key.slice(0, -7); // Remove '+append'
       if (Array.isArray(value)) {
         const existing = result[baseKey];
-        result[baseKey] = Array.isArray(existing)
-          ? [...existing, ...value]
-          : value;
+        result[baseKey] = Array.isArray(existing) ? [...existing, ...value] : value;
       }
       continue;
     }

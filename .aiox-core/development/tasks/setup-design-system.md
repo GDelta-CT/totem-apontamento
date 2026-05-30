@@ -9,16 +9,19 @@
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -170,6 +173,7 @@ token_usage: ~800-2,500 tokens
 ```
 
 **Optimization Notes:**
+
 - Validate configuration early; use atomic writes; implement rollback checkpoints
 
 ---
@@ -188,7 +192,6 @@ updated_at: 2025-11-17
 ```
 
 ---
-
 
 ## Description
 
@@ -303,18 +306,18 @@ This task uses interactive elicitation to configure setup.
 ```yaml
 # .state.yaml Atlas setup section
 atlas_setup:
-  completed_at: "2025-10-27T15:00:00Z"
-  starting_point: "brownfield"  # or "greenfield"
+  completed_at: '2025-10-27T15:00:00Z'
+  starting_point: 'brownfield' # or "greenfield"
 
   configuration:
-    component_directory: "src/components/ui"
-    css_approach: "tailwind_v4"
-    test_framework: "jest"
+    component_directory: 'src/components/ui'
+    css_approach: 'tailwind_v4'
+    test_framework: 'jest'
     storybook_enabled: true
     shadcn_enabled: true
 
   tokens_loaded:
-    source: "Brad tokenization"
+    source: 'Brad tokenization'
     categories:
       - color (12 tokens)
       - spacing (7 tokens)
@@ -322,7 +325,7 @@ atlas_setup:
       - radius (4 tokens)
       - shadow (3 tokens)
     total_tokens: 36
-    validation: "passed"
+    validation: 'passed'
 
   directory_structure:
     - components/ui/
@@ -334,15 +337,15 @@ atlas_setup:
     - __tests__/
 
   dependencies_added:
-    - "@testing-library/react"
-    - "@testing-library/jest-dom"
-    - "@storybook/react"
-    - "class-variance-authority"
-    - "tailwind-merge"
-    - "@radix-ui/react-slot"
+    - '@testing-library/react'
+    - '@testing-library/jest-dom'
+    - '@storybook/react'
+    - 'class-variance-authority'
+    - 'tailwind-merge'
+    - '@radix-ui/react-slot'
 
-  phase: "setup_complete"
-  ready_for: "component_building"
+  phase: 'setup_complete'
+  ready_for: 'component_building'
 ```
 
 ## Success Criteria
@@ -380,6 +383,7 @@ atlas_setup:
 ```
 
 Output:
+
 ```
 🏗️ Atlas: Setting up design system structure...
 
@@ -426,6 +430,7 @@ Atlas says: "Foundation is solid. Ready to build."
 ```
 
 Output:
+
 ```
 🏗️ Atlas: No Brad state found. Starting greenfield setup...
 
@@ -459,4 +464,4 @@ User selects 1
 - Atlas automatically creates TypeScript types for tokens
 - Base styles include CSS reset and token variables
 - Setup can be re-run safely (asks before overwriting)
-- Next step after setup: *build {pattern} to generate components
+- Next step after setup: \*build {pattern} to generate components

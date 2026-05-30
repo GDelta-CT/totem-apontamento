@@ -16,7 +16,12 @@ const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
 
-const WORKFLOW_PATTERNS_PATH = path.join(process.cwd(), '.aiox-core', 'data', 'workflow-patterns.yaml');
+const WORKFLOW_PATTERNS_PATH = path.join(
+  process.cwd(),
+  '.aiox-core',
+  'data',
+  'workflow-patterns.yaml'
+);
 
 class WorkflowNavigator {
   constructor() {
@@ -77,7 +82,7 @@ class WorkflowNavigator {
     }
 
     // Generate suggestions with pre-populated templates
-    const suggestions = transition.next_steps.map(step => {
+    const suggestions = transition.next_steps.map((step) => {
       const command = this.populateTemplate(step.args_template, workflowState.context);
       return {
         command: `*${step.command}${command ? ' ' + command : ''}`,
@@ -106,7 +111,7 @@ class WorkflowNavigator {
     // Replace ${variable} with context values
     const variables = template.match(/\$\{([^}]+)\}/g);
     if (variables) {
-      variables.forEach(variable => {
+      variables.forEach((variable) => {
         const key = variable.slice(2, -1); // Remove ${ and }
         const value = context[key] || '';
         result = result.replace(variable, value);
@@ -218,8 +223,11 @@ class WorkflowNavigator {
         const wfDef = this.patterns.workflows[stateData.workflow_id];
         if (wfDef && wfDef.transitions) {
           for (const [stateName, transition] of Object.entries(wfDef.transitions)) {
-            if (transition.trigger && currentStep.agent &&
-                transition.trigger.includes(currentStep.agent)) {
+            if (
+              transition.trigger &&
+              currentStep.agent &&
+              transition.trigger.includes(currentStep.agent)
+            ) {
               semanticState = stateName;
               break;
             }
@@ -254,7 +262,11 @@ class WorkflowNavigator {
       return [];
     }
 
-    if (!Array.isArray(state.steps) || state.current_step_index < 0 || state.current_step_index >= state.steps.length) {
+    if (
+      !Array.isArray(state.steps) ||
+      state.current_step_index < 0 ||
+      state.current_step_index >= state.steps.length
+    ) {
       return [];
     }
 

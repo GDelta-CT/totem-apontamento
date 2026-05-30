@@ -13,10 +13,7 @@ module.exports = {
   roots: ['<rootDir>'],
 
   // Test file patterns
-  testMatch: [
-    '**/__tests__/**/*.test.ts',
-    '**/__tests__/**/*.spec.ts',
-  ],
+  testMatch: ['**/__tests__/**/*.test.ts', '**/__tests__/**/*.spec.ts'],
 
   // TypeScript transformation
   transform: {
@@ -78,10 +75,7 @@ module.exports = {
   },
 
   // Ignore patterns
-  testPathIgnorePatterns: [
-    '/node_modules/',
-    '/dist/',
-  ],
+  testPathIgnorePatterns: ['/node_modules/', '/dist/'],
 
   // Global setup/teardown
   // globalSetup: '<rootDir>/jest.global-setup.ts',

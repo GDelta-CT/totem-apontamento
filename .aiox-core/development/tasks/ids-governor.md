@@ -14,18 +14,18 @@ This task handles the execution of IDS (Incremental Development System) commands
 
 ### Available Commands
 
-| Command | Description | Arguments |
-|---------|-------------|-----------|
-| `*ids query {intent}` | Query registry for REUSE/ADAPT/CREATE recommendations | intent (required), --type (optional) |
-| `*ids health` | Registry health check | none |
-| `*ids stats` | Registry statistics (entity counts, health score) | --json (optional) |
-| `*ids impact {entity-id}` | Impact analysis for modifications | entity-id (required) |
+| Command                   | Description                                           | Arguments                            |
+| ------------------------- | ----------------------------------------------------- | ------------------------------------ |
+| `*ids query {intent}`     | Query registry for REUSE/ADAPT/CREATE recommendations | intent (required), --type (optional) |
+| `*ids health`             | Registry health check                                 | none                                 |
+| `*ids stats`              | Registry statistics (entity counts, health score)     | --json (optional)                    |
+| `*ids impact {entity-id}` | Impact analysis for modifications                     | entity-id (required)                 |
 
 ---
 
 ## Execution Steps
 
-### *ids query {intent}
+### \*ids query {intent}
 
 1. Load FrameworkGovernor (RegistryLoader + DecisionEngine + RegistryUpdater)
 2. Call `governor.preCheck(intent, entityType)`
@@ -33,7 +33,7 @@ This task handles the execution of IDS (Incremental Development System) commands
 4. If matches found, present options: [1] ADAPT existing [2] CREATE new [3] Skip
 5. Log decision
 
-### *ids health
+### \*ids health
 
 1. Load FrameworkGovernor
 2. Call `governor.healthCheck()`
@@ -41,14 +41,14 @@ This task handles the execution of IDS (Incremental Development System) commands
 4. If RegistryHealer unavailable: display basic stats with degraded mode message
 5. Show entity count and registry loaded status
 
-### *ids stats
+### \*ids stats
 
 1. Load FrameworkGovernor
 2. Call `governor.getStats()`
 3. Display formatted output using `FrameworkGovernor.formatStatsOutput(result)`
 4. Show: totalEntities, byType, byCategory, healthScore, healerAvailable
 
-### *ids impact {entity-id}
+### \*ids impact {entity-id}
 
 1. Load FrameworkGovernor
 2. Call `governor.impactAnalysis(entityId)`
@@ -84,6 +84,7 @@ node bin/aiox-ids.js ids:register path/to/file.md
 ## Error Handling
 
 All commands apply graceful degradation:
+
 - Timeout: 2 seconds (warn and proceed)
 - Missing healer: Show degraded mode message
 - Registry load failure: Display error with recovery suggestion
@@ -91,4 +92,4 @@ All commands apply graceful degradation:
 
 ---
 
-*IDS-7 | Created 2026-02-10 by @dev (Dex)*
+_IDS-7 | Created 2026-02-10 by @dev (Dex)_

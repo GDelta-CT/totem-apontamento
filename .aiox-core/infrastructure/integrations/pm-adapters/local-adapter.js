@@ -76,7 +76,6 @@ class LocalAdapter extends PMAdapter {
         success: true,
         url: `file://${path.resolve(storyPath)}`,
       };
-
     } catch (error) {
       console.error('❌ Error validating local story:', error);
       return {
@@ -100,7 +99,7 @@ class LocalAdapter extends PMAdapter {
 
     return {
       success: true,
-      updates: null,  // No updates from external source
+      updates: null, // No updates from external source
     };
   }
 
@@ -125,7 +124,7 @@ class LocalAdapter extends PMAdapter {
 
     return {
       success: true,
-      url: null,  // No external URL in local mode
+      url: null, // No external URL in local mode
     };
   }
 

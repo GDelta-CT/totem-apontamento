@@ -13,7 +13,7 @@ class ImprovementValidator {
     this.rootPath = options.rootPath || process.cwd();
     this.security = new SecurityChecker();
     this.dependencies = new DependencyManager();
-    
+
     // Protected files and patterns
     this.protectedFiles = [
       'bootstrap.js',
@@ -23,22 +23,12 @@ class ImprovementValidator {
       'rollback-handler.js',
       'backup-manager.js',
     ];
-    
-    this.protectedPatterns = [
-      /^\.git/,
-      /node_modules/,
-      /\.env/,
-      /config\/security/,
-      /backup\//,
-    ];
-    
+
+    this.protectedPatterns = [/^\.git/, /node_modules/, /\.env/, /config\/security/, /backup\//];
+
     // Improvement history for recursive detection
-    this.improvementHistoryFile = path.join(
-      this.rootPath,
-      '.aiox',
-      'improvement-history.json',
-    );
-    
+    this.improvementHistoryFile = path.join(this.rootPath, '.aiox', 'improvement-history.json');
+
     // Safety thresholds
     this.thresholds = {
       maxFilesPerImprovement: options.maxFiles || 20,
@@ -56,9 +46,9 @@ class ImprovementValidator {
    */
   async validateRequest(params) {
     const { request, scope, constraints = {} } = params;
-    
+
     console.log(chalk.blue('🔍 Validating improvement request...'));
-    
+
     const validation = {
       valid: true,
       reason: null,
@@ -114,7 +104,6 @@ class ImprovementValidator {
         validation.reason = 'Risk score exceeds threshold';
         validation.warnings.push(`Risk score: ${validation.risk_assessment.score}/10`);
       }
-
     } catch (error) {
       validation.valid = false;
       validation.reason = `Validation error: ${error.message}`;
@@ -131,7 +120,7 @@ class ImprovementValidator {
     try {
       // Load improvement history
       const history = await this.loadImprovementHistory();
-      
+
       // Check current improvement depth
       const currentDepth = this.getCurrentImprovementDepth();
       if (currentDepth >= this.thresholds.maxImprovementDepth) {
@@ -144,9 +133,9 @@ class ImprovementValidator {
 
       // Generate request fingerprint
       const fingerprint = this.generateRequestFingerprint(request);
-      
+
       // Check for similar recent improvements
-      const recentImprovements = history.improvements.filter(imp => {
+      const recentImprovements = history.improvements.filter((imp) => {
         const ageInHours = (Date.now() - new Date(imp.timestamp)) / (1000 * 60 * 60);
         return ageInHours < 24;
       });
@@ -180,7 +169,6 @@ class ImprovementValidator {
       });
 
       return { isRecursive: false };
-
     } catch (error) {
       console.error(chalk.red(`Recursive detection error: ${error.message}`));
       // Fail safe - prevent improvement if detection fails
@@ -199,7 +187,7 @@ class ImprovementValidator {
    */
   async validateSafety(plan) {
     console.log(chalk.blue('🛡️ Validating improvement safety...'));
-    
+
     const safety = {
       safe: true,
       risk_level: 'low',
@@ -230,7 +218,7 @@ class ImprovementValidator {
           safety.safe = false;
           safety.risks.push(...changeValidation.risks);
         }
-        
+
         if (changeValidation.breaking_changes.length > 0) {
           safety.interface_preserved = false;
           safety.breaking_changes.push(...changeValidation.breaking_changes);
@@ -257,12 +245,11 @@ class ImprovementValidator {
 
       // Calculate overall risk level
       safety.risk_level = this.calculateRiskLevel(safety.risks);
-      
+
       // Generate mitigations
       if (safety.risks.length > 0) {
         safety.mitigations = this.generateMitigations(safety.risks);
       }
-
     } catch (error) {
       safety.safe = false;
       safety.risks.push({
@@ -296,7 +283,7 @@ class ImprovementValidator {
             impact: 'Existing integrations may break',
           });
           break;
-          
+
         case 'signature_change':
           validation.breaking_changes.push({
             type: 'signature_change',
@@ -304,7 +291,7 @@ class ImprovementValidator {
             impact: 'Callers must be updated',
           });
           break;
-          
+
         case 'config_format_change':
           validation.risks.push({
             type: 'config_change',
@@ -347,7 +334,7 @@ class ImprovementValidator {
           rolled_back: 0,
         },
       };
-      
+
       await this.saveImprovementHistory(initialHistory);
       return initialHistory;
     }
@@ -360,10 +347,7 @@ class ImprovementValidator {
   async saveImprovementHistory(history) {
     const dir = path.dirname(this.improvementHistoryFile);
     await fs.mkdir(dir, { recursive: true });
-    await fs.writeFile(
-      this.improvementHistoryFile,
-      JSON.stringify(history, null, 2),
-    );
+    await fs.writeFile(this.improvementHistoryFile, JSON.stringify(history, null, 2));
   }
 
   /**
@@ -372,20 +356,20 @@ class ImprovementValidator {
    */
   async recordImprovementAttempt(attempt) {
     const history = await this.loadImprovementHistory();
-    
+
     history.improvements.push({
       id: `imp-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
       ...attempt,
       depth: this.getCurrentImprovementDepth(),
     });
-    
+
     history.statistics.total_attempts++;
-    
+
     // Keep only last 100 improvements
     if (history.improvements.length > 100) {
       history.improvements = history.improvements.slice(-100);
     }
-    
+
     await this.saveImprovementHistory(history);
   }
 
@@ -404,14 +388,10 @@ class ImprovementValidator {
    * @private
    */
   generateRequestFingerprint(request) {
-    const normalized = request.toLowerCase()
-      .replace(/\s+/g, ' ')
-      .trim();
-    
-    const hash = crypto.createHash('sha256')
-      .update(normalized)
-      .digest('hex');
-    
+    const normalized = request.toLowerCase().replace(/\s+/g, ' ').trim();
+
+    const hash = crypto.createHash('sha256').update(normalized).digest('hex');
+
     // Extract key features
     const features = {
       hash,
@@ -419,7 +399,7 @@ class ImprovementValidator {
       keywords: this.extractKeywords(normalized),
       patterns: this.extractPatterns(normalized),
     };
-    
+
     return features;
   }
 
@@ -430,22 +410,21 @@ class ImprovementValidator {
   calculateSimilarity(fp1, fp2) {
     // Hash similarity
     if (fp1.hash === fp2.hash) return 1.0;
-    
+
     // Keyword overlap
     const keywords1 = new Set(fp1.keywords);
     const keywords2 = new Set(fp2.keywords);
-    const intersection = [...keywords1].filter(k => keywords2.has(k));
+    const intersection = [...keywords1].filter((k) => keywords2.has(k));
     const union = new Set([...keywords1, ...keywords2]);
-    
-    const keywordSimilarity = union.size > 0 
-      ? intersection.length / union.size 
-      : 0;
-    
+
+    const keywordSimilarity = union.size > 0 ? intersection.length / union.size : 0;
+
     // Length similarity
-    const lengthSimilarity = 1 - Math.abs(fp1.length - fp2.length) / Math.max(fp1.length, fp2.length);
-    
+    const lengthSimilarity =
+      1 - Math.abs(fp1.length - fp2.length) / Math.max(fp1.length, fp2.length);
+
     // Weighted combination
-    return (keywordSimilarity * 0.7) + (lengthSimilarity * 0.3);
+    return keywordSimilarity * 0.7 + lengthSimilarity * 0.3;
   }
 
   /**
@@ -460,8 +439,8 @@ class ImprovementValidator {
       /update.*recursive.*detection/i,
       /enhance.*self.*modification/i,
     ];
-    
-    return selfPatterns.some(pattern => pattern.test(request));
+
+    return selfPatterns.some((pattern) => pattern.test(request));
   }
 
   /**
@@ -473,7 +452,7 @@ class ImprovementValidator {
       suspicious: false,
       warnings: [],
     };
-    
+
     // Check for dangerous patterns
     const dangerous = [
       { pattern: /disable.*safety/i, message: 'Attempting to disable safety features' },
@@ -481,14 +460,14 @@ class ImprovementValidator {
       { pattern: /remove.*check/i, message: 'Attempting to remove checks' },
       { pattern: /unlimited|infinite|no.*limit/i, message: 'Attempting to remove limits' },
     ];
-    
+
     for (const check of dangerous) {
       if (check.pattern.test(request)) {
         analysis.suspicious = true;
         analysis.warnings.push(check.message);
       }
     }
-    
+
     return analysis;
   }
 
@@ -498,17 +477,17 @@ class ImprovementValidator {
    */
   validateConstraints(constraints) {
     const validation = { valid: true };
-    
+
     if (constraints.max_files && constraints.max_files > this.thresholds.maxFilesPerImprovement) {
       validation.valid = false;
       validation.reason = `Max files exceeds limit (${this.thresholds.maxFilesPerImprovement})`;
     }
-    
+
     if (constraints.preserve_interfaces === false) {
       validation.valid = false;
       validation.reason = 'Interface preservation is mandatory';
     }
-    
+
     return validation;
   }
 
@@ -519,13 +498,13 @@ class ImprovementValidator {
   assessRequestRisk(request, scope) {
     let score = 0;
     const factors = [];
-    
+
     // Scope risk
     if (scope === 'general') {
       score += 3;
       factors.push({ factor: 'general_scope', points: 3 });
     }
-    
+
     // Pattern risk
     const riskPatterns = [
       { pattern: /core|critical|system/i, points: 2 },
@@ -534,17 +513,17 @@ class ImprovementValidator {
       { pattern: /performance|optimize/i, points: 1 },
       { pattern: /security|auth/i, points: 2 },
     ];
-    
+
     for (const risk of riskPatterns) {
       if (risk.pattern.test(request)) {
         score += risk.points;
-        factors.push({ 
-          factor: risk.pattern.source, 
-          points: risk.points, 
+        factors.push({
+          factor: risk.pattern.source,
+          points: risk.points,
         });
       }
     }
-    
+
     return { score, factors };
   }
 
@@ -554,14 +533,14 @@ class ImprovementValidator {
    */
   isProtectedFile(file) {
     const filename = path.basename(file);
-    
+
     // Check exact matches
     if (this.protectedFiles.includes(filename)) {
       return true;
     }
-    
+
     // Check patterns
-    return this.protectedPatterns.some(pattern => pattern.test(file));
+    return this.protectedPatterns.some((pattern) => pattern.test(file));
   }
 
   /**
@@ -573,7 +552,7 @@ class ImprovementValidator {
       hasIssues: false,
       issues: [],
     };
-    
+
     try {
       for (const file of plan.affectedFiles) {
         const deps = await this.dependencies.getDependents(file);
@@ -589,7 +568,7 @@ class ImprovementValidator {
     } catch (error) {
       console.warn(`Dependency check failed: ${error.message}`);
     }
-    
+
     return impact;
   }
 
@@ -602,7 +581,7 @@ class ImprovementValidator {
       safe: true,
       risks: [],
     };
-    
+
     // Check for security-sensitive modifications
     for (const change of plan.changes) {
       for (const mod of change.modifications) {
@@ -617,7 +596,7 @@ class ImprovementValidator {
         }
       }
     }
-    
+
     return check;
   }
 
@@ -626,9 +605,9 @@ class ImprovementValidator {
    * @private
    */
   calculateRiskLevel(risks) {
-    if (risks.some(r => r.severity === 'critical')) return 'critical';
-    if (risks.filter(r => r.severity === 'high').length > 1) return 'high';
-    if (risks.some(r => r.severity === 'high')) return 'medium';
+    if (risks.some((r) => r.severity === 'critical')) return 'critical';
+    if (risks.filter((r) => r.severity === 'high').length > 1) return 'high';
+    if (risks.some((r) => r.severity === 'high')) return 'medium';
     if (risks.length > 3) return 'medium';
     return 'low';
   }
@@ -639,7 +618,7 @@ class ImprovementValidator {
    */
   generateMitigations(risks) {
     const mitigations = [];
-    
+
     for (const risk of risks) {
       switch (risk.type) {
         case 'protected_file':
@@ -649,7 +628,7 @@ class ImprovementValidator {
             action: 'copy_and_modify',
           });
           break;
-          
+
         case 'missing_tests':
           mitigations.push({
             risk: risk.type,
@@ -657,7 +636,7 @@ class ImprovementValidator {
             action: 'generate_tests',
           });
           break;
-          
+
         case 'dependency_impact':
           mitigations.push({
             risk: risk.type,
@@ -665,7 +644,7 @@ class ImprovementValidator {
             action: 'update_dependents',
           });
           break;
-          
+
         default:
           mitigations.push({
             risk: risk.type,
@@ -674,7 +653,7 @@ class ImprovementValidator {
           });
       }
     }
-    
+
     return mitigations;
   }
 
@@ -683,10 +662,21 @@ class ImprovementValidator {
    * @private
    */
   extractKeywords(text) {
-    const stopWords = new Set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for']);
-    const words = text.split(/\s+/)
-      .filter(w => w.length > 3 && !stopWords.has(w));
-    
+    const stopWords = new Set([
+      'the',
+      'a',
+      'an',
+      'and',
+      'or',
+      'but',
+      'in',
+      'on',
+      'at',
+      'to',
+      'for',
+    ]);
+    const words = text.split(/\s+/).filter((w) => w.length > 3 && !stopWords.has(w));
+
     return [...new Set(words)];
   }
 
@@ -696,13 +686,13 @@ class ImprovementValidator {
    */
   extractPatterns(text) {
     const patterns = [];
-    
+
     // Action patterns
     if (/improve|enhance|optimize/.test(text)) patterns.push('improvement');
     if (/fix|repair|correct/.test(text)) patterns.push('bugfix');
     if (/add|create|implement/.test(text)) patterns.push('feature');
     if (/refactor|reorganize|restructure/.test(text)) patterns.push('refactor');
-    
+
     return patterns;
   }
 }

@@ -35,25 +35,18 @@ function getTemplateOverrides(resolvedConfig) {
   const overrides = resolvedConfig?.template_overrides ?? {};
   const story = overrides.story ?? {};
 
-  const sectionsOrder = Array.isArray(story.sections_order)
-    ? story.sections_order
-    : null;
+  const sectionsOrder = Array.isArray(story.sections_order) ? story.sections_order : null;
 
-  const optionalSections = Array.isArray(story.optional_sections)
-    ? story.optional_sections
-    : [];
+  const optionalSections = Array.isArray(story.optional_sections) ? story.optional_sections : [];
 
   // Validate section IDs
-  const allSections = [
-    ...(sectionsOrder ?? []),
-    ...optionalSections,
-  ];
+  const allSections = [...(sectionsOrder ?? []), ...optionalSections];
 
   const unknown = allSections.filter((id) => !KNOWN_STORY_SECTIONS.includes(id));
   if (unknown.length > 0) {
     throw new Error(
       `Unknown story section ID(s) in template_overrides: ${unknown.join(', ')}. ` +
-      `Valid IDs: ${KNOWN_STORY_SECTIONS.join(', ')}`
+        `Valid IDs: ${KNOWN_STORY_SECTIONS.join(', ')}`
     );
   }
 

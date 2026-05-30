@@ -79,7 +79,7 @@ async function generateDocument(templateType, options) {
     // Show validation warnings
     if (result.validation && !result.validation.isValid) {
       console.warn('\n⚠️  Validation warnings:');
-      result.validation.errors.forEach(err => console.warn(`   - ${err}`));
+      result.validation.errors.forEach((err) => console.warn(`   - ${err}`));
     }
 
     // Show metadata
@@ -89,7 +89,6 @@ async function generateDocument(templateType, options) {
       console.log(`   Generated: ${result.generatedAt}`);
       if (result.savedTo) console.log(`   Saved to: ${result.savedTo}`);
     }
-
   } catch (error) {
     console.error(`\n❌ Generation failed: ${error.message}`);
     if (options.verbose) {
@@ -115,13 +114,13 @@ async function listTemplates(options) {
     if (options.json) {
       console.log(JSON.stringify(templates, null, 2));
     } else {
-      templates.forEach(t => {
+      templates.forEach((t) => {
         const status = t.status === 'missing' ? '⚠️  (missing)' : '✅';
         console.log(`  ${status} ${t.type.padEnd(10)} - ${t.name} v${t.version}`);
 
         if (options.verbose && t.variables.length > 0) {
           console.log('     Variables:');
-          t.variables.forEach(v => {
+          t.variables.forEach((v) => {
             const req = v.required ? '*' : ' ';
             console.log(`       ${req}${v.name} (${v.type})`);
           });
@@ -155,7 +154,7 @@ async function showTemplateInfo(templateType, options) {
       console.log(`   Type: ${info.type}`);
       console.log(`   Version: ${info.version}`);
       console.log('\n   Variables:');
-      info.variables.forEach(v => {
+      info.variables.forEach((v) => {
         const req = v.required ? '(required)' : '(optional)';
         console.log(`     - ${v.name}: ${v.type} ${req}`);
         if (v.description) console.log(`       ${v.description}`);

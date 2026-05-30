@@ -283,14 +283,14 @@ class FrameworkAnalyzer {
       // Extract YAML frontmatter
       const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
       let metadata = {};
-      
+
       if (frontmatterMatch) {
         metadata = yaml.load(frontmatterMatch[1]) || {};
       }
 
       // Extract markdown content
       const markdownContent = content.replace(/^---\n[\s\S]*?\n---\n/, '');
-      
+
       return {
         type: 'agent',
         id: metadata.id || path.basename(filePath, '.md'),
@@ -349,7 +349,7 @@ class FrameworkAnalyzer {
   async parseWorkflowFile(filePath, content) {
     try {
       const workflow = yaml.load(content);
-      
+
       return {
         type: 'workflow',
         id: workflow.id || path.basename(filePath, '.yaml'),
@@ -377,7 +377,7 @@ class FrameworkAnalyzer {
   async parseUtilFile(filePath, content) {
     try {
       const stats = await fs.stat(filePath);
-      
+
       return {
         type: 'utility',
         id: path.basename(filePath, '.js'),
@@ -405,7 +405,7 @@ class FrameworkAnalyzer {
     try {
       const stats = await fs.stat(filePath);
       const content = await fs.readFile(filePath, 'utf-8');
-      
+
       return {
         type: 'template',
         id: path.basename(filePath),
@@ -430,7 +430,7 @@ class FrameworkAnalyzer {
     try {
       const stats = await fs.stat(filePath);
       const content = await fs.readFile(filePath, 'utf-8');
-      
+
       return {
         type: 'documentation',
         id: path.basename(filePath, '.md'),
@@ -456,7 +456,7 @@ class FrameworkAnalyzer {
     try {
       const stats = await fs.stat(filePath);
       const content = await fs.readFile(filePath, 'utf-8');
-      
+
       return {
         type: 'test',
         id: path.basename(filePath, '.js'),
@@ -511,7 +511,7 @@ class FrameworkAnalyzer {
 
     // Analyze dependencies for each component type
     const allComponents = this.flattenComponents(components);
-    
+
     for (const component of allComponents) {
       if (component.dependencies) {
         for (const dep of component.dependencies) {
@@ -526,18 +526,24 @@ class FrameworkAnalyzer {
 
     // Detect circular dependencies
     dependencies.circular = await this.detectCircularDependencies(allComponents);
-    
+
     // Find orphaned components
     dependencies.orphaned = this.findOrphanedComponents(allComponents);
-    
+
     // Find highly coupled components
     dependencies.highly_coupled = this.findHighlyCoupledComponents(allComponents);
 
     return {
       internal_count: dependencies.internal.size,
       external_count: dependencies.external.size,
-      internal_dependencies: Array.from(dependencies.internal.entries()).map(([name, count]) => ({ name, count })),
-      external_dependencies: Array.from(dependencies.external.entries()).map(([name, count]) => ({ name, count })),
+      internal_dependencies: Array.from(dependencies.internal.entries()).map(([name, count]) => ({
+        name,
+        count,
+      })),
+      external_dependencies: Array.from(dependencies.external.entries()).map(([name, count]) => ({
+        name,
+        count,
+      })),
       circular_dependencies: dependencies.circular,
       orphaned_components: dependencies.orphaned,
       highly_coupled_components: dependencies.highly_coupled,
@@ -549,7 +555,7 @@ class FrameworkAnalyzer {
    */
   async calculateFrameworkMetrics(components) {
     const allComponents = this.flattenComponents(components);
-    
+
     return {
       total_size: allComponents.reduce((sum, comp) => sum + (comp.size || 0), 0),
       average_complexity: this.calculateAverageComplexity(allComponents),
@@ -583,15 +589,15 @@ class FrameworkAnalyzer {
   async getFilesByExtension(dir, extensions) {
     const files = [];
     const extArray = Array.isArray(extensions) ? extensions : [extensions];
-    
+
     try {
       const entries = await fs.readdir(dir, { withFileTypes: true });
-      
+
       for (const entry of entries) {
         const fullPath = path.join(dir, entry.name);
-        
+
         if (entry.isDirectory() && !this.isExcluded(entry.name)) {
-          files.push(...await this.getFilesByExtension(fullPath, extensions));
+          files.push(...(await this.getFilesByExtension(fullPath, extensions)));
         } else if (entry.isFile()) {
           const ext = path.extname(entry.name).toLowerCase();
           if (extArray.includes(ext)) {
@@ -602,7 +608,7 @@ class FrameworkAnalyzer {
     } catch (error) {
       // Directory not accessible
     }
-    
+
     return files;
   }
 
@@ -610,32 +616,33 @@ class FrameworkAnalyzer {
     try {
       const entries = await fs.readdir(dir, { withFileTypes: true });
       result.depth = Math.max(result.depth || 0, depth);
-      
+
       for (const entry of entries) {
         if (this.isExcluded(entry.name)) continue;
-        
+
         const fullPath = path.join(dir, entry.name);
-        
+
         if (entry.isDirectory()) {
           result.total_directories = (result.total_directories || 0) + 1;
           await this.walkDirectory(fullPath, result, depth + 1);
         } else if (entry.isFile()) {
           result.total_files = (result.total_files || 0) + 1;
-          
+
           if (result.files) {
             result.files.push(fullPath);
           }
-          
+
           // Track file types
           const ext = path.extname(entry.name).toLowerCase();
           result.file_types = result.file_types || {};
           result.file_types[ext] = (result.file_types[ext] || 0) + 1;
-          
+
           // Track size distribution
           const stats = await fs.stat(fullPath);
           const sizeCategory = this.getSizeCategory(stats.size);
           result.size_distribution = result.size_distribution || {};
-          result.size_distribution[sizeCategory] = (result.size_distribution[sizeCategory] || 0) + 1;
+          result.size_distribution[sizeCategory] =
+            (result.size_distribution[sizeCategory] || 0) + 1;
         }
       }
     } catch (error) {
@@ -645,10 +652,8 @@ class FrameworkAnalyzer {
 
   // Helper methods
   isExcluded(name) {
-    return this.excludes.some(exclude => 
-      name === exclude || 
-      name.startsWith(exclude) || 
-      name.startsWith('.'),
+    return this.excludes.some(
+      (exclude) => name === exclude || name.startsWith(exclude) || name.startsWith('.')
     );
   }
 
@@ -658,25 +663,25 @@ class FrameworkAnalyzer {
 
   extractDescription(content) {
     // Extract first paragraph or first meaningful line
-    const lines = content.split('\n').filter(line => line.trim());
-    return lines.find(line => line.length > 20 && !line.startsWith('#')) || '';
+    const lines = content.split('\n').filter((line) => line.trim());
+    return lines.find((line) => line.length > 20 && !line.startsWith('#')) || '';
   }
 
   extractDependencies(content) {
     const deps = [];
     const requireMatches = content.match(/require\(['"`]([^'"`]+)['"`]\)/g) || [];
     const importMatches = content.match(/import .* from ['"`]([^'"`]+)['"`]/g) || [];
-    
-    requireMatches.forEach(match => {
+
+    requireMatches.forEach((match) => {
       const dep = match.match(/['"`]([^'"`]+)['"`]/)[1];
       if (!deps.includes(dep)) deps.push(dep);
     });
-    
-    importMatches.forEach(match => {
+
+    importMatches.forEach((match) => {
       const dep = match.match(/from ['"`]([^'"`]+)['"`]/)[1];
       if (!deps.includes(dep)) deps.push(dep);
     });
-    
+
     return deps;
   }
 
@@ -685,7 +690,7 @@ class FrameworkAnalyzer {
     const lines = content.split('\n').length;
     const functions = (content.match(/function|async|=>/g) || []).length;
     const conditions = (content.match(/if|while|for|switch|catch/g) || []).length;
-    const complexity = Math.min(10, (functions + conditions * 2) / lines * 100);
+    const complexity = Math.min(10, ((functions + conditions * 2) / lines) * 100);
     return Math.max(1, Math.round(complexity));
   }
 
@@ -711,9 +716,15 @@ class FrameworkAnalyzer {
   }
 
   // Stub methods for more complex analysis
-  extractTaskParameters(content) { return []; }
-  analyzeImplementationStatus(content) { return 'unknown'; }
-  calculateWorkflowComplexity(workflow) { return 1; }
+  extractTaskParameters(content) {
+    return [];
+  }
+  analyzeImplementationStatus(content) {
+    return 'unknown';
+  }
+  calculateWorkflowComplexity(workflow) {
+    return 1;
+  }
   async validateWorkflow(workflow) {
     try {
       const { WorkflowValidator } = require('../../development/scripts/workflow-validator');
@@ -728,35 +739,91 @@ class FrameworkAnalyzer {
       }
       return result;
     } catch (error) {
-      return { valid: false, errors: [{ code: 'VALIDATOR_LOAD_ERROR', message: error.message }], warnings: [] };
+      return {
+        valid: false,
+        errors: [{ code: 'VALIDATOR_LOAD_ERROR', message: error.message }],
+        warnings: [],
+      };
     }
   }
-  extractUtilDescription(content) { return ''; }
-  extractExports(content) { return []; }
-  extractFunctions(content) { return []; }
-  extractImports(content) { return []; }
-  calculateCodeComplexity(content) { return 1; }
-  calculateTestCoverage(filePath) { return 0; }
-  extractTemplateDescription(content) { return ''; }
-  detectTemplateType(filePath, content) { return 'generic'; }
-  extractTemplateVariables(content) { return []; }
-  detectDocType(filePath) { return 'general'; }
-  extractSections(content) { return []; }
-  countWords(content) { return content.split(/\s+/).length; }
-  extractTestDescription(content) { return ''; }
-  detectTestFramework(content) { return 'jest'; }
-  extractTestSuites(content) { return []; }
-  countTests(content) { return (content.match(/test\(|it\(/g) || []).length; }
-  extractCoverageTarget(filePath) { return null; }
-  detectCircularDependencies(components) { return []; }
-  findOrphanedComponents(components) { return []; }
-  findHighlyCoupledComponents(components) { return []; }
-  calculateAverageComplexity(components) { return 1; }
-  calculateMaintainabilityIndex(components) { return 80; }
-  calculateOverallTestCoverage(components) { return 0; }
-  calculateDocumentationCoverage(components) { return 0; }
-  calculateCodeQualityScore(components) { return 7; }
-  calculateTechnicalDebt(components) { return 'low'; }
+  extractUtilDescription(content) {
+    return '';
+  }
+  extractExports(content) {
+    return [];
+  }
+  extractFunctions(content) {
+    return [];
+  }
+  extractImports(content) {
+    return [];
+  }
+  calculateCodeComplexity(content) {
+    return 1;
+  }
+  calculateTestCoverage(filePath) {
+    return 0;
+  }
+  extractTemplateDescription(content) {
+    return '';
+  }
+  detectTemplateType(filePath, content) {
+    return 'generic';
+  }
+  extractTemplateVariables(content) {
+    return [];
+  }
+  detectDocType(filePath) {
+    return 'general';
+  }
+  extractSections(content) {
+    return [];
+  }
+  countWords(content) {
+    return content.split(/\s+/).length;
+  }
+  extractTestDescription(content) {
+    return '';
+  }
+  detectTestFramework(content) {
+    return 'jest';
+  }
+  extractTestSuites(content) {
+    return [];
+  }
+  countTests(content) {
+    return (content.match(/test\(|it\(/g) || []).length;
+  }
+  extractCoverageTarget(filePath) {
+    return null;
+  }
+  detectCircularDependencies(components) {
+    return [];
+  }
+  findOrphanedComponents(components) {
+    return [];
+  }
+  findHighlyCoupledComponents(components) {
+    return [];
+  }
+  calculateAverageComplexity(components) {
+    return 1;
+  }
+  calculateMaintainabilityIndex(components) {
+    return 80;
+  }
+  calculateOverallTestCoverage(components) {
+    return 0;
+  }
+  calculateDocumentationCoverage(components) {
+    return 0;
+  }
+  calculateCodeQualityScore(components) {
+    return 7;
+  }
+  calculateTechnicalDebt(components) {
+    return 'low';
+  }
 }
 
 module.exports = FrameworkAnalyzer;

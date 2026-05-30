@@ -19,7 +19,7 @@ Checklist:
   - [ ] Return appropriate exit code
 ---
 
-# *validate-squad
+# \*validate-squad
 
 Validates a squad against the JSON Schema and TASK-FORMAT-SPECIFICATION-V1.
 
@@ -35,33 +35,38 @@ Validates a squad against the JSON Schema and TASK-FORMAT-SPECIFICATION-V1.
 
 ## Parameters
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `squad_path` | string | - | Full path to squad directory |
-| `name` | string | - | Squad name (resolves to ./squads/{name}) |
-| `--strict` | flag | false | Treat warnings as errors |
-| `--verbose` | flag | false | Show detailed validation output |
+| Parameter    | Type   | Default | Description                              |
+| ------------ | ------ | ------- | ---------------------------------------- |
+| `squad_path` | string | -       | Full path to squad directory             |
+| `name`       | string | -       | Squad name (resolves to ./squads/{name}) |
+| `--strict`   | flag   | false   | Treat warnings as errors                 |
+| `--verbose`  | flag   | false   | Show detailed validation output          |
 
 ## Validation Checks
 
 ### 1. Manifest Validation
+
 - Checks for `squad.yaml` or `config.yaml` (deprecated)
 - Validates against JSON Schema
 - Required fields: `name`, `version`
 
 ### 2. Structure Validation
+
 - Checks for expected directories: `tasks/`, `agents/`
 - Verifies referenced files exist
 
 ### 3. Task Validation (TASK-FORMAT-SPECIFICATION-V1)
+
 - Checks for required fields in task files
 - Validates naming conventions (kebab-case)
 
 ### 4. Agent Validation
+
 - Checks for valid agent definition format
 - Validates naming conventions
 
 ### 5. Config Reference Validation (SQS-10)
+
 - Validates config paths in squad.yaml resolve correctly
 - Supports both local (`config/coding-standards.md`) and project-level (`../../docs/framework/CODING-STANDARDS.md`) paths
 - Warns if project-level reference doesn't exist
@@ -108,18 +113,18 @@ Result: VALID (with warnings)
 
 ## Error Codes
 
-| Code | Severity | Description |
-|------|----------|-------------|
-| `MANIFEST_NOT_FOUND` | Error | No squad.yaml or config.yaml found |
-| `YAML_PARSE_ERROR` | Error | Invalid YAML syntax |
-| `SCHEMA_ERROR` | Error | Manifest doesn't match JSON Schema |
-| `FILE_NOT_FOUND` | Error | Referenced file doesn't exist |
-| `DEPRECATED_MANIFEST` | Warning | Using config.yaml instead of squad.yaml |
-| `MISSING_DIRECTORY` | Warning | Expected directory not found |
-| `NO_TASKS` | Warning | No task files in tasks/ |
-| `TASK_MISSING_FIELD` | Warning | Task missing recommended field |
-| `AGENT_INVALID_FORMAT` | Warning | Agent file may not follow format |
-| `INVALID_NAMING` | Warning | Filename not in kebab-case |
+| Code                   | Severity | Description                             |
+| ---------------------- | -------- | --------------------------------------- |
+| `MANIFEST_NOT_FOUND`   | Error    | No squad.yaml or config.yaml found      |
+| `YAML_PARSE_ERROR`     | Error    | Invalid YAML syntax                     |
+| `SCHEMA_ERROR`         | Error    | Manifest doesn't match JSON Schema      |
+| `FILE_NOT_FOUND`       | Error    | Referenced file doesn't exist           |
+| `DEPRECATED_MANIFEST`  | Warning  | Using config.yaml instead of squad.yaml |
+| `MISSING_DIRECTORY`    | Warning  | Expected directory not found            |
+| `NO_TASKS`             | Warning  | No task files in tasks/                 |
+| `TASK_MISSING_FIELD`   | Warning  | Task missing recommended field          |
+| `AGENT_INVALID_FORMAT` | Warning  | Agent file may not follow format        |
+| `INVALID_NAMING`       | Warning  | Filename not in kebab-case              |
 
 ## Implementation
 

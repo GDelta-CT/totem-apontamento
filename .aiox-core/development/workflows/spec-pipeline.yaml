@@ -1,7 +1,7 @@
 workflow:
   id: spec-pipeline
   name: Spec Pipeline - Requirements to Specification
-  version: "1.0"
+  version: '1.0'
   description: >-
     Pipeline completo que transforma requisitos informais em especificações
     executáveis. Orquestra 5 fases: Gather → Assess → Research → Write → Critique.
@@ -22,7 +22,7 @@ workflow:
   triggers:
     # Primary trigger: Explicit command
     - event: command
-      command: "*create-spec"
+      command: '*create-spec'
       action: run_pipeline
 
     # Secondary trigger: New story created
@@ -32,27 +32,27 @@ workflow:
 
     # Agent-specific triggers
     - event: command
-      command: "*gather-requirements"
+      command: '*gather-requirements'
       action: run_phase
       phase: gather
 
     - event: command
-      command: "*assess-complexity"
+      command: '*assess-complexity'
       action: run_phase
       phase: assess
 
     - event: command
-      command: "*research-deps"
+      command: '*research-deps'
       action: run_phase
       phase: research
 
     - event: command
-      command: "*write-spec"
+      command: '*write-spec'
       action: run_phase
       phase: spec
 
     - event: command
-      command: "*critique-spec"
+      command: '*critique-spec'
       action: run_phase
       phase: critique
 
@@ -75,7 +75,7 @@ workflow:
     retryDelay: 1000
 
     # Gate behavior
-    strictGate: true  # BLOCKED verdict halts pipeline
+    strictGate: true # BLOCKED verdict halts pipeline
 
     # Output directory pattern
     outputDir: docs/stories/{storyId}/spec/
@@ -87,16 +87,16 @@ workflow:
   phases:
     # SIMPLE: Minimal pipeline for straightforward tasks
     SIMPLE:
-      description: "Tarefa direta, padrões existentes"
+      description: 'Tarefa direta, padrões existentes'
       steps:
         - gather
         - spec
         - critique
-      estimated_time: "30-60 min"
+      estimated_time: '30-60 min'
 
     # STANDARD: Full pipeline for moderate complexity
     STANDARD:
-      description: "Complexidade moderada, alguma pesquisa necessária"
+      description: 'Complexidade moderada, alguma pesquisa necessária'
       steps:
         - gather
         - assess
@@ -104,11 +104,11 @@ workflow:
         - spec
         - critique
         - plan
-      estimated_time: "2-4 hours"
+      estimated_time: '2-4 hours'
 
     # COMPLEX: Extended pipeline with revision loop
     COMPLEX:
-      description: "Alta complexidade, múltiplas iterações"
+      description: 'Alta complexidade, múltiplas iterações'
       steps:
         - gather
         - assess
@@ -118,10 +118,10 @@ workflow:
         - revise
         - critique_2
         - plan
-      estimated_time: "4-8 hours"
+      estimated_time: '4-8 hours'
       flags:
-        - "Architectural review recommended"
-        - "Consider breaking into smaller stories"
+        - 'Architectural review recommended'
+        - 'Consider breaking into smaller stories'
 
   # ═══════════════════════════════════════════════════════════════════════════════════
   #                              PRE-FLIGHT CHECKS
@@ -132,7 +132,7 @@ workflow:
 
     checks:
       - id: story_exists
-        description: "Verify story directory exists or can be created"
+        description: 'Verify story directory exists or can be created'
         script: |
           const fs = require('fs');
           const path = `docs/stories/${storyId}`;
@@ -141,20 +141,20 @@ workflow:
           }
           return true;
         blocking: true
-        error: "Cannot create story directory"
+        error: 'Cannot create story directory'
 
       - id: no_existing_spec
-        description: "Check for existing spec (avoid overwrite)"
+        description: 'Check for existing spec (avoid overwrite)'
         script: |
           const fs = require('fs');
           const specPath = `docs/stories/${storyId}/spec/spec.md`;
           return !fs.existsSync(specPath);
         blocking: false
-        warning: "Existing spec found - will iterate"
+        warning: 'Existing spec found - will iterate'
 
       - id: agents_available
-        description: "Verify required agents are configured"
-        check: "All spec pipeline agents have autoClaude.specPipeline defined"
+        description: 'Verify required agents are configured'
+        check: 'All spec pipeline agents have autoClaude.specPipeline defined'
         blocking: true
 
   # ═══════════════════════════════════════════════════════════════════════════════════
@@ -162,14 +162,13 @@ workflow:
   # ═══════════════════════════════════════════════════════════════════════════════════
 
   sequence:
-
     # ═════════════════════════════════════════════════════════════════════════════════
     # PHASE 1: GATHER REQUIREMENTS
     # ═════════════════════════════════════════════════════════════════════════════════
 
     - step: gather
       phase: 1
-      phase_name: "Gather Requirements"
+      phase_name: 'Gather Requirements'
       agent: pm
 
       description: >-
@@ -179,22 +178,22 @@ workflow:
       task: spec-gather-requirements.md
 
       inputs:
-        storyId: "{storyId}"
-        source: "{source|user}"
-        prdPath: "{prdPath|null}"
+        storyId: '{storyId}'
+        source: '{source|user}'
+        prdPath: '{prdPath|null}'
 
       outputs:
         - requirements.json
 
-      elicit: true  # Requires user interaction
+      elicit: true # Requires user interaction
 
       on_success:
-        log: "✅ Requirements gathered: {requirements.functional.length} FR, {requirements.nonFunctional.length} NFR"
+        log: '✅ Requirements gathered: {requirements.functional.length} FR, {requirements.nonFunctional.length} NFR'
         next: assess
 
       on_failure:
         action: halt
-        error: "Failed to gather requirements"
+        error: 'Failed to gather requirements'
 
     # ═════════════════════════════════════════════════════════════════════════════════
     # PHASE 2: ASSESS COMPLEXITY
@@ -202,7 +201,7 @@ workflow:
 
     - step: assess
       phase: 2
-      phase_name: "Assess Complexity"
+      phase_name: 'Assess Complexity'
       agent: architect
 
       description: >-
@@ -212,9 +211,9 @@ workflow:
       task: spec-assess-complexity.md
 
       inputs:
-        storyId: "{storyId}"
-        requirements: "docs/stories/{storyId}/spec/requirements.json"
-        overrideComplexity: "{complexity|null}"
+        storyId: '{storyId}'
+        requirements: 'docs/stories/{storyId}/spec/requirements.json'
+        overrideComplexity: '{complexity|null}'
 
       outputs:
         - complexity.json
@@ -222,13 +221,13 @@ workflow:
       skip_if: "source === 'simple' OR overrideComplexity === 'SIMPLE'"
 
       on_success:
-        log: "📊 Complexity assessed: {complexity.result} (score: {complexity.totalScore})"
-        dynamic_phases: true  # Use complexity.result to determine phases
+        log: '📊 Complexity assessed: {complexity.result} (score: {complexity.totalScore})'
+        dynamic_phases: true # Use complexity.result to determine phases
         next: research
 
       on_failure:
         action: continue
-        fallback: "Assume STANDARD complexity"
+        fallback: 'Assume STANDARD complexity'
 
     # ═════════════════════════════════════════════════════════════════════════════════
     # PHASE 3: RESEARCH DEPENDENCIES
@@ -236,7 +235,7 @@ workflow:
 
     - step: research
       phase: 3
-      phase_name: "Research Dependencies"
+      phase_name: 'Research Dependencies'
       agent: analyst
 
       description: >-
@@ -246,9 +245,9 @@ workflow:
       task: spec-research-dependencies.md
 
       inputs:
-        storyId: "{storyId}"
-        requirements: "docs/stories/{storyId}/spec/requirements.json"
-        complexity: "docs/stories/{storyId}/spec/complexity.json"
+        storyId: '{storyId}'
+        requirements: 'docs/stories/{storyId}/spec/requirements.json'
+        complexity: 'docs/stories/{storyId}/spec/complexity.json'
 
       outputs:
         - research.json
@@ -260,12 +259,12 @@ workflow:
         - exa
 
       on_success:
-        log: "🔍 Research complete: {research.dependencies.length} dependencies, {research.unverifiedClaims.length} unverified"
+        log: '🔍 Research complete: {research.dependencies.length} dependencies, {research.unverifiedClaims.length} unverified'
         next: spec
 
       on_failure:
         action: continue
-        fallback: "Proceed with minimal research output"
+        fallback: 'Proceed with minimal research output'
 
     # ═════════════════════════════════════════════════════════════════════════════════
     # PHASE 4: WRITE SPECIFICATION
@@ -273,7 +272,7 @@ workflow:
 
     - step: spec
       phase: 4
-      phase_name: "Write Specification"
+      phase_name: 'Write Specification'
       agent: pm
 
       description: >-
@@ -283,21 +282,21 @@ workflow:
       task: spec-write-spec.md
 
       inputs:
-        storyId: "{storyId}"
-        requirements: "docs/stories/{storyId}/spec/requirements.json"
-        complexity: "docs/stories/{storyId}/spec/complexity.json"
-        research: "docs/stories/{storyId}/spec/research.json"
+        storyId: '{storyId}'
+        requirements: 'docs/stories/{storyId}/spec/requirements.json'
+        complexity: 'docs/stories/{storyId}/spec/complexity.json'
+        research: 'docs/stories/{storyId}/spec/research.json'
 
       outputs:
         - spec.md
 
       on_success:
-        log: "📝 Specification written: docs/stories/{storyId}/spec/spec.md"
+        log: '📝 Specification written: docs/stories/{storyId}/spec/spec.md'
         next: critique
 
       on_failure:
         action: halt
-        error: "Failed to write specification"
+        error: 'Failed to write specification'
 
     # ═════════════════════════════════════════════════════════════════════════════════
     # PHASE 5: CRITIQUE SPECIFICATION
@@ -305,7 +304,7 @@ workflow:
 
     - step: critique
       phase: 5
-      phase_name: "Critique Specification"
+      phase_name: 'Critique Specification'
       agent: qa
 
       description: >-
@@ -315,41 +314,41 @@ workflow:
       task: spec-critique.md
 
       inputs:
-        storyId: "{storyId}"
-        spec: "docs/stories/{storyId}/spec/spec.md"
-        requirements: "docs/stories/{storyId}/spec/requirements.json"
-        complexity: "docs/stories/{storyId}/spec/complexity.json"
-        research: "docs/stories/{storyId}/spec/research.json"
+        storyId: '{storyId}'
+        spec: 'docs/stories/{storyId}/spec/spec.md'
+        requirements: 'docs/stories/{storyId}/spec/requirements.json'
+        complexity: 'docs/stories/{storyId}/spec/complexity.json'
+        research: 'docs/stories/{storyId}/spec/research.json'
 
       outputs:
         - critique.json
 
-      gate: true  # Blocking gate
+      gate: true # Blocking gate
 
       on_verdict:
         APPROVED:
-          log: "✅ Spec APPROVED (score: {critique.scores.average})"
+          log: '✅ Spec APPROVED (score: {critique.scores.average})'
           next: plan
           action: continue
 
         NEEDS_REVISION:
-          log: "⚠️ Spec NEEDS_REVISION: {critique.verdictReason}"
+          log: '⚠️ Spec NEEDS_REVISION: {critique.verdictReason}'
           action: return_to_spec
           pass: [critique.json, critique.autoFixes]
           max_iterations: 2
 
         BLOCKED:
-          log: "🛑 Spec BLOCKED: {critique.verdictReason}"
+          log: '🛑 Spec BLOCKED: {critique.verdictReason}'
           action: halt
-          escalate_to: "@architect"
+          escalate_to: '@architect'
 
     # ═════════════════════════════════════════════════════════════════════════════════
     # PHASE 5b: REVISE SPECIFICATION (COMPLEX only)
     # ═════════════════════════════════════════════════════════════════════════════════
 
     - step: revise
-      phase: "5b"
-      phase_name: "Revise Specification"
+      phase: '5b'
+      phase_name: 'Revise Specification'
       agent: pm
 
       description: >-
@@ -359,15 +358,15 @@ workflow:
       condition: "complexity.result === 'COMPLEX' OR critique.verdict === 'NEEDS_REVISION'"
 
       inputs:
-        storyId: "{storyId}"
-        spec: "docs/stories/{storyId}/spec/spec.md"
-        critique: "docs/stories/{storyId}/spec/critique.json"
+        storyId: '{storyId}'
+        spec: 'docs/stories/{storyId}/spec/spec.md'
+        critique: 'docs/stories/{storyId}/spec/critique.json'
 
       outputs:
         - spec.md (updated)
 
       on_success:
-        log: "🔄 Specification revised based on critique"
+        log: '🔄 Specification revised based on critique'
         next: critique_2
 
     # ═════════════════════════════════════════════════════════════════════════════════
@@ -375,8 +374,8 @@ workflow:
     # ═════════════════════════════════════════════════════════════════════════════════
 
     - step: critique_2
-      phase: "5c"
-      phase_name: "Second Critique"
+      phase: '5c'
+      phase_name: 'Second Critique'
       agent: qa
 
       description: >-
@@ -388,9 +387,9 @@ workflow:
       task: spec-critique.md
 
       inputs:
-        storyId: "{storyId}"
-        spec: "docs/stories/{storyId}/spec/spec.md"
-        requirements: "docs/stories/{storyId}/spec/requirements.json"
+        storyId: '{storyId}'
+        spec: 'docs/stories/{storyId}/spec/spec.md'
+        requirements: 'docs/stories/{storyId}/spec/requirements.json'
         iteration: 2
 
       outputs:
@@ -403,10 +402,10 @@ workflow:
           next: plan
         NEEDS_REVISION:
           action: halt
-          error: "Spec failed second critique - manual intervention needed"
+          error: 'Spec failed second critique - manual intervention needed'
         BLOCKED:
           action: halt
-          escalate_to: "@architect"
+          escalate_to: '@architect'
 
     # ═════════════════════════════════════════════════════════════════════════════════
     # PHASE 6: CREATE IMPLEMENTATION PLAN
@@ -414,7 +413,7 @@ workflow:
 
     - step: plan
       phase: 6
-      phase_name: "Create Implementation Plan"
+      phase_name: 'Create Implementation Plan'
       agent: architect
 
       description: >-
@@ -423,18 +422,18 @@ workflow:
 
       condition: "critique.verdict === 'APPROVED'"
 
-      task: plan-create-implementation.md  # Future task
+      task: plan-create-implementation.md # Future task
 
       inputs:
-        storyId: "{storyId}"
-        spec: "docs/stories/{storyId}/spec/spec.md"
-        complexity: "docs/stories/{storyId}/spec/complexity.json"
+        storyId: '{storyId}'
+        spec: 'docs/stories/{storyId}/spec/spec.md'
+        complexity: 'docs/stories/{storyId}/spec/complexity.json'
 
       outputs:
         - plan.json
 
       on_success:
-        log: "📋 Implementation plan created"
+        log: '📋 Implementation plan created'
         complete: true
 
   # ═══════════════════════════════════════════════════════════════════════════════════
@@ -472,9 +471,9 @@ workflow:
       - critique.json
 
     next_steps:
-      - "Review specification: docs/stories/{storyId}/spec/spec.md"
-      - "Start development: @dev *develop {storyId}"
-      - "View critique: docs/stories/{storyId}/spec/critique.json"
+      - 'Review specification: docs/stories/{storyId}/spec/spec.md'
+      - 'Start development: @dev *develop {storyId}'
+      - 'View critique: docs/stories/{storyId}/spec/critique.json'
 
   # ═══════════════════════════════════════════════════════════════════════════════════
   #                              ERROR HANDLING
@@ -482,23 +481,23 @@ workflow:
 
   error_handling:
     missing_story_id:
-      message: "Story ID is required"
-      suggestion: "Usage: *create-spec STORY-42"
+      message: 'Story ID is required'
+      suggestion: 'Usage: *create-spec STORY-42'
       action: prompt
 
     phase_failed:
-      message: "Phase {phase} failed"
-      suggestion: "Check logs and retry: *create-spec {storyId} --resume"
+      message: 'Phase {phase} failed'
+      suggestion: 'Check logs and retry: *create-spec {storyId} --resume'
       action: halt
 
     max_iterations_reached:
-      message: "Max revision iterations reached"
-      suggestion: "Manual intervention needed - escalating to @architect"
+      message: 'Max revision iterations reached'
+      suggestion: 'Manual intervention needed - escalating to @architect'
       action: escalate
 
     critique_blocked:
-      message: "Specification blocked by QA gate"
-      suggestion: "Review critique.json and address HIGH severity issues"
+      message: 'Specification blocked by QA gate'
+      suggestion: 'Review critique.json and address HIGH severity issues'
       action: halt
 
   # ═══════════════════════════════════════════════════════════════════════════════════
@@ -548,10 +547,10 @@ workflow:
     # Notification hooks
     notifications:
       on_complete:
-        message: "Spec ready for {storyId}"
+        message: 'Spec ready for {storyId}'
         channels: [log]
       on_blocked:
-        message: "Spec blocked for {storyId} - needs attention"
+        message: 'Spec blocked for {storyId} - needs attention'
         channels: [log]
 
   # ═══════════════════════════════════════════════════════════════════════════════════
@@ -559,10 +558,10 @@ workflow:
   # ═══════════════════════════════════════════════════════════════════════════════════
 
   metadata:
-    story: "3.6"
-    epic: "Epic 3 - Spec Pipeline"
-    created: "2026-01-28"
-    author: "@architect (Aria)"
+    story: '3.6'
+    epic: 'Epic 3 - Spec Pipeline'
+    created: '2026-01-28'
+    author: '@architect (Aria)'
     dependencies:
       - spec-gather-requirements.md
       - spec-assess-complexity.md

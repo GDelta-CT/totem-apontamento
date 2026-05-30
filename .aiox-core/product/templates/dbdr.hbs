@@ -10,7 +10,7 @@ variables:
   - name: title
     type: string
     required: true
-    prompt: "Title of the database decision:"
+    prompt: 'Title of the database decision:'
   - name: status
     type: choice
     required: true
@@ -20,222 +20,219 @@ variables:
     type: choice
     required: true
     choices: [PostgreSQL, MySQL, MongoDB, SQLite, Supabase, Other]
-    prompt: "Which database?"
+    prompt: 'Which database?'
   - name: owner
     type: string
     required: true
-    prompt: "Who is the decision owner?"
+    prompt: 'Who is the decision owner?'
   - name: context
     type: text
     required: true
-    prompt: "What is the context and data problem?"
+    prompt: 'What is the context and data problem?'
   - name: decision
     type: text
     required: true
-    prompt: "What is the decision being made?"
+    prompt: 'What is the decision being made?'
   - name: migrationStrategy
     type: text
     required: true
-    prompt: "What is the migration strategy?"
+    prompt: 'What is the migration strategy?'
   - name: rollbackPlan
     type: text
     required: true
-    prompt: "What is the rollback plan?"
+    prompt: 'What is the rollback plan?'
 ---
 
-# DBDR {{padNumber number 3}}: {{title}}
+# DBDR
+{{padNumber number 3}}:
+{{title}}
 
-**Status:** {{status}}
-**Date:** {{formatDate now "YYYY-MM-DD"}}
-**Owner:** {{owner}}
-**Database:** {{dbType}}
+**Status:**
+{{status}}
+**Date:**
+{{formatDate now 'YYYY-MM-DD'}}
+**Owner:**
+{{owner}}
+**Database:**
+{{dbType}}
 
----
-
-## Context
+--- ## Context
 
 {{#if currentState}}
-### Current State
-{{currentState}}
+  ### Current State
+  {{currentState}}
 {{/if}}
 
 ### Problem Statement
 {{context}}
 
 {{#if dataVolume}}
-### Data Volume Considerations
-- **Current Size:** {{dataVolume.current}}
-- **Projected Growth:** {{dataVolume.projected}}
-- **Retention Policy:** {{dataVolume.retention}}
+  ### Data Volume Considerations - **Current Size:**
+  {{dataVolume.current}}
+  - **Projected Growth:**
+  {{dataVolume.projected}}
+  - **Retention Policy:**
+  {{dataVolume.retention}}
 {{/if}}
 
----
-
-## Decision
+--- ## Decision
 
 {{decision}}
 
 {{#if rationale}}
-### Rationale
-{{rationale}}
+  ### Rationale
+  {{rationale}}
 {{/if}}
 
----
-
-## Schema Changes
+--- ## Schema Changes
 
 {{#if schemaChanges}}
-### Tables Affected
+  ### Tables Affected | Table | Change Type | Description | |-------|-------------|-------------|
+  {{#each schemaChanges}}
+    | `{{this.table}}` |
+    {{this.changeType}}
+    |
+    {{this.description}}
+    |
+  {{/each}}
 
-| Table | Change Type | Description |
-|-------|-------------|-------------|
-{{#each schemaChanges}}
-| `{{this.table}}` | {{this.changeType}} | {{this.description}} |
-{{/each}}
+  ### SQL Migrations ```sql
+  {{#each schemaChanges}}
+    --
+    {{this.table}}:
+    {{this.changeType}}
+    {{this.sql}}
 
-### SQL Migrations
-
-```sql
-{{#each schemaChanges}}
--- {{this.table}}: {{this.changeType}}
-{{this.sql}}
-
-{{/each}}
-```
+  {{/each}}
+  ```
 {{else}}
-_No schema changes required._
+  _No schema changes required._
 {{/if}}
 
----
-
-## Migration Strategy
-
-### Approach
+--- ## Migration Strategy ### Approach
 {{migrationStrategy}}
 
 {{#if migrationPhases}}
-### Phases
+  ### Phases
 
-{{#each migrationPhases}}
-1. **{{this.phase}}** ({{this.duration}})
-   - {{this.description}}
-   - Validation: {{this.validation}}
-{{/each}}
+  {{#each migrationPhases}}
+    1. **{{this.phase}}** ({{this.duration}}) -
+    {{this.description}}
+    - Validation:
+    {{this.validation}}
+  {{/each}}
 {{/if}}
 
 {{#if dataMigrationScripts}}
-### Data Migration Scripts
-
-```sql
-{{dataMigrationScripts}}
-```
+  ### Data Migration Scripts ```sql
+  {{dataMigrationScripts}}
+  ```
 {{/if}}
 
----
-
-## Performance Impact
+--- ## Performance Impact
 
 {{#if performanceMetrics}}
-### Expected Impact
-
-| Metric | Before | After | Acceptable? |
-|--------|--------|-------|-------------|
-{{#each performanceMetrics}}
-| {{this.metric}} | {{this.before}} | {{this.after}} | {{this.acceptable}} |
-{{/each}}
+  ### Expected Impact | Metric | Before | After | Acceptable? |
+  |--------|--------|-------|-------------|
+  {{#each performanceMetrics}}
+    |
+    {{this.metric}}
+    |
+    {{this.before}}
+    |
+    {{this.after}}
+    |
+    {{this.acceptable}}
+    |
+  {{/each}}
 {{/if}}
 
 {{#if indexes}}
-### Indexing Strategy
+  ### Indexing Strategy
 
-{{#each indexes}}
-- `{{this.name}}` on `{{this.table}}({{this.columns}})` - {{this.reason}}
-{{/each}}
+  {{#each indexes}}
+    - `{{this.name}}` on `{{this.table}}({{this.columns}})` -
+    {{this.reason}}
+  {{/each}}
 {{else}}
-_No new indexes required._
+  _No new indexes required._
 {{/if}}
 
----
-
-## Rollback Plan
-
-### Rollback Strategy
+--- ## Rollback Plan ### Rollback Strategy
 {{rollbackPlan}}
 
 {{#if rollbackScripts}}
-### Rollback Scripts
-
-```sql
-{{rollbackScripts}}
-```
+  ### Rollback Scripts ```sql
+  {{rollbackScripts}}
+  ```
 {{/if}}
 
 {{#if rollbackTriggers}}
-### Rollback Triggers
+  ### Rollback Triggers
 
-{{#each rollbackTriggers}}
-- **{{this.condition}}**: {{this.action}}
-{{/each}}
+  {{#each rollbackTriggers}}
+    - **{{this.condition}}**:
+    {{this.action}}
+  {{/each}}
 {{/if}}
 
----
-
-## Testing
+--- ## Testing
 
 {{#if preMigrationTests}}
-### Pre-Migration Testing
-{{#each preMigrationTests}}
-- [ ] {{this}}
-{{/each}}
+  ### Pre-Migration Testing
+  {{#each preMigrationTests}}
+    - [ ]
+    {{this}}
+  {{/each}}
 {{/if}}
 
 {{#if postMigrationValidation}}
-### Post-Migration Validation
-{{#each postMigrationValidation}}
-- [ ] {{this}}
-{{/each}}
+  ### Post-Migration Validation
+  {{#each postMigrationValidation}}
+    - [ ]
+    {{this}}
+  {{/each}}
 {{/if}}
 
----
-
-## Consequences
+--- ## Consequences
 
 {{#if positiveConsequences}}
-### Positive
-{{#each positiveConsequences}}
-- ✅ {{this}}
-{{/each}}
+  ### Positive
+  {{#each positiveConsequences}}
+    - ✅
+    {{this}}
+  {{/each}}
 {{/if}}
 
 {{#if negativeConsequences}}
-### Negative (Trade-offs)
-{{#each negativeConsequences}}
-- ⚠️ {{this}}
-{{/each}}
+  ### Negative (Trade-offs)
+  {{#each negativeConsequences}}
+    - ⚠️
+    {{this}}
+  {{/each}}
 {{else}}
-_No significant trade-offs identified._
+  _No significant trade-offs identified._
 {{/if}}
 
----
-
-## Related Decisions
+--- ## Related Decisions
 
 {{#if relatedDBDRs}}
-{{#each relatedDBDRs}}
-- [DBDR {{this.number}}](./dbdr-{{padNumber this.number 3}}.md): {{this.title}}
-{{/each}}
+  {{#each relatedDBDRs}}
+    - [DBDR
+    {{this.number}}](./dbdr-{{padNumber this.number 3}}.md):
+    {{this.title}}
+  {{/each}}
 {{else}}
-_No related decisions._
+  _No related decisions._
 {{/if}}
 
 {{#if relatedADRs}}
-### Related ADRs
-{{#each relatedADRs}}
-- [ADR {{this.number}}](../adr/adr-{{padNumber this.number 3}}.md): {{this.title}}
-{{/each}}
+  ### Related ADRs
+  {{#each relatedADRs}}
+    - [ADR
+    {{this.number}}](../adr/adr-{{padNumber this.number 3}}.md):
+    {{this.title}}
+  {{/each}}
 {{/if}}
 
----
-
-**Generated by:** AIOX Template Engine v2.0
-**Template Version:** dbdr-1.0
+--- **Generated by:** AIOX Template Engine v2.0 **Template Version:** dbdr-1.0

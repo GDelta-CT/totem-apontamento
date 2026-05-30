@@ -14,7 +14,12 @@ class ApprovalWorkflow {
       low: { auto_approve: true, requires_review: false },
       medium: { auto_approve: false, requires_review: true },
       high: { auto_approve: false, requires_review: true, requires_approval: true },
-      critical: { auto_approve: false, requires_review: true, requires_approval: true, requires_multiple_approvers: true },
+      critical: {
+        auto_approve: false,
+        requires_review: true,
+        requires_approval: true,
+        requires_multiple_approvers: true,
+      },
     };
     this.approvalHistory = [];
     this.pendingApprovals = new Map();
@@ -35,7 +40,7 @@ class ApprovalWorkflow {
     });
 
     this.approvalRules.set('workflow_modification', {
-      risk_threshold: 'medium', 
+      risk_threshold: 'medium',
       required_approvers: 1,
       timeout_hours: 48,
       auto_approve_conditions: ['low_risk', 'has_tests'],
@@ -69,10 +74,12 @@ class ApprovalWorkflow {
    */
   async processApprovalRequest(impactReport, options = {}) {
     const requestId = `approval-${Date.now()}`;
-    
+
     try {
-      console.log(chalk.blue(`🔍 Processing approval request for: ${impactReport.targetComponent.path}`));
-      
+      console.log(
+        chalk.blue(`🔍 Processing approval request for: ${impactReport.targetComponent.path}`)
+      );
+
       const config = {
         skip_approval: options.skip_approval || false,
         auto_approve_low_risk: options.auto_approve_low_risk !== false,
@@ -83,25 +90,28 @@ class ApprovalWorkflow {
 
       // Determine approval requirements
       const approvalRequirements = await this.determineApprovalRequirements(impactReport, config);
-      
+
       // Check if modification can be auto-approved
       const autoApprovalResult = await this.checkAutoApproval(impactReport, approvalRequirements);
-      
+
       if (autoApprovalResult.can_auto_approve) {
-        const approvalResult = await this.executeAutoApproval(impactReport, autoApprovalResult, requestId);
+        const approvalResult = await this.executeAutoApproval(
+          impactReport,
+          autoApprovalResult,
+          requestId
+        );
         return approvalResult;
       }
 
       // Manual approval required
       const approvalResult = await this.executeManualApproval(
-        impactReport, 
-        approvalRequirements, 
-        config, 
-        requestId,
+        impactReport,
+        approvalRequirements,
+        config,
+        requestId
       );
 
       return approvalResult;
-
     } catch (error) {
       console.error(chalk.red(`Approval process failed: ${error.message}`));
       throw error;
@@ -136,21 +146,35 @@ class ApprovalWorkflow {
     // Component-specific rules
     const componentRule = this.getComponentApprovalRule(impactReport.targetComponent);
     if (componentRule) {
-      requirements.required_approvers = Math.max(requirements.required_approvers, componentRule.required_approvers);
-      requirements.timeout_hours = Math.max(requirements.timeout_hours, componentRule.timeout_hours);
+      requirements.required_approvers = Math.max(
+        requirements.required_approvers,
+        componentRule.required_approvers
+      );
+      requirements.timeout_hours = Math.max(
+        requirements.timeout_hours,
+        componentRule.timeout_hours
+      );
     }
 
     // Modification-specific rules
     const modificationRule = this.getModificationApprovalRule(impactReport.modificationType);
     if (modificationRule) {
-      requirements.required_approvers = Math.max(requirements.required_approvers, modificationRule.required_approvers);
-      requirements.timeout_hours = Math.max(requirements.timeout_hours, modificationRule.timeout_hours);
+      requirements.required_approvers = Math.max(
+        requirements.required_approvers,
+        modificationRule.required_approvers
+      );
+      requirements.timeout_hours = Math.max(
+        requirements.timeout_hours,
+        modificationRule.timeout_hours
+      );
     }
 
     // Critical issues that block auto-approval
     if (impactReport.riskAssessment.criticalIssues.length > 0) {
       requirements.approval_needed = true;
-      requirements.blocking_issues = impactReport.riskAssessment.criticalIssues.map(issue => issue.description);
+      requirements.blocking_issues = impactReport.riskAssessment.criticalIssues.map(
+        (issue) => issue.description
+      );
     }
 
     // High-impact propagation
@@ -162,13 +186,16 @@ class ApprovalWorkflow {
     // Many affected components
     if (impactReport.summary.affectedComponents > 20) {
       requirements.approval_needed = true;
-      requirements.review_criteria.push('Large number of affected components requires careful review');
+      requirements.review_criteria.push(
+        'Large number of affected components requires careful review'
+      );
     }
 
     // Breaking changes
-    const hasBreakingChanges = impactReport.propagationAnalysis.directEffects?.some(
-      effect => effect.changeType?.severity === 'breaking',
-    ) || false;
+    const hasBreakingChanges =
+      impactReport.propagationAnalysis.directEffects?.some(
+        (effect) => effect.changeType?.severity === 'breaking'
+      ) || false;
 
     if (hasBreakingChanges) {
       requirements.approval_needed = true;
@@ -198,7 +225,9 @@ class ApprovalWorkflow {
 
     // Never auto-approve if manual approval is explicitly needed
     if (requirements.approval_needed) {
-      result.reasons.push('Manual approval explicitly required due to risk level or critical issues');
+      result.reasons.push(
+        'Manual approval explicitly required due to risk level or critical issues'
+      );
       return result;
     }
 
@@ -216,7 +245,7 @@ class ApprovalWorkflow {
 
     // Check auto-approval conditions
     const autoApprovalConditions = await this.evaluateAutoApprovalConditions(impactReport);
-    
+
     if (autoApprovalConditions.all_conditions_met) {
       result.can_auto_approve = true;
       result.conditions_met = autoApprovalConditions.met_conditions;
@@ -303,7 +332,7 @@ class ApprovalWorkflow {
     console.log(chalk.gray(`Component: ${impactReport.targetComponent.path}`));
     console.log(chalk.gray(`Risk Level: ${impactReport.riskAssessment.overallRisk.toUpperCase()}`));
     console.log(chalk.gray(`Affected Components: ${impactReport.summary.affectedComponents}`));
-    
+
     if (requirements.blocking_issues.length > 0) {
       console.log(chalk.red('\nBlocking Issues:'));
       requirements.blocking_issues.forEach((issue, index) => {
@@ -367,7 +396,7 @@ class ApprovalWorkflow {
       console.log(chalk.green('\n✅ Manual approval granted'));
       console.log(chalk.gray(`   Approved by: ${approval.approved_by}`));
       console.log(chalk.gray(`   Valid until: ${new Date(approval.valid_until).toLocaleString()}`));
-      
+
       if (approval.approval_conditions) {
         console.log(chalk.blue(`   Conditions: ${approval.approval_conditions}`));
       }
@@ -456,7 +485,7 @@ class ApprovalWorkflow {
 
     questions.push({
       type: 'input',
-      name: 'recommended_actions', 
+      name: 'recommended_actions',
       message: 'Recommended actions before resubmission:',
       when: (answers) => !answers.approved,
       default: 'Address critical issues and reduce risk factors',
@@ -483,14 +512,13 @@ class ApprovalWorkflow {
     try {
       const logDir = path.join(this.rootPath, '.aiox', 'audit');
       await fs.mkdir(logDir, { recursive: true });
-      
+
       const logFile = path.join(logDir, 'approval_log.jsonl');
       const logEntry = JSON.stringify(approval) + '\n';
-      
-      await fs.appendFile(logFile, logEntry);
-      
-      console.log(chalk.gray('   Approval logged to audit trail'));
 
+      await fs.appendFile(logFile, logEntry);
+
+      console.log(chalk.gray('   Approval logged to audit trail'));
     } catch (error) {
       console.warn(chalk.yellow(`Failed to write approval log: ${error.message}`));
     }
@@ -517,15 +545,23 @@ class ApprovalWorkflow {
   }
 
   hasBreakingChanges(impactReport) {
-    return impactReport.propagationAnalysis.directEffects?.some(
-      effect => effect.changeType?.severity === 'breaking',
-    ) || false;
+    return (
+      impactReport.propagationAnalysis.directEffects?.some(
+        (effect) => effect.changeType?.severity === 'breaking'
+      ) || false
+    );
   }
 
   async componentHasTests(component) {
     const testPaths = [
       path.join(this.rootPath, 'tests', 'unit', component.type, `${component.name}.test.js`),
-      path.join(this.rootPath, 'tests', 'integration', component.type, `${component.name}.integration.test.js`),
+      path.join(
+        this.rootPath,
+        'tests',
+        'integration',
+        component.type,
+        `${component.name}.integration.test.js`
+      ),
       path.join(this.rootPath, 'test', `${component.name}.test.js`),
     ];
 
@@ -542,8 +578,9 @@ class ApprovalWorkflow {
   }
 
   isSmallChange(impactReport) {
-    return impactReport.summary.affectedComponents <= 3 && 
-           impactReport.summary.propagationDepth <= 2;
+    return (
+      impactReport.summary.affectedComponents <= 3 && impactReport.summary.propagationDepth <= 2
+    );
   }
 
   calculateExpirationTime(hours) {
@@ -579,13 +616,13 @@ class ApprovalWorkflow {
 
     if (options.component) {
       history.component_approvals = this.approvalHistory.filter(
-        approval => approval.component === options.component,
+        (approval) => approval.component === options.component
       );
     }
 
     if (options.risk_level) {
       history.risk_level_approvals = this.approvalHistory.filter(
-        approval => approval.risk_level === options.risk_level,
+        (approval) => approval.risk_level === options.risk_level
       );
     }
 
@@ -600,7 +637,7 @@ class ApprovalWorkflow {
       by_risk_level: { low: 0, medium: 0, high: 0, critical: 0 },
     };
 
-    this.approvalHistory.forEach(approval => {
+    this.approvalHistory.forEach((approval) => {
       if (approval.status === 'approved') stats.approved++;
       else if (approval.status === 'rejected') stats.rejected++;
       else if (approval.status === 'auto_approved') stats.auto_approved++;

@@ -65,9 +65,11 @@ class DiffGenerator {
       const cmd = staged ? 'git diff --cached --name-status' : 'git diff --name-status';
       const output = execSync(cmd, { encoding: 'utf-8' });
 
-      return output.trim().split('\n')
-        .filter(line => line)
-        .map(line => {
+      return output
+        .trim()
+        .split('\n')
+        .filter((line) => line)
+        .map((line) => {
           const [status, ...fileParts] = line.split('\t');
           const filePath = fileParts.join('\t');
           return {
@@ -86,11 +88,11 @@ class DiffGenerator {
    */
   _parseStatus(code) {
     const statusMap = {
-      'A': 'added',
-      'M': 'modified',
-      'D': 'deleted',
-      'R': 'renamed',
-      'C': 'copied',
+      A: 'added',
+      M: 'modified',
+      D: 'deleted',
+      R: 'renamed',
+      C: 'copied',
     };
     return statusMap[code] || 'unknown';
   }

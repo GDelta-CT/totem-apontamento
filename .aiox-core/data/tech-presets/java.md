@@ -256,17 +256,17 @@ public final class OrderBuilder {
 
 ## Tech Stack
 
-| Category | Technology | Version | Purpose |
-| -------- | ---------- | ------- | ------- |
-| Runtime | Java | 21+ | Linguagem base |
-| Framework | Spring Boot | 3.3+ | Bootstrapping e web |
-| API | Spring Web | 6+ | REST controllers |
-| Persistence | Spring Data JPA | 3+ | Acesso a dados |
-| Migration | Flyway | 10+ | Versionamento de schema |
-| Validation | Bean Validation | Jakarta | Validacao de DTO |
-| Unit Test | JUnit 5 | latest | Testes unitarios |
-| Assertions | AssertJ | latest | Assertivas legiveis |
-| Integration | Testcontainers | latest | Testes com infra real |
+| Category    | Technology      | Version | Purpose                 |
+| ----------- | --------------- | ------- | ----------------------- |
+| Runtime     | Java            | 21+     | Linguagem base          |
+| Framework   | Spring Boot     | 3.3+    | Bootstrapping e web     |
+| API         | Spring Web      | 6+      | REST controllers        |
+| Persistence | Spring Data JPA | 3+      | Acesso a dados          |
+| Migration   | Flyway          | 10+     | Versionamento de schema |
+| Validation  | Bean Validation | Jakarta | Validacao de DTO        |
+| Unit Test   | JUnit 5         | latest  | Testes unitarios        |
+| Assertions  | AssertJ         | latest  | Assertivas legiveis     |
+| Integration | Testcontainers  | latest  | Testes com infra real   |
 
 ### Required Dependencies
 
@@ -286,14 +286,14 @@ public final class OrderBuilder {
 
 ### Naming Conventions
 
-| Element | Convention | Example |
-| ------- | ---------- | ------- |
-| Package | lowercase dot notation | `com.example.orders.application` |
-| Class | PascalCase | `PlaceOrderService` |
-| Interface | PascalCase + role | `OrderRepository` |
-| DTO | Suffix `Request`/`Response` | `PlaceOrderRequest` |
-| Test | `<ClassName>Test` | `PlaceOrderServiceTest` |
-| Constants | UPPER_SNAKE_CASE | `MAX_RETRY_ATTEMPTS` |
+| Element   | Convention                  | Example                          |
+| --------- | --------------------------- | -------------------------------- |
+| Package   | lowercase dot notation      | `com.example.orders.application` |
+| Class     | PascalCase                  | `PlaceOrderService`              |
+| Interface | PascalCase + role           | `OrderRepository`                |
+| DTO       | Suffix `Request`/`Response` | `PlaceOrderRequest`              |
+| Test      | `<ClassName>Test`           | `PlaceOrderServiceTest`          |
+| Constants | UPPER_SNAKE_CASE            | `MAX_RETRY_ATTEMPTS`             |
 
 ### Critical Rules
 
@@ -396,12 +396,12 @@ Pedir alteracoes no adapter sem tocar dominio reduz contexto.
 
 ## Bug Prevention Stack
 
-| Layer | Catches | Implementation |
-| ----- | ------- | -------------- |
-| Compiler + Nullability discipline | 35% | Java 21 + static analysis |
-| Validation + transactions | 35% | Bean Validation + `@Transactional` |
-| Integration tests | 25% | Testcontainers + Flyway |
-| E2E smoke | 5% | Fluxos essenciais |
+| Layer                             | Catches | Implementation                     |
+| --------------------------------- | ------- | ---------------------------------- |
+| Compiler + Nullability discipline | 35%     | Java 21 + static analysis          |
+| Validation + transactions         | 35%     | Bean Validation + `@Transactional` |
+| Integration tests                 | 25%     | Testcontainers + Flyway            |
+| E2E smoke                         | 5%      | Fluxos essenciais                  |
 
 ---
 
@@ -490,8 +490,8 @@ public class OrdersController {
 
 ## Changelog
 
-| Date       | Version | Changes |
-| ---------- | ------- | ------- |
+| Date       | Version | Changes             |
+| ---------- | ------- | ------------------- |
 | 2026-02-19 | 1.0.0   | Initial Java preset |
 
 ---

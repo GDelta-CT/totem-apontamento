@@ -1,6 +1,6 @@
 ---
 tools:
-  - github-cli        # Git operations for archiving files
+  - github-cli # Git operations for archiving files
 ---
 
 # Cleanup Utilities Task
@@ -12,6 +12,7 @@ Safely archive deprecated utilities identified in Story 3.17 audit, reducing tec
 ## Safety Principles
 
 **CRITICAL**: This task archives (not deletes) deprecated utilities using a fail-safe workflow:
+
 1. **Backup first** - Create timestamped backup before any changes
 2. **Verify dependencies** - Block removal if active code depends on utility
 3. **Archive, don't delete** - Preserve files for historical reference
@@ -29,17 +30,20 @@ Safely archive deprecated utilities identified in Story 3.17 audit, reducing tec
 Before cleanup, verify utilities are truly deprecated:
 
 ### ✅ SAFE TO ARCHIVE
+
 - No active code references (grep shows 0 results)
 - Classified as DEPRECATED in audit report
 - Obsolete concept or non-functional
 - Duplicate/refactored version exists
 
 ### ⚠️ NEEDS REVIEW
+
 - Has active references in code (grep shows >0 results)
 - Classified as FIXABLE but needs deprecation
 - Unclear status from audit
 
 ### ❌ DO NOT ARCHIVE
+
 - Classified as WORKING in audit report
 - Critical framework utility
 - Has active agent/task dependencies
@@ -53,6 +57,7 @@ This task requires the following configuration keys from `core-config.yaml`:
 - **`qaLocation`**: QA output directory (typically docs/qa) - Required to write quality reports
 
 **Loading Config:**
+
 ```javascript
 const yaml = require('js-yaml');
 const fs = require('fs');
@@ -71,6 +76,7 @@ const qaLocation = config.qa?.qaLocation || 'docs/qa'; // qaLocation
 ### Step 1: Pre-Cleanup Preparation
 
 **1.1 Create Backup**
+
 ```bash
 # Create timestamped backup of entire utils directory
 mkdir -p .backups
@@ -78,6 +84,7 @@ cp -r .aiox-core/utils ".backups/utils.backup-3.18-$(date +%Y%m%d-%H%M%S)"
 ```
 
 **1.2 Verify Audit Report**
+
 ```bash
 # Ensure audit report exists and is readable
 test -f UTILITIES-AUDIT-REPORT.md && echo "✅ Audit report found" || echo "❌ Audit report missing"
@@ -86,6 +93,7 @@ test -f UTILITIES-AUDIT-REPORT.md && echo "✅ Audit report found" || echo "❌ 
 **1.3 Extract Deprecated List**
 
 From UTILITIES-AUDIT-REPORT.md, identify all utilities in:
+
 - Category A: Duplicate/Redundant Versions
 - Category B: Incomplete Experiments
 - Category C: Obsolete Concepts
@@ -96,6 +104,7 @@ From UTILITIES-AUDIT-REPORT.md, identify all utilities in:
 For each deprecated utility, check for active references:
 
 **2.1 Automated Dependency Check**
+
 ```bash
 # Check for require() statements
 grep -r "require.*utility-name" .aiox-core/agents .aiox-core/tasks .aiox-core/workflows Squads/
@@ -111,6 +120,7 @@ echo "References found: $count"
 **2.2 Manual Review**
 
 If references found (count > 0):
+
 - Review each reference context
 - Determine if reference is:
   - Active usage (BLOCK removal)
@@ -120,6 +130,7 @@ If references found (count > 0):
 **2.3 Create Exception List**
 
 Document utilities that cannot be archived due to dependencies:
+
 ```markdown
 ## Utilities with Active Dependencies
 
@@ -132,6 +143,7 @@ Document utilities that cannot be archived due to dependencies:
 ### Step 3: Create Archive Structure
 
 **3.1 Create Archive Directory**
+
 ```bash
 mkdir -p .aiox-core/utils-archive
 ```
@@ -140,7 +152,7 @@ mkdir -p .aiox-core/utils-archive
 
 Create `.aiox-core/utils-archive/ARCHIVE-README.md`:
 
-```markdown
+````markdown
 # Archived Utilities - Story 3.18
 
 **Archive Date**: 2025-10-31
@@ -161,15 +173,19 @@ This directory contains utilities that were deprecated and removed from active u
 ## Archive Categories
 
 ### Category A: Duplicate/Redundant Versions (9 files)
+
 Utilities with `-refactored` or `-fixed` suffixes where original version works.
 
 ### Category B: Incomplete Experiments (9 files)
+
 Partially implemented utilities that were abandoned before completion.
 
 ### Category C: Obsolete Concepts (12 files)
+
 Utilities whose functionality is better handled by external tools or manual processes.
 
 ### Category D: Misplaced Files (1 file)
+
 Test files that belong in `/tests` directory instead of `/utils`.
 
 ## How to Restore a Utility
@@ -180,8 +196,10 @@ If you need to restore an archived utility:
    ```bash
    cp .aiox-core/utils-archive/utility-name.js .aiox-core/scripts/
    ```
+````
 
 2. **Reinstall dependencies** (if needed):
+
    ```bash
    npm install missing-dependency
    ```
@@ -192,6 +210,7 @@ If you need to restore an archived utility:
    - Add to core-config.yaml registry
 
 4. **Test thoroughly**:
+
    ```bash
    node .aiox-core/scripts/test-utilities.js
    ```
@@ -211,12 +230,14 @@ Total: 28 files archived from 81 total utilities
 If cleanup breaks something:
 
 **Immediate Rollback**:
+
 ```bash
 rm -rf .aiox-core/utils
 cp -r .backups/utils.backup-3.18-YYYYMMDD-HHMMSS .aiox-core/utils
 ```
 
 **Selective Restoration**:
+
 ```bash
 cp .aiox-core/utils-archive/specific-utility.js .aiox-core/scripts/
 ```
@@ -228,16 +249,19 @@ cp .aiox-core/utils-archive/specific-utility.js .aiox-core/scripts/
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -405,6 +429,7 @@ token_usage: ~1,000-3,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Parallelize independent operations; reuse atom results; implement early exits
 
 ---
@@ -424,8 +449,9 @@ updated_at: 2025-11-17
 
 ---
 
-*Generated during Story 3.18 - Epic 3c Phase 2*
-```
+_Generated during Story 3.18 - Epic 3c Phase 2_
+
+````
 
 ### Step 4: Execute Cleanup
 
@@ -439,7 +465,7 @@ git mv .aiox-core/scripts/utility-name.js .aiox-core/utils-archive/
 
 # Or for multiple files:
 git mv .aiox-core/scripts/{aiox-validator-fixed.js,aiox-validator-refactored.js} .aiox-core/utils-archive/
-```
+````
 
 **4.2 Move Misplaced Files** (Category D)
 
@@ -459,17 +485,20 @@ Add complete list of archived files to ARCHIVE-README.md:
 ## Archived Utilities
 
 ### Category A: Duplicate/Redundant (9 files)
+
 1. aiox-validator-fixed.js - Duplicate of aiox-validator.js
 2. aiox-validator-refactored.js - Duplicate of aiox-validator.js
-...
+   ...
 
 ### Category B: Incomplete Experiments (9 files)
+
 1. change-propagation-predictor.js - 20% complete, no clear use case
-...
+   ...
 
 ### Category C: Obsolete Concepts (12 files)
+
 1. batch-creator.js - Batch processing not used
-...
+   ...
 
 **Total Archived**: 30 files
 **Remaining Active**: 51 files
@@ -485,7 +514,7 @@ Update utility count in `.aiox-core/core-config.yaml`:
 framework:
   entities:
     utils:
-      count: 51  # Updated from 81
+      count: 51 # Updated from 81
       location: .aiox-core/scripts/
 ```
 
@@ -510,6 +539,7 @@ Add entry to Epic 3 changelog (or Story 3.18 change_log):
 **5.3 Update Developer Guides**
 
 If any developer guides reference archived utilities, update them:
+
 - Remove references to deprecated utilities
 - Update utility lists to reflect active utilities only
 - Add note about archived utilities location
@@ -570,27 +600,32 @@ Expected: Only active utilities tested, no errors loading utilities
 
 Document the exact rollback procedure in story completion notes:
 
-```markdown
+````markdown
 ## Rollback Procedure
 
 **Backup Location**: `.backups/utils.backup-3.18-YYYYMMDD-HHMMSS`
 
 **Full Rollback**:
+
 ```bash
 rm -rf .aiox-core/utils
 cp -r .backups/utils.backup-3.18-YYYYMMDD-HHMMSS .aiox-core/utils
 git checkout .aiox-core/core-config.yaml
 ```
+````
 
 **Selective Restoration**:
+
 ```bash
 cp .aiox-core/utils-archive/utility-name.js .aiox-core/scripts/
 ```
 
 **Verification**:
+
 ```bash
 node .aiox-core/scripts/aiox-validator.js
 ```
+
 ```
 
 ## Output
@@ -668,3 +703,4 @@ For this cleanup, manual execution is preferred to maintain full control and vis
 
 **Issue**: Validation script errors
 **Solution**: Rollback, identify which archived utility was needed, update audit classification
+```

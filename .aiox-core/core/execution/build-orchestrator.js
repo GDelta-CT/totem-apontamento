@@ -360,7 +360,7 @@ class BuildOrchestrator extends EventEmitter {
     const planPath = path.join(
       ctx.worktree?.path || this.rootPath,
       ctx.config.planDir,
-      'implementation.yaml',
+      'implementation.yaml'
     );
 
     // Check if plan exists

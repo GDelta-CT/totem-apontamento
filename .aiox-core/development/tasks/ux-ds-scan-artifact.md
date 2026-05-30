@@ -12,16 +12,19 @@
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -189,6 +192,7 @@ token_usage: ~2,000-8,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Iterative analysis with depth limits; cache intermediate results; batch similar operations
 
 ---
@@ -207,7 +211,6 @@ updated_at: 2025-11-17
 ```
 
 ---
-
 
 ## 📋 Description
 
@@ -228,21 +231,25 @@ Analyze HTML/React artifacts (files, screenshots, or live URLs) to extract desig
 ## 📊 Supported Artifact Types
 
 ### Type 1: HTML Files
+
 **Format:** .html, .htm
 **Analysis:** Parse DOM, extract styles, identify components
 **Speed:** Fast (< 5 seconds)
 
 ### Type 2: React Components
+
 **Format:** .jsx, .tsx, .js with JSX
 **Analysis:** AST parsing, prop extraction, component structure
 **Speed:** Fast (< 10 seconds)
 
 ### Type 3: Screenshots
+
 **Format:** .png, .jpg, .jpeg
 **Analysis:** Visual pattern recognition (requires AI vision)
 **Speed:** Moderate (10-30 seconds)
 
 ### Type 4: Live URLs
+
 **Format:** https://example.com
 **Analysis:** Fetch + parse, full DOM analysis
 **Speed:** Moderate (15-45 seconds depending on page)
@@ -252,6 +259,7 @@ Analyze HTML/React artifacts (files, screenshots, or live URLs) to extract desig
 ## 🔄 Workflow
 
 ### Step 1: Specify Artifact
+
 **Interactive Elicitation:**
 
 ```
@@ -273,6 +281,7 @@ Your input: _____
 ### Step 2: Scan & Parse Artifact
 
 **HTML/React Parsing:**
+
 1. Load file content
 2. Parse DOM/AST structure
 3. Extract all elements with attributes
@@ -280,6 +289,7 @@ Your input: _____
 5. Group similar elements
 
 **Screenshot Analysis:**
+
 1. Load image
 2. Detect UI regions (header, content, footer)
 3. Identify buttons, inputs, cards, etc.
@@ -287,6 +297,7 @@ Your input: _____
 5. Measure spacing patterns
 
 **Live URL Fetching:**
+
 1. Fetch page HTML
 2. Download inline styles
 3. Parse external CSS (if accessible)
@@ -298,6 +309,7 @@ Your input: _____
 ### Step 3: Extract Design Tokens
 
 **Color Tokens:**
+
 ```
 colors:
   primary:
@@ -314,6 +326,7 @@ colors:
 ```
 
 **Typography Tokens:**
+
 ```
 typography:
   fontFamilies:
@@ -334,6 +347,7 @@ typography:
 ```
 
 **Spacing Tokens:**
+
 ```
 spacing:
   scale: [4px, 8px, 12px, 16px, 24px, 32px, 48px, 64px]
@@ -345,6 +359,7 @@ spacing:
 ```
 
 **Border Radius Tokens:**
+
 ```
 borderRadius:
   - 0px (sharp edges - 15% of components)
@@ -354,6 +369,7 @@ borderRadius:
 ```
 
 **Shadow Tokens:**
+
 ```
 shadows:
   - none (flat design)
@@ -367,6 +383,7 @@ shadows:
 ### Step 4: Identify Components (Atomic Design)
 
 **Atoms (Fundamental Building Blocks):**
+
 ```
 atoms:
   - Button
@@ -394,6 +411,7 @@ atoms:
 ```
 
 **Molecules (Simple Combinations):**
+
 ```
 molecules:
   - FormField (Label + Input + Helper Text)
@@ -418,6 +436,7 @@ molecules:
 ```
 
 **Organisms (Complex Sections):**
+
 ```
 organisms:
   - Header (Logo + Navigation + Search + Profile)
@@ -446,6 +465,7 @@ organisms:
 ### Step 5: Calculate Pattern Redundancy
 
 **Redundancy Analysis:**
+
 ```
 Pattern: Buttons
 ----
@@ -475,6 +495,7 @@ Reduction: 74.5% (47 → 12)
 ### Step 6: Generate Build Recommendations
 
 **Component Priority Matrix:**
+
 ```
 Priority: HIGH (Build First)
 - Button (47 instances - most used)
@@ -493,6 +514,7 @@ Priority: LOW (Build Last or Skip)
 ```
 
 **Build Order Recommendation:**
+
 ```
 Phase 1: Core Atoms (Week 1)
 1. Button (all 4 variants)
@@ -525,6 +547,7 @@ Phase 4: Page Templates (Week 4)
 All artifacts saved to: `outputs/design-system/{project}/scan/`
 
 ### Required Files:
+
 1. **scan-summary.md** - High-level findings
 2. **design-tokens.yaml** - Extracted tokens (colors, typography, spacing)
 3. **component-inventory.md** - List of components (Atomic Design)
@@ -532,6 +555,7 @@ All artifacts saved to: `outputs/design-system/{project}/scan/`
 5. **build-recommendations.md** - Priority matrix and build order
 
 ### Optional Files:
+
 6. **screenshots/** - Visual comparisons of patterns
 7. **extracted-styles.css** - All CSS extracted from artifact
 8. **comparison-matrix.xlsx** - Side-by-side pattern comparisons
@@ -554,6 +578,7 @@ All artifacts saved to: `outputs/design-system/{project}/scan/`
 ## 🔄 Integration with Other Tasks
 
 **Works with any phase:**
+
 - `*research` - Scan competitor sites for UX patterns
 - `*wireframe` - Scan existing app to inventory current components
 - `*audit` - Complement full codebase audit with specific artifact focus
@@ -562,6 +587,7 @@ All artifacts saved to: `outputs/design-system/{project}/scan/`
 
 **State Management:**
 Updates `.state.yaml` with:
+
 - `artifact_scanned: {type, path}`
 - `tokens_extracted: {colors, typography, spacing}`
 - `components_found: [list of components]`
@@ -573,6 +599,7 @@ Updates `.state.yaml` with:
 ## 📚 Token Extraction Algorithms
 
 ### Color Clustering (HSL-based, 5% threshold)
+
 ```
 Algorithm:
 1. Extract all hex colors from artifact
@@ -583,6 +610,7 @@ Algorithm:
 ```
 
 ### Spacing Normalization (4px base)
+
 ```
 Algorithm:
 1. Extract all px values from padding, margin, gap
@@ -593,6 +621,7 @@ Algorithm:
 ```
 
 ### Component Similarity Detection
+
 ```
 Algorithm:
 1. Extract element structure (tag + classes + children)
@@ -607,18 +636,21 @@ Algorithm:
 ## ⚠️ Limitations
 
 ### HTML/React Files:
+
 - ✅ Can parse structure and styles
 - ✅ Can extract inline and CSS classes
 - ❌ Cannot see rendered visual (no browser)
 - ❌ Cannot detect dynamic behavior
 
 ### Screenshots:
+
 - ✅ Can see visual appearance
 - ✅ Can detect colors and spacing
 - ❌ Cannot extract code structure
 - ❌ Cannot identify interactive states (hover, focus)
 
 ### Live URLs:
+
 - ✅ Can fetch full page HTML
 - ✅ Can extract all styles
 - ❌ May be blocked by CORS/auth
@@ -638,27 +670,34 @@ Algorithm:
 **Page Complexity:** MEDIUM (47 components, 3 levels deep)
 
 ## Design Tokens Extracted
+
 - **Colors:** 18 distinct colors → 12 tokens recommended
 - **Typography:** 6 font sizes, 4 weights → Well-structured
 - **Spacing:** 47 values → Normalize to 8 tokens
 - **Border Radius:** 3 values (0px, 4px, 8px) → Already optimal
 
 ## Components Found (Atomic Design)
+
 ### Atoms (8 types, 147 instances)
+
 - Button (47), Input (23), Label (31), Icon (89), Badge (12), ...
 
 ### Molecules (5 types, 42 instances)
+
 - FormField (18), Card (24), SearchBar (3), NavItem (8), ...
 
 ### Organisms (4 types, 7 instances)
+
 - Header (1), Form (4), Modal (3), DataTable (2)
 
 ## Redundancy Analysis
+
 - **Buttons:** 75% reduction possible (12 variants → 3)
 - **Colors:** 86.5% reduction possible (89 → 12)
 - **Spacing:** 74.5% reduction possible (47 → 12)
 
 ## Build Recommendations
+
 **Phase 1 (Week 1):** Button, Input, Label, Icon
 **Phase 2 (Week 2):** FormField, Card, Badge
 **Phase 3 (Week 3):** Header, Form, Modal

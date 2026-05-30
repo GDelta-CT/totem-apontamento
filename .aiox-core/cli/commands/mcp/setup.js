@@ -32,7 +32,10 @@ function createSetupCommand() {
   setup
     .description('Create global MCP configuration structure at ~/.aiox/')
     .option('--with-defaults', 'Include default server templates (context7, exa, github)')
-    .option('--servers <servers>', 'Comma-separated list of servers to add (e.g., context7,exa,github)')
+    .option(
+      '--servers <servers>',
+      'Comma-separated list of servers to add (e.g., context7,exa,github)'
+    )
     .option('-f, --force', 'Force recreation even if exists')
     .option('-v, --verbose', 'Show detailed output')
     .action(async (options) => {
@@ -89,7 +92,7 @@ async function executeSetup(options) {
     console.log(`  ✓ Added ${Object.keys(initialServers).length} default servers`);
   } else if (options.servers) {
     // Add specified servers
-    const serverNames = options.servers.split(',').map(s => s.trim());
+    const serverNames = options.servers.split(',').map((s) => s.trim());
     console.log('\nStep 2: Adding specified servers...');
 
     for (const server of serverNames) {

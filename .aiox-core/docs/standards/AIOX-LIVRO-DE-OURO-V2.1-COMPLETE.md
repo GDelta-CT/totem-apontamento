@@ -40,14 +40,14 @@ Este documento é a **versão consolidada v4.2** que incorpora todas as mudança
 
 **IMPORTANTE: v4.0.4 alterou fundamentalmente o business model!**
 
-| Componente               | v2.0        | v4.0.4            | Rationale                  |
+| Componente               | v2.0        | v4.0.4          | Rationale                  |
 | ------------------------ | ----------- | --------------- | -------------------------- |
 | **11 Agents**            | ✅ Open     | ✅ Open         | Core functionality         |
 | **Workers (97+)**        | ❌ Closed   | ✅ **OPEN**     | Commodity, network effects |
 | **Service Discovery**    | ❌ None     | ✅ **BUILT-IN** | Community needs it         |
 | **Task-First Arch**      | ⚠️ Implicit | ✅ **EXPLICIT** | Architecture clarity       |
 | **Clones (DNA Mental™)** | 🔒 Closed   | 🔒 **CLOSED**   | True moat (IP)             |
-| **Squads**      | 🔒 Closed   | 🔒 **CLOSED**   | Domain expertise           |
+| **Squads**               | 🔒 Closed   | 🔒 **CLOSED**   | Domain expertise           |
 
 ### Repositório Multi-Repo Structure
 
@@ -346,12 +346,12 @@ Regras:
 
 ### Terminologia
 
-| Termo Antigo   | Termo Novo         | Descrição              |
-| -------------- | ------------------ | ---------------------- |
-| Squad | **Squad**          | Modular AI agent teams |
-| Squads/        | **squads/**        | Diretório de Squads    |
-| pack.yaml      | **squad.yaml**     | Manifesto do Squad     |
-| @expansion/\*  | **@aiox/squad-\*** | npm scope              |
+| Termo Antigo  | Termo Novo         | Descrição              |
+| ------------- | ------------------ | ---------------------- |
+| Squad         | **Squad**          | Modular AI agent teams |
+| Squads/       | **squads/**        | Diretório de Squads    |
+| pack.yaml     | **squad.yaml**     | Manifesto do Squad     |
+| @expansion/\* | **@aiox/squad-\*** | npm scope              |
 
 ### Estrutura de Squad
 

@@ -108,7 +108,9 @@ class SecurityAdapter {
    * @returns {Object} Block decision
    */
   shouldBlockPR(report) {
-    const criticalCount = report.vulnerabilities.filter((v) => v.severity === Severity.CRITICAL).length;
+    const criticalCount = report.vulnerabilities.filter(
+      (v) => v.severity === Severity.CRITICAL
+    ).length;
     const highCount = report.vulnerabilities.filter((v) => v.severity === Severity.HIGH).length;
 
     const shouldBlock =

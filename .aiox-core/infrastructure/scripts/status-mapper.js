@@ -14,21 +14,21 @@
 
 const STATUS_MAPPING = {
   AIOX_TO_CLICKUP: {
-    'Draft': 'Draft',
+    Draft: 'Draft',
     'Ready for Review': 'Ready for Review',
-    'Review': 'Review',
+    Review: 'Review',
     'In Progress': 'In Progress',
-    'Done': 'Done',
-    'Blocked': 'Blocked',
+    Done: 'Done',
+    Blocked: 'Blocked',
   },
   CLICKUP_TO_AIOX: {
-    'Draft': 'Draft',
-    'Ready for Dev': 'Ready for Review',  // ClickUp-specific status
+    Draft: 'Draft',
+    'Ready for Dev': 'Ready for Review', // ClickUp-specific status
     'Ready for Review': 'Ready for Review',
-    'Review': 'Review',
+    Review: 'Review',
     'In Progress': 'In Progress',
-    'Done': 'Done',
-    'Blocked': 'Blocked',
+    Done: 'Done',
+    Blocked: 'Blocked',
   },
 };
 

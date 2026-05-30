@@ -186,15 +186,10 @@ async function updateFileImports(filePath, transformMap, fileModule, options = {
     for (const imp of imports) {
       const relativePath = path.relative(
         path.dirname(filePath).split('.aiox-core')[1]?.slice(1) || '',
-        '',
+        ''
       );
 
-      const newPath = transformImportPath(
-        imp.importPath,
-        fileModule,
-        filePath,
-        transformMap,
-      );
+      const newPath = transformImportPath(imp.importPath, fileModule, filePath, transformMap);
 
       if (newPath && newPath !== imp.importPath) {
         // Replace in content
@@ -220,7 +215,6 @@ async function updateFileImports(filePath, transformMap, fileModule, options = {
     }
 
     result.modified = content !== originalContent;
-
   } catch (error) {
     result.errors.push(error.message);
   }
@@ -264,12 +258,10 @@ async function updateAllImports(aioxCoreDir, plan, options = {}) {
     for (const file of files) {
       result.totalFiles++;
 
-      const updateResult = await updateFileImports(
-        file,
-        transformMap,
-        moduleName,
-        { dryRun, verbose },
-      );
+      const updateResult = await updateFileImports(file, transformMap, moduleName, {
+        dryRun,
+        verbose,
+      });
 
       if (updateResult.modified) {
         result.filesModified++;
@@ -278,10 +270,12 @@ async function updateAllImports(aioxCoreDir, plan, options = {}) {
       result.importsUpdated += updateResult.updated;
 
       if (updateResult.errors.length > 0) {
-        result.errors.push(...updateResult.errors.map(e => ({
-          file,
-          error: e,
-        })));
+        result.errors.push(
+          ...updateResult.errors.map((e) => ({
+            file,
+            error: e,
+          }))
+        );
       }
 
       if (verbose && updateResult.updated > 0) {

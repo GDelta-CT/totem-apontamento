@@ -12,11 +12,7 @@ const fs = require('fs');
 
 const name = 'claude-md';
 
-const REQUIRED_SECTIONS = [
-  'Constitution',
-  'Framework vs Project Boundary',
-  'Sistema de Agentes',
-];
+const REQUIRED_SECTIONS = ['Constitution', 'Framework vs Project Boundary', 'Sistema de Agentes'];
 
 async function run(context) {
   const claudeMdPath = path.join(context.projectRoot, '.claude', 'CLAUDE.md');
@@ -32,9 +28,7 @@ async function run(context) {
 
   const content = fs.readFileSync(claudeMdPath, 'utf8');
 
-  const missingSections = REQUIRED_SECTIONS.filter(
-    (section) => !content.includes(section),
-  );
+  const missingSections = REQUIRED_SECTIONS.filter((section) => !content.includes(section));
 
   if (missingSections.length === 0) {
     return {

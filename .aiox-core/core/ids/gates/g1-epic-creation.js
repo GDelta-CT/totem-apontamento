@@ -62,9 +62,7 @@ class G1EpicCreationGate extends VerificationGate {
       };
     }
 
-    const intent = context.epicTitle
-      ? `${context.epicTitle}: ${context.intent}`
-      : context.intent;
+    const intent = context.epicTitle ? `${context.epicTitle}: ${context.intent}` : context.intent;
 
     const analysis = this._decisionEngine.analyze(intent, {
       type: context.type || undefined,
@@ -80,9 +78,7 @@ class G1EpicCreationGate extends VerificationGate {
 
     const warnings = [];
     if (opportunities.length > 0) {
-      warnings.push(
-        `Found ${opportunities.length} related entities that may be reusable`,
-      );
+      warnings.push(`Found ${opportunities.length} related entities that may be reusable`);
     }
 
     if (analysis.warnings) {

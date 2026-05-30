@@ -184,7 +184,6 @@ async function runMigration(options) {
       backup: backupResult.backupDir,
       plan: { totalFiles: plan.totalFiles },
     });
-
   } catch (error) {
     console.error(`  ❌ Backup failed: ${error.message}`);
     process.exit(1);
@@ -210,7 +209,6 @@ async function runMigration(options) {
       phase: 'migrated',
       files: migrationResult.totalFiles,
     });
-
   } catch (error) {
     console.error(`  ❌ Migration error: ${error.message}`);
     console.log('  Run: aiox migrate --rollback');
@@ -228,7 +226,6 @@ async function runMigration(options) {
 
     console.log(`  ✓ Scanned ${importResult.totalFiles} files`);
     console.log(`  ✓ Updated ${importResult.importsUpdated} imports`);
-
   } catch (error) {
     console.error(`  ⚠️  Import update warning: ${error.message}`);
     // Non-fatal - continue
@@ -253,11 +250,12 @@ async function runMigration(options) {
   const backupDir = `.aiox-backup-${new Date().toISOString().split('T')[0]}`;
 
   console.log('');
-  console.log(generateSummary(
-    { totalFiles: plan.totalFiles, modules: plan.stats },
-    validationResult,
-    { backupLocation: backupDir, duration },
-  ));
+  console.log(
+    generateSummary({ totalFiles: plan.totalFiles, modules: plan.stats }, validationResult, {
+      backupLocation: backupDir,
+      duration,
+    })
+  );
 }
 
 /**
@@ -374,7 +372,9 @@ function createMigrateCommand() {
     .option('--rollback', 'Rollback to pre-migration state')
     .option('--backup <path>', 'Specify backup path for rollback')
     .option('--status', 'Show backup status')
-    .addHelpText('after', `
+    .addHelpText(
+      'after',
+      `
 Migration Flow:
   Phase 1: Backup
     - Creates .aiox-backup-{date}/ with all files
@@ -413,7 +413,8 @@ Rollback:
 
   Manual rollback:
   $ cp -r .aiox-backup-{date}/* .aiox-core/
-`);
+`
+    );
 
   migrate.action(async (options) => {
     try {

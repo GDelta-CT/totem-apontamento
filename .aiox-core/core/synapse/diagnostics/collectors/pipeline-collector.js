@@ -55,7 +55,7 @@ function collectPipelineSimulation(promptCount, activeAgentId, manifest) {
     if (i === 2 && isActive && activeAgentId) {
       const domains = manifest?.domains || {};
       const hasMatchingDomain = Object.values(domains).some(
-        (d) => d.agentTrigger === activeAgentId,
+        (d) => d.agentTrigger === activeAgentId
       );
 
       if (hasMatchingDomain) {

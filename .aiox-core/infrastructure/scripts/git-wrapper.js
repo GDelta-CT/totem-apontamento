@@ -182,7 +182,7 @@ ${JSON.stringify(metadata, null, 2)}`;
 
       if (!output) return status;
 
-      const lines = output.split('\n').filter(line => line.trim());
+      const lines = output.split('\n').filter((line) => line.trim());
 
       for (const line of lines) {
         const statusCode = line.substring(0, 2);
@@ -209,7 +209,7 @@ ${JSON.stringify(metadata, null, 2)}`;
   async getHistory(limit = 10) {
     try {
       const output = await this.execGit(`log --oneline -n ${limit}`);
-      return output.split('\n').map(line => {
+      return output.split('\n').map((line) => {
         const [hash, ...messageParts] = line.split(' ');
         return {
           hash,
@@ -227,7 +227,7 @@ ${JSON.stringify(metadata, null, 2)}`;
   async getConflicts() {
     try {
       const output = await this.execGit('diff --name-only --diff-filter=U');
-      return output ? output.split('\n').filter(f => f.trim()) : [];
+      return output ? output.split('\n').filter((f) => f.trim()) : [];
     } catch (error) {
       return [];
     }
@@ -270,9 +270,7 @@ ${JSON.stringify(metadata, null, 2)}`;
    * Create a git tag
    */
   async createTag(tagName, message = null) {
-    const tagArgs = message
-      ? `tag -a ${tagName} -m "${message}"`
-      : `tag ${tagName}`;
+    const tagArgs = message ? `tag -a ${tagName} -m "${message}"` : `tag ${tagName}`;
 
     return await this.execGit(tagArgs);
   }
@@ -339,9 +337,7 @@ ${JSON.stringify(metadata, null, 2)}`;
    * Stash changes
    */
   async stash(message = null) {
-    const stashCommand = message
-      ? `stash save "${message}"`
-      : 'stash';
+    const stashCommand = message ? `stash save "${message}"` : 'stash';
 
     return await this.execGit(stashCommand);
   }
@@ -350,9 +346,7 @@ ${JSON.stringify(metadata, null, 2)}`;
    * Apply stashed changes
    */
   async stashApply(stashRef = null) {
-    const applyCommand = stashRef
-      ? `stash apply ${stashRef}`
-      : 'stash apply';
+    const applyCommand = stashRef ? `stash apply ${stashRef}` : 'stash apply';
 
     return await this.execGit(applyCommand);
   }
@@ -367,7 +361,7 @@ ${JSON.stringify(metadata, null, 2)}`;
 
       if (!output) return remotes;
 
-      const lines = output.split('\n').filter(line => line.trim());
+      const lines = output.split('\n').filter((line) => line.trim());
 
       for (const line of lines) {
         const [name, url, type] = line.split(/\s+/);

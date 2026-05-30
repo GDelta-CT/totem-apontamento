@@ -79,7 +79,7 @@ class PerformanceAnalyzer {
       // Analyze each component
       for (const component of components) {
         const componentAnalysis = await this.analyzeComponentPerformance(component);
-        
+
         // Aggregate results
         analysis.bottlenecks.push(...componentAnalysis.bottlenecks);
         analysis.optimization_opportunities.push(...componentAnalysis.optimizations);
@@ -88,7 +88,7 @@ class PerformanceAnalyzer {
         analysis.code_quality_issues.push(...componentAnalysis.quality_issues);
         analysis.file_size_issues.push(...componentAnalysis.file_size_issues);
         analysis.complexity_issues.push(...componentAnalysis.complexity_issues);
-        
+
         analysis.metrics.total_files_analyzed++;
       }
 
@@ -104,7 +104,6 @@ class PerformanceAnalyzer {
       console.log(chalk.gray(`   Overall score: ${analysis.overall_score}/10`));
 
       return analysis;
-
     } catch (error) {
       console.error(chalk.red(`Performance analysis failed: ${error.message}`));
       throw error;
@@ -176,9 +175,10 @@ class PerformanceAnalyzer {
       // Dead code analysis
       const deadCodeIssues = await this.findDeadCode(content, component);
       analysis.optimizations.push(...deadCodeIssues);
-
     } catch (error) {
-      console.warn(chalk.yellow(`Failed to analyze performance for ${component.id}: ${error.message}`));
+      console.warn(
+        chalk.yellow(`Failed to analyze performance for ${component.id}: ${error.message}`)
+      );
     }
 
     return analysis;
@@ -191,11 +191,11 @@ class PerformanceAnalyzer {
     const issues = [];
     const lines = content.split('\n');
 
-    this.performancePatterns.syncOperations.forEach(pattern => {
+    this.performancePatterns.syncOperations.forEach((pattern) => {
       lines.forEach((line, index) => {
         const matches = line.match(pattern);
         if (matches) {
-          matches.forEach(match => {
+          matches.forEach((match) => {
             issues.push({
               component: component.id,
               issue: `Synchronous operation: ${match}`,
@@ -221,14 +221,14 @@ class PerformanceAnalyzer {
     const issues = [];
     const lines = content.split('\n');
 
-    this.performancePatterns.memoryIssues.forEach(pattern => {
+    this.performancePatterns.memoryIssues.forEach((pattern) => {
       lines.forEach((line, index) => {
         const matches = line.match(pattern);
         if (matches) {
-          matches.forEach(match => {
+          matches.forEach((match) => {
             let severity = 'medium';
             let recommendation = 'Optimize memory usage';
-            
+
             if (match.includes('new Array')) {
               severity = 'high';
               recommendation = 'Use array literals or streaming for large datasets';
@@ -263,14 +263,14 @@ class PerformanceAnalyzer {
     const issues = [];
     const lines = content.split('\n');
 
-    this.performancePatterns.antiPatterns.forEach(pattern => {
+    this.performancePatterns.antiPatterns.forEach((pattern) => {
       lines.forEach((line, index) => {
         const matches = line.match(pattern);
         if (matches) {
-          matches.forEach(match => {
+          matches.forEach((match) => {
             let severity = 'low';
             let recommendation = 'Remove or optimize';
-            
+
             if (match.includes('console.log')) {
               recommendation = 'Remove console.log statements from production code';
             } else if (match.includes('debugger')) {
@@ -305,14 +305,14 @@ class PerformanceAnalyzer {
     const issues = [];
     const lines = content.split('\n');
 
-    this.performancePatterns.inefficientLoops.forEach(pattern => {
+    this.performancePatterns.inefficientLoops.forEach((pattern) => {
       lines.forEach((line, index) => {
         const matches = line.match(pattern);
         if (matches) {
-          matches.forEach(match => {
+          matches.forEach((match) => {
             let severity = 'medium';
             let recommendation = 'Optimize loop structure';
-            
+
             if (match.includes('.length')) {
               recommendation = 'Cache array length in variable before loop';
             } else if (match.includes('while(true)')) {
@@ -347,7 +347,7 @@ class PerformanceAnalyzer {
     const issues = [];
     const functions = this.extractFunctions(content);
 
-    functions.forEach(func => {
+    functions.forEach((func) => {
       // Check function length
       if (func.lines > this.thresholds.functionLength) {
         issues.push({
@@ -367,7 +367,8 @@ class PerformanceAnalyzer {
           component: component.id,
           issue: `High complexity: ${func.name} (complexity: ${func.complexity})`,
           line: func.startLine,
-          severity: func.complexity > this.thresholds.cyclomaticComplexity * 1.5 ? 'high' : 'medium',
+          severity:
+            func.complexity > this.thresholds.cyclomaticComplexity * 1.5 ? 'high' : 'medium',
           recommendation: 'Reduce conditional complexity',
           impact: 'high',
           effort: 'high',
@@ -410,7 +411,7 @@ class PerformanceAnalyzer {
     }
 
     // Find unused imports (basic heuristic)
-    const unusedImports = imports.filter(imp => {
+    const unusedImports = imports.filter((imp) => {
       const usage = content.split(imp.name).length - 1;
       return usage <= 1; // Only appears in import statement
     });
@@ -418,7 +419,7 @@ class PerformanceAnalyzer {
     if (unusedImports.length > 0) {
       issues.push({
         component: component.id,
-        issue: `Unused imports: ${unusedImports.map(i => i.name).join(', ')}`,
+        issue: `Unused imports: ${unusedImports.map((i) => i.name).join(', ')}`,
         severity: 'low',
         recommendation: 'Remove unused imports',
         impact: 'low',
@@ -434,17 +435,18 @@ class PerformanceAnalyzer {
    */
   async findDeadCode(content, component) {
     const issues = [];
-    
+
     // This is a simplified implementation
     // A full implementation would analyze the entire codebase for usage
     const functions = this.extractFunctions(content);
     const exports = this.extractExports(content);
-    
+
     // Check for functions that are defined but never called within the file
-    functions.forEach(func => {
+    functions.forEach((func) => {
       if (!func.name.startsWith('_') && !exports.includes(func.name)) {
         const usage = content.split(func.name).length - 1;
-        if (usage <= 1) { // Only appears in definition
+        if (usage <= 1) {
+          // Only appears in definition
           issues.push({
             component: component.id,
             issue: `Potentially unused function: ${func.name}`,
@@ -467,13 +469,14 @@ class PerformanceAnalyzer {
   extractFunctions(content) {
     const functions = [];
     const lines = content.split('\n');
-    const functionRegex = /(?:function\s+(\w+)|(\w+)\s*[:=]\s*(?:async\s+)?function|(?:async\s+)?(\w+)\s*\([^)]*\)\s*(?:=>|{))/g;
+    const functionRegex =
+      /(?:function\s+(\w+)|(\w+)\s*[:=]\s*(?:async\s+)?function|(?:async\s+)?(\w+)\s*\([^)]*\)\s*(?:=>|{))/g;
 
     lines.forEach((line, index) => {
       const matches = [...line.matchAll(functionRegex)];
-      matches.forEach(match => {
+      matches.forEach((match) => {
         const name = match[1] || match[2] || match[3] || 'anonymous';
-        
+
         // Calculate function metrics (simplified)
         const funcInfo = {
           name,
@@ -495,10 +498,11 @@ class PerformanceAnalyzer {
    */
   extractImports(content) {
     const imports = [];
-    const importRegex = /(?:import\s+(?:(\w+)|\{([^}]+)\}|.*)\s+from\s+['"`]([^'"`]+)['"`]|const\s+(?:(\w+)|\{([^}]+)\})\s*=\s*require\(['"`]([^'"`]+)['"`]\))/g;
+    const importRegex =
+      /(?:import\s+(?:(\w+)|\{([^}]+)\}|.*)\s+from\s+['"`]([^'"`]+)['"`]|const\s+(?:(\w+)|\{([^}]+)\})\s*=\s*require\(['"`]([^'"`]+)['"`]\))/g;
 
     const matches = [...content.matchAll(importRegex)];
-    matches.forEach(match => {
+    matches.forEach((match) => {
       const defaultImport = match[1] || match[4];
       const namedImports = match[2] || match[5];
       const source = match[3] || match[6];
@@ -508,7 +512,7 @@ class PerformanceAnalyzer {
       }
 
       if (namedImports) {
-        namedImports.split(',').forEach(name => {
+        namedImports.split(',').forEach((name) => {
           imports.push({ name: name.trim(), source, type: 'named' });
         });
       }
@@ -522,10 +526,11 @@ class PerformanceAnalyzer {
    */
   extractExports(content) {
     const exports = [];
-    const exportRegex = /(?:export\s+(?:default\s+)?(?:function\s+(\w+)|class\s+(\w+)|(?:const|let|var)\s+(\w+))|module\.exports\s*=\s*(\w+))/g;
+    const exportRegex =
+      /(?:export\s+(?:default\s+)?(?:function\s+(\w+)|class\s+(\w+)|(?:const|let|var)\s+(\w+))|module\.exports\s*=\s*(\w+))/g;
 
     const matches = [...content.matchAll(exportRegex)];
-    matches.forEach(match => {
+    matches.forEach((match) => {
       const name = match[1] || match[2] || match[3] || match[4];
       if (name) exports.push(name);
     });
@@ -570,12 +575,26 @@ class PerformanceAnalyzer {
    */
   estimateComplexity(lines, startIndex) {
     let complexity = 1; // Base complexity
-    const complexityKeywords = ['if', 'else', 'while', 'for', 'switch', 'case', 'catch', '&&', '||', '?'];
-    
-    const functionLines = lines.slice(startIndex, startIndex + this.estimateFunctionLength(lines, startIndex));
-    
-    functionLines.forEach(line => {
-      complexityKeywords.forEach(keyword => {
+    const complexityKeywords = [
+      'if',
+      'else',
+      'while',
+      'for',
+      'switch',
+      'case',
+      'catch',
+      '&&',
+      '||',
+      '?',
+    ];
+
+    const functionLines = lines.slice(
+      startIndex,
+      startIndex + this.estimateFunctionLength(lines, startIndex)
+    );
+
+    functionLines.forEach((line) => {
+      complexityKeywords.forEach((keyword) => {
         const matches = line.match(new RegExp(`\\b${keyword}\\b`, 'g'));
         if (matches) {
           complexity += matches.length;
@@ -592,10 +611,13 @@ class PerformanceAnalyzer {
   estimateNestingDepth(lines, startIndex) {
     let maxDepth = 0;
     let currentDepth = 0;
-    
-    const functionLines = lines.slice(startIndex, startIndex + this.estimateFunctionLength(lines, startIndex));
-    
-    functionLines.forEach(line => {
+
+    const functionLines = lines.slice(
+      startIndex,
+      startIndex + this.estimateFunctionLength(lines, startIndex)
+    );
+
+    functionLines.forEach((line) => {
       for (const char of line) {
         if (char === '{') {
           currentDepth++;
@@ -622,11 +644,16 @@ class PerformanceAnalyzer {
     };
 
     // Apply penalties based on issue severity
-    [...analysis.bottlenecks, ...analysis.memory_issues, ...analysis.async_opportunities,
-      ...analysis.code_quality_issues, ...analysis.file_size_issues, ...analysis.complexity_issues]
-      .forEach(issue => {
-        score -= penalties[issue.severity] || 0.1;
-      });
+    [
+      ...analysis.bottlenecks,
+      ...analysis.memory_issues,
+      ...analysis.async_opportunities,
+      ...analysis.code_quality_issues,
+      ...analysis.file_size_issues,
+      ...analysis.complexity_issues,
+    ].forEach((issue) => {
+      score -= penalties[issue.severity] || 0.1;
+    });
 
     return Math.max(0, Math.round(score * 10) / 10);
   }
@@ -635,12 +662,14 @@ class PerformanceAnalyzer {
    * Count total issues
    */
   countTotalIssues(analysis) {
-    return analysis.bottlenecks.length +
-           analysis.memory_issues.length +
-           analysis.async_opportunities.length +
-           analysis.code_quality_issues.length +
-           analysis.file_size_issues.length +
-           analysis.complexity_issues.length;
+    return (
+      analysis.bottlenecks.length +
+      analysis.memory_issues.length +
+      analysis.async_opportunities.length +
+      analysis.code_quality_issues.length +
+      analysis.file_size_issues.length +
+      analysis.complexity_issues.length
+    );
   }
 
   /**
@@ -657,10 +686,10 @@ class PerformanceAnalyzer {
       ...analysis.complexity_issues,
     ];
 
-    metrics.critical_issues = allIssues.filter(i => i.severity === 'critical').length;
-    metrics.high_priority_issues = allIssues.filter(i => i.severity === 'high').length;
-    metrics.medium_priority_issues = allIssues.filter(i => i.severity === 'medium').length;
-    metrics.low_priority_issues = allIssues.filter(i => i.severity === 'low').length;
+    metrics.critical_issues = allIssues.filter((i) => i.severity === 'critical').length;
+    metrics.high_priority_issues = allIssues.filter((i) => i.severity === 'high').length;
+    metrics.medium_priority_issues = allIssues.filter((i) => i.severity === 'medium').length;
+    metrics.low_priority_issues = allIssues.filter((i) => i.severity === 'low').length;
 
     return metrics;
   }
@@ -730,7 +759,7 @@ class PerformanceAnalyzer {
   shouldAnalyzeComponent(component) {
     const analyzableTypes = ['utility', 'task'];
     const analyzableExtensions = ['.js', '.mjs', '.ts'];
-    
+
     if (!analyzableTypes.includes(component.type)) {
       return false;
     }

@@ -133,7 +133,9 @@ class PersonalizedOutputFormatter {
 
       const duration = Number(process.hrtime.bigint() - startTime) / 1000000; // Convert to ms
       if (duration > 100) {
-        console.warn(`[OutputFormatter] Performance warning: ${duration.toFixed(2)}ms (target: <50ms)`);
+        console.warn(
+          `[OutputFormatter] Performance warning: ${duration.toFixed(2)}ms (target: <50ms)`
+        );
       }
 
       return formatted;
@@ -190,7 +192,8 @@ ${statusIcon} ${message}`;
    * @returns {string} Output section markdown
    */
   buildOutput() {
-    const outputContent = this.results?.output || this.results?.content || 'Task completed successfully.';
+    const outputContent =
+      this.results?.output || this.results?.content || 'Task completed successfully.';
 
     return `### Output
 ${outputContent}`;

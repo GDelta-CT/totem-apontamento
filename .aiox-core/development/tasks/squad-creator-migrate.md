@@ -19,7 +19,7 @@ Checklist:
   - "[ ] Generate migration report"
 ---
 
-# *migrate-squad
+# \*migrate-squad
 
 Migrates legacy squad formats to AIOX 2.1 standard.
 
@@ -43,24 +43,24 @@ Migrates legacy squad formats to AIOX 2.1 standard.
 
 ## Parameters
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `squad_path` | string | - | Full path to squad directory (required) |
-| `--dry-run` | flag | false | Preview changes without modifying files |
-| `--verbose` | flag | false | Show detailed migration output |
+| Parameter    | Type   | Default | Description                             |
+| ------------ | ------ | ------- | --------------------------------------- |
+| `squad_path` | string | -       | Full path to squad directory (required) |
+| `--dry-run`  | flag   | false   | Preview changes without modifying files |
+| `--verbose`  | flag   | false   | Show detailed migration output          |
 
 ## Migration Detection
 
 The migrator detects the following legacy patterns:
 
-| Pattern | Detection | Migration Action |
-|---------|-----------|------------------|
-| `config.yaml` | Legacy manifest name | Rename to `squad.yaml` |
-| Flat structure | No `tasks/`, `agents/` dirs | Create directory structure |
-| Missing `aiox.type` | Field not present | Add `aiox.type: squad` |
-| Missing `aiox.minVersion` | Field not present | Add `aiox.minVersion: 2.1.0` |
-| Missing `name` | Field not present | Infer from directory name |
-| Missing `version` | Field not present | Add `version: 1.0.0` |
+| Pattern                   | Detection                   | Migration Action             |
+| ------------------------- | --------------------------- | ---------------------------- |
+| `config.yaml`             | Legacy manifest name        | Rename to `squad.yaml`       |
+| Flat structure            | No `tasks/`, `agents/` dirs | Create directory structure   |
+| Missing `aiox.type`       | Field not present           | Add `aiox.type: squad`       |
+| Missing `aiox.minVersion` | Field not present           | Add `aiox.minVersion: 2.1.0` |
+| Missing `name`            | Field not present           | Infer from directory name    |
+| Missing `version`         | Field not present           | Add `version: 1.0.0`         |
 
 ## Flow
 
@@ -187,14 +187,14 @@ ls ./squads/my-squad/
 
 ## Error Codes
 
-| Code | Severity | Description |
-|------|----------|-------------|
-| `SQUAD_NOT_FOUND` | Error | Squad directory doesn't exist |
-| `NO_MANIFEST` | Error | No config.yaml or squad.yaml found |
-| `BACKUP_FAILED` | Error | Failed to create backup |
-| `MIGRATION_FAILED` | Error | Action execution failed |
-| `VALIDATION_FAILED` | Warning | Post-migration validation found issues |
-| `INVALID_PATH` | Error | Invalid squad path provided |
+| Code                | Severity | Description                            |
+| ------------------- | -------- | -------------------------------------- |
+| `SQUAD_NOT_FOUND`   | Error    | Squad directory doesn't exist          |
+| `NO_MANIFEST`       | Error    | No config.yaml or squad.yaml found     |
+| `BACKUP_FAILED`     | Error    | Failed to create backup                |
+| `MIGRATION_FAILED`  | Error    | Action execution failed                |
+| `VALIDATION_FAILED` | Warning  | Post-migration validation found issues |
+| `INVALID_PATH`      | Error    | Invalid squad path provided            |
 
 ## Implementation
 
@@ -210,7 +210,7 @@ async function migrateSquad(options) {
   const migrator = new SquadMigrator({
     dryRun,
     verbose,
-    validator
+    validator,
   });
 
   // Analyze first

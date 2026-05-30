@@ -1,6 +1,6 @@
 ---
 task: analyzeSquad()
-responsavel: "@squad-creator"
+responsavel: '@squad-creator'
 responsavel_type: Agent
 atomic_layer: Task
 elicit: true
@@ -16,19 +16,19 @@ Entrada:
     tipo: string
     origem: User Input
     obrigatorio: false
-    validacao: "console | markdown | json (default: console)"
+    validacao: 'console | markdown | json (default: console)'
 
   - campo: verbose
     tipo: boolean
     origem: User Input
     obrigatorio: false
-    validacao: "Include file details (default: false)"
+    validacao: 'Include file details (default: false)'
 
   - campo: suggestions
     tipo: boolean
     origem: User Input
     obrigatorio: false
-    validacao: "Include improvement suggestions (default: true)"
+    validacao: 'Include improvement suggestions (default: true)'
 
 Saida:
   - campo: analysis_report
@@ -52,12 +52,12 @@ Saida:
     persistido: false
 
 Checklist:
-  - "[ ] Validate squad exists"
-  - "[ ] Load squad.yaml manifest"
-  - "[ ] Inventory components by type"
-  - "[ ] Calculate coverage metrics"
-  - "[ ] Generate improvement suggestions"
-  - "[ ] Format and display report"
+  - '[ ] Validate squad exists'
+  - '[ ] Load squad.yaml manifest'
+  - '[ ] Inventory components by type'
+  - '[ ] Calculate coverage metrics'
+  - '[ ] Generate improvement suggestions'
+  - '[ ] Format and display report'
 ---
 
 # Analyze Squad Task
@@ -131,7 +131,7 @@ const overview = {
   author: manifest.author,
   license: manifest.license,
   aioxMinVersion: manifest.aiox?.minVersion || 'N/A',
-  description: manifest.description
+  description: manifest.description,
 };
 ```
 
@@ -186,12 +186,15 @@ const suggestions = analyzer.generateSuggestions(inventory, coverage);
 ### Step 6: Format and Display Report
 
 ```javascript
-const report = analyzer.formatReport({
-  overview,
-  inventory,
-  coverage,
-  suggestions
-}, outputFormat);
+const report = analyzer.formatReport(
+  {
+    overview,
+    inventory,
+    coverage,
+    suggestions,
+  },
+  outputFormat
+);
 
 if (outputFormat === 'console') {
   console.log(report);
@@ -312,4 +315,4 @@ tags:
 
 ---
 
-*Task definition for *analyze-squad command*
+*Task definition for *analyze-squad command\*

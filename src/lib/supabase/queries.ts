@@ -4,7 +4,7 @@
  * REGRA DE OURO: nenhum loading dura mais que TIMEOUT_MS. Sempre.
  */
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   getSupabase,
   type Apontamento,
@@ -16,25 +16,21 @@ import {
   type RegistroPonto,
   type SituacaoPonto,
   type TipoPontoId,
-} from "./client";
+} from './client';
 
 const TIMEOUT_MS = 8000;
 
 export type FetchState<T> =
-  | { status: "idle" }
-  | { status: "loading" }
-  | { status: "success"; data: T }
-  | { status: "empty" }
-  | { status: "error"; message: string };
+  | { status: 'idle' }
+  | { status: 'loading' }
+  | { status: 'success'; data: T }
+  | { status: 'empty' }
+  | { status: 'error'; message: string };
 
 function withTimeout<T>(promise: PromiseLike<T>, ms = TIMEOUT_MS): Promise<T> {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
-      reject(
-        new Error(
-          "Conexão demorou demais. Verifique a internet e toque em Tentar de novo.",
-        ),
-      );
+      reject(new Error('Conexão demorou demais. Verifique a internet e toque em Tentar de novo.'));
     }, ms);
     Promise.resolve(promise).then(
       (v) => {
@@ -44,7 +40,7 @@ function withTimeout<T>(promise: PromiseLike<T>, ms = TIMEOUT_MS): Promise<T> {
       (e) => {
         clearTimeout(timer);
         reject(e);
-      },
+      }
     );
   });
 }
@@ -53,23 +49,23 @@ function withTimeout<T>(promise: PromiseLike<T>, ms = TIMEOUT_MS): Promise<T> {
 
 export function useFuncionariosAtivos() {
   const [state, setState] = useState<FetchState<Funcionario[]>>({
-    status: "loading",
+    status: 'loading',
   });
   const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
-    setState({ status: "loading" });
+    setState({ status: 'loading' });
 
     const run = async () => {
       try {
         const sb = getSupabase();
         const result = await withTimeout(
           sb
-            .from("funcionarios")
-            .select("id, nome, ativo, cargo")
-            .eq("ativo", true)
-            .order("nome", { ascending: true }),
+            .from('funcionarios')
+            .select('id, nome, ativo, cargo')
+            .eq('ativo', true)
+            .order('nome', { ascending: true })
         );
         const { data, error } = result as {
           data: Funcionario[] | null;
@@ -79,21 +75,21 @@ export function useFuncionariosAtivos() {
         if (cancelled) return;
 
         if (error) {
-          setState({ status: "error", message: traduzirErro(error.message) });
+          setState({ status: 'error', message: traduzirErro(error.message) });
           return;
         }
 
         if (!data || data.length === 0) {
-          setState({ status: "empty" });
+          setState({ status: 'empty' });
           return;
         }
 
-        setState({ status: "success", data });
+        setState({ status: 'success', data });
       } catch (e) {
         if (cancelled) return;
         setState({
-          status: "error",
-          message: e instanceof Error ? e.message : "Erro desconhecido.",
+          status: 'error',
+          message: e instanceof Error ? e.message : 'Erro desconhecido.',
         });
       }
     };
@@ -111,25 +107,23 @@ export function useFuncionariosAtivos() {
 
 /* ────────────────────── ORDENS DE SERVIÇO ────────────────────── */
 
-export async function buscarOSPorPlaca(
-  placaInput: string,
-): Promise<FetchState<OrdemServico>> {
+export async function buscarOSPorPlaca(placaInput: string): Promise<FetchState<OrdemServico>> {
   const placa = normalizarPlaca(placaInput);
   if (!placa) {
     return {
-      status: "error",
-      message: "Digite uma placa antes de buscar.",
+      status: 'error',
+      message: 'Digite uma placa antes de buscar.',
     };
   }
 
   try {
     const result = await withTimeout(
       getSupabase()
-        .from("ordens_servico")
-        .select("id, placa, modelo_veiculo, status_geral, data_entrada")
-        .ilike("placa", placa)
+        .from('ordens_servico')
+        .select('id, placa, modelo_veiculo, status_geral, data_entrada')
+        .ilike('placa', placa)
         .limit(1)
-        .maybeSingle(),
+        .maybeSingle()
     );
     const { data, error } = result as {
       data: OrdemServico | null;
@@ -137,16 +131,16 @@ export async function buscarOSPorPlaca(
     };
 
     if (error) {
-      return { status: "error", message: traduzirErro(error.message) };
+      return { status: 'error', message: traduzirErro(error.message) };
     }
     if (!data) {
-      return { status: "empty" };
+      return { status: 'empty' };
     }
-    return { status: "success", data };
+    return { status: 'success', data };
   } catch (e) {
     return {
-      status: "error",
-      message: e instanceof Error ? e.message : "Erro desconhecido.",
+      status: 'error',
+      message: e instanceof Error ? e.message : 'Erro desconhecido.',
     };
   }
 }
@@ -162,29 +156,29 @@ export async function iniciarApontamento(params: {
   try {
     const result = await withTimeout(
       getSupabase()
-        .from("apontamentos")
+        .from('apontamentos')
         .insert({
           ordem_servico_id: params.ordemServicoId,
           nome_funcionario: params.nomeFuncionario,
           cargo_funcionario: params.cargoFuncionario,
-          status_tarefa: "Em andamento",
+          status_tarefa: 'Em andamento',
           etapa: params.etapa,
           tempo_pausado_seg: 0,
         })
         .select()
-        .single(),
+        .single()
     );
     const { data, error } = result as {
       data: Apontamento | null;
       error: { message: string } | null;
     };
-    if (error) return { status: "error", message: traduzirErro(error.message) };
-    if (!data) return { status: "error", message: "Falha ao criar apontamento." };
-    return { status: "success", data };
+    if (error) return { status: 'error', message: traduzirErro(error.message) };
+    if (!data) return { status: 'error', message: 'Falha ao criar apontamento.' };
+    return { status: 'success', data };
   } catch (e) {
     return {
-      status: "error",
-      message: e instanceof Error ? e.message : "Erro desconhecido.",
+      status: 'error',
+      message: e instanceof Error ? e.message : 'Erro desconhecido.',
     };
   }
 }
@@ -196,147 +190,140 @@ export async function pausarApontamento(params: {
   try {
     const result = await withTimeout(
       getSupabase()
-        .from("apontamentos")
+        .from('apontamentos')
         .update({
-          status_tarefa: "Pausado",
+          status_tarefa: 'Pausado',
           motivo_pausa: params.motivo,
           pausado_em: new Date().toISOString(),
         })
-        .eq("id", params.apontamentoId)
+        .eq('id', params.apontamentoId)
         .select()
-        .single(),
+        .single()
     );
     const { data, error } = result as {
       data: Apontamento | null;
       error: { message: string } | null;
     };
-    if (error) return { status: "error", message: traduzirErro(error.message) };
-    if (!data) return { status: "error", message: "Falha ao pausar." };
-    return { status: "success", data };
+    if (error) return { status: 'error', message: traduzirErro(error.message) };
+    if (!data) return { status: 'error', message: 'Falha ao pausar.' };
+    return { status: 'success', data };
   } catch (e) {
     return {
-      status: "error",
-      message: e instanceof Error ? e.message : "Erro desconhecido.",
+      status: 'error',
+      message: e instanceof Error ? e.message : 'Erro desconhecido.',
     };
   }
 }
 
 export async function retomarApontamento(
-  apontamento: Apontamento,
+  apontamento: Apontamento
 ): Promise<FetchState<Apontamento>> {
   if (!apontamento.pausado_em) {
     return {
-      status: "error",
-      message: "Apontamento não está pausado.",
+      status: 'error',
+      message: 'Apontamento não está pausado.',
     };
   }
 
   try {
     const pausadoEmISO = parseISOComUTC(apontamento.pausado_em);
-    const segundosPausados = Math.max(
-      0,
-      Math.floor((Date.now() - pausadoEmISO) / 1000),
-    );
-    const tempoPausadoTotal =
-      (apontamento.tempo_pausado_seg ?? 0) + segundosPausados;
+    const segundosPausados = Math.max(0, Math.floor((Date.now() - pausadoEmISO) / 1000));
+    const tempoPausadoTotal = (apontamento.tempo_pausado_seg ?? 0) + segundosPausados;
 
     const result = await withTimeout(
       getSupabase()
-        .from("apontamentos")
+        .from('apontamentos')
         .update({
-          status_tarefa: "Em andamento",
+          status_tarefa: 'Em andamento',
           motivo_pausa: null,
           pausado_em: null,
           tempo_pausado_seg: tempoPausadoTotal,
         })
-        .eq("id", apontamento.id)
+        .eq('id', apontamento.id)
         .select()
-        .single(),
+        .single()
     );
     const { data, error } = result as {
       data: Apontamento | null;
       error: { message: string } | null;
     };
-    if (error) return { status: "error", message: traduzirErro(error.message) };
-    if (!data) return { status: "error", message: "Falha ao retomar." };
-    return { status: "success", data };
+    if (error) return { status: 'error', message: traduzirErro(error.message) };
+    if (!data) return { status: 'error', message: 'Falha ao retomar.' };
+    return { status: 'success', data };
   } catch (e) {
     return {
-      status: "error",
-      message: e instanceof Error ? e.message : "Erro desconhecido.",
+      status: 'error',
+      message: e instanceof Error ? e.message : 'Erro desconhecido.',
     };
   }
 }
 
 export async function finalizarApontamento(
-  apontamento: Apontamento,
+  apontamento: Apontamento
 ): Promise<FetchState<Apontamento>> {
   try {
     let tempoPausadoTotal = apontamento.tempo_pausado_seg ?? 0;
-    if (apontamento.status_tarefa === "Pausado" && apontamento.pausado_em) {
+    if (apontamento.status_tarefa === 'Pausado' && apontamento.pausado_em) {
       const pausadoEmISO = parseISOComUTC(apontamento.pausado_em);
-      const segundosPausados = Math.max(
-        0,
-        Math.floor((Date.now() - pausadoEmISO) / 1000),
-      );
+      const segundosPausados = Math.max(0, Math.floor((Date.now() - pausadoEmISO) / 1000));
       tempoPausadoTotal += segundosPausados;
     }
 
     const result = await withTimeout(
       getSupabase()
-        .from("apontamentos")
+        .from('apontamentos')
         .update({
           hora_fim: new Date().toISOString(),
-          status_tarefa: "Finalizado",
+          status_tarefa: 'Finalizado',
           pausado_em: null,
           tempo_pausado_seg: tempoPausadoTotal,
         })
-        .eq("id", apontamento.id)
+        .eq('id', apontamento.id)
         .select()
-        .single(),
+        .single()
     );
     const { data, error } = result as {
       data: Apontamento | null;
       error: { message: string } | null;
     };
-    if (error) return { status: "error", message: traduzirErro(error.message) };
-    if (!data) return { status: "error", message: "Falha ao finalizar." };
-    return { status: "success", data };
+    if (error) return { status: 'error', message: traduzirErro(error.message) };
+    if (!data) return { status: 'error', message: 'Falha ao finalizar.' };
+    return { status: 'success', data };
   } catch (e) {
     return {
-      status: "error",
-      message: e instanceof Error ? e.message : "Erro desconhecido.",
+      status: 'error',
+      message: e instanceof Error ? e.message : 'Erro desconhecido.',
     };
   }
 }
 
 export async function buscarApontamentoAtivo(
-  nomeFuncionario: string,
+  nomeFuncionario: string
 ): Promise<FetchState<ApontamentoComOS>> {
   try {
     const result = await withTimeout(
       getSupabase()
-        .from("apontamentos")
+        .from('apontamentos')
         .select(
-          "id, ordem_servico_id, nome_funcionario, cargo_funcionario, hora_inicio, hora_fim, status_tarefa, etapa, motivo_pausa, pausado_em, tempo_pausado_seg, ordem_servico:ordens_servico(id, placa, modelo_veiculo, status_geral, data_entrada)",
+          'id, ordem_servico_id, nome_funcionario, cargo_funcionario, hora_inicio, hora_fim, status_tarefa, etapa, motivo_pausa, pausado_em, tempo_pausado_seg, ordem_servico:ordens_servico(id, placa, modelo_veiculo, status_geral, data_entrada)'
         )
-        .eq("nome_funcionario", nomeFuncionario)
-        .in("status_tarefa", ["Em andamento", "Pausado"])
-        .order("hora_inicio", { ascending: false })
+        .eq('nome_funcionario', nomeFuncionario)
+        .in('status_tarefa', ['Em andamento', 'Pausado'])
+        .order('hora_inicio', { ascending: false })
         .limit(1)
-        .maybeSingle(),
+        .maybeSingle()
     );
     const { data, error } = result as {
       data: ApontamentoComOS | null;
       error: { message: string } | null;
     };
-    if (error) return { status: "error", message: traduzirErro(error.message) };
-    if (!data) return { status: "empty" };
-    return { status: "success", data };
+    if (error) return { status: 'error', message: traduzirErro(error.message) };
+    if (!data) return { status: 'empty' };
+    return { status: 'success', data };
   } catch (e) {
     return {
-      status: "error",
-      message: e instanceof Error ? e.message : "Erro desconhecido.",
+      status: 'error',
+      message: e instanceof Error ? e.message : 'Erro desconhecido.',
     };
   }
 }
@@ -356,7 +343,7 @@ export async function baterPonto(params: {
   try {
     const result = await withTimeout(
       getSupabase()
-        .from("pontos_eletronicos")
+        .from('pontos_eletronicos')
         .insert({
           nome_funcionario: params.nomeFuncionario,
           cargo_funcionario: params.cargoFuncionario ?? null,
@@ -364,19 +351,19 @@ export async function baterPonto(params: {
           observacao: params.observacao ?? null,
         })
         .select()
-        .single(),
+        .single()
     );
     const { data, error } = result as {
       data: RegistroPonto | null;
       error: { message: string } | null;
     };
-    if (error) return { status: "error", message: traduzirErro(error.message) };
-    if (!data) return { status: "error", message: "Falha ao bater ponto." };
-    return { status: "success", data };
+    if (error) return { status: 'error', message: traduzirErro(error.message) };
+    if (!data) return { status: 'error', message: 'Falha ao bater ponto.' };
+    return { status: 'success', data };
   } catch (e) {
     return {
-      status: "error",
-      message: e instanceof Error ? e.message : "Erro desconhecido.",
+      status: 'error',
+      message: e instanceof Error ? e.message : 'Erro desconhecido.',
     };
   }
 }
@@ -417,39 +404,35 @@ export async function baterPontoComAutoPausa(params: {
 }): Promise<FetchState<ResultadoBaterPonto>> {
   // Mapeia tipo de ponto → motivo de pausa
   const tipoParaMotivo: Partial<Record<TipoPontoId, MotivoPausaId>> = {
-    almoco_saida: "almoco",
-    fim_expediente: "fim_expediente",
+    almoco_saida: 'almoco',
+    fim_expediente: 'fim_expediente',
   };
 
   const motivoAutoPausa = tipoParaMotivo[params.tipo];
 
   // 1. Verifica se tem tarefa em andamento (não pausada)
-  let autopausaResult: ResultadoBaterPonto["autopausa"] = null;
+  let autopausaResult: ResultadoBaterPonto['autopausa'] = null;
 
   if (motivoAutoPausa) {
     const ativoResult = await buscarApontamentoAtivo(params.nomeFuncionario);
-    if (
-      ativoResult.status === "success" &&
-      ativoResult.data.status_tarefa === "Em andamento"
-    ) {
+    if (ativoResult.status === 'success' && ativoResult.data.status_tarefa === 'Em andamento') {
       // Pausar essa tarefa
       const pausaResult = await pausarApontamento({
         apontamentoId: ativoResult.data.id,
         motivo: motivoAutoPausa,
       });
-      if (pausaResult.status === "success") {
+      if (pausaResult.status === 'success') {
         autopausaResult = {
           apontamento: pausaResult.data,
           os: ativoResult.data.ordem_servico,
           motivo: motivoAutoPausa,
         };
-      } else if (pausaResult.status === "error") {
+      } else if (pausaResult.status === 'error') {
         // Se falhou em pausar, NÃO bate ponto — evita inconsistência
         return {
-          status: "error",
+          status: 'error',
           message:
-            "Falha ao pausar tarefa em andamento. Ponto não foi registrado: " +
-            pausaResult.message,
+            'Falha ao pausar tarefa em andamento. Ponto não foi registrado: ' + pausaResult.message,
         };
       }
     }
@@ -462,12 +445,12 @@ export async function baterPontoComAutoPausa(params: {
     tipo: params.tipo,
   });
 
-  if (pontoResult.status !== "success") {
+  if (pontoResult.status !== 'success') {
     return pontoResult as FetchState<ResultadoBaterPonto>;
   }
 
   return {
-    status: "success",
+    status: 'success',
     data: {
       ponto: pontoResult.data,
       autopausa: autopausaResult,
@@ -480,7 +463,7 @@ export async function baterPontoComAutoPausa(params: {
  * Pega todos os batimentos do dia e calcula qual é o próximo permitido.
  */
 export async function consultarSituacaoPonto(
-  nomeFuncionario: string,
+  nomeFuncionario: string
 ): Promise<FetchState<SituacaoPonto>> {
   try {
     const hojeInicio = new Date();
@@ -489,41 +472,41 @@ export async function consultarSituacaoPonto(
 
     const result = await withTimeout(
       getSupabase()
-        .from("pontos_eletronicos")
-        .select("id, nome_funcionario, cargo_funcionario, tipo, registrado_em, observacao")
-        .eq("nome_funcionario", nomeFuncionario)
-        .gte("registrado_em", hojeInicioISO)
-        .order("registrado_em", { ascending: true }),
+        .from('pontos_eletronicos')
+        .select('id, nome_funcionario, cargo_funcionario, tipo, registrado_em, observacao')
+        .eq('nome_funcionario', nomeFuncionario)
+        .gte('registrado_em', hojeInicioISO)
+        .order('registrado_em', { ascending: true })
     );
     const { data, error } = result as {
       data: RegistroPonto[] | null;
       error: { message: string } | null;
     };
 
-    if (error) return { status: "error", message: traduzirErro(error.message) };
+    if (error) return { status: 'error', message: traduzirErro(error.message) };
 
     const registros = data ?? [];
 
-    const entrada = registros.filter((r) => r.tipo === "entrada").pop() ?? null;
-    const almoco_saida = registros.filter((r) => r.tipo === "almoco_saida").pop() ?? null;
-    const almoco_volta = registros.filter((r) => r.tipo === "almoco_volta").pop() ?? null;
-    const fim_expediente = registros.filter((r) => r.tipo === "fim_expediente").pop() ?? null;
+    const entrada = registros.filter((r) => r.tipo === 'entrada').pop() ?? null;
+    const almoco_saida = registros.filter((r) => r.tipo === 'almoco_saida').pop() ?? null;
+    const almoco_volta = registros.filter((r) => r.tipo === 'almoco_volta').pop() ?? null;
+    const fim_expediente = registros.filter((r) => r.tipo === 'fim_expediente').pop() ?? null;
 
     let proximoBatimentoPermitido: TipoPontoId | null = null;
     if (!entrada) {
-      proximoBatimentoPermitido = "entrada";
+      proximoBatimentoPermitido = 'entrada';
     } else if (!almoco_saida && !fim_expediente) {
-      proximoBatimentoPermitido = "almoco_saida";
+      proximoBatimentoPermitido = 'almoco_saida';
     } else if (almoco_saida && !almoco_volta) {
-      proximoBatimentoPermitido = "almoco_volta";
+      proximoBatimentoPermitido = 'almoco_volta';
     } else if (almoco_volta && !fim_expediente) {
-      proximoBatimentoPermitido = "fim_expediente";
+      proximoBatimentoPermitido = 'fim_expediente';
     } else if (fim_expediente) {
       proximoBatimentoPermitido = null;
     }
 
     return {
-      status: "success",
+      status: 'success',
       data: {
         entrada,
         almoco_saida,
@@ -534,8 +517,8 @@ export async function consultarSituacaoPonto(
     };
   } catch (e) {
     return {
-      status: "error",
-      message: e instanceof Error ? e.message : "Erro desconhecido.",
+      status: 'error',
+      message: e instanceof Error ? e.message : 'Erro desconhecido.',
     };
   }
 }
@@ -545,25 +528,25 @@ export async function consultarSituacaoPonto(
 export function normalizarPlaca(input: string): string {
   return input
     .toUpperCase()
-    .replace(/[^A-Z0-9]/g, "")
+    .replace(/[^A-Z0-9]/g, '')
     .trim();
 }
 
 function traduzirErro(msg: string): string {
   const m = msg.toLowerCase();
-  if (m.includes("jwt") || m.includes("invalid api key")) {
-    return "Chave de acesso inválida. Avise o administrador.";
+  if (m.includes('jwt') || m.includes('invalid api key')) {
+    return 'Chave de acesso inválida. Avise o administrador.';
   }
-  if (m.includes("relation") && m.includes("does not exist")) {
-    return "Tabela não encontrada no banco. Avise o administrador.";
+  if (m.includes('relation') && m.includes('does not exist')) {
+    return 'Tabela não encontrada no banco. Avise o administrador.';
   }
-  if (m.includes("permission") || m.includes("rls") || m.includes("policy")) {
-    return "Sem permissão para gravar/ler. Aplique as políticas RLS no Supabase.";
+  if (m.includes('permission') || m.includes('rls') || m.includes('policy')) {
+    return 'Sem permissão para gravar/ler. Aplique as políticas RLS no Supabase.';
   }
-  if (m.includes("network") || m.includes("fetch")) {
-    return "Sem conexão com o servidor. Verifique a internet.";
+  if (m.includes('network') || m.includes('fetch')) {
+    return 'Sem conexão com o servidor. Verifique a internet.';
   }
-  if (m.includes("does not exist")) {
+  if (m.includes('does not exist')) {
     return msg;
   }
   return msg;
@@ -580,16 +563,14 @@ export function useFocoAutomatico<T extends HTMLElement>() {
 
 function parseISOComUTC(iso: string): number {
   const isoComUTC =
-    iso.endsWith("Z") || /[+-]\d{2}:?\d{2}$/.test(iso)
-      ? iso
-      : iso.replace(" ", "T") + "Z";
+    iso.endsWith('Z') || /[+-]\d{2}:?\d{2}$/.test(iso) ? iso : iso.replace(' ', 'T') + 'Z';
   return new Date(isoComUTC).getTime();
 }
 
 export function useCronometro(
   horaInicioISO: string | null,
   pausadoEmISO?: string | null,
-  tempoPausadoSeg?: number | null,
+  tempoPausadoSeg?: number | null
 ) {
   const [, setTick] = useState(0);
 
@@ -604,7 +585,7 @@ export function useCronometro(
   }, [horaInicioISO, pausadoEmISO]);
 
   if (!horaInicioISO) {
-    return { formatado: "00:00:00", segundos: 0, pausado: false };
+    return { formatado: '00:00:00', segundos: 0, pausado: false };
   }
 
   const inicioMs = parseISOComUTC(horaInicioISO);
@@ -616,19 +597,23 @@ export function useCronometro(
     const pausaMs = parseISOComUTC(pausadoEmISO);
     segundosTrabalhados = Math.max(
       0,
-      Math.floor((pausaMs - inicioMs) / 1000) - tempoPausadoAcumulado,
+      Math.floor((pausaMs - inicioMs) / 1000) - tempoPausadoAcumulado
     );
   } else {
     const agoraMs = Date.now();
     segundosTrabalhados = Math.max(
       0,
-      Math.floor((agoraMs - inicioMs) / 1000) - tempoPausadoAcumulado,
+      Math.floor((agoraMs - inicioMs) / 1000) - tempoPausadoAcumulado
     );
   }
 
-  const h = Math.floor(segundosTrabalhados / 3600).toString().padStart(2, "0");
-  const m = Math.floor((segundosTrabalhados % 3600) / 60).toString().padStart(2, "0");
-  const s = (segundosTrabalhados % 60).toString().padStart(2, "0");
+  const h = Math.floor(segundosTrabalhados / 3600)
+    .toString()
+    .padStart(2, '0');
+  const m = Math.floor((segundosTrabalhados % 3600) / 60)
+    .toString()
+    .padStart(2, '0');
+  const s = (segundosTrabalhados % 60).toString().padStart(2, '0');
   return {
     formatado: `${h}:${m}:${s}`,
     segundos: segundosTrabalhados,
@@ -648,27 +633,27 @@ export function useTempoPausado(pausadoEmISO: string | null | undefined) {
     return () => clearInterval(id);
   }, [pausadoEmISO]);
 
-  if (!pausadoEmISO) return "";
+  if (!pausadoEmISO) return '';
 
   const pausaMs = parseISOComUTC(pausadoEmISO);
   const minutos = Math.max(0, Math.floor((Date.now() - pausaMs) / 60000));
 
-  if (minutos < 1) return "agora mesmo";
-  if (minutos === 1) return "há 1 minuto";
+  if (minutos < 1) return 'agora mesmo';
+  if (minutos === 1) return 'há 1 minuto';
   if (minutos < 60) return `há ${minutos} minutos`;
   const horas = Math.floor(minutos / 60);
   const restante = minutos % 60;
-  if (horas === 1 && restante === 0) return "há 1 hora";
+  if (horas === 1 && restante === 0) return 'há 1 hora';
   if (restante === 0) return `há ${horas} horas`;
   if (horas === 1) return `há 1h ${restante}min`;
   return `há ${horas}h ${restante}min`;
 }
 
 export function formatarHora(iso: string | null | undefined): string {
-  if (!iso) return "--:--";
+  if (!iso) return '--:--';
   const ms = parseISOComUTC(iso);
   const d = new Date(ms);
-  const h = d.getHours().toString().padStart(2, "0");
-  const m = d.getMinutes().toString().padStart(2, "0");
+  const h = d.getHours().toString().padStart(2, '0');
+  const m = d.getMinutes().toString().padStart(2, '0');
   return `${h}:${m}`;
 }

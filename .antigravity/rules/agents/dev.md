@@ -16,10 +16,10 @@
 - `*build-resume` - Resume autonomous build from last checkpoint
 - `*build-status` - Show build status (--all for all builds)
 - `*build-autonomous` - Start autonomous build loop for a story (Coder Agent Loop with retries)
-- `*build` - Complete autonomous build: worktree → plan → execute → verify → merge (*build {story-id})
-- `*gotcha` - Add a gotcha manually (*gotcha {title} - {description})
-- `*gotchas` - List and search gotchas (*gotchas [--category X] [--severity Y])
-- `*worktree-create` - Create isolated worktree for story (*worktree-create {story-id})
+- `*build` - Complete autonomous build: worktree → plan → execute → verify → merge (\*build {story-id})
+- `*gotcha` - Add a gotcha manually (\*gotcha {title} - {description})
+- `*gotchas` - List and search gotchas (\*gotchas [--category X] [--severity Y])
+- `*worktree-create` - Create isolated worktree for story (\*worktree-create {story-id})
 - `*worktree-list` - List active worktrees with status
 - `*create-service` - Create new service from Handlebars template (api-integration, utility, agent-tool)
 - `*waves` - Analyze workflow for parallel execution opportunities (--visual for ASCII art)
@@ -44,14 +44,14 @@
 - `*build-log` - View build attempt log for debugging
 - `*build-cleanup` - Cleanup abandoned build state files
 - `*build-autonomous` - Start autonomous build loop for a story (Coder Agent Loop with retries)
-- `*build` - Complete autonomous build: worktree → plan → execute → verify → merge (*build {story-id})
-- `*gotcha` - Add a gotcha manually (*gotcha {title} - {description})
-- `*gotchas` - List and search gotchas (*gotchas [--category X] [--severity Y])
+- `*build` - Complete autonomous build: worktree → plan → execute → verify → merge (\*build {story-id})
+- `*gotcha` - Add a gotcha manually (\*gotcha {title} - {description})
+- `*gotchas` - List and search gotchas (\*gotchas [--category X] [--severity Y])
 - `*gotcha-context` - Get relevant gotchas for current task context
-- `*worktree-create` - Create isolated worktree for story (*worktree-create {story-id})
+- `*worktree-create` - Create isolated worktree for story (\*worktree-create {story-id})
 - `*worktree-list` - List active worktrees with status
 - `*worktree-cleanup` - Remove completed/stale worktrees
-- `*worktree-merge` - Merge worktree branch back to base (*worktree-merge {story-id})
+- `*worktree-merge` - Merge worktree branch back to base (\*worktree-merge {story-id})
 - `*create-service` - Create new service from Handlebars template (api-integration, utility, agent-tool)
 - `*waves` - Analyze workflow for parallel execution opportunities (--visual for ASCII art)
 - `*apply-qa-fixes` - Apply QA feedback and fixes
@@ -71,4 +71,5 @@
 **I collaborate with:**
 
 ---
-*AIOX Agent - Synced from .aiox-core/development/agents/dev.md*
+
+_AIOX Agent - Synced from .aiox-core/development/agents/dev.md_

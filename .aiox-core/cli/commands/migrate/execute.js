@@ -157,12 +157,11 @@ async function executeMigration(plan, options = {}) {
       message: `✓ Migrating ${moduleName.charAt(0).toUpperCase() + moduleName.slice(1)} module (${moduleData.files.length} files)`,
     });
 
-    const moduleResult = await migrateModule(
-      moduleData,
-      moduleName,
-      plan.aioxCoreDir,
-      { verbose, onProgress, dryRun },
-    );
+    const moduleResult = await migrateModule(moduleData, moduleName, plan.aioxCoreDir, {
+      verbose,
+      onProgress,
+      dryRun,
+    });
 
     result.modules[moduleName] = {
       files: moduleResult.migratedFiles.length,
@@ -236,7 +235,7 @@ async function executeMigration(plan, options = {}) {
   }
 
   // Final status
-  result.success = result.errors.filter(e => e.type !== 'cleanup').length === 0;
+  result.success = result.errors.filter((e) => e.type !== 'cleanup').length === 0;
 
   return result;
 }
@@ -248,10 +247,17 @@ async function executeMigration(plan, options = {}) {
  */
 async function saveMigrationState(projectRoot, state) {
   const statePath = path.join(projectRoot, '.aiox-migration-state.json');
-  await fs.promises.writeFile(statePath, JSON.stringify({
-    ...state,
-    timestamp: new Date().toISOString(),
-  }, null, 2));
+  await fs.promises.writeFile(
+    statePath,
+    JSON.stringify(
+      {
+        ...state,
+        timestamp: new Date().toISOString(),
+      },
+      null,
+      2
+    )
+  );
 }
 
 /**

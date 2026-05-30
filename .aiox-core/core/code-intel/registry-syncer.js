@@ -76,7 +76,9 @@ class RegistrySyncer {
 
     // AC5: Fallback — check provider availability first
     if (!this._isProviderAvailable()) {
-      this._logger('[registry-syncer] No code intelligence provider available, skipping enrichment');
+      this._logger(
+        '[registry-syncer] No code intelligence provider available, skipping enrichment'
+      );
       return { processed: 0, skipped: 0, errors: 0, total: 0, aborted: true };
     }
 
@@ -95,7 +97,9 @@ class RegistrySyncer {
     }
 
     this._stats = { processed: 0, skipped: 0, errors: 0, total: allEntities.length };
-    this._logger(`[registry-syncer] Starting ${isFull ? 'full' : 'incremental'} sync of ${allEntities.length} entities`);
+    this._logger(
+      `[registry-syncer] Starting ${isFull ? 'full' : 'incremental'} sync of ${allEntities.length} entities`
+    );
 
     // Iterate and enrich
     for (const entity of allEntities) {
@@ -120,7 +124,9 @@ class RegistrySyncer {
     // Atomic write
     this._atomicWrite(this._registryPath, registry);
 
-    this._logger(`[registry-syncer] Sync complete: ${this._stats.processed} processed, ${this._stats.skipped} skipped, ${this._stats.errors} errors`);
+    this._logger(
+      `[registry-syncer] Sync complete: ${this._stats.processed} processed, ${this._stats.skipped} skipped, ${this._stats.errors} errors`
+    );
     return { ...this._stats };
   }
 

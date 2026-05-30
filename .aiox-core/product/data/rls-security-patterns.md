@@ -10,6 +10,7 @@
 ## RLS FUNDAMENTALS
 
 ### Enabling RLS
+
 ```sql
 -- Enable RLS on table (required before policies work)
 ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
@@ -19,6 +20,7 @@ ALTER TABLE posts FORCE ROW LEVEL SECURITY;
 ```
 
 ### Policy Structure
+
 ```sql
 CREATE POLICY policy_name
 ON table_name
@@ -33,6 +35,7 @@ WITH CHECK (expression) -- Filter for INSERT, UPDATE
 ## COMMON PATTERNS
 
 ### Pattern 1: User Owns Row
+
 ```sql
 -- Users can only see/modify their own data
 CREATE POLICY "Users can view own data"
@@ -58,6 +61,7 @@ WITH CHECK (auth.uid() = user_id);
 ```
 
 ### Pattern 2: Organization/Team Based
+
 ```sql
 -- Users can see data from their organization
 CREATE POLICY "Team members can view team data"
@@ -73,6 +77,7 @@ USING (
 ```
 
 ### Pattern 3: Role-Based Access
+
 ```sql
 -- Different access levels based on user role
 CREATE POLICY "Admins have full access"
@@ -99,6 +104,7 @@ USING (
 ```
 
 ### Pattern 4: Public Read, Authenticated Write
+
 ```sql
 -- Anyone can read, only authenticated can write
 CREATE POLICY "Public read access"
@@ -113,6 +119,7 @@ WITH CHECK (auth.uid() = author_id);
 ```
 
 ### Pattern 5: Time-Based Access
+
 ```sql
 -- Access expires after a certain date
 CREATE POLICY "Time-limited access"
@@ -129,6 +136,7 @@ USING (
 ## SUPABASE-SPECIFIC PATTERNS
 
 ### Using auth.uid()
+
 ```sql
 -- Get the current authenticated user's ID
 SELECT auth.uid();
@@ -141,6 +149,7 @@ USING (owner_id = auth.uid());
 ```
 
 ### Using auth.jwt()
+
 ```sql
 -- Access JWT claims
 SELECT auth.jwt() ->> 'email';
@@ -156,6 +165,7 @@ USING (
 ```
 
 ### Using auth.role()
+
 ```sql
 -- Different policies for different Supabase roles
 CREATE POLICY "Anon can read public"
@@ -179,6 +189,7 @@ USING (true);
 ## PERFORMANCE OPTIMIZATION
 
 ### Use Indexes for RLS
+
 ```sql
 -- Create index on columns used in RLS policies
 CREATE INDEX idx_posts_user_id ON posts(user_id);
@@ -186,6 +197,7 @@ CREATE INDEX idx_org_members_user_org ON organization_members(user_id, organizat
 ```
 
 ### Avoid Expensive Subqueries
+
 ```sql
 -- ❌ Bad: Subquery in every row check
 CREATE POLICY "Expensive policy"
@@ -214,6 +226,7 @@ USING (id IN (SELECT get_accessible_document_ids()));
 ```
 
 ### Materialized Permissions
+
 ```sql
 -- Pre-compute permissions for complex access patterns
 CREATE TABLE user_document_access (
@@ -241,6 +254,7 @@ USING (
 ## SECURITY BEST PRACTICES
 
 ### Always Enable RLS
+
 ```sql
 -- Check tables without RLS
 SELECT tablename
@@ -252,6 +266,7 @@ AND tablename NOT IN (
 ```
 
 ### Default Deny
+
 ```sql
 -- Enable RLS = default deny (no access without policy)
 ALTER TABLE sensitive_data ENABLE ROW LEVEL SECURITY;
@@ -264,6 +279,7 @@ USING (/* specific conditions */);
 ```
 
 ### Avoid USING (true)
+
 ```sql
 -- ❌ Dangerous: Opens access to all
 CREATE POLICY "Too permissive"
@@ -278,6 +294,7 @@ USING (id = auth.uid() OR is_public = true);
 ```
 
 ### Separate Policies by Operation
+
 ```sql
 -- ✅ Granular control
 CREATE POLICY "Select policy" ON posts FOR SELECT ...;
@@ -294,6 +311,7 @@ CREATE POLICY "All operations" ON posts FOR ALL ...;
 ## DEBUGGING RLS
 
 ### Test Policies
+
 ```sql
 -- Check what policies exist
 SELECT * FROM pg_policies WHERE tablename = 'posts';
@@ -309,6 +327,7 @@ RESET ROLE;
 ```
 
 ### Common Issues
+
 1. **No data returned:** Check USING clause conditions
 2. **Can't insert:** Check WITH CHECK clause
 3. **Performance slow:** Add indexes on RLS filter columns
@@ -329,5 +348,5 @@ RESET ROLE;
 
 ---
 
-**Reviewer:** ________ **Date:** ________
+**Reviewer:** **\_\_\_\_** **Date:** **\_\_\_\_**
 **Security Audit:** [ ] PASS [ ] NEEDS REVIEW

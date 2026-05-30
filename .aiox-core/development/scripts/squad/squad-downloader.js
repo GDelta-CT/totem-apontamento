@@ -17,15 +17,13 @@ const path = require('path');
  * Default registry URL for aiox-squads
  * @constant {string}
  */
-const REGISTRY_URL =
-  'https://raw.githubusercontent.com/SynkraAI/aiox-squads/main/registry.json';
+const REGISTRY_URL = 'https://raw.githubusercontent.com/SynkraAI/aiox-squads/main/registry.json';
 
 /**
  * GitHub API base URL for aiox-squads contents
  * @constant {string}
  */
-const GITHUB_API_BASE =
-  'https://api.github.com/repos/SynkraAI/aiox-squads/contents/packages';
+const GITHUB_API_BASE = 'https://api.github.com/repos/SynkraAI/aiox-squads/contents/packages';
 
 /**
  * Default path for downloaded squads
@@ -206,7 +204,7 @@ class SquadDownloader {
       throw new SquadDownloaderError(
         DownloaderErrorCodes.SQUAD_EXISTS,
         `Squad "${name}" already exists at ${targetPath}`,
-        'Use --overwrite flag or delete existing squad first',
+        'Use --overwrite flag or delete existing squad first'
       );
     }
 
@@ -218,14 +216,14 @@ class SquadDownloader {
       throw new SquadDownloaderError(
         DownloaderErrorCodes.SQUAD_NOT_FOUND,
         `Squad "${name}" not found in registry`,
-        'Use *download-squad --list to see available squads',
+        'Use *download-squad --list to see available squads'
       );
     }
 
     // 3. Verify version if specified
     if (version !== 'latest' && squadInfo.version !== version) {
       this._log(
-        `Warning: Requested version ${version}, but only ${squadInfo.version} is available`,
+        `Warning: Requested version ${version}, but only ${squadInfo.version} is available`
       );
     }
 
@@ -293,7 +291,7 @@ class SquadDownloader {
       throw new SquadDownloaderError(
         DownloaderErrorCodes.REGISTRY_FETCH_ERROR,
         `Failed to fetch registry: ${error.message}`,
-        'Check network connection or try again later',
+        'Check network connection or try again later'
       );
     }
   }
@@ -352,7 +350,7 @@ class SquadDownloader {
       throw new SquadDownloaderError(
         DownloaderErrorCodes.DOWNLOAD_ERROR,
         `Failed to fetch squad contents: ${error.message}`,
-        'Squad may not exist in repository yet',
+        'Squad may not exist in repository yet'
       );
     }
 
@@ -360,7 +358,7 @@ class SquadDownloader {
       throw new SquadDownloaderError(
         DownloaderErrorCodes.DOWNLOAD_ERROR,
         'Invalid response from GitHub API',
-        'Check if squad exists in aiox-squads repository',
+        'Check if squad exists in aiox-squads repository'
       );
     }
 
@@ -429,8 +427,8 @@ class SquadDownloader {
                 new SquadDownloaderError(
                   DownloaderErrorCodes.RATE_LIMIT,
                   `GitHub API rate limit exceeded. Resets at ${resetDate.toISOString()}`,
-                  'Set GITHUB_TOKEN environment variable to increase rate limit',
-                ),
+                  'Set GITHUB_TOKEN environment variable to increase rate limit'
+                )
               );
               return;
             }
@@ -447,8 +445,8 @@ class SquadDownloader {
             reject(
               new SquadDownloaderError(
                 DownloaderErrorCodes.NETWORK_ERROR,
-                `HTTP ${res.statusCode}: ${res.statusMessage}`,
-              ),
+                `HTTP ${res.statusCode}: ${res.statusMessage}`
+              )
             );
             return;
           }
@@ -468,8 +466,8 @@ class SquadDownloader {
             new SquadDownloaderError(
               DownloaderErrorCodes.NETWORK_ERROR,
               `Network error: ${error.message}`,
-              'Check internet connection',
-            ),
+              'Check internet connection'
+            )
           );
         });
     });

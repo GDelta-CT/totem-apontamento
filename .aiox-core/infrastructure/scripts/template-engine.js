@@ -24,21 +24,21 @@ class TemplateEngine {
   process(template, variables = {}) {
     // First, handle escaped braces
     let processed = template.replace(this.escapePattern, '{{$1}}');
-    
+
     // Process loops
     processed = this.processLoops(processed, variables);
-    
+
     // Process conditionals
     processed = this.processConditionals(processed, variables);
-    
+
     // Process simple variables
     processed = this.processVariables(processed, variables);
-    
+
     // Restore escaped braces
-    processed = processed.replace(/\{\{ESCAPED_BRACE_(LEFT|RIGHT)\}\}/g, (match, side) => 
-      side === 'LEFT' ? '{{' : '}}',
+    processed = processed.replace(/\{\{ESCAPED_BRACE_(LEFT|RIGHT)\}\}/g, (match, side) =>
+      side === 'LEFT' ? '{{' : '}}'
     );
-    
+
     return processed;
   }
 
@@ -52,31 +52,35 @@ class TemplateEngine {
   processLoops(template, variables) {
     return template.replace(this.loopPattern, (match, loopVar, content) => {
       const items = this.resolveVariable(loopVar, variables);
-      
+
       // Handle non-array values gracefully
       if (!Array.isArray(items)) {
-        console.warn(`[TemplateEngine] Expected array for loop variable '${loopVar}', got ${typeof items}`);
+        console.warn(
+          `[TemplateEngine] Expected array for loop variable '${loopVar}', got ${typeof items}`
+        );
         return '';
       }
-      
-      return items.map((item, index) => {
-        // Create proper loop context with item and metadata
-        const loopVars = {
-          ...variables,
-          ITEM: item,
-          INDEX: index,
-          FIRST: index === 0,
-          LAST: index === items.length - 1,
-          [loopVar.replace('_', '')]: item,
-        };
-        
-        // Process nested loops and conditionals
-        let processedContent = this.processLoops(content, loopVars);
-        processedContent = this.processConditionals(processedContent, loopVars);
-        processedContent = this.processVariables(processedContent, loopVars);
-        
-        return processedContent;
-      }).join('');
+
+      return items
+        .map((item, index) => {
+          // Create proper loop context with item and metadata
+          const loopVars = {
+            ...variables,
+            ITEM: item,
+            INDEX: index,
+            FIRST: index === 0,
+            LAST: index === items.length - 1,
+            [loopVar.replace('_', '')]: item,
+          };
+
+          // Process nested loops and conditionals
+          let processedContent = this.processLoops(content, loopVars);
+          processedContent = this.processConditionals(processedContent, loopVars);
+          processedContent = this.processVariables(processedContent, loopVars);
+
+          return processedContent;
+        })
+        .join('');
     });
   }
 
@@ -87,7 +91,7 @@ class TemplateEngine {
   processConditionals(template, variables) {
     return template.replace(this.conditionalPattern, (match, condition, content) => {
       const value = this.resolveVariable(condition, variables);
-      
+
       // Check for truthy value
       if (value && (Array.isArray(value) ? value.length > 0 : true)) {
         return content;
@@ -115,7 +119,7 @@ class TemplateEngine {
     // Handle nested paths like "user.name"
     const parts = varName.split('.');
     let value = variables;
-    
+
     for (const part of parts) {
       if (value && typeof value === 'object') {
         value = value[part];
@@ -123,7 +127,7 @@ class TemplateEngine {
         return undefined;
       }
     }
-    
+
     return value;
   }
 
@@ -136,29 +140,25 @@ class TemplateEngine {
   validateTemplate(template, requiredVars = []) {
     const foundVars = new Set();
     const missing = [];
-    
+
     // Extract all variable names from template
     let match;
-    const allPatterns = [
-      this.variablePattern,
-      /\{\{#IF_([^}]+)\}\}/g,
-      /\{\{#EACH_([^}]+)\}\}/g,
-    ];
-    
+    const allPatterns = [this.variablePattern, /\{\{#IF_([^}]+)\}\}/g, /\{\{#EACH_([^}]+)\}\}/g];
+
     for (const pattern of allPatterns) {
       pattern.lastIndex = 0; // Reset regex
       while ((match = pattern.exec(template)) !== null) {
         foundVars.add(match[1].trim());
       }
     }
-    
+
     // Check for missing required variables
     for (const reqVar of requiredVars) {
       if (!foundVars.has(reqVar)) {
         missing.push(reqVar);
       }
     }
-    
+
     return {
       valid: missing.length === 0,
       missing,
@@ -184,7 +184,7 @@ class TemplateEngine {
    */
   escapeInput(input) {
     if (typeof input !== 'string') return input;
-    
+
     // Escape template syntax
     return input
       .replace(/\{\{/g, '\\{{')
@@ -206,7 +206,7 @@ class TemplateEngine {
       conditionals: [],
       loops: [],
     };
-    
+
     // Extract simple variables
     let match;
     this.variablePattern.lastIndex = 0;
@@ -215,24 +215,24 @@ class TemplateEngine {
         variables.simple.push(match[1].trim());
       }
     }
-    
+
     // Extract conditionals
     const conditionalStartPattern = /\{\{#IF_([^}]+)\}\}/g;
     while ((match = conditionalStartPattern.exec(template)) !== null) {
       variables.conditionals.push(match[1].trim());
     }
-    
+
     // Extract loops
     const loopStartPattern = /\{\{#EACH_([^}]+)\}\}/g;
     while ((match = loopStartPattern.exec(template)) !== null) {
       variables.loops.push(match[1].trim());
     }
-    
+
     // Remove duplicates
     for (const key in variables) {
       variables[key] = [...new Set(variables[key])];
     }
-    
+
     return variables;
   }
 }

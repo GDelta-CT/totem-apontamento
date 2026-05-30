@@ -56,8 +56,9 @@ class L2AgentProcessor extends LayerProcessor {
     }
 
     // 2. Find domain with matching agentTrigger
-    const domainKey = Object.keys(manifest.domains || {})
-      .find(k => manifest.domains[k].agentTrigger === agentId);
+    const domainKey = Object.keys(manifest.domains || {}).find(
+      (k) => manifest.domains[k].agentTrigger === agentId
+    );
 
     if (!domainKey) {
       return null;
@@ -77,7 +78,7 @@ class L2AgentProcessor extends LayerProcessor {
     }
 
     // 4. Check for authority boundaries
-    const hasAuthority = rules.some(r => r.toUpperCase().includes('AUTH'));
+    const hasAuthority = rules.some((r) => r.toUpperCase().includes('AUTH'));
 
     return {
       rules,

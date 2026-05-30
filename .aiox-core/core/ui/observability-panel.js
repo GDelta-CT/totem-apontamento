@@ -145,9 +145,10 @@ class ObservabilityPanel {
    * @returns {void}
    */
   render() {
-    const output = this.state.mode === PanelMode.DETAILED
-      ? this.renderer.renderDetailed(this.state)
-      : this.renderer.renderMinimal(this.state);
+    const output =
+      this.state.mode === PanelMode.DETAILED
+        ? this.renderer.renderDetailed(this.state)
+        : this.renderer.renderMinimal(this.state);
 
     this.clearPanel();
     process.stdout.write(output);
@@ -250,7 +251,7 @@ class ObservabilityPanel {
    */
   removeTerminal(pid) {
     this.state.active_terminals.list = this.state.active_terminals.list.filter(
-      (t) => t.pid !== pid,
+      (t) => t.pid !== pid
     );
     this.state.active_terminals.count = this.state.active_terminals.list.length;
   }
@@ -305,9 +306,8 @@ class ObservabilityPanel {
    * @returns {string} Current mode after toggle
    */
   toggleMode() {
-    this.state.mode = this.state.mode === PanelMode.MINIMAL
-      ? PanelMode.DETAILED
-      : PanelMode.MINIMAL;
+    this.state.mode =
+      this.state.mode === PanelMode.MINIMAL ? PanelMode.DETAILED : PanelMode.MINIMAL;
     return this.state.mode;
   }
 

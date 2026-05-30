@@ -24,8 +24,8 @@ agents:
         condition: kb_command
         size: 35KB
     lazy_loading:
-      registry: false      # Always load (15KB, frequently used)
-      aiox-kb: true        # Load only on *kb command
+      registry: false # Always load (15KB, frequently used)
+      aiox-kb: true # Load only on *kb command
     performance_target: <30ms
 
   # ======================================================================
@@ -51,8 +51,8 @@ agents:
         lazy: false
         size: 15KB
     lazy_loading:
-      framework_docs: false        # Always load
-      project_decisions: true      # Load when yolo mode or story development
+      framework_docs: false # Always load
+      project_decisions: true # Load when yolo mode or story development
     performance_target: <50ms
 
   qa:
@@ -71,7 +71,7 @@ agents:
         lazy: false
         size: 6KB
     lazy_loading:
-      test_frameworks: false    # Always load
+      test_frameworks: false # Always load
     performance_target: <50ms
 
   devops:
@@ -110,7 +110,7 @@ agents:
         lazy: false
         size: 15KB
     lazy_loading:
-      architecture_templates: true  # Load when creating architecture
+      architecture_templates: true # Load when creating architecture
     performance_target: <75ms
 
   po:
@@ -124,8 +124,8 @@ agents:
         lazy: false
         size: 5KB
     lazy_loading:
-      story_templates: true      # Load when creating stories
-      prd_templates: true        # Load when creating PRDs
+      story_templates: true # Load when creating stories
+      prd_templates: true # Load when creating PRDs
     performance_target: <75ms
 
   sm:
@@ -228,8 +228,8 @@ agents:
         condition: meta_operations
         size: 35KB
     lazy_loading:
-      aiox_kb: true              # Load only for meta operations
-      agent_templates: true      # Load when creating agents
+      aiox_kb: true # Load only for meta operations
+      agent_templates: true # Load when creating agents
     performance_target: <100ms
 
   aiox-orchestrator:
@@ -249,7 +249,7 @@ agents:
       - squadsTemplateLocation
     files_loaded: []
     lazy_loading:
-      agent_registry: true         # Load when validating/creating squads
+      agent_registry: true # Load when validating/creating squads
       squad_manifest: true # Load when managing squads
     performance_target: <150ms
 
@@ -371,7 +371,7 @@ performance_baseline:
 # ======================================================================
 
 cache_strategy:
-  ttl: 300000  # 5 minutes in milliseconds
+  ttl: 300000 # 5 minutes in milliseconds
 
   high_priority_files:
     - .aiox-core/data/technical-preferences.md
@@ -384,7 +384,7 @@ cache_strategy:
     - config_reload_command
     - ttl_expiration
 
-  expected_cache_hit_rate: ">70%"
+  expected_cache_hit_rate: '>70%'
 
 # ======================================================================
 # MIGRATION NOTES (Q2 2026)
@@ -393,7 +393,7 @@ cache_strategy:
 migration_notes:
   framework_docs:
     current_location: docs/framework/
-    future_location: aiox-core/docs/framework/  # In REPO 1
+    future_location: aiox-core/docs/framework/ # In REPO 1
     migration_phase: Q2 2026
 
   backward_compatibility:

@@ -135,8 +135,8 @@ class CodeGraphProvider extends CodeIntelProvider {
     if (!result) return null;
     return {
       file: result.file ?? result.path ?? null,
-      line: result.line != null ? result.line : (result.row != null ? result.row : null),
-      column: result.column != null ? result.column : (result.col != null ? result.col : null),
+      line: result.line != null ? result.line : result.row != null ? result.row : null,
+      column: result.column != null ? result.column : result.col != null ? result.col : null,
       context: result.context || result.snippet || null,
     };
   }
@@ -146,7 +146,7 @@ class CodeGraphProvider extends CodeIntelProvider {
     const items = Array.isArray(result) ? result : result.references || result.results || [];
     return items.map((r) => ({
       file: r.file ?? r.path ?? null,
-      line: r.line != null ? r.line : (r.row != null ? r.row : null),
+      line: r.line != null ? r.line : r.row != null ? r.row : null,
       context: r.context || r.snippet || null,
     }));
   }
@@ -157,7 +157,7 @@ class CodeGraphProvider extends CodeIntelProvider {
     return items.map((r) => ({
       caller: r.caller || r.name || null,
       file: r.file ?? r.path ?? null,
-      line: r.line != null ? r.line : (r.row != null ? r.row : null),
+      line: r.line != null ? r.line : r.row != null ? r.row : null,
     }));
   }
 
@@ -167,7 +167,7 @@ class CodeGraphProvider extends CodeIntelProvider {
     return items.map((r) => ({
       callee: r.callee || r.name || null,
       file: r.file ?? r.path ?? null,
-      line: r.line != null ? r.line : (r.row != null ? r.row : null),
+      line: r.line != null ? r.line : r.row != null ? r.row : null,
     }));
   }
 
@@ -182,7 +182,8 @@ class CodeGraphProvider extends CodeIntelProvider {
   _normalizeComplexityResult(result) {
     if (!result) return null;
     return {
-      score: result.score != null ? result.score : (result.complexity != null ? result.complexity : 0),
+      score:
+        result.score != null ? result.score : result.complexity != null ? result.complexity : 0,
       details: result.details || result.metrics || {},
     };
   }
@@ -199,8 +200,10 @@ class CodeGraphProvider extends CodeIntelProvider {
   _normalizeStatsResult(result) {
     if (!result) return null;
     return {
-      files: result.files != null ? result.files : (result.total_files != null ? result.total_files : 0),
-      lines: result.lines != null ? result.lines : (result.total_lines != null ? result.total_lines : 0),
+      files:
+        result.files != null ? result.files : result.total_files != null ? result.total_files : 0,
+      lines:
+        result.lines != null ? result.lines : result.total_lines != null ? result.total_lines : 0,
       languages: result.languages || {},
     };
   }

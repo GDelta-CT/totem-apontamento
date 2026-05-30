@@ -203,11 +203,14 @@ updated_at: 2025-11-17
  Powered by AIOX™ Core -->
 
 ---
+
 tools:
-  - github-cli        # Requirements tracking and test coverage analysis
-  - context7          # Research testing patterns and traceability best practices
-checklists:
-  - po-master-checklist.md
+
+- github-cli # Requirements tracking and test coverage analysis
+- context7 # Research testing patterns and traceability best practices
+  checklists:
+- po-master-checklist.md
+
 ---
 
 # trace-requirements
@@ -474,4 +477,3 @@ Trace matrix: qa.qaLocation/assessments/{epic}.{story}-trace-{YYYYMMDD}.md
 - Identify both presence and absence
 - Prioritize based on risk
 - Make recommendations actionable
- 

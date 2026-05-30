@@ -1,7 +1,7 @@
 ---
 tools:
-  - git               # Track backlog file changes
-  - context7          # Research backlog management best practices
+  - git # Track backlog file changes
+  - context7 # Research backlog management best practices
 checklists:
   - backlog-management-checklist.md
 ---
@@ -13,6 +13,7 @@ Manage the STORY-BACKLOG.md file to track follow-up tasks, technical debt, and o
 ## Purpose
 
 The Story Backlog provides a centralized, structured way to:
+
 - Track follow-up tasks identified during QA reviews
 - Document technical debt from development
 - Capture optimization opportunities
@@ -38,6 +39,7 @@ The Story Backlog provides a centralized, structured way to:
 **Trigger**: After QA review, during development, or PM prioritization
 
 **Input Parameters**:
+
 ```yaml
 required:
   - story_id: 'STORY-XXX' # Source story
@@ -57,6 +59,7 @@ optional:
 ```
 
 **Process**:
+
 1. Read existing `STORY-BACKLOG.md`
 2. Generate unique ID: `[{story_id}-{item_type}{sequential_number}]`
    - Example: `[STORY-013-F1]` (first follow-up from STORY-013)
@@ -68,8 +71,10 @@ optional:
 7. Write updated backlog file
 
 **Item Template**:
-```markdown
+
+````markdown
 #### [{story_id}-{type}{num}] {title}
+
 - **Source**: {source}
 - **Priority**: {priority_emoji} {priority}
 - **Effort**: {effort}
@@ -89,16 +94,19 @@ optional:
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -150,6 +158,7 @@ atomic_layer: Organism
   destino: State management
   persistido: true
 ```
+````
 
 ---
 
@@ -266,6 +275,7 @@ token_usage: ~3,000-10,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Break into smaller workflows; implement checkpointing; use async processing where possible
 
 ---
@@ -285,7 +295,7 @@ updated_at: 2025-11-17
 
 ---
 
-```
+````
 
 ### 2. Update Backlog Item Status
 
@@ -300,9 +310,10 @@ required:
 optional:
   - blocker_reason: 'Why blocked' # If status=BLOCKED
   - completion_notes: 'Notes on completion' # If status=DONE
-```
+````
 
 **Process**:
+
 1. Find item by ID in backlog file
 2. Update status field
 3. Add completion date if DONE
@@ -311,6 +322,7 @@ optional:
 6. Write updated file
 
 **Status Values**:
+
 - 📋 **TODO**: Not started
 - 🚧 **IN PROGRESS**: Currently being worked on
 - ⏸️ **BLOCKED**: Waiting on dependency
@@ -323,6 +335,7 @@ optional:
 **Trigger**: Weekly backlog review meeting
 
 **Process**:
+
 1. Read entire backlog file
 2. Generate review report:
    - Items by status
@@ -338,6 +351,7 @@ optional:
 4. Output review summary
 
 **Review Questions**:
+
 - Are all 📋 TODO items still relevant?
 - Should any 💡 IDEA items be promoted to TODO?
 - Are any items blocked for too long?
@@ -349,6 +363,7 @@ optional:
 **Trigger**: Monthly or when backlog gets too large
 
 **Process**:
+
 1. Collect all ✅ DONE items
 2. Create archive file: `docs/qa/backlog-archive-{YYYY-MM}.md`
 3. Move DONE items to archive with completion metadata
@@ -361,6 +376,7 @@ optional:
 **Trigger**: Sprint planning, stakeholder requests
 
 **Output Options**:
+
 - **Summary**: Item counts by priority/status/sprint
 - **Detailed**: Full item list with all fields
 - **Sprint View**: Items grouped by sprint
@@ -376,6 +392,7 @@ This task requires the following configuration keys from `core-config.yaml`:
 - **`qaLocation`**: QA output directory (to link QA reviews)
 
 **Example Config Addition**:
+
 ```yaml
 # Story Backlog Management (added with Story Backlog feature)
 storyBacklog:
@@ -391,13 +408,16 @@ storyBacklog:
 ### QA Agent Integration
 
 After completing story review (`review-story` task), QA agent should:
+
 1. Identify follow-ups, technical debt, optimizations
 2. Call `manage-story-backlog` with operation='add' for each item
 3. Reference backlog items in QA Results section
 
 **Example QA Results Addition**:
+
 ```markdown
 ### Recommended Actions
+
 1. ✅ **Commit immediately** - Unblocks dependent stories
 2. 📝 **Created [STORY-013-F1]**: Install Jest+ESM transformer (tracked in backlog)
 3. 📝 **Created [STORY-013-F2]**: Add integration tests (tracked in backlog)
@@ -406,11 +426,13 @@ After completing story review (`review-story` task), QA agent should:
 ### Dev Agent Integration
 
 During development (`develop-story` task), dev agent should:
+
 1. Note technical debt incurred for speed
 2. Identify optimization opportunities
 3. Add items to backlog with `source: Development`
 
 **Example Usage**:
+
 ```javascript
 // Dev notices optimization opportunity during implementation
 await addBacklogItem({
@@ -422,19 +444,21 @@ await addBacklogItem({
   effort: '2 hours',
   source: 'Development',
   assignee: 'Backend Developer',
-  sprint: 'Sprint 2'
+  sprint: 'Sprint 2',
 });
 ```
 
 ### PO Agent Integration
 
 Product Owner uses backlog for:
+
 1. Sprint planning prioritization
 2. Weekly backlog reviews
 3. Technical debt management
 4. Stakeholder reporting
 
 **PO Commands** (see agent update below):
+
 - `*backlog-review`: Generate review report for sprint planning
 - `*backlog-summary`: Quick summary of backlog status
 - `*backlog-prioritize`: Re-prioritize items based on new information
@@ -477,8 +501,10 @@ Product Owner uses backlog for:
 ## Example Workflow
 
 **After QA Review of STORY-013**:
+
 1. QA identifies 3 follow-ups
 2. QA calls `manage-story-backlog` 3 times:
+
    ```bash
    # Add Jest+ESM config item
    *backlog-add STORY-013 F HIGH "Install Jest+ESM transformer" "..."
@@ -489,6 +515,7 @@ Product Owner uses backlog for:
    # Add README update item
    *backlog-add STORY-013 F MEDIUM "Update README documentation" "..."
    ```
+
 3. Items appear in backlog with IDs `[STORY-013-F1]`, `[STORY-013-F2]`, `[STORY-013-F3]`
 4. Sprint planning: PO calls `*backlog-review`
 5. Team commits to F1 and F2 in Sprint 1, defers F3 to Sprint 2
@@ -499,6 +526,7 @@ Product Owner uses backlog for:
 ## Success Metrics
 
 Track effectiveness of Story Backlog:
+
 - **Item Completion Rate**: % of backlog items completed
 - **Age of Items**: How long items sit in TODO state
 - **Blocked Item Resolution**: Time to unblock blocked items
@@ -518,6 +546,6 @@ Track effectiveness of Story Backlog:
 
 ---
 
-*Created: 2025-11-11*
-*Purpose: Officially integrate Story Backlog into AIOX framework*
-*Story: STORY-013 QA Review Process*
+_Created: 2025-11-11_
+_Purpose: Officially integrate Story Backlog into AIOX framework_
+_Story: STORY-013 QA Review Process_

@@ -11,16 +11,19 @@
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -188,6 +191,7 @@ token_usage: ~800-2,500 tokens
 ```
 
 **Optimization Notes:**
+
 - Validate configuration early; use atomic writes; implement rollback checkpoints
 
 ---
@@ -207,7 +211,6 @@ updated_at: 2025-11-17
 
 ---
 
-
 ## Inputs
 
 - `label` (string): Snapshot label/name (e.g., "baseline", "pre_migration", "v1_2_0")
@@ -219,6 +222,7 @@ updated_at: 2025-11-17
 ### 1. Confirm Snapshot Details
 
 Ask user:
+
 - Snapshot label: `{label}`
 - Purpose of this snapshot (e.g., "before adding user_roles table")
 - Include data? (schema-only is default, safer, faster)
@@ -325,6 +329,7 @@ Metadata saved to:
 ## Snapshot Options
 
 ### Schema-Only (Default)
+
 - ✅ Fast (seconds)
 - ✅ Small file size
 - ✅ Safe to apply to any environment
@@ -332,6 +337,7 @@ Metadata saved to:
 - **Use for**: Migration rollback, schema versioning
 
 ### Schema + Data
+
 ```bash
 pg_dump "$SUPABASE_DB_URL" \
   --clean \
@@ -340,6 +346,7 @@ pg_dump "$SUPABASE_DB_URL" \
   --no-privileges \
   > "$FILENAME"
 ```
+
 - ⚠️ Slower (minutes to hours)
 - ⚠️ Large file size
 - ⚠️ Data may conflict on restore
@@ -347,6 +354,7 @@ pg_dump "$SUPABASE_DB_URL" \
 - **Use for**: Disaster recovery, environment cloning
 
 ### Specific Tables Only
+
 ```bash
 pg_dump "$SUPABASE_DB_URL" \
   --schema-only \
@@ -354,6 +362,7 @@ pg_dump "$SUPABASE_DB_URL" \
   --table="profiles" \
   > "$FILENAME"
 ```
+
 - ✅ Targeted snapshot
 - ✅ Smaller file
 - **Use for**: Testing specific table changes
@@ -365,6 +374,7 @@ pg_dump "$SUPABASE_DB_URL" \
 ### When to Snapshot
 
 **Always before:**
+
 - Migrations
 - Schema changes
 - RLS policy changes
@@ -372,6 +382,7 @@ pg_dump "$SUPABASE_DB_URL" \
 - Major data operations
 
 **Regularly:**
+
 - Daily schema snapshots (automated)
 - Before each deployment
 - After successful migrations (post-snapshot)
@@ -379,12 +390,14 @@ pg_dump "$SUPABASE_DB_URL" \
 ### Snapshot Naming
 
 **Good names:**
+
 - `baseline` - Initial schema state
 - `pre_migration` - Before any migration
 - `pre_v1_2_0` - Before version deployment
 - `working_state` - Known good state
 
 **Bad names:**
+
 - `backup` - Too generic
 - `test` - Unclear purpose
 - `snapshot1` - No context
@@ -392,6 +405,7 @@ pg_dump "$SUPABASE_DB_URL" \
 ### Retention
 
 Keep snapshots for:
+
 - Last 7 days: All snapshots
 - Last 30 days: Daily snapshots
 - Last year: Monthly snapshots
@@ -407,22 +421,24 @@ ls -t *.sql | tail -n +11 | xargs rm -f
 
 ## Snapshot vs Backup
 
-| Feature | Snapshot (pg_dump) | Supabase Backup |
-|---------|-------------------|-----------------|
-| Speed | Fast | Depends |
-| Scope | Schema only (default) | Full database |
-| Storage | Local files | Supabase managed |
-| Restore | Manual psql | Supabase dashboard |
-| Version control | ✅ Git-friendly | ❌ Binary |
-| Automation | Easy (script) | Automatic |
+| Feature         | Snapshot (pg_dump)    | Supabase Backup    |
+| --------------- | --------------------- | ------------------ |
+| Speed           | Fast                  | Depends            |
+| Scope           | Schema only (default) | Full database      |
+| Storage         | Local files           | Supabase managed   |
+| Restore         | Manual psql           | Supabase dashboard |
+| Version control | ✅ Git-friendly       | ❌ Binary          |
+| Automation      | Easy (script)         | Automatic          |
 
 **Use snapshots for:**
+
 - Schema version control
 - Migration rollback
 - Development workflows
 - Quick local backups
 
 **Use Supabase backups for:**
+
 - Disaster recovery
 - Point-in-time restore
 - Production incidents
@@ -449,7 +465,8 @@ ls -t *.sql | tail -n +11 | xargs rm -f
 ### "Snapshot file is empty"
 
 **Problem**: No schema objects or connection failed  
-**Fix**: 
+**Fix**:
+
 1. Verify database has tables: `SELECT * FROM pg_tables WHERE schemaname='public';`
 2. Check pg_dump version compatibility
 3. Verify network connectivity
@@ -464,6 +481,7 @@ ls -t *.sql | tail -n +11 | xargs rm -f
 ## Integration with Workflow
 
 ### Pre-Migration Workflow
+
 ```bash
 *snapshot pre_migration      # Create rollback point
 *verify-order migration.sql  # Check DDL order
@@ -473,6 +491,7 @@ ls -t *.sql | tail -n +11 | xargs rm -f
 ```
 
 ### Comparison Workflow
+
 ```bash
 *snapshot before_changes
 # ... make changes ...
@@ -519,16 +538,19 @@ git commit -m "snapshot: schema before feature X"
 ## Security Notes
 
 ⚠️ **Snapshots may contain sensitive schema info**:
+
 - Table names reveal business logic
 - Function names expose features
 - Comments may contain internal notes
 
 **In public repos:**
+
 - Consider .gitignore for snapshots
 - Or sanitize before committing
 - Or use private repos only
 
 **Do NOT commit:**
+
 - Snapshots with `--data-included`
 - Files containing passwords/secrets
 - Connection strings in metadata

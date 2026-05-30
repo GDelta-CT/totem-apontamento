@@ -57,7 +57,7 @@ async function parseStoryFile(storyFilePath) {
 
   // Parse tasks (checkbox items)
   const taskMatches = fileContent.matchAll(/^- \[([ x])\] (.+)$/gm);
-  const tasks = Array.from(taskMatches).map(match => ({
+  const tasks = Array.from(taskMatches).map((match) => ({
     completed: match[1] === 'x',
     text: match[2],
   }));
@@ -131,20 +131,24 @@ async function saveStoryFile(storyFilePath, content, skipSync = false) {
     // Sync to ClickUp if there are changes
     await syncStoryToClickUp(storyFile, changes);
 
-    const hasChanges = changes.status.changed ||
-                      changes.tasksCompleted.length > 0 ||
-                      changes.filesAdded.length > 0 ||
-                      changes.devNotesAdded ||
-                      changes.acceptanceCriteriaChanged;
+    const hasChanges =
+      changes.status.changed ||
+      changes.tasksCompleted.length > 0 ||
+      changes.filesAdded.length > 0 ||
+      changes.devNotesAdded ||
+      changes.acceptanceCriteriaChanged;
 
     if (hasChanges) {
       console.log('✅ Story synced to ClickUp');
-      return { saved: true, synced: true, changes: Object.keys(changes).filter(k => changes[k] && changes[k] !== false).length };
+      return {
+        saved: true,
+        synced: true,
+        changes: Object.keys(changes).filter((k) => changes[k] && changes[k] !== false).length,
+      };
     } else {
       console.log('ℹ️ No sync needed: no changes detected');
       return { saved: true, synced: false, reason: 'no_changes' };
     }
-
   } catch (error) {
     console.error(`Error saving story file: ${error.message}`);
     throw error;
@@ -237,9 +241,7 @@ async function createStoryInClickUp({
   }
 
   // Format story identifier
-  const storyId = subStoryNum
-    ? `${epicNum}.${subStoryNum}.${storyNum}`
-    : `${epicNum}.${storyNum}`;
+  const storyId = subStoryNum ? `${epicNum}.${subStoryNum}.${storyNum}` : `${epicNum}.${storyNum}`;
 
   const storyName = `Story ${storyId}: ${title}`;
 
@@ -247,7 +249,8 @@ async function createStoryInClickUp({
   const tags = ['story', `epic-${epicNum}`, `story-${storyId}`];
 
   // Auto-generate file path if not provided
-  const filePath = storyFilePath || `docs/stories/${storyId}.${title.toLowerCase().replace(/\s+/g, '-')}.md`;
+  const filePath =
+    storyFilePath || `docs/stories/${storyId}.${title.toLowerCase().replace(/\s+/g, '-')}.md`;
 
   // Prepare custom fields
   const customFields = [
@@ -267,7 +270,7 @@ async function createStoryInClickUp({
     const result = await clickUpTool.createTask({
       listName: listName,
       name: storyName,
-      parent: epicTaskId,  // Creates as subtask
+      parent: epicTaskId, // Creates as subtask
       markdown_description: storyContent,
       tags: tags,
       custom_fields: customFields,
@@ -279,7 +282,6 @@ async function createStoryInClickUp({
       taskId: result.id,
       url: result.url || `https://app.clickup.com/t/${result.id}`,
     };
-
   } catch (error) {
     console.error('Error creating story in ClickUp:', error);
     throw new Error(`Failed to create story in ClickUp: ${error.message}`);
@@ -326,7 +328,10 @@ async function syncStoryToPM(storyPath) {
  */
 async function pullStoryFromPM(storyId) {
   try {
-    const { getPMAdapter, isPMToolConfigured } = require('../../infrastructure/scripts/pm-adapter-factory');
+    const {
+      getPMAdapter,
+      isPMToolConfigured,
+    } = require('../../infrastructure/scripts/pm-adapter-factory');
 
     if (!isPMToolConfigured()) {
       console.log('ℹ️  Local-only mode: No PM tool configured');
@@ -366,7 +371,7 @@ module.exports = {
   parseStoryFile,
   saveStoryFile,
   updateFrontmatter,
-  updateStoryFrontmatter: updateFrontmatter,  // Alias for test compatibility
+  updateStoryFrontmatter: updateFrontmatter, // Alias for test compatibility
   updateFrontmatterTimestamp,
   createStoryInClickUp,
   // PM adapter-aware functions (Story 3.20)

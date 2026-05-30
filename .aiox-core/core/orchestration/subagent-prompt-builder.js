@@ -82,10 +82,7 @@ class SubagentPromptBuilder {
    */
   async loadAgentDefinition(agentId) {
     // Try different file naming patterns
-    const patterns = [
-      `${agentId}.md`,
-      `${agentId.replace(/-/g, '_')}.md`,
-    ];
+    const patterns = [`${agentId}.md`, `${agentId.replace(/-/g, '_')}.md`];
 
     for (const pattern of patterns) {
       const filePath = path.join(this.paths.agents, pattern);
@@ -271,16 +268,8 @@ class SubagentPromptBuilder {
    * @returns {string} Complete assembled prompt
    */
   assemblePrompt(components) {
-    const {
-      agentId,
-      agentDef,
-      taskFile,
-      taskDef,
-      checklists,
-      templates,
-      context,
-      contextSection,
-    } = components;
+    const { agentId, agentDef, taskFile, taskDef, checklists, templates, context, contextSection } =
+      components;
 
     let prompt = `# AGENT TRANSFORMATION
 

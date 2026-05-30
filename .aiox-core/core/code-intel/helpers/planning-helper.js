@@ -5,9 +5,9 @@ const { getEnricher, getClient, isCodeIntelAvailable } = require('../index');
 // Risk level thresholds based on blast radius (reference count)
 // Consistent with dev-helper.js and qa-helper.js
 const RISK_THRESHOLDS = {
-  LOW_MAX: 4,       // 0-4 refs = LOW
-  MEDIUM_MAX: 15,   // 5-15 refs = MEDIUM
-                     // >15 refs = HIGH
+  LOW_MAX: 4, // 0-4 refs = LOW
+  MEDIUM_MAX: 15, // 5-15 refs = MEDIUM
+  // >15 refs = HIGH
 };
 
 /**
@@ -96,16 +96,16 @@ async function getComplexityAnalysis(files) {
             complexity: null,
           };
         }
-      }),
+      })
     );
 
     const validResults = results.filter((r) => r.complexity !== null);
     const scores = validResults
-      .map((r) => r.complexity && typeof r.complexity.score === 'number' ? r.complexity.score : null)
+      .map((r) =>
+        r.complexity && typeof r.complexity.score === 'number' ? r.complexity.score : null
+      )
       .filter((s) => s !== null);
-    const average = scores.length > 0
-      ? scores.reduce((sum, s) => sum + s, 0) / scores.length
-      : 0;
+    const average = scores.length > 0 ? scores.reduce((sum, s) => sum + s, 0) / scores.length : 0;
 
     return {
       perFile: results,
@@ -142,18 +142,24 @@ async function getImplementationContext(symbols) {
         try {
           const def = await client.findDefinition(symbol);
           if (def) definitions.push({ symbol, ...def });
-        } catch { /* skip */ }
+        } catch {
+          /* skip */
+        }
 
         try {
           const deps = await client.analyzeDependencies(symbol);
           if (deps) dependencies.push({ symbol, deps });
-        } catch { /* skip */ }
+        } catch {
+          /* skip */
+        }
 
         try {
           const tests = await enricher.findTests(symbol);
           if (tests) relatedTests.push({ symbol, tests });
-        } catch { /* skip */ }
-      }),
+        } catch {
+          /* skip */
+        }
+      })
     );
 
     return {

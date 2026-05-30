@@ -31,15 +31,17 @@ const CompressionLevel = {
  */
 const COMPRESSION_FIELDS = {
   [CompressionLevel.FULL_DETAIL]: [
-    'id', 'title', 'executor', 'quality_gate', 'status',
-    'acceptance_criteria', 'files_modified', 'dev_notes',
+    'id',
+    'title',
+    'executor',
+    'quality_gate',
+    'status',
+    'acceptance_criteria',
+    'files_modified',
+    'dev_notes',
   ],
-  [CompressionLevel.METADATA_PLUS_FILES]: [
-    'id', 'title', 'executor', 'status', 'files_modified',
-  ],
-  [CompressionLevel.METADATA_ONLY]: [
-    'id', 'executor', 'status',
-  ],
+  [CompressionLevel.METADATA_PLUS_FILES]: ['id', 'title', 'executor', 'status', 'files_modified'],
+  [CompressionLevel.METADATA_ONLY]: ['id', 'executor', 'status'],
 };
 
 /**
@@ -102,12 +104,12 @@ function hasFileOverlap(storyFiles, targetFiles) {
   if (!storyFiles || !Array.isArray(storyFiles) || storyFiles.length === 0) return false;
 
   if (targetFiles instanceof Map || targetFiles instanceof Set) {
-    return storyFiles.some(file => targetFiles.has(file));
+    return storyFiles.some((file) => targetFiles.has(file));
   }
 
   if (Array.isArray(targetFiles)) {
     const targetSet = new Set(targetFiles);
-    return storyFiles.some(file => targetSet.has(file));
+    return storyFiles.some((file) => targetSet.has(file));
   }
 
   return false;
@@ -234,7 +236,7 @@ class EpicContextAccumulator {
       sections.push(`Executors: ${executorSummary}`);
     }
     sections.push('---');
-    sections.push(...formattedEntries.filter(e => e.length > 0));
+    sections.push(...formattedEntries.filter((e) => e.length > 0));
 
     return sections.join('\n');
   }

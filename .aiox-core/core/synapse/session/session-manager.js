@@ -61,7 +61,12 @@ function buildDefaultSession(sessionId, cwd) {
  */
 function resolveSessionFile(sessionId, sessionsDir) {
   // Sanitize sessionId to prevent path traversal
-  if (typeof sessionId !== 'string' || sessionId.includes('..') || sessionId.includes('/') || sessionId.includes('\\')) {
+  if (
+    typeof sessionId !== 'string' ||
+    sessionId.includes('..') ||
+    sessionId.includes('/') ||
+    sessionId.includes('\\')
+  ) {
     throw new Error('[synapse:session] Invalid sessionId: contains path separators or traversal');
   }
 
@@ -70,7 +75,9 @@ function resolveSessionFile(sessionId, sessionsDir) {
   const resolvedDir = path.resolve(sessionsDir);
 
   if (!resolved.startsWith(resolvedDir + path.sep) && resolved !== resolvedDir) {
-    throw new Error('[synapse:session] Invalid sessionId: resolved path escapes sessions directory');
+    throw new Error(
+      '[synapse:session] Invalid sessionId: resolved path escapes sessions directory'
+    );
   }
 
   return filePath;
@@ -99,12 +106,7 @@ function ensureGitignore(synapsePath) {
     return;
   }
 
-  const content = [
-    '# SYNAPSE runtime data (auto-generated)',
-    'sessions/',
-    'cache/',
-    '',
-  ].join('\n');
+  const content = ['# SYNAPSE runtime data (auto-generated)', 'sessions/', 'cache/', ''].join('\n');
 
   ensureDir(synapsePath);
   fs.writeFileSync(gitignorePath, content, 'utf8');
@@ -165,7 +167,7 @@ function loadSession(sessionId, sessionsDir) {
 
     if (session.schema_version !== SCHEMA_VERSION) {
       console.warn(
-        `[synapse:session] Warning: Session ${sessionId} has schema_version "${session.schema_version}", expected "${SCHEMA_VERSION}"`,
+        `[synapse:session] Warning: Session ${sessionId} has schema_version "${session.schema_version}", expected "${SCHEMA_VERSION}"`
       );
       return null;
     }

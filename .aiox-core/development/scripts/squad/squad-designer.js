@@ -30,16 +30,55 @@ const MIN_CONFIDENCE_THRESHOLD = 0.5;
  * @constant {string[]}
  */
 const ACTION_KEYWORDS = [
-  'create', 'add', 'new', 'generate', 'build',
-  'update', 'edit', 'modify', 'change', 'patch',
-  'delete', 'remove', 'cancel', 'archive',
-  'get', 'fetch', 'retrieve', 'list', 'search', 'find', 'query',
-  'process', 'handle', 'manage', 'execute', 'run',
-  'validate', 'verify', 'check', 'approve', 'reject',
-  'send', 'notify', 'alert', 'email', 'publish',
-  'import', 'export', 'sync', 'migrate', 'transform',
-  'login', 'logout', 'authenticate', 'authorize',
-  'upload', 'download', 'save', 'load',
+  'create',
+  'add',
+  'new',
+  'generate',
+  'build',
+  'update',
+  'edit',
+  'modify',
+  'change',
+  'patch',
+  'delete',
+  'remove',
+  'cancel',
+  'archive',
+  'get',
+  'fetch',
+  'retrieve',
+  'list',
+  'search',
+  'find',
+  'query',
+  'process',
+  'handle',
+  'manage',
+  'execute',
+  'run',
+  'validate',
+  'verify',
+  'check',
+  'approve',
+  'reject',
+  'send',
+  'notify',
+  'alert',
+  'email',
+  'publish',
+  'import',
+  'export',
+  'sync',
+  'migrate',
+  'transform',
+  'login',
+  'logout',
+  'authenticate',
+  'authorize',
+  'upload',
+  'download',
+  'save',
+  'load',
 ];
 
 /**
@@ -47,14 +86,44 @@ const ACTION_KEYWORDS = [
  * @constant {string[]}
  */
 const INTEGRATION_KEYWORDS = [
-  'api', 'rest', 'graphql', 'webhook', 'endpoint',
-  'database', 'db', 'sql', 'nosql', 'redis', 'postgres', 'mysql', 'mongodb',
-  'aws', 'azure', 'gcp', 'cloud', 's3', 'lambda',
-  'stripe', 'paypal', 'payment', 'gateway',
-  'slack', 'discord', 'email', 'sms', 'twilio',
-  'oauth', 'jwt', 'auth0', 'firebase',
-  'github', 'gitlab', 'bitbucket',
-  'docker', 'kubernetes', 'k8s',
+  'api',
+  'rest',
+  'graphql',
+  'webhook',
+  'endpoint',
+  'database',
+  'db',
+  'sql',
+  'nosql',
+  'redis',
+  'postgres',
+  'mysql',
+  'mongodb',
+  'aws',
+  'azure',
+  'gcp',
+  'cloud',
+  's3',
+  'lambda',
+  'stripe',
+  'paypal',
+  'payment',
+  'gateway',
+  'slack',
+  'discord',
+  'email',
+  'sms',
+  'twilio',
+  'oauth',
+  'jwt',
+  'auth0',
+  'firebase',
+  'github',
+  'gitlab',
+  'bitbucket',
+  'docker',
+  'kubernetes',
+  'k8s',
 ];
 
 /**
@@ -62,11 +131,28 @@ const INTEGRATION_KEYWORDS = [
  * @constant {string[]}
  */
 const ROLE_KEYWORDS = [
-  'user', 'admin', 'administrator', 'manager', 'owner',
-  'customer', 'client', 'buyer', 'seller', 'vendor',
-  'developer', 'engineer', 'devops', 'qa', 'tester',
-  'analyst', 'designer', 'architect',
-  'operator', 'support', 'agent', 'representative',
+  'user',
+  'admin',
+  'administrator',
+  'manager',
+  'owner',
+  'customer',
+  'client',
+  'buyer',
+  'seller',
+  'vendor',
+  'developer',
+  'engineer',
+  'devops',
+  'qa',
+  'tester',
+  'analyst',
+  'designer',
+  'architect',
+  'operator',
+  'support',
+  'agent',
+  'representative',
 ];
 
 /**
@@ -112,7 +198,7 @@ class SquadDesignerError extends Error {
     return new SquadDesignerError(
       DesignerErrorCodes.NO_DOCUMENTATION,
       'No documentation provided for analysis',
-      'Provide documentation via --docs flag or paste text interactively',
+      'Provide documentation via --docs flag or paste text interactively'
     );
   }
 
@@ -126,7 +212,7 @@ class SquadDesignerError extends Error {
     return new SquadDesignerError(
       DesignerErrorCodes.PARSE_ERROR,
       `Failed to parse documentation: ${filePath} - ${reason}`,
-      'Check file format (supported: .md, .yaml, .yml, .json, .txt)',
+      'Check file format (supported: .md, .yaml, .yml, .json, .txt)'
     );
   }
 
@@ -138,7 +224,7 @@ class SquadDesignerError extends Error {
     return new SquadDesignerError(
       DesignerErrorCodes.EMPTY_ANALYSIS,
       'No domain concepts could be extracted from documentation',
-      'Provide more detailed documentation with clear entities and workflows',
+      'Provide more detailed documentation with clear entities and workflows'
     );
   }
 
@@ -151,7 +237,7 @@ class SquadDesignerError extends Error {
     return new SquadDesignerError(
       DesignerErrorCodes.BLUEPRINT_EXISTS,
       `Blueprint already exists at ${blueprintPath}`,
-      'Use --force to overwrite or choose a different output path',
+      'Use --force to overwrite or choose a different output path'
     );
   }
 }
@@ -189,7 +275,7 @@ class SquadDesigner {
     if (options.docs) {
       const paths = Array.isArray(options.docs)
         ? options.docs
-        : options.docs.split(',').map(p => p.trim());
+        : options.docs.split(',').map((p) => p.trim());
 
       for (const filePath of paths) {
         try {
@@ -221,7 +307,7 @@ class SquadDesigner {
     return {
       sources,
       domainHint: options.domain || null,
-      mergedContent: sources.map(s => s.content).join('\n\n---\n\n'),
+      mergedContent: sources.map((s) => s.content).join('\n\n---\n\n'),
     };
   }
 
@@ -327,10 +413,7 @@ class SquadDesigner {
     };
 
     // Validate we extracted something useful
-    if (
-      analysis.entities.length === 0 &&
-      analysis.workflows.length === 0
-    ) {
+    if (analysis.entities.length === 0 && analysis.workflows.length === 0) {
       throw SquadDesignerError.emptyAnalysis();
     }
 
@@ -416,17 +499,96 @@ class SquadDesigner {
    */
   isCommonWord(word) {
     const commonWords = new Set([
-      'The', 'This', 'That', 'These', 'Those', 'What', 'When', 'Where', 'Which',
-      'How', 'Why', 'Who', 'All', 'Any', 'Some', 'Each', 'Every', 'Both',
-      'Few', 'More', 'Most', 'Other', 'Such', 'No', 'Not', 'Only', 'Same',
-      'Than', 'Too', 'Very', 'Just', 'But', 'And', 'For', 'With', 'From',
-      'About', 'Into', 'Through', 'During', 'Before', 'After', 'Above', 'Below',
-      'Between', 'Under', 'Again', 'Further', 'Then', 'Once', 'Here', 'There',
-      'True', 'False', 'Null', 'None', 'Yes', 'No', 'Example', 'Note', 'Warning',
-      'Error', 'Success', 'Failure', 'Status', 'Type', 'Name', 'Value', 'Data',
-      'File', 'Path', 'String', 'Number', 'Boolean', 'Array', 'Object', 'Function',
-      'Class', 'Method', 'Property', 'Parameter', 'Return', 'Input', 'Output',
-      'Request', 'Response', 'Result', 'Config', 'Options', 'Settings',
+      'The',
+      'This',
+      'That',
+      'These',
+      'Those',
+      'What',
+      'When',
+      'Where',
+      'Which',
+      'How',
+      'Why',
+      'Who',
+      'All',
+      'Any',
+      'Some',
+      'Each',
+      'Every',
+      'Both',
+      'Few',
+      'More',
+      'Most',
+      'Other',
+      'Such',
+      'No',
+      'Not',
+      'Only',
+      'Same',
+      'Than',
+      'Too',
+      'Very',
+      'Just',
+      'But',
+      'And',
+      'For',
+      'With',
+      'From',
+      'About',
+      'Into',
+      'Through',
+      'During',
+      'Before',
+      'After',
+      'Above',
+      'Below',
+      'Between',
+      'Under',
+      'Again',
+      'Further',
+      'Then',
+      'Once',
+      'Here',
+      'There',
+      'True',
+      'False',
+      'Null',
+      'None',
+      'Yes',
+      'No',
+      'Example',
+      'Note',
+      'Warning',
+      'Error',
+      'Success',
+      'Failure',
+      'Status',
+      'Type',
+      'Name',
+      'Value',
+      'Data',
+      'File',
+      'Path',
+      'String',
+      'Number',
+      'Boolean',
+      'Array',
+      'Object',
+      'Function',
+      'Class',
+      'Method',
+      'Property',
+      'Parameter',
+      'Return',
+      'Input',
+      'Output',
+      'Request',
+      'Response',
+      'Result',
+      'Config',
+      'Options',
+      'Settings',
     ]);
     return commonWords.has(word);
   }
@@ -482,11 +644,52 @@ class SquadDesigner {
    */
   isStopWord(word) {
     const stopWords = new Set([
-      'the', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
-      'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could',
-      'should', 'may', 'might', 'must', 'shall', 'can', 'need', 'dare',
-      'to', 'of', 'in', 'for', 'on', 'with', 'at', 'by', 'from', 'as',
-      'it', 'its', 'this', 'that', 'these', 'those', 'all', 'each', 'every',
+      'the',
+      'a',
+      'an',
+      'is',
+      'are',
+      'was',
+      'were',
+      'be',
+      'been',
+      'being',
+      'have',
+      'has',
+      'had',
+      'do',
+      'does',
+      'did',
+      'will',
+      'would',
+      'could',
+      'should',
+      'may',
+      'might',
+      'must',
+      'shall',
+      'can',
+      'need',
+      'dare',
+      'to',
+      'of',
+      'in',
+      'for',
+      'on',
+      'with',
+      'at',
+      'by',
+      'from',
+      'as',
+      'it',
+      'its',
+      'this',
+      'that',
+      'these',
+      'those',
+      'all',
+      'each',
+      'every',
     ]);
     return stopWords.has(word.toLowerCase());
   }
@@ -553,12 +756,12 @@ class SquadDesigner {
       if (workflows.length === 0) continue;
 
       const agentId = `${analysis.domain}-${category}`;
-      const commands = workflows.map(w => w.replace(/-/g, '-'));
+      const commands = workflows.map((w) => w.replace(/-/g, '-'));
 
       // Calculate confidence based on workflow clarity
       const confidence = Math.min(
         0.95,
-        0.6 + (workflows.length * 0.05) + (commands.length > 3 ? 0.1 : 0),
+        0.6 + workflows.length * 0.05 + (commands.length > 3 ? 0.1 : 0)
       );
 
       agents.push({
@@ -570,7 +773,7 @@ class SquadDesigner {
         user_modified: false,
       });
 
-      workflows.forEach(w => usedWorkflows.add(w));
+      workflows.forEach((w) => usedWorkflows.add(w));
     }
 
     // If we have entities but no clear workflows, create a generic manager
@@ -579,7 +782,12 @@ class SquadDesigner {
       agents.push({
         id: `${mainEntity}-manager`,
         role: `Manages ${mainEntity} lifecycle and operations`,
-        commands: [`create-${mainEntity}`, `update-${mainEntity}`, `delete-${mainEntity}`, `list-${mainEntity}s`],
+        commands: [
+          `create-${mainEntity}`,
+          `update-${mainEntity}`,
+          `delete-${mainEntity}`,
+          `list-${mainEntity}s`,
+        ],
         confidence: 0.65,
         user_added: false,
         user_modified: false,
@@ -614,9 +822,7 @@ class SquadDesigner {
     }
 
     // Remove empty groups
-    return Object.fromEntries(
-      Object.entries(groups).filter(([, v]) => v.length > 0),
-    );
+    return Object.fromEntries(Object.entries(groups).filter(([, v]) => v.length > 0));
   }
 
   /**
@@ -627,7 +833,10 @@ class SquadDesigner {
    * @returns {string} Role description
    */
   generateAgentRole(category, workflows, domain) {
-    const domainTitle = domain.split('-').map(w => this.toTitleCase(w)).join(' ');
+    const domainTitle = domain
+      .split('-')
+      .map((w) => this.toTitleCase(w))
+      .join(' ');
 
     switch (category) {
       case 'manager':
@@ -669,10 +878,7 @@ class SquadDesigner {
         const saida = this.generateTaskSaida(command, analysis);
 
         // Calculate confidence based on entrada/saida clarity
-        const confidence = Math.min(
-          0.95,
-          0.5 + (entrada.length * 0.1) + (saida.length * 0.1),
-        );
+        const confidence = Math.min(0.95, 0.5 + entrada.length * 0.1 + saida.length * 0.1);
 
         tasks.push({
           name: taskName.replace('.md', ''),
@@ -821,12 +1027,13 @@ class SquadDesigner {
     const { analysis, recommendations, metadata, userAdjustments } = options;
 
     // Calculate overall confidence
-    const agentConfidences = recommendations.agents.map(a => a.confidence);
-    const taskConfidences = recommendations.tasks.map(t => t.confidence);
+    const agentConfidences = recommendations.agents.map((a) => a.confidence);
+    const taskConfidences = recommendations.tasks.map((t) => t.confidence);
     const allConfidences = [...agentConfidences, ...taskConfidences];
-    const overallConfidence = allConfidences.length > 0
-      ? allConfidences.reduce((a, b) => a + b, 0) / allConfidences.length
-      : 0.5;
+    const overallConfidence =
+      allConfidences.length > 0
+        ? allConfidences.reduce((a, b) => a + b, 0) / allConfidences.length
+        : 0.5;
 
     // Determine template based on recommendations
     const template = this.determineTemplate(recommendations);
@@ -864,9 +1071,12 @@ class SquadDesigner {
    * @returns {string} Template name
    */
   determineTemplate(recommendations) {
-    const hasDataProcessing = recommendations.tasks.some(t =>
-      t.name.includes('process') || t.name.includes('transform') ||
-      t.name.includes('import') || t.name.includes('export'),
+    const hasDataProcessing = recommendations.tasks.some(
+      (t) =>
+        t.name.includes('process') ||
+        t.name.includes('transform') ||
+        t.name.includes('import') ||
+        t.name.includes('export')
     );
 
     if (hasDataProcessing) {
@@ -934,12 +1144,15 @@ class SquadDesigner {
 # Created: ${blueprint.metadata.created_at}
 
 `;
-    return header + yaml.dump(blueprint, {
-      indent: 2,
-      lineWidth: 100,
-      noRefs: true,
-      sortKeys: false,
-    });
+    return (
+      header +
+      yaml.dump(blueprint, {
+        indent: 2,
+        lineWidth: 100,
+        noRefs: true,
+        sortKeys: false,
+      })
+    );
   }
 
   /**
@@ -955,7 +1168,7 @@ class SquadDesigner {
       throw new SquadDesignerError(
         DesignerErrorCodes.INVALID_BLUEPRINT,
         `Failed to load blueprint: ${error.message}`,
-        'Check that the blueprint file exists and is valid YAML',
+        'Check that the blueprint file exists and is valid YAML'
       );
     }
   }

@@ -23,7 +23,7 @@ const mockDevAgent = {
     zodiac: '♒ Aquarius',
     greeting_levels: {
       minimal: '💻 Dex ready',
-      named: '💻 Dex (Builder) ready. Let\'s build something solid!',
+      named: "💻 Dex (Builder) ready. Let's build something solid!",
       archetypal: '💻 Dex the Builder (♒ Aquarius) ready to construct excellence!',
     },
   },
@@ -31,17 +31,49 @@ const mockDevAgent = {
     role: 'Full Stack Developer specializing in clean, maintainable code',
   },
   commands: [
-    { name: 'help', visibility: ['full', 'quick', 'key'], description: 'Show all available commands with descriptions' },
-    { name: 'develop', visibility: ['full', 'quick', 'key'], description: 'Implement story tasks (modes: yolo, interactive, preflight)' },
-    { name: 'review-code', visibility: ['full', 'quick'], description: 'Review uncommitted code changes for quality and standards' },
-    { name: 'run-tests', visibility: ['full', 'quick'], description: 'Execute test suite and show results' },
+    {
+      name: 'help',
+      visibility: ['full', 'quick', 'key'],
+      description: 'Show all available commands with descriptions',
+    },
+    {
+      name: 'develop',
+      visibility: ['full', 'quick', 'key'],
+      description: 'Implement story tasks (modes: yolo, interactive, preflight)',
+    },
+    {
+      name: 'review-code',
+      visibility: ['full', 'quick'],
+      description: 'Review uncommitted code changes for quality and standards',
+    },
+    {
+      name: 'run-tests',
+      visibility: ['full', 'quick'],
+      description: 'Execute test suite and show results',
+    },
     { name: 'build', visibility: ['full'], description: 'Build the project for production' },
-    { name: 'debug', visibility: ['full'], description: 'Start debugging session with breakpoints' },
-    { name: 'refactor', visibility: ['full'], description: 'Refactor code for better maintainability' },
+    {
+      name: 'debug',
+      visibility: ['full'],
+      description: 'Start debugging session with breakpoints',
+    },
+    {
+      name: 'refactor',
+      visibility: ['full'],
+      description: 'Refactor code for better maintainability',
+    },
     { name: 'performance', visibility: ['full'], description: 'Analyze and optimize performance' },
-    { name: 'security', visibility: ['full'], description: 'Run security audit and fix vulnerabilities' },
+    {
+      name: 'security',
+      visibility: ['full'],
+      description: 'Run security audit and fix vulnerabilities',
+    },
     { name: 'qa-gate', visibility: ['key'], description: 'Run quality gate before commit' },
-    { name: 'commit', visibility: ['key'], description: 'Create git commit with conventional format' },
+    {
+      name: 'commit',
+      visibility: ['key'],
+      description: 'Create git commit with conventional format',
+    },
     { name: 'exit', visibility: ['full', 'quick', 'key'], description: 'Exit dev mode' },
   ],
 };
@@ -57,7 +89,7 @@ const mockPoAgent = {
     zodiac: '♎ Libra',
     greeting_levels: {
       minimal: '⚖️ Pax ready',
-      named: '⚖️ Pax (Balancer) ready. Let\'s prioritize together!',
+      named: "⚖️ Pax (Balancer) ready. Let's prioritize together!",
       archetypal: '⚖️ Pax the Balancer (♎ Libra) ready to harmonize requirements!',
     },
   },
@@ -66,9 +98,21 @@ const mockPoAgent = {
   },
   commands: [
     { name: 'help', visibility: ['full', 'quick', 'key'], description: 'Show available commands' },
-    { name: 'validate-story-draft', visibility: ['full', 'quick', 'key'], description: 'Validate story quality and completeness' },
-    { name: 'create-next-story', visibility: ['full', 'quick'], description: 'Create next story in backlog' },
-    { name: 'backlog-summary', visibility: ['quick', 'key'], description: 'Quick backlog status summary' },
+    {
+      name: 'validate-story-draft',
+      visibility: ['full', 'quick', 'key'],
+      description: 'Validate story quality and completeness',
+    },
+    {
+      name: 'create-next-story',
+      visibility: ['full', 'quick'],
+      description: 'Create next story in backlog',
+    },
+    {
+      name: 'backlog-summary',
+      visibility: ['quick', 'key'],
+      description: 'Quick backlog status summary',
+    },
     { name: 'backlog-prioritize', visibility: ['full'], description: 'Prioritize backlog items' },
     { name: 'sync-story', visibility: ['full'], description: 'Sync story to ClickUp' },
     { name: 'exit', visibility: ['full', 'quick', 'key'], description: 'Exit PO mode' },
@@ -136,7 +180,7 @@ async function testGreetings() {
 }
 
 // Run tests
-testGreetings().catch(error => {
+testGreetings().catch((error) => {
   console.error('Fatal error:', error);
   process.exit(1);
 });

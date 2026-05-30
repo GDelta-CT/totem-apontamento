@@ -29,9 +29,7 @@ async function run(context) {
 
   const content = fs.readFileSync(configPath, 'utf8');
 
-  const missingSections = REQUIRED_SECTIONS.filter(
-    (section) => !content.includes(`${section}:`),
-  );
+  const missingSections = REQUIRED_SECTIONS.filter((section) => !content.includes(`${section}:`));
 
   if (missingSections.length === 0) {
     return {

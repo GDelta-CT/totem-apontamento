@@ -216,7 +216,7 @@ tool:
       - id: build-select-query
         language: javascript
         runtime: isolated_vm
-        description: "Build SELECT query with RLS considerations"
+        description: 'Build SELECT query with RLS considerations'
         function: |
           (function() {
             const { table, columns, where, orderBy, limit, checkRLS } = args;
@@ -259,7 +259,7 @@ tool:
       - id: build-insert-query
         language: javascript
         runtime: isolated_vm
-        description: "Build INSERT query with RLS validation"
+        description: 'Build INSERT query with RLS validation'
         function: |
           (function() {
             const { table, data, returning } = args;
@@ -299,7 +299,7 @@ tool:
       - id: build-update-query
         language: javascript
         runtime: isolated_vm
-        description: "Build UPDATE query with RLS validation"
+        description: 'Build UPDATE query with RLS validation'
         function: |
           (function() {
             const { table, data, where, returning } = args;
@@ -349,7 +349,7 @@ tool:
       - id: validate-rls-policy
         language: javascript
         runtime: isolated_vm
-        description: "Validate RLS policy syntax and structure"
+        description: 'Validate RLS policy syntax and structure'
         function: |
           (function() {
             const { policy, table, operation } = args;
@@ -399,7 +399,7 @@ tool:
       - id: format-realtime-subscription
         language: javascript
         runtime: isolated_vm
-        description: "Format real-time subscription configuration"
+        description: 'Format real-time subscription configuration'
         function: |
           (function() {
             const { table, event, filter, schema } = args;
@@ -437,7 +437,7 @@ tool:
       - id: validate-table-permissions
         language: javascript
         runtime: isolated_vm
-        description: "Validate table permissions and RLS status"
+        description: 'Validate table permissions and RLS status'
         function: |
           (function() {
             const { table, hasRLS, policies } = args;
@@ -486,7 +486,7 @@ tool:
       - id: parse-postgres-error
         language: javascript
         runtime: isolated_vm
-        description: "Parse and format Postgres error messages"
+        description: 'Parse and format Postgres error messages'
         function: |
           (function() {
             const { error, query } = args;
@@ -530,7 +530,7 @@ tool:
       - id: generate-migration-name
         language: javascript
         runtime: isolated_vm
-        description: "Generate timestamped migration name"
+        description: 'Generate timestamped migration name'
         function: |
           (function() {
             const { description } = args;
@@ -564,19 +564,19 @@ tool:
   api_complexity:
     rls_policy_patterns:
       - pattern: authenticated_user
-        description: "Allow access only to authenticated users"
+        description: 'Allow access only to authenticated users'
         example: |
           USING (auth.uid() IS NOT NULL)
-        use_case: "Restrict access to logged-in users only"
+        use_case: 'Restrict access to logged-in users only'
 
       - pattern: user_owned_rows
-        description: "Users can only access their own rows"
+        description: 'Users can only access their own rows'
         example: |
           USING (auth.uid() = user_id)
-        use_case: "Private user data (profiles, settings)"
+        use_case: 'Private user data (profiles, settings)'
 
       - pattern: role_based_access
-        description: "Access based on user role"
+        description: 'Access based on user role'
         example: |
           USING (
             EXISTS (
@@ -585,10 +585,10 @@ tool:
               AND role IN ('admin', 'editor')
             )
           )
-        use_case: "Admin panels, content management"
+        use_case: 'Admin panels, content management'
 
       - pattern: team_member_access
-        description: "Access for team/organization members"
+        description: 'Access for team/organization members'
         example: |
           USING (
             EXISTS (
@@ -597,21 +597,21 @@ tool:
               AND user_id = auth.uid()
             )
           )
-        use_case: "Collaborative workspaces, multi-tenant apps"
+        use_case: 'Collaborative workspaces, multi-tenant apps'
 
     realtime_subscription_patterns:
       - pattern: table_changes
-        description: "Subscribe to all changes on a table"
+        description: 'Subscribe to all changes on a table'
         config: |
           {
             event: '*',
             schema: 'public',
             table: 'messages'
           }
-        use_case: "Real-time chat, activity feeds"
+        use_case: 'Real-time chat, activity feeds'
 
       - pattern: filtered_changes
-        description: "Subscribe to specific rows"
+        description: 'Subscribe to specific rows'
         config: |
           {
             event: 'INSERT',
@@ -619,7 +619,7 @@ tool:
             table: 'messages',
             filter: 'room_id=eq.123'
           }
-        use_case: "Room-specific updates, filtered feeds"
+        use_case: 'Room-specific updates, filtered feeds'
 
       - pattern: user_specific_changes
         description: "Subscribe to user's own data"
@@ -630,32 +630,32 @@ tool:
             table: 'notifications',
             filter: 'user_id=eq.[USER_ID]'
           }
-        use_case: "User notifications, personal updates"
+        use_case: 'User notifications, personal updates'
 
     auth_integration_quirks:
       - quirk: auth_uid_null
-        description: "auth.uid() returns NULL for unauthenticated requests"
-        impact: "RLS policies using auth.uid() will block anonymous access"
-        solution: "Use separate policies for authenticated and anonymous users"
+        description: 'auth.uid() returns NULL for unauthenticated requests'
+        impact: 'RLS policies using auth.uid() will block anonymous access'
+        solution: 'Use separate policies for authenticated and anonymous users'
 
       - quirk: jwt_token_expiry
-        description: "JWT tokens expire after configured duration (default 1 hour)"
-        impact: "Long-running operations may fail mid-execution"
-        solution: "Implement token refresh logic in client applications"
+        description: 'JWT tokens expire after configured duration (default 1 hour)'
+        impact: 'Long-running operations may fail mid-execution'
+        solution: 'Implement token refresh logic in client applications'
 
       - quirk: rls_bypass_service_role
-        description: "Service role key bypasses RLS policies"
-        impact: "Backend operations ignore RLS - can access all data"
-        solution: "Never expose service role key to clients - use anon/user keys only"
+        description: 'Service role key bypasses RLS policies'
+        impact: 'Backend operations ignore RLS - can access all data'
+        solution: 'Never expose service role key to clients - use anon/user keys only'
 
       - quirk: policy_evaluation_order
         description: "Multiple policies are OR'd together (any match grants access)"
-        impact: "Cannot create deny policies - all policies must grant access"
-        solution: "Design policies to be restrictive by default"
+        impact: 'Cannot create deny policies - all policies must grant access'
+        solution: 'Design policies to be restrictive by default'
 
   anti_patterns:
     - pattern: missing_rls_policies
-      description: "Enabling RLS without creating policies"
+      description: 'Enabling RLS without creating policies'
       category: security
       severity: high
       wrong: |
@@ -672,10 +672,10 @@ tool:
           ON users FOR UPDATE
           USING (auth.uid() = id);
         -- ✅ RLS enabled with appropriate policies
-      rationale: "RLS without policies makes tables completely inaccessible. Always create policies after enabling RLS."
+      rationale: 'RLS without policies makes tables completely inaccessible. Always create policies after enabling RLS.'
 
     - pattern: overly_permissive_policies
-      description: "Using USING (true) for all operations"
+      description: 'Using USING (true) for all operations'
       category: security
       severity: critical
       wrong: |
@@ -688,10 +688,10 @@ tool:
           ON sensitive_data FOR SELECT
           USING (auth.uid() IS NOT NULL AND auth.uid() = user_id);
         -- ✅ Restricts access to authenticated users and their own data
-      rationale: "USING (true) defeats the purpose of RLS. Always implement meaningful access controls."
+      rationale: 'USING (true) defeats the purpose of RLS. Always implement meaningful access controls.'
 
     - pattern: hardcoded_uuids_in_migrations
-      description: "Hardcoding UUIDs in data migrations"
+      description: 'Hardcoding UUIDs in data migrations'
       category: migrations
       severity: medium
       wrong: |
@@ -703,10 +703,10 @@ tool:
         INSERT INTO projects (name, owner_id)
         VALUES ('My Project', (SELECT id FROM users WHERE email = 'admin@example.com'))
         RETURNING id;
-      rationale: "Hardcoded UUIDs cause migration failures across environments. Use generated IDs or lookups."
+      rationale: 'Hardcoded UUIDs cause migration failures across environments. Use generated IDs or lookups.'
 
     - pattern: ddl_in_execute_sql
-      description: "Running DDL operations via execute_sql"
+      description: 'Running DDL operations via execute_sql'
       category: migrations
       severity: high
       wrong: |
@@ -720,44 +720,44 @@ tool:
           query: "CREATE TABLE users (id uuid PRIMARY KEY DEFAULT uuid_generate_v4(), name text NOT NULL)"
         })
         -- ✅ DDL tracked in migrations table
-      rationale: "DDL operations must be tracked via migrations for version control and rollback capability."
+      rationale: 'DDL operations must be tracked via migrations for version control and rollback capability.'
 
   examples:
     execute_sql:
       - scenario: success
-        description: "Execute SELECT query with RLS"
+        description: 'Execute SELECT query with RLS'
         input:
-          project_id: "proj_abc123"
-          query: "SELECT * FROM posts WHERE user_id = auth.uid()"
+          project_id: 'proj_abc123'
+          query: 'SELECT * FROM posts WHERE user_id = auth.uid()'
         output:
-          rows: [{ id: 1, title: "My Post", user_id: "user_xyz" }]
+          rows: [{ id: 1, title: 'My Post', user_id: 'user_xyz' }]
           count: 1
 
       - scenario: failure_invalid_param
-        description: "Missing required project_id"
+        description: 'Missing required project_id'
         input:
-          query: "SELECT * FROM posts"
+          query: 'SELECT * FROM posts'
         error:
           code: VALIDATION_ERROR
-          message: "project_id is required"
+          message: 'project_id is required'
           validator: validate-execute-sql
 
       - scenario: failure_ddl_operation
-        description: "Attempting DDL via execute_sql"
+        description: 'Attempting DDL via execute_sql'
         input:
-          project_id: "proj_abc123"
-          query: "CREATE TABLE test (id int)"
+          project_id: 'proj_abc123'
+          query: 'CREATE TABLE test (id int)'
         error:
           code: VALIDATION_ERROR
-          message: "DDL operations not allowed in execute_sql - use apply_migration instead"
+          message: 'DDL operations not allowed in execute_sql - use apply_migration instead'
           validator: validate-execute-sql
 
     apply_migration:
       - scenario: success
-        description: "Apply migration to create table"
+        description: 'Apply migration to create table'
         input:
-          project_id: "proj_abc123"
-          name: "create_posts_table"
+          project_id: 'proj_abc123'
+          name: 'create_posts_table'
           query: |
             CREATE TABLE posts (
               id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -773,36 +773,36 @@ tool:
               ON posts FOR SELECT
               USING (auth.uid() = user_id);
         output:
-          migration_id: "mig_xyz789"
-          status: "applied"
+          migration_id: 'mig_xyz789'
+          status: 'applied'
 
       - scenario: failure_invalid_param
-        description: "Invalid migration name format"
+        description: 'Invalid migration name format'
         input:
-          project_id: "proj_abc123"
-          name: "CreatePostsTable"
-          query: "CREATE TABLE posts (id int)"
+          project_id: 'proj_abc123'
+          name: 'CreatePostsTable'
+          query: 'CREATE TABLE posts (id int)'
         error:
           code: VALIDATION_ERROR
-          message: "migration name must be snake_case (lowercase letters, numbers, underscores only)"
+          message: 'migration name must be snake_case (lowercase letters, numbers, underscores only)'
           validator: validate-apply-migration
 
   mcp_specific:
-    server_command: "https://mcp.supabase.com/mcp"
+    server_command: 'https://mcp.supabase.com/mcp'
     transport: sse
     auth: oauth
     query_parameters:
       - name: project_ref
         required: false
-        description: "Scope server to specific project (recommended)"
+        description: 'Scope server to specific project (recommended)'
       - name: read_only
         required: false
-        description: "Restrict to read-only operations (recommended)"
+        description: 'Restrict to read-only operations (recommended)'
       - name: features
         required: false
-        description: "Specify which tool groups to enable"
+        description: 'Specify which tool groups to enable'
     health_check:
       method: tool_call
       command: list_projects
-      expected_response: "Array of projects or organization prompt"
+      expected_response: 'Array of projects or organization prompt'
       timeout_ms: 10000

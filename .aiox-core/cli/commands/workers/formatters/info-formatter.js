@@ -56,14 +56,14 @@ function formatInfoPretty(worker, options = {}) {
   const description = worker.description || 'No description available';
   // Word wrap description at ~60 chars
   const wrapped = wrapText(description, 58);
-  wrapped.forEach(line => {
+  wrapped.forEach((line) => {
     output += `  ${line}\n`;
   });
 
   // Inputs section
   if (worker.inputs && worker.inputs.length > 0) {
     output += '\nInputs:\n';
-    worker.inputs.forEach(input => {
+    worker.inputs.forEach((input) => {
       output += `  - ${input}\n`;
     });
   }
@@ -71,7 +71,7 @@ function formatInfoPretty(worker, options = {}) {
   // Outputs section
   if (worker.outputs && worker.outputs.length > 0) {
     output += '\nOutputs:\n';
-    worker.outputs.forEach(out => {
+    worker.outputs.forEach((out) => {
       output += `  - ${out}\n`;
     });
   }
@@ -97,7 +97,7 @@ function formatInfoPretty(worker, options = {}) {
 
   // Agents section
   if (worker.agents && worker.agents.length > 0) {
-    output += `\nAgents: ${worker.agents.map(a => '@' + a).join(', ')}\n`;
+    output += `\nAgents: ${worker.agents.map((a) => '@' + a).join(', ')}\n`;
   }
 
   output += '\n' + BOX.horizontal.repeat(lineWidth) + '\n';
@@ -109,7 +109,7 @@ function formatInfoPretty(worker, options = {}) {
   // Related workers section
   if (relatedWorkers.length > 0) {
     output += '\nRelated Workers:\n';
-    relatedWorkers.slice(0, 5).forEach(related => {
+    relatedWorkers.slice(0, 5).forEach((related) => {
       output += `  - ${related.id}\n`;
     });
   }
@@ -152,7 +152,7 @@ function formatInfoJSON(worker, options = {}) {
     performance: worker.performance || null,
     agents: worker.agents || [],
     metadata: worker.metadata || {},
-    relatedWorkers: relatedWorkers.slice(0, 5).map(w => w.id),
+    relatedWorkers: relatedWorkers.slice(0, 5).map((w) => w.id),
   };
 
   return JSON.stringify(output, null, 2);
@@ -183,7 +183,7 @@ function formatInfoYAML(worker, options = {}) {
     performance: worker.performance || null,
     agents: worker.agents || [],
     metadata: worker.metadata || {},
-    relatedWorkers: relatedWorkers.slice(0, 5).map(w => w.id),
+    relatedWorkers: relatedWorkers.slice(0, 5).map((w) => w.id),
   };
 
   return yaml.dump(output, {
@@ -227,7 +227,7 @@ function formatNotFoundError(id, suggestions = []) {
 
   if (suggestions.length > 0) {
     output += '\nDid you mean:\n';
-    suggestions.slice(0, 5).forEach(worker => {
+    suggestions.slice(0, 5).forEach((worker) => {
       output += `  - ${worker.id}\n`;
     });
   }

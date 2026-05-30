@@ -11,16 +11,19 @@
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -188,6 +191,7 @@ token_usage: ~800-2,500 tokens
 ```
 
 **Optimization Notes:**
+
 - Validate configuration early; use atomic writes; implement rollback checkpoints
 
 ---
@@ -206,7 +210,6 @@ updated_at: 2025-11-17
 ```
 
 ---
-
 
 ## 🚀 NEW: Use Automated RLS Policy Installer (RECOMMENDED)
 
@@ -304,6 +307,7 @@ psql "$SUPABASE_DB_URL" -c \
 Present policy that will be applied based on mode:
 
 **If mode = 'kiss':**
+
 ```
 Will apply KISS policy to {table}:
 - Enable RLS
@@ -319,6 +323,7 @@ Continue? (yes/no)
 ```
 
 **If mode = 'granular':**
+
 ```
 Will apply granular policies to {table}:
 - Enable RLS
@@ -336,6 +341,7 @@ Get confirmation before proceeding.
 Based on mode, generate appropriate SQL:
 
 **KISS Mode:**
+
 ```sql
 -- Enable RLS
 ALTER TABLE {table} ENABLE ROW LEVEL SECURITY;
@@ -365,6 +371,7 @@ COMMENT ON POLICY "{table}_policy" ON {table} IS
 ```
 
 **Granular Mode (PERFORMANCE OPTIMIZED):**
+
 ```sql
 -- Enable RLS
 ALTER TABLE {table} ENABLE ROW LEVEL SECURITY;
@@ -492,6 +499,7 @@ echo "    - Verify each operation (SELECT, INSERT, UPDATE, DELETE)"
 ## Output
 
 Display summary:
+
 ```
 ✅ RLS POLICY APPLIED
 
@@ -514,12 +522,14 @@ Next steps:
 ### KISS vs Granular
 
 **KISS** (Keep It Simple, Stupid):
+
 - ✅ Single policy for all operations
 - ✅ Easier to understand
 - ✅ Less verbose
 - ❌ Less flexible
 
 **Granular**:
+
 - ✅ Separate policies per operation
 - ✅ Fine-grained control
 - ✅ Can have different logic per operation
@@ -528,6 +538,7 @@ Next steps:
 ### Common Patterns
 
 **Public Read, Authenticated Write (Performance Optimized):**
+
 ```sql
 -- SELECT: Public
 CREATE POLICY "{table}_select" ON {table}
@@ -548,6 +559,7 @@ CREATE POLICY "{table}_write" ON {table}
 ```
 
 **Tenant-Based (Performance Optimized):**
+
 ```sql
 CREATE POLICY "{table}_tenant" ON {table}
   FOR ALL TO authenticated
@@ -564,6 +576,7 @@ CREATE POLICY "{table}_tenant" ON {table}
 
 **Critical Performance Optimization:**
 Always wrap `auth.uid()` in a `SELECT` statement:
+
 ```sql
 -- ❌ SLOW (99.99% slower)
 USING (auth.uid() = user_id)
@@ -573,11 +586,13 @@ USING ((select auth.uid()) = user_id)
 ```
 
 **Why it matters:**
+
 - Without SELECT: PostgreSQL calls `auth.uid()` for EVERY row
 - With SELECT: PostgreSQL caches the result for the entire statement
 - Performance improvement: **99.99%** (essentially 10,000x faster on large tables)
 
 **Index Recommendations:**
+
 - Always index columns used in policies (e.g., `user_id`, `tenant_id`)
 - Example: `CREATE INDEX idx_{table}_user_id ON {table}(user_id);`
 - Performance improvement: **99.94%** when combined with wrapped auth functions
@@ -599,6 +614,7 @@ CREATE POLICY "bad_policy" ON {table}
 **Why dangerous:** `raw_user_meta_data` can be modified by the user through Supabase Auth client. An attacker can set `{ "role": "admin" }` and bypass security!
 
 **Safe alternative:** Use `raw_app_meta_data` (server-only):
+
 ```sql
 -- ✅ SAFE - Only server can modify app_metadata
 CREATE POLICY "safe_policy" ON {table}
@@ -610,6 +626,7 @@ CREATE POLICY "safe_policy" ON {table}
 ### Auth NULL Check
 
 Always check if user is authenticated:
+
 ```sql
 -- ❌ Missing NULL check
 USING (auth.uid() = user_id)  -- Fails silently for anon users
@@ -624,6 +641,7 @@ USING (
 ### Policy Debugging
 
 Enable RLS policies in SQL Editor (dev only):
+
 ```sql
 -- Temporarily disable RLS for debugging (DANGEROUS - dev only!)
 ALTER TABLE {table} DISABLE ROW LEVEL SECURITY;
@@ -637,6 +655,7 @@ ALTER TABLE {table} ENABLE ROW LEVEL SECURITY;
 ## Prerequisites
 
 Table must have:
+
 - `user_id UUID` column (for user-based policies)
 - Or `tenant_id` column (for tenant-based policies)
 - **Indexes on all policy filter columns** (critical for performance!)
@@ -647,6 +666,7 @@ Table must have:
 ## Error Handling
 
 If policy application fails:
+
 1. Check table has required columns (user_id, etc.)
 2. Verify auth.uid() is available (Supabase)
 3. Check for existing policies with same names

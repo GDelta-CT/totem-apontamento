@@ -144,7 +144,6 @@ class ManifestGenerator {
       results.agents = agents;
       results.workers = workers;
       results.tasks = tasks;
-
     } catch (error) {
       results.errors.push(error.message);
     }
@@ -166,7 +165,7 @@ class ManifestGenerator {
 
     try {
       const files = await fs.readdir(agentsDir);
-      const mdFiles = files.filter(f => f.endsWith('.md'));
+      const mdFiles = files.filter((f) => f.endsWith('.md'));
 
       for (const file of mdFiles) {
         try {
@@ -196,10 +195,10 @@ class ManifestGenerator {
 
       // Generate CSV content
       const header = 'id,name,archetype,icon,version,status,file_path,when_to_use';
-      const rows = agents.map(a =>
+      const rows = agents.map((a) =>
         [a.id, a.name, a.archetype, a.icon, a.version, a.status, a.file_path, a.when_to_use]
           .map(escapeCSV)
-          .join(','),
+          .join(',')
       );
 
       const csvContent = [header, ...rows].join('\n');
@@ -211,7 +210,6 @@ class ManifestGenerator {
         path: outputPath,
         errors,
       };
-
     } catch (error) {
       return {
         success: false,
@@ -234,7 +232,7 @@ class ManifestGenerator {
       const registryContent = await fs.readFile(registryPath, 'utf8');
       const registry = JSON.parse(registryContent);
 
-      const workers = registry.workers.map(w => ({
+      const workers = registry.workers.map((w) => ({
         id: w.id,
         name: w.name,
         category: w.category,
@@ -247,10 +245,10 @@ class ManifestGenerator {
 
       // Generate CSV content
       const header = 'id,name,category,subcategory,executor_types,tags,file_path,status';
-      const rows = workers.map(w =>
+      const rows = workers.map((w) =>
         [w.id, w.name, w.category, w.subcategory, w.executor_types, w.tags, w.file_path, w.status]
           .map(escapeCSV)
-          .join(','),
+          .join(',')
       );
 
       const csvContent = [header, ...rows].join('\n');
@@ -262,7 +260,6 @@ class ManifestGenerator {
         path: outputPath,
         errors: [],
       };
-
     } catch (error) {
       return {
         success: false,
@@ -286,7 +283,7 @@ class ManifestGenerator {
 
     try {
       const files = await fs.readdir(tasksDir);
-      const mdFiles = files.filter(f => f.endsWith('.md'));
+      const mdFiles = files.filter((f) => f.endsWith('.md'));
 
       for (const file of mdFiles) {
         try {
@@ -295,9 +292,10 @@ class ManifestGenerator {
           const parsed = parseYAMLFromMarkdown(content);
 
           const taskId = file.replace('.md', '');
-          let taskName = taskId.split('-').map(w =>
-            w.charAt(0).toUpperCase() + w.slice(1),
-          ).join(' ');
+          let taskName = taskId
+            .split('-')
+            .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' ');
 
           let category = 'general';
           let format = 'TASK-FORMAT-V1';
@@ -337,7 +335,6 @@ class ManifestGenerator {
             file_path: `.aiox-core/development/tasks/${file}`,
             status: 'active',
           });
-
         } catch (e) {
           errors.push(`Error parsing ${file}: ${e.message}`);
         }
@@ -345,10 +342,10 @@ class ManifestGenerator {
 
       // Generate CSV content
       const header = 'id,name,category,format,has_elicitation,file_path,status';
-      const rows = tasks.map(t =>
+      const rows = tasks.map((t) =>
         [t.id, t.name, t.category, t.format, t.has_elicitation, t.file_path, t.status]
           .map(escapeCSV)
-          .join(','),
+          .join(',')
       );
 
       const csvContent = [header, ...rows].join('\n');
@@ -360,7 +357,6 @@ class ManifestGenerator {
         path: outputPath,
         errors,
       };
-
     } catch (error) {
       return {
         success: false,

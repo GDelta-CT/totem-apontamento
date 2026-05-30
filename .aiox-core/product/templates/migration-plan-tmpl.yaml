@@ -1,13 +1,13 @@
 ---
-template_name: "Schema Migration Plan"
-template_version: "1.0.0"
-output_format: "markdown"
-destination: "migration-plan.md"
-description: "Plan and validate a safe schema migration with rollback and tests"
+template_name: 'Schema Migration Plan'
+template_version: '1.0.0'
+output_format: 'markdown'
+destination: 'migration-plan.md'
+description: 'Plan and validate a safe schema migration with rollback and tests'
 
 sections:
   - id: summary
-    title: "Executive Summary"
+    title: 'Executive Summary'
     instruction: |
       Summarize the change:
       - Objective and scope
@@ -17,7 +17,7 @@ sections:
     elicit: true
 
   - id: change-set
-    title: "Change Set"
+    title: 'Change Set'
     instruction: |
       Detail every schema change:
       - Tables created/altered/dropped
@@ -28,7 +28,7 @@ sections:
     elicit: true
 
   - id: dependencies
-    title: "Dependencies & Ordering"
+    title: 'Dependencies & Ordering'
     instruction: |
       List dependencies and execution order:
       1) Extensions
@@ -41,7 +41,7 @@ sections:
     elicit: true
 
   - id: data-migration
-    title: "Data Migration & Backfill"
+    title: 'Data Migration & Backfill'
     instruction: |
       Strategies for migrating existing data safely at scale.
 
@@ -364,7 +364,7 @@ sections:
     elicit: true
 
   - id: safety
-    title: "Safety & Rollback"
+    title: 'Safety & Rollback'
     instruction: |
       Safety plan:
       - Pre-migration snapshot strategy
@@ -374,7 +374,7 @@ sections:
     elicit: true
 
   - id: testing
-    title: "Testing Strategy"
+    title: 'Testing Strategy'
     instruction: |
       Tests to run:
       - Dry-run (BEGIN; \i file; ROLLBACK)
@@ -384,7 +384,7 @@ sections:
     elicit: true
 
   - id: operations
-    title: "Operational Runbook"
+    title: 'Operational Runbook'
     instruction: |
       Provide exact commands with placeholders:
       - Set env, check psql/pg_dump versions
@@ -396,7 +396,7 @@ sections:
     elicit: true
 
   - id: communication
-    title: "Communication & Approval"
+    title: 'Communication & Approval'
     instruction: |
       - Stakeholders, approvers
       - Change window notice
@@ -405,7 +405,7 @@ sections:
     elicit: true
 
   - id: version-tracking
-    title: "Schema Version Tracking"
+    title: 'Schema Version Tracking'
     instruction: |
       DB Sage uses custom schema_migrations table for enhanced tracking beyond Supabase's built-in migration system.
 
@@ -592,7 +592,7 @@ sections:
     elicit: false
 
   - id: zero-downtime
-    title: "Zero-Downtime Migrations"
+    title: 'Zero-Downtime Migrations'
     instruction: |
       Use expand/contract pattern for non-breaking schema changes. Forward-only migrations that allow
       old and new application versions to coexist.
@@ -868,7 +868,7 @@ sections:
     elicit: false
 
   - id: supabase-cli
-    title: "Supabase CLI Integration"
+    title: 'Supabase CLI Integration'
     instruction: |
       How DB Sage migration workflow integrates with Supabase CLI.
 

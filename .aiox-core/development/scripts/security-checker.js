@@ -36,20 +36,16 @@ class SecurityChecker {
     ];
 
     // Command injection patterns
-    this.commandInjectionPatterns = [
-      /[;&|`$()]/g,
-      /\$\{.*\}/g,
-      />|</g,
-    ];
+    this.commandInjectionPatterns = [/[;&|`$()]/g, /\$\{.*\}/g, />|</g];
 
     // Safe patterns that should be allowed
     this.safePatterns = {
-      'eval': [
+      eval: [
         /\/\*.*eval.*\*\//gs, // eval in comments
         /\/\/.*eval/g, // eval in single-line comments
         /".*eval.*"/g, // eval in strings
         /'.*eval.*'/g,
-      ]
+      ],
     };
   }
 
@@ -64,7 +60,7 @@ class SecurityChecker {
       valid: true,
       errors: [],
       warnings: [],
-      suggestions: []
+      suggestions: [],
     };
 
     // Validate input
@@ -72,7 +68,7 @@ class SecurityChecker {
       results.valid = false;
       results.errors.push({
         type: 'invalid_input',
-        message: 'Code must be a non-empty string'
+        message: 'Code must be a non-empty string',
       });
       return results;
     }
@@ -84,7 +80,7 @@ class SecurityChecker {
         // Check if it's in a safe context
         let isSafe = false;
         const patternName = pattern.source.split('\\')[0];
-        
+
         if (this.safePatterns[patternName]) {
           for (const safePattern of this.safePatterns[patternName]) {
             if (code.match(safePattern)) {
@@ -101,7 +97,7 @@ class SecurityChecker {
             pattern: pattern.source,
             matches: matches,
             message: `Dangerous pattern detected: ${matches[0]}`,
-            line: this._getLineNumber(code, matches.index)
+            line: this._getLineNumber(code, matches.index),
           });
         }
       }
@@ -115,7 +111,7 @@ class SecurityChecker {
           results.errors.push({
             type: 'sql_injection',
             pattern: pattern.source,
-            message: 'Potential SQL injection vulnerability detected'
+            message: 'Potential SQL injection vulnerability detected',
           });
         }
       }
@@ -126,7 +122,7 @@ class SecurityChecker {
       if (!code.includes('sanitize') && !code.includes('validate') && !code.includes('escape')) {
         results.warnings.push({
           type: 'input_validation',
-          message: 'User input detected without explicit sanitization'
+          message: 'User input detected without explicit sanitization',
         });
       }
     }
@@ -141,28 +137,27 @@ class SecurityChecker {
     const results = {
       valid: true,
       errors: [],
-      warnings: []
+      warnings: [],
     };
 
     try {
       const parsed = yaml.load(yamlContent);
-      
+
       // Check for dangerous YAML features
       if (yamlContent.includes('!!') && !yamlContent.includes('!!str')) {
         results.warnings.push({
           type: 'yaml_tags',
-          message: 'YAML tags detected - ensure they are safe'
+          message: 'YAML tags detected - ensure they are safe',
         });
       }
 
       // Validate structure
       this.validateYAMLStructure(parsed, results);
-      
     } catch (error) {
       results.valid = false;
       results.errors.push({
         type: 'yaml_parse',
-        message: `YAML parsing error: ${error.message}`
+        message: `YAML parsing error: ${error.message}`,
       });
     }
 
@@ -176,7 +171,7 @@ class SecurityChecker {
     if (typeof obj === 'object' && obj !== null) {
       for (const [key, value] of Object.entries(obj)) {
         const currentPath = path ? `${path}.${key}` : key;
-        
+
         // Check for command injection in string values
         if (typeof value === 'string') {
           for (const pattern of this.commandInjectionPatterns) {
@@ -184,12 +179,12 @@ class SecurityChecker {
               results.warnings.push({
                 type: 'command_injection',
                 path: currentPath,
-                message: `Potential command injection in ${currentPath}`
+                message: `Potential command injection in ${currentPath}`,
               });
             }
           }
         }
-        
+
         // Recurse for nested objects
         if (typeof value === 'object') {
           this.validateYAMLStructure(_value, results, currentPath);
@@ -203,7 +198,7 @@ class SecurityChecker {
    */
   isSafeCommandContext(key, value) {
     const safeKeys = ['description', 'comment', 'note', 'help', 'usage'];
-    return safeKeys.some(safe => key.toLowerCase().includes(safe));
+    return safeKeys.some((safe) => key.toLowerCase().includes(safe));
   }
 
   /**
@@ -212,7 +207,7 @@ class SecurityChecker {
   validatePath(filePath) {
     const results = {
       valid: true,
-      errors: []
+      errors: [],
     };
 
     // Normalize the path
@@ -223,7 +218,7 @@ class SecurityChecker {
       results.valid = false;
       results.errors.push({
         type: 'path_traversal',
-        message: 'Path traversal detected'
+        message: 'Path traversal detected',
       });
     }
 
@@ -231,7 +226,7 @@ class SecurityChecker {
     if (path.isAbsolute(normalized)) {
       results.errors.push({
         type: 'absolute_path',
-        message: 'Absolute path detected - use relative paths'
+        message: 'Absolute path detected - use relative paths',
       });
     }
 
@@ -250,7 +245,7 @@ class SecurityChecker {
         results.warnings = results.warnings || [];
         results.warnings.push({
           type: 'sensitive_path',
-          message: `Path contains potentially sensitive directory: ${pattern.source}`
+          message: `Path contains potentially sensitive directory: ${pattern.source}`,
         });
       }
     }
@@ -277,12 +272,12 @@ class SecurityChecker {
         // Allow only alphanumeric, dash, underscore, and dot
         sanitized = sanitized.replace(/[^a-zA-Z0-9\-_\.]/g, '');
         break;
-      
+
       case 'identifier':
         // Allow only alphanumeric, dash, and underscore
         sanitized = sanitized.replace(/[^a-zA-Z0-9\-_]/g, '');
         break;
-      
+
       case 'yaml':
         // Escape special YAML characters
         sanitized = sanitized
@@ -291,7 +286,7 @@ class SecurityChecker {
           .replace(/>/g, '\\>')
           .replace(/</g, '\\<');
         break;
-      
+
       case 'general':
       default:
         // Basic HTML/script escaping
@@ -319,9 +314,9 @@ class SecurityChecker {
         totalChecks: 0,
         passed: 0,
         failed: 0,
-        warnings: 0
+        warnings: 0,
       },
-      details: validations
+      details: validations,
     };
 
     // Calculate summary

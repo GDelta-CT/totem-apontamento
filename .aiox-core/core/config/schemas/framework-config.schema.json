@@ -116,7 +116,10 @@
             "properties": {
               "enabled": { "type": "boolean" },
               "path": { "type": "string" },
-              "format": { "type": "string", "enum": ["full-markdown-yaml", "condensed-rules", "cursor-style"] }
+              "format": {
+                "type": "string",
+                "enum": ["full-markdown-yaml", "condensed-rules", "cursor-style"]
+              }
             },
             "additionalProperties": false
           }
@@ -142,10 +145,7 @@
           "type": "object",
           "properties": {
             "sections_order": {
-              "oneOf": [
-                { "type": "array", "items": { "type": "string" } },
-                { "type": "null" }
-              ],
+              "oneOf": [{ "type": "array", "items": { "type": "string" } }, { "type": "null" }],
               "description": "Custom section order for story templates. null = use template default.",
               "default": null
             },

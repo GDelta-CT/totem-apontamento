@@ -11,16 +11,19 @@
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -188,6 +191,7 @@ token_usage: ~3,000-10,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Break into smaller workflows; implement checkpointing; use async processing where possible
 
 ---
@@ -207,7 +211,6 @@ updated_at: 2025-11-17
 
 ---
 
-
 ## Process
 
 ### 1. Confirm Project Setup
@@ -217,6 +220,7 @@ Ask user:
 **Project name**: (e.g., "mmos-platform")
 
 **Include starter templates?**
+
 1. Minimal - Directories only
 2. Standard - Directories + READMEs + config
 3. Full - Everything + baseline schema example
@@ -247,6 +251,7 @@ echo "✓ Created directories:
 Example: 20251026120000_baseline_schema.sql
 
 ## Order (within each file):
+
 1. Extensions
 2. Tables + Constraints
 3. Functions
@@ -255,11 +260,12 @@ Example: 20251026120000_baseline_schema.sql
 6. Views
 
 ## Workflow:
-*verify-order migration.sql  # Check order
-*dry-run migration.sql       # Test
-*snapshot pre_migration      # Create rollback point
-*apply-migration migration.sql  # Apply
-*smoke-test                  # Validate
+
+*verify-order migration.sql # Check order
+*dry-run migration.sql # Test
+*snapshot pre_migration # Create rollback point
+*apply-migration migration.sql # Apply
+\*smoke-test # Validate
 ```
 
 #### supabase/seeds/README.md
@@ -270,11 +276,13 @@ Example: 20251026120000_baseline_schema.sql
 ## Naming: YYYYMMDDHHMMSS_description_seed.sql
 
 ## Types:
+
 - Required: Data app needs to function
 - Test: Sample data for development
 - Reference: Lookup tables (countries, categories)
 
 ## Idempotent pattern:
+
 INSERT INTO table (id, name) VALUES (1, 'value')
 ON CONFLICT (id) DO NOTHING;
 ```
@@ -285,13 +293,14 @@ ON CONFLICT (id) DO NOTHING;
 # Tests
 
 ## Smoke tests (post-migration validation):
+
 - Tables exist
 - RLS enabled
 - Policies installed
 - Functions callable
 - Basic queries work
 
-## Run: *smoke-test
+## Run: \*smoke-test
 ```
 
 #### supabase/rollback/README.md
@@ -300,10 +309,12 @@ ON CONFLICT (id) DO NOTHING;
 # Rollback
 
 ## Snapshots (automatic):
+
 Created by *apply-migration and *snapshot commands
 Located in: ../snapshots/
 
 ## Manual rollback scripts:
+
 Write explicit undo operations for complex migrations
 
 Example: YYYYMMDDHHMMSS_rollback_description.sql
@@ -424,15 +435,15 @@ COMMIT;
 SET client_min_messages = warning;
 
 \echo 'Checking tables...'
-SELECT COUNT(*) AS tables FROM information_schema.tables 
+SELECT COUNT(*) AS tables FROM information_schema.tables
 WHERE table_schema='public';
 
 \echo 'Checking RLS...'
-SELECT COUNT(*) AS rls_enabled FROM pg_tables 
+SELECT COUNT(*) AS rls_enabled FROM pg_tables
 WHERE schemaname='public' AND rowsecurity=true;
 
 \echo 'Checking policies...'
-SELECT COUNT(*) AS policies FROM pg_policies 
+SELECT COUNT(*) AS policies FROM pg_policies
 WHERE schemaname='public';
 
 \echo '✓ Smoke test complete'
@@ -446,7 +457,9 @@ WHERE schemaname='public';
 # Migration Log
 
 ## Format:
+
 ### Version X.Y.Z - Description (Date)
+
 - Migration: filename.sql
 - Status: ✅ Success / ❌ Failed / ⏪ Rolled Back
 - Changes: What changed
@@ -455,6 +468,7 @@ WHERE schemaname='public';
 ---
 
 ## Baseline (Initial)
+
 - Migration: 00000000000000_baseline.sql
 - Status: ⏳ Pending
 - Changes: Initial project structure
@@ -509,6 +523,7 @@ SUPABASE_DB_URL="postgresql://postgres.[PASSWORD]@[PROJECT-REF].supabase.co:6543
 ```
 
 **Security**:
+
 - ✅ Added to .gitignore
 - ✅ Use pooler (port 6543)
 - ✅ Require SSL
@@ -518,6 +533,7 @@ SUPABASE_DB_URL="postgresql://postgres.[PASSWORD]@[PROJECT-REF].supabase.co:6543
 ## Project Options
 
 ### Minimal (Directories Only)
+
 ```
 supabase/
 ├── migrations/
@@ -527,24 +543,29 @@ supabase/
 ├── snapshots/
 └── docs/
 ```
+
 **Use for**: Existing projects, simple setups
 
 ### Standard (+ READMEs + Config)
+
 ```
 + README.md files
 + config.toml
 + .gitignore
 + migration-log.md
 ```
+
 **Use for**: New projects, team environments
 
 ### Full (+ Baseline Schema)
+
 ```
 + baseline.sql migration
 + smoke_test.sql
 + Example profiles table
 + RLS policies
 ```
+
 **Use for**: Greenfield projects, learning
 
 ---
@@ -571,6 +592,7 @@ cp supabase.backup/migrations/* supabase/migrations/
 ### For Your Project
 
 Replace baseline.sql with your tables:
+
 - Copy schema from existing DB
 - Or design with: `*create-schema`
 - Then create migration file
@@ -578,6 +600,7 @@ Replace baseline.sql with your tables:
 ### Team Standards
 
 Edit READMEs to add:
+
 - Team-specific naming conventions
 - Required reviewers for migrations
 - Deployment procedures
@@ -615,6 +638,7 @@ Add to pipeline:
 
 **Problem**: supabase/ folder exists  
 **Options**:
+
 1. Backup and replace (recommended)
 2. Merge manually
 3. Choose different directory
@@ -628,6 +652,7 @@ Add to pipeline:
 
 **Problem**: Already using Supabase CLI  
 **Solution**: Bootstrap is compatible with Supabase CLI
+
 - Keep existing config
 - Use bootstrap for organization only
 

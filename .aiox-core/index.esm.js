@@ -7,10 +7,10 @@ import ComponentSearch from './infrastructure/scripts/component-search.js';
 import DependencyAnalyzer from './infrastructure/scripts/dependency-analyzer.js';
 
 export {
-    MetaAgent,
-    TaskManager,
-    ElicitationEngine,
-    TemplateEngine,
-    ComponentSearch,
-    DependencyAnalyzer
+  MetaAgent,
+  TaskManager,
+  ElicitationEngine,
+  TemplateEngine,
+  ComponentSearch,
+  DependencyAnalyzer,
 };

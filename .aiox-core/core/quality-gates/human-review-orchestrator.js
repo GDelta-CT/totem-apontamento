@@ -63,7 +63,7 @@ class HumanReviewOrchestrator {
     const reviewRequest = await this.generateHumanReviewRequest(
       prContext,
       layer1Result,
-      layer2Result,
+      layer2Result
     );
 
     // Step 4: Send notification to human reviewer
@@ -276,7 +276,7 @@ class HumanReviewOrchestrator {
       layer1Result.results.forEach((r) => {
         summary.layer1.checks.push({
           check: r.check,
-          status: r.pass ? 'passed' : (r.skipped ? 'skipped' : 'failed'),
+          status: r.pass ? 'passed' : r.skipped ? 'skipped' : 'failed',
           message: r.message,
         });
       });
@@ -286,7 +286,11 @@ class HumanReviewOrchestrator {
     const coderabbitResult = layer2Result?.results?.find((r) => r.check === 'coderabbit');
     if (coderabbitResult) {
       summary.layer2.coderabbit = {
-        status: coderabbitResult.pass ? 'passed' : (coderabbitResult.skipped ? 'skipped' : 'issues_found'),
+        status: coderabbitResult.pass
+          ? 'passed'
+          : coderabbitResult.skipped
+            ? 'skipped'
+            : 'issues_found',
         issues: coderabbitResult.issues || { critical: 0, high: 0, medium: 0, low: 0 },
         details: coderabbitResult.details?.slice(0, 5) || [], // Top 5 issues
       };
@@ -296,7 +300,7 @@ class HumanReviewOrchestrator {
     const quinnResult = layer2Result?.results?.find((r) => r.check === 'quinn');
     if (quinnResult) {
       summary.layer2.quinn = {
-        status: quinnResult.pass ? 'passed' : (quinnResult.skipped ? 'skipped' : 'issues_found'),
+        status: quinnResult.pass ? 'passed' : quinnResult.skipped ? 'skipped' : 'issues_found',
         suggestions: quinnResult.suggestions || 0,
         blocking: quinnResult.blocking || 0,
         details: quinnResult.details?.slice(0, 5) || [], // Top 5 suggestions
@@ -315,10 +319,9 @@ class HumanReviewOrchestrator {
     const baseTime = 10; // Base 10 minutes
     const perAreaTime = 5; // 5 minutes per focus area
 
-    const areaCount = (focusAreas.primary?.length || 0) +
-                     (focusAreas.secondary?.length || 0) * 0.5;
+    const areaCount = (focusAreas.primary?.length || 0) + (focusAreas.secondary?.length || 0) * 0.5;
 
-    return Math.round(baseTime + (areaCount * perAreaTime));
+    return Math.round(baseTime + areaCount * perAreaTime);
   }
 
   /**
@@ -401,10 +404,7 @@ class HumanReviewOrchestrator {
     // Validate ID to prevent path traversal
     const validatedId = this.validateRequestId(reviewRequest.id);
 
-    const requestPath = path.join(
-      this.reviewRequestsPath,
-      `${validatedId}.json`,
-    );
+    const requestPath = path.join(this.reviewRequestsPath, `${validatedId}.json`);
 
     // Additional containment check
     const resolvedPath = path.resolve(requestPath);
@@ -427,36 +427,38 @@ class HumanReviewOrchestrator {
    */
   async updateStatus(reviewRequest) {
     // Chain the update operation onto the queue to serialize concurrent writes
-    this.statusQueue = this.statusQueue.then(async () => {
-      let status = {};
+    this.statusQueue = this.statusQueue
+      .then(async () => {
+        let status = {};
 
-      try {
-        status = JSON.parse(await fs.readFile(this.statusPath, 'utf8'));
-      } catch {
-        // Create new status
-      }
+        try {
+          status = JSON.parse(await fs.readFile(this.statusPath, 'utf8'));
+        } catch {
+          // Create new status
+        }
 
-      status.lastHumanReviewRequest = {
-        id: reviewRequest.id,
-        createdAt: reviewRequest.createdAt,
-        reviewer: reviewRequest.reviewer,
-        status: reviewRequest.status,
-        estimatedTime: reviewRequest.estimatedTime,
-      };
+        status.lastHumanReviewRequest = {
+          id: reviewRequest.id,
+          createdAt: reviewRequest.createdAt,
+          reviewer: reviewRequest.reviewer,
+          status: reviewRequest.status,
+          estimatedTime: reviewRequest.estimatedTime,
+        };
 
-      // Update reviewer index for round-robin
-      const reviewers = ['@architect', '@tech-lead', '@senior-dev'];
-      const currentIndex = reviewers.indexOf(reviewRequest.reviewer);
-      if (currentIndex !== -1) {
-        status.lastReviewerIndex = currentIndex;
-      }
+        // Update reviewer index for round-robin
+        const reviewers = ['@architect', '@tech-lead', '@senior-dev'];
+        const currentIndex = reviewers.indexOf(reviewRequest.reviewer);
+        if (currentIndex !== -1) {
+          status.lastReviewerIndex = currentIndex;
+        }
 
-      await fs.mkdir(path.dirname(this.statusPath), { recursive: true });
-      await fs.writeFile(this.statusPath, JSON.stringify(status, null, 2));
-    }).catch((err) => {
-      // Log but don't break the queue for future updates
-      console.error('Failed to update status:', err.message);
-    });
+        await fs.mkdir(path.dirname(this.statusPath), { recursive: true });
+        await fs.writeFile(this.statusPath, JSON.stringify(status, null, 2));
+      })
+      .catch((err) => {
+        // Log but don't break the queue for future updates
+        console.error('Failed to update status:', err.message);
+      });
 
     // Wait for this update to complete
     await this.statusQueue;
@@ -473,10 +475,7 @@ class HumanReviewOrchestrator {
 
       for (const file of files) {
         if (file.endsWith('.json')) {
-          const content = await fs.readFile(
-            path.join(this.reviewRequestsPath, file),
-            'utf8',
-          );
+          const content = await fs.readFile(path.join(this.reviewRequestsPath, file), 'utf8');
           const request = JSON.parse(content);
           if (request.status === 'pending') {
             requests.push(request);

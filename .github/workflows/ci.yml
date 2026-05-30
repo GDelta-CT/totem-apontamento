@@ -36,7 +36,7 @@ jobs:
 
       - name: Lint
         run: npm run lint
-        continue-on-error: true  # Lint não bloqueia build inicialmente
+        continue-on-error: true # Lint não bloqueia build inicialmente
 
       - name: Build
         run: npm run build

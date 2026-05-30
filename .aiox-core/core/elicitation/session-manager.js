@@ -78,7 +78,7 @@ class ElicitationSessionManager {
   async loadSession(sessionId) {
     const sessionPath = this.getSessionPath(sessionId);
 
-    if (!await fs.pathExists(sessionPath)) {
+    if (!(await fs.pathExists(sessionPath))) {
       throw new Error(`Session ${sessionId} not found`);
     }
 
@@ -135,8 +135,10 @@ class ElicitationSessionManager {
             created: session.created,
             updated: session.updated,
             status: session.status,
-            progress: session.totalSteps > 0 ?
-              Math.round((session.currentStep / session.totalSteps) * 100) : 0,
+            progress:
+              session.totalSteps > 0
+                ? Math.round((session.currentStep / session.totalSteps) * 100)
+                : 0,
           });
         } catch (_error) {
           // Skip invalid session files
@@ -165,8 +167,8 @@ class ElicitationSessionManager {
       resumeFrom: session.currentStep,
       completedSteps: Object.keys(session.answers).length,
       remainingSteps: session.totalSteps - session.currentStep,
-      percentComplete: session.totalSteps > 0 ?
-        Math.round((session.currentStep / session.totalSteps) * 100) : 0,
+      percentComplete:
+        session.totalSteps > 0 ? Math.round((session.currentStep / session.totalSteps) * 100) : 0,
     };
 
     return resumeInfo;

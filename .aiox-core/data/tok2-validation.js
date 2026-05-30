@@ -62,10 +62,14 @@ function run() {
   console.log('\n--- Deferred Loading (AC 4-7) ---');
 
   check(4, 'Tier 3 tools deferred via best available strategy', () => {
-    const caps = JSON.parse(fs.readFileSync(path.join(PROJECT_ROOT, '.aiox', 'runtime-capabilities.json'), 'utf8'));
-    return caps.strategy.primary === 'tool-search-auto' ||
-           caps.strategy.primary === 'mcp-discipline' ||
-           caps.strategy.primary === 'claudemd-guidance';
+    const caps = JSON.parse(
+      fs.readFileSync(path.join(PROJECT_ROOT, '.aiox', 'runtime-capabilities.json'), 'utf8')
+    );
+    return (
+      caps.strategy.primary === 'tool-search-auto' ||
+      caps.strategy.primary === 'mcp-discipline' ||
+      caps.strategy.primary === 'claudemd-guidance'
+    );
   });
 
   check('5-6', 'Tool Search latency and search limits documented', () => {
@@ -76,7 +80,9 @@ function run() {
   });
 
   check(7, 'Search accuracy validated (7/7 test queries pass)', () => {
-    const { validate } = require(path.join(PROJECT_ROOT, '.aiox-core', 'data', 'tool-search-validation.js'));
+    const { validate } = require(
+      path.join(PROJECT_ROOT, '.aiox-core', 'data', 'tool-search-validation.js')
+    );
     return validate();
   });
 
@@ -88,19 +94,27 @@ function run() {
   });
 
   check(9, 'Essential MCP servers defined in tool-registry.yaml', () => {
-    const registry = fs.readFileSync(path.join(PROJECT_ROOT, '.aiox-core', 'data', 'tool-registry.yaml'), 'utf8');
+    const registry = fs.readFileSync(
+      path.join(PROJECT_ROOT, '.aiox-core', 'data', 'tool-registry.yaml'),
+      'utf8'
+    );
     return registry.includes('essential: true') && registry.includes('essential: false');
   });
 
   check(10, 'Non-essential servers can be re-enabled per-session', () => {
-    const mod = fs.readFileSync(path.join(PROJECT_ROOT, '.aiox-core', 'data', 'mcp-discipline.js'), 'utf8');
+    const mod = fs.readFileSync(
+      path.join(PROJECT_ROOT, '.aiox-core', 'data', 'mcp-discipline.js'),
+      'utf8'
+    );
     return mod.includes('--enable') && mod.includes('--restore');
   });
 
   check(11, 'CLAUDE.md includes tool selection guidance', () => {
     const claudeMd = fs.readFileSync(path.join(PROJECT_ROOT, '.claude', 'CLAUDE.md'), 'utf8');
-    return claudeMd.includes('Tool Selection Guidance') &&
-           (claudeMd.includes('prefer native') || claudeMd.includes('Prefer native'));
+    return (
+      claudeMd.includes('Tool Selection Guidance') &&
+      (claudeMd.includes('prefer native') || claudeMd.includes('Prefer native'))
+    );
   });
 
   check(12, 'Guidance references tool-registry.yaml', () => {
@@ -112,15 +126,19 @@ function run() {
   console.log('\n--- Scope Separation (AC 13-15) ---');
 
   check(13, 'ACs separated by scope (project vs global)', () => {
-    const caps = JSON.parse(fs.readFileSync(path.join(PROJECT_ROOT, '.aiox', 'runtime-capabilities.json'), 'utf8'));
+    const caps = JSON.parse(
+      fs.readFileSync(path.join(PROJECT_ROOT, '.aiox', 'runtime-capabilities.json'), 'utf8')
+    );
     const hasProject = caps.mcpServers.project.length > 0;
     const hasGlobal = caps.mcpServers.global.length > 0;
     return hasProject && hasGlobal;
   });
 
   check(14, 'Capability detection validates against actual MCPs', () => {
-    const caps = JSON.parse(fs.readFileSync(path.join(PROJECT_ROOT, '.aiox', 'runtime-capabilities.json'), 'utf8'));
-    const projectNames = caps.mcpServers.project.map(s => s.name);
+    const caps = JSON.parse(
+      fs.readFileSync(path.join(PROJECT_ROOT, '.aiox', 'runtime-capabilities.json'), 'utf8')
+    );
+    const projectNames = caps.mcpServers.project.map((s) => s.name);
     return projectNames.includes('nogic') && projectNames.includes('code-graph');
   });
 

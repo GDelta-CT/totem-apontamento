@@ -531,6 +531,7 @@ metadata:
 ```
 
 ## Handoff
+
 next_agent: @qa
-next_command: *critique-spec {story-id}
+next_command: \*critique-spec {story-id}
 condition: Spec written (spec.md created)

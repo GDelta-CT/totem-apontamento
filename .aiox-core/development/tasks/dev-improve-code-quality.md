@@ -182,6 +182,7 @@ token_usage: ~2,000-8,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Iterative analysis with depth limits; cache intermediate results; batch similar operations
 
 ---
@@ -202,29 +203,36 @@ updated_at: 2025-11-17
 ---
 
 # No checklists needed - this task performs automated code refactoring, validation is through linting and testing
+
 tools:
-  - github-cli
+
+- github-cli
+
 ---
 
 # Improve Code Quality - AIOX Developer Task
 
 ## Purpose
+
 Automatically improve code quality across multiple dimensions including formatting, linting, modern syntax, and best practices.
 
 ## Command Pattern
+
 ```
 *improve-code-quality <path> [options]
 ```
 
 ## Parameters
+
 - `path`: File or directory path to improve
 - `options`: Code improvement configuration
 
 ### Options
+
 - `--patterns <types>`: Comma-separated improvement patterns to apply
 - `--auto-fix`: Automatically apply all safe improvements
 - `--preview`: Show changes before applying
-- `--exclude <patterns>`: Exclude file patterns (e.g., "*.test.js")
+- `--exclude <patterns>`: Exclude file patterns (e.g., "\*.test.js")
 - `--recursive`: Process directories recursively
 - `--config <file>`: Use custom configuration file
 - `--report <file>`: Generate improvement report
@@ -232,6 +240,7 @@ Automatically improve code quality across multiple dimensions including formatti
 - `--backup`: Create backups before applying changes
 
 ## Improvement Patterns
+
 - `formatting`: Code formatting with Prettier
 - `linting`: ESLint fixes and rule compliance
 - `modern-syntax`: ES6+ syntax upgrades
@@ -244,6 +253,7 @@ Automatically improve code quality across multiple dimensions including formatti
 - `documentation`: JSDoc generation and updates
 
 ## Examples
+
 ```bash
 # Improve single file with preview
 *improve-code-quality aiox-core/scripts/legacy-utility.js --preview
@@ -287,13 +297,13 @@ class ImproveCodeQualityTask {
 
       // Parse parameters
       const config = await this.parseParameters(params);
-      
+
       // Initialize dependencies
       await this.initializeDependencies();
 
       // Get files to improve
       const files = await this.getFilesToImprove(config);
-      
+
       if (files.length === 0) {
         console.log(chalk.yellow('No files found to improve'));
         return { success: true, improvements: [] };
@@ -322,9 +332,8 @@ class ImproveCodeQualityTask {
         success: true,
         filesAnalyzed: files.length,
         totalImprovements: this.improvements.length,
-        appliedImprovements: this.appliedImprovements.length
+        appliedImprovements: this.appliedImprovements.length,
       };
-
     } catch (error) {
       console.error(chalk.red(`\n❌ Code quality improvement failed: ${error.message}`));
       throw error;
@@ -346,13 +355,13 @@ class ImproveCodeQualityTask {
       configFile: null,
       report: null,
       threshold: 0.8,
-      backup: true
+      backup: true,
     };
 
     // Parse options
     for (let i = 1; i < params.length; i++) {
       const param = params[i];
-      
+
       if (param === '--auto-fix') {
         config.autoFix = true;
       } else if (param === '--preview') {
@@ -362,9 +371,9 @@ class ImproveCodeQualityTask {
       } else if (param === '--backup') {
         config.backup = true;
       } else if (param.startsWith('--patterns') && params[i + 1]) {
-        config.patterns = params[++i].split(',').map(p => p.trim());
+        config.patterns = params[++i].split(',').map((p) => p.trim());
       } else if (param.startsWith('--exclude') && params[i + 1]) {
-        config.exclude = params[++i].split(',').map(e => e.trim());
+        config.exclude = params[++i].split(',').map((e) => e.trim());
       } else if (param.startsWith('--config') && params[i + 1]) {
         config.configFile = params[++i];
       } else if (param.startsWith('--report') && params[i + 1]) {
@@ -391,14 +400,14 @@ class ImproveCodeQualityTask {
     try {
       const content = await fs.readFile(config.configFile, 'utf-8');
       const customConfig = JSON.parse(content);
-      
+
       // Merge custom config
       Object.assign(config, {
         patterns: customConfig.patterns || config.patterns,
         threshold: customConfig.threshold || config.threshold,
         exclude: customConfig.exclude || config.exclude,
         // Add pattern-specific configurations
-        patternConfig: customConfig.patternConfig || {}
+        patternConfig: customConfig.patternConfig || {},
       });
     } catch (error) {
       console.warn(chalk.yellow(`Failed to load custom config: ${error.message}`));
@@ -409,7 +418,6 @@ class ImproveCodeQualityTask {
     try {
       const CodeQualityImprover = require('../scripts/code-quality-improver');
       this.codeQualityImprover = new CodeQualityImprover({ rootPath: this.rootPath });
-
     } catch (error) {
       throw new Error(`Failed to initialize dependencies: ${error.message}`);
     }
@@ -421,7 +429,7 @@ class ImproveCodeQualityTask {
 
     try {
       const stats = await fs.stat(targetPath);
-      
+
       if (stats.isFile()) {
         // Single file
         if (this.shouldProcessFile(targetPath, config)) {
@@ -431,12 +439,12 @@ class ImproveCodeQualityTask {
         // Directory
         const pattern = config.recursive ? '**/*.{js,jsx,ts,tsx}' : '*.{js,jsx,ts,tsx}';
         const globPattern = path.join(targetPath, pattern);
-        
+
         const matches = await glob(globPattern, {
-          ignore: config.exclude.map(e => path.join(targetPath, '**', e)),
-          nodir: true
+          ignore: config.exclude.map((e) => path.join(targetPath, '**', e)),
+          nodir: true,
         });
-        
+
         for (const match of matches) {
           if (this.shouldProcessFile(match, config)) {
             files.push(match);
@@ -455,17 +463,17 @@ class ImproveCodeQualityTask {
     if (!config.includeTests && (filePath.includes('.test.') || filePath.includes('.spec.'))) {
       return false;
     }
-    
+
     // Skip build artifacts
     if (filePath.includes('/dist/') || filePath.includes('/build/')) {
       return false;
     }
-    
+
     // Skip node_modules
     if (filePath.includes('node_modules')) {
       return false;
     }
-    
+
     // Check file extension
     const ext = path.extname(filePath);
     return ['.js', '.jsx', '.ts', '.tsx'].includes(ext);
@@ -473,12 +481,12 @@ class ImproveCodeQualityTask {
 
   async analyzeFiles(files, config) {
     console.log(chalk.blue('🔍 Analyzing code quality...'));
-    
+
     const progressInterval = Math.max(1, Math.floor(files.length / 20));
-    
+
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      
+
       try {
         // Create backup if requested
         if (config.backup) {
@@ -488,15 +496,15 @@ class ImproveCodeQualityTask {
         // Analyze file for improvements
         const analysis = await this.codeQualityImprover.analyzeFile(file, {
           patterns: config.patterns,
-          patternConfig: config.patternConfig
+          patternConfig: config.patternConfig,
         });
-        
+
         if (analysis.improvements && analysis.improvements.length > 0) {
           // Filter by confidence threshold
           const filteredImprovements = analysis.improvements.filter(
-            imp => imp.confidence >= config.threshold
+            (imp) => imp.confidence >= config.threshold
           );
-          
+
           // Add to improvements list
           for (const improvement of filteredImprovements) {
             improvement.file = path.relative(this.rootPath, file);
@@ -504,18 +512,17 @@ class ImproveCodeQualityTask {
             this.improvements.push(improvement);
           }
         }
-        
+
         // Show progress
         if (i % progressInterval === 0) {
           const progress = Math.floor((i / files.length) * 100);
           process.stdout.write(`\rProgress: ${progress}%`);
         }
-        
       } catch (error) {
         console.warn(chalk.yellow(`\nFailed to analyze ${file}: ${error.message}`));
       }
     }
-    
+
     console.log('\rProgress: 100%\n');
   }
 
@@ -524,14 +531,14 @@ class ImproveCodeQualityTask {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const relativePath = path.relative(this.rootPath, filePath);
     const backupPath = path.join(backupDir, timestamp, relativePath);
-    
+
     await fs.mkdir(path.dirname(backupPath), { recursive: true });
     await fs.copyFile(filePath, backupPath);
   }
 
   async applyImprovements(config) {
     console.log(chalk.blue('\n🔧 Applying improvements...'));
-    
+
     if (this.improvements.length === 0) {
       console.log(chalk.yellow('No improvements to apply'));
       return;
@@ -539,25 +546,25 @@ class ImproveCodeQualityTask {
 
     // Group improvements by file
     const byFile = this.groupImprovementsByFile();
-    
+
     let applied = 0;
     let failed = 0;
-    
+
     for (const [file, improvements] of Object.entries(byFile)) {
       try {
         console.log(chalk.gray(`\nImproving ${file}...`));
-        
+
         const result = await this.codeQualityImprover.applyImprovements(
           path.join(this.rootPath, file),
           improvements
         );
-        
+
         if (result.success) {
           applied += result.appliedCount;
-          this.appliedImprovements.push(...improvements.filter(
-            imp => result.applied.includes(imp.id)
-          ));
-          
+          this.appliedImprovements.push(
+            ...improvements.filter((imp) => result.applied.includes(imp.id))
+          );
+
           // Show applied improvements
           for (const improvement of improvements) {
             if (result.applied.includes(improvement.id)) {
@@ -573,7 +580,7 @@ class ImproveCodeQualityTask {
         console.error(chalk.red(`  Error: ${error.message}`));
       }
     }
-    
+
     // Show summary
     console.log(chalk.blue('\n📊 Improvement Summary:'));
     console.log(chalk.green(`  ✅ Applied: ${applied}`));
@@ -596,7 +603,7 @@ class ImproveCodeQualityTask {
     for (const [file, improvements] of Object.entries(byFile)) {
       console.log(chalk.blue(`\n📄 ${file}`));
       console.log(chalk.gray('─'.repeat(50)));
-      
+
       for (const improvement of improvements) {
         this.displayImprovement(improvement);
       }
@@ -609,7 +616,9 @@ class ImproveCodeQualityTask {
     console.log(chalk.blue('\n📌 Next Steps:'));
     console.log(`1. Apply all improvements: *improve-code-quality ${config.targetPath} --auto-fix`);
     console.log(`2. Interactive selection: *improve-code-quality ${config.targetPath}`);
-    console.log(`3. Generate report: *improve-code-quality ${config.targetPath} --report quality-report.json`);
+    console.log(
+      `3. Generate report: *improve-code-quality ${config.targetPath} --report quality-report.json`
+    );
   }
 
   async interactiveImprovement(config) {
@@ -625,32 +634,32 @@ class ImproveCodeQualityTask {
 
     for (const [file, improvements] of Object.entries(byFile)) {
       console.log(chalk.blue(`\n📄 ${file}`));
-      
-      const choices = improvements.map(imp => ({
+
+      const choices = improvements.map((imp) => ({
         name: `${imp.pattern}: ${imp.description}`,
         value: imp.id,
-        checked: imp.confidence >= 0.9 // Pre-check high confidence
+        checked: imp.confidence >= 0.9, // Pre-check high confidence
       }));
 
-      const { selected } = await inquirer.prompt([{
-        type: 'checkbox',
-        name: 'selected',
-        message: 'Select improvements to apply:',
-        choices,
-        pageSize: 10
-      }]);
+      const { selected } = await inquirer.prompt([
+        {
+          type: 'checkbox',
+          name: 'selected',
+          message: 'Select improvements to apply:',
+          choices,
+          pageSize: 10,
+        },
+      ]);
 
       if (selected.length > 0) {
-        const selectedImprovements = improvements.filter(
-          imp => selected.includes(imp.id)
-        );
-        
+        const selectedImprovements = improvements.filter((imp) => selected.includes(imp.id));
+
         try {
           const result = await this.codeQualityImprover.applyImprovements(
             path.join(this.rootPath, file),
             selectedImprovements
           );
-          
+
           if (result.success) {
             console.log(chalk.green(`✅ Applied ${result.appliedCount} improvements`));
             this.appliedImprovements.push(...selectedImprovements);
@@ -666,30 +675,39 @@ class ImproveCodeQualityTask {
 
   groupImprovementsByFile() {
     const byFile = {};
-    
+
     for (const improvement of this.improvements) {
       if (!byFile[improvement.file]) {
         byFile[improvement.file] = [];
       }
       byFile[improvement.file].push(improvement);
     }
-    
+
     return byFile;
   }
 
   displayImprovement(improvement) {
-    const confidenceColor = improvement.confidence >= 0.9 ? chalk.green :
-                          improvement.confidence >= 0.7 ? chalk.yellow :
-                          chalk.gray;
-    
-    console.log(`\n${chalk.gray(improvement.id)} ${chalk.blue(`[${improvement.pattern}]`)} ${improvement.description}`);
-    console.log(`   ${chalk.gray('Confidence:')} ${confidenceColor((improvement.confidence * 100).toFixed(0) + '%')}`);
-    console.log(`   ${chalk.gray('Location:')} Line ${improvement.location.start}${improvement.location.end !== improvement.location.start ? `-${improvement.location.end}` : ''}`);
-    
+    const confidenceColor =
+      improvement.confidence >= 0.9
+        ? chalk.green
+        : improvement.confidence >= 0.7
+          ? chalk.yellow
+          : chalk.gray;
+
+    console.log(
+      `\n${chalk.gray(improvement.id)} ${chalk.blue(`[${improvement.pattern}]`)} ${improvement.description}`
+    );
+    console.log(
+      `   ${chalk.gray('Confidence:')} ${confidenceColor((improvement.confidence * 100).toFixed(0) + '%')}`
+    );
+    console.log(
+      `   ${chalk.gray('Location:')} Line ${improvement.location.start}${improvement.location.end !== improvement.location.start ? `-${improvement.location.end}` : ''}`
+    );
+
     if (improvement.details) {
       console.log(`   ${chalk.gray('Details:')} ${improvement.details}`);
     }
-    
+
     if (improvement.preview) {
       console.log(chalk.gray('   Preview:'));
       console.log(chalk.red(`     - ${improvement.preview.before}`));
@@ -699,21 +717,21 @@ class ImproveCodeQualityTask {
 
   async generateReport(reportPath) {
     console.log(chalk.blue('\n📤 Generating quality report...'));
-    
+
     const report = {
       version: 1,
       timestamp: new Date().toISOString(),
       summary: {
-        filesAnalyzed: new Set(this.improvements.map(i => i.file)).size,
+        filesAnalyzed: new Set(this.improvements.map((i) => i.file)).size,
         totalImprovements: this.improvements.length,
         appliedImprovements: this.appliedImprovements.length,
-        patterns: this.getPatternStatistics()
+        patterns: this.getPatternStatistics(),
       },
-      improvements: this.improvements.map(imp => ({
+      improvements: this.improvements.map((imp) => ({
         ...imp,
-        applied: this.appliedImprovements.some(a => a.id === imp.id)
+        applied: this.appliedImprovements.some((a) => a.id === imp.id),
       })),
-      files: this.getFileStatistics()
+      files: this.getFileStatistics(),
     };
 
     await fs.writeFile(reportPath, JSON.stringify(report, null, 2));
@@ -722,70 +740,71 @@ class ImproveCodeQualityTask {
 
   getPatternStatistics() {
     const stats = {};
-    
+
     for (const improvement of this.improvements) {
       if (!stats[improvement.pattern]) {
         stats[improvement.pattern] = {
           total: 0,
           applied: 0,
-          averageConfidence: 0
+          averageConfidence: 0,
         };
       }
-      
+
       stats[improvement.pattern].total++;
       stats[improvement.pattern].averageConfidence += improvement.confidence;
-      
-      if (this.appliedImprovements.some(a => a.id === improvement.id)) {
+
+      if (this.appliedImprovements.some((a) => a.id === improvement.id)) {
         stats[improvement.pattern].applied++;
       }
     }
-    
+
     // Calculate averages
     for (const pattern of Object.keys(stats)) {
       stats[pattern].averageConfidence /= stats[pattern].total;
     }
-    
+
     return stats;
   }
 
   getFileStatistics() {
     const fileStats = {};
-    
+
     for (const improvement of this.improvements) {
       if (!fileStats[improvement.file]) {
         fileStats[improvement.file] = {
           improvements: 0,
           applied: 0,
-          patterns: new Set()
+          patterns: new Set(),
         };
       }
-      
+
       fileStats[improvement.file].improvements++;
       fileStats[improvement.file].patterns.add(improvement.pattern);
-      
-      if (this.appliedImprovements.some(a => a.id === improvement.id)) {
+
+      if (this.appliedImprovements.some((a) => a.id === improvement.id)) {
         fileStats[improvement.file].applied++;
       }
     }
-    
+
     // Convert sets to arrays
     for (const file of Object.keys(fileStats)) {
       fileStats[file].patterns = Array.from(fileStats[file].patterns);
     }
-    
+
     return fileStats;
   }
 
   displayStatistics() {
     const patternStats = this.getPatternStatistics();
-    
+
     console.log(chalk.blue('\n📊 Pattern Statistics:'));
-    
-    const sortedPatterns = Object.entries(patternStats)
-      .sort(([,a], [,b]) => b.total - a.total);
-    
+
+    const sortedPatterns = Object.entries(patternStats).sort(([, a], [, b]) => b.total - a.total);
+
     for (const [pattern, stats] of sortedPatterns) {
-      console.log(`  ${pattern}: ${stats.total} improvements (${(stats.averageConfidence * 100).toFixed(0)}% avg confidence)`);
+      console.log(
+        `  ${pattern}: ${stats.total} improvements (${(stats.averageConfidence * 100).toFixed(0)}% avg confidence)`
+      );
     }
   }
 }
@@ -796,24 +815,28 @@ module.exports = ImproveCodeQualityTask;
 ## Integration Points
 
 ### Code Quality Improver
+
 - Core improvement engine
 - Pattern-based analysis
 - Safe transformation application
 - Multi-tool integration
 
 ### Tool Integration
+
 - ESLint for linting fixes
 - Prettier for formatting
 - jscodeshift for AST transformations
 - Custom patterns for specific improvements
 
 ### Configuration System
+
 - Pattern-specific configurations
 - Custom rule definitions
 - Threshold management
 - Tool preferences
 
 ### Backup System
+
 - Automatic backup creation
 - Timestamped storage
 - Easy rollback capability
@@ -822,6 +845,7 @@ module.exports = ImproveCodeQualityTask;
 ## Improvement Workflow
 
 ### Analysis Phase
+
 1. Parse source code
 2. Run pattern analyzers
 3. Calculate confidence scores
@@ -829,6 +853,7 @@ module.exports = ImproveCodeQualityTask;
 5. Filter by threshold
 
 ### Review Phase
+
 1. Display improvements
 2. Group by file/pattern
 3. Show confidence levels
@@ -836,6 +861,7 @@ module.exports = ImproveCodeQualityTask;
 5. Allow selection
 
 ### Application Phase
+
 1. Create backups
 2. Apply transformations
 3. Validate results
@@ -845,6 +871,7 @@ module.exports = ImproveCodeQualityTask;
 ## Best Practices
 
 ### Safe Improvements
+
 - Always backup before changes
 - Validate syntax after transformation
 - Test code after improvements
@@ -852,6 +879,7 @@ module.exports = ImproveCodeQualityTask;
 - Apply incrementally
 
 ### Pattern Selection
+
 - Start with safe patterns (formatting)
 - Progress to more complex transformations
 - Respect project conventions
@@ -859,6 +887,7 @@ module.exports = ImproveCodeQualityTask;
 - Monitor results
 
 ### Quality Tracking
+
 - Generate regular reports
 - Track improvement trends
 - Measure code quality metrics
@@ -866,8 +895,9 @@ module.exports = ImproveCodeQualityTask;
 - Celebrate progress
 
 ## Security Considerations
+
 - Validate transformation safety
 - Prevent code injection
 - Maintain functionality
 - Preserve sensitive patterns
-- Audit all changes 
+- Audit all changes

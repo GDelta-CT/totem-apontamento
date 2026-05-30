@@ -10,18 +10,18 @@ Define how agent waiting works with the Task tool. Provides patterns for sequent
 
 ## Input
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `execution_type` | string | No | `sequential` | One of: `sequential`, `parallel`, `mixed` |
-| `parallel_count` | number | No | `3` | Number of parallel agents (only for parallel/mixed) |
+| Parameter        | Type   | Required | Default      | Description                                         |
+| ---------------- | ------ | -------- | ------------ | --------------------------------------------------- |
+| `execution_type` | string | No       | `sequential` | One of: `sequential`, `parallel`, `mixed`           |
+| `parallel_count` | number | No       | `3`          | Number of parallel agents (only for parallel/mixed) |
 
 ## Output
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `understanding` | string | How blocking mechanism works |
-| `pattern` | string | Code pattern for the execution type |
-| `anti_patterns` | string[] | What to avoid |
+| Field           | Type     | Description                         |
+| --------------- | -------- | ----------------------------------- |
+| `understanding` | string   | How blocking mechanism works        |
+| `pattern`       | string   | Code pattern for the execution type |
+| `anti_patterns` | string[] | What to avoid                       |
 
 ## Core Content
 
@@ -56,6 +56,7 @@ TaskOutput(task_id: "id_N", block: true)
 ### Mixed Execution
 
 Combine sequential phases with parallel phases:
+
 1. Sequential: Use blocking Task calls
 2. Parallel: Spawn with `run_in_background: true`, collect with `TaskOutput`
 3. Sequential: Resume after all parallel agents complete
@@ -108,10 +109,10 @@ None - this is a reference/documentation block.
 
 ## Error Handling
 
-| Error | Behavior |
-|-------|----------|
+| Error                  | Behavior                |
+| ---------------------- | ----------------------- |
 | Invalid execution_type | Default to `sequential` |
-| parallel_count < 1 | Default to `3` |
+| parallel_count < 1     | Default to `3`          |
 
 ## Notes
 

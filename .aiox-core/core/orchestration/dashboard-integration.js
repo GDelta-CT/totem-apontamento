@@ -133,7 +133,7 @@ class DashboardIntegration extends EventEmitter {
           orch.storyId,
           data.previousState || 'unknown',
           data.newState,
-          orch.getProgressPercentage?.() || 0,
+          orch.getProgressPercentage?.() || 0
         );
       }
 
@@ -204,7 +204,11 @@ class DashboardIntegration extends EventEmitter {
       // Emit command error for epic execution
       const epicConfig = orch.constructor.EPIC_CONFIG || {};
       const epicName = epicConfig[data.epicNum]?.name || `Epic ${data.epicNum}`;
-      emitter.emitCommandError(epicName, data.error?.message || 'Epic execution failed', data.duration_ms);
+      emitter.emitCommandError(
+        epicName,
+        data.error?.message || 'Epic execution failed',
+        data.duration_ms
+      );
 
       // Add error notification
       this.addNotification({

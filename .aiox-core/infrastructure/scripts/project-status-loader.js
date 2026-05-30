@@ -167,7 +167,7 @@ class ProjectStatusLoader {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32-bit integer
     }
     return Math.abs(hash).toString(16).padStart(8, '0');
@@ -202,8 +202,14 @@ class ProjectStatusLoader {
       const indexPath = path.join(resolvedGitDir, 'index');
 
       const mtimes = await Promise.all([
-        fs.stat(headPath).then(s => s.mtimeMs).catch(() => 0),
-        fs.stat(indexPath).then(s => s.mtimeMs).catch(() => 0),
+        fs
+          .stat(headPath)
+          .then((s) => s.mtimeMs)
+          .catch(() => 0),
+        fs
+          .stat(indexPath)
+          .then((s) => s.mtimeMs)
+          .catch(() => 0),
       ]);
 
       return `${mtimes[0]}:${mtimes[1]}`;
@@ -601,7 +607,7 @@ class ProjectStatusLoader {
             continue;
           }
           // Wait briefly and retry
-          await new Promise(resolve => setTimeout(resolve, 50));
+          await new Promise((resolve) => setTimeout(resolve, 50));
           continue;
         }
         // Other error (e.g., ENOENT for missing directory) - skip locking
@@ -623,7 +629,7 @@ class ProjectStatusLoader {
     try {
       const content = await fs.readFile(this.lockFile, 'utf8');
       const lockData = JSON.parse(content);
-      return (Date.now() - lockData.timestamp) > LOCK_STALE_MS;
+      return Date.now() - lockData.timestamp > LOCK_STALE_MS;
     } catch (error) {
       // Cannot read lock file - consider it stale
       return true;
@@ -680,7 +686,11 @@ class ProjectStatusLoader {
         // On Windows, rename can fail if target exists - fall back to direct write
         await fs.writeFile(this.cacheFile, content, 'utf8');
         // Clean up temp file
-        try { await fs.unlink(tempFile); } catch { /* ignore */ }
+        try {
+          await fs.unlink(tempFile);
+        } catch {
+          /* ignore */
+        }
       }
     } catch (error) {
       // Cache write failure is non-critical, just log

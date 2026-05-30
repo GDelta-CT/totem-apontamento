@@ -34,10 +34,11 @@ function parseArgs(argv = process.argv.slice(2)) {
 
 function listSkillFiles(skillsDir) {
   if (!fs.existsSync(skillsDir)) return [];
-  return fs.readdirSync(skillsDir, { withFileTypes: true })
-    .filter(entry => entry.isDirectory() && entry.name.startsWith('aiox-'))
-    .map(entry => path.join(skillsDir, entry.name, 'SKILL.md'))
-    .filter(file => fs.existsSync(file));
+  return fs
+    .readdirSync(skillsDir, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && entry.name.startsWith('aiox-'))
+    .map((entry) => path.join(skillsDir, entry.name, 'SKILL.md'))
+    .filter((file) => fs.existsSync(file));
 }
 
 function collectAbsolutePathViolations(content, filePath) {
@@ -83,14 +84,20 @@ function validatePaths(options = {}) {
     try {
       content = fs.readFileSync(file, 'utf8');
     } catch (error) {
-      errors.push(`Unable to read file: ${path.relative(resolved.projectRoot, file)} (${error.message})`);
+      errors.push(
+        `Unable to read file: ${path.relative(resolved.projectRoot, file)} (${error.message})`
+      );
       continue;
     }
     checkedFiles.push(file);
-    errors.push(...collectAbsolutePathViolations(content, path.relative(resolved.projectRoot, file)));
+    errors.push(
+      ...collectAbsolutePathViolations(content, path.relative(resolved.projectRoot, file))
+    );
 
     if (file.endsWith('SKILL.md')) {
-      errors.push(...validateSkillPathConventions(content, path.relative(resolved.projectRoot, file)));
+      errors.push(
+        ...validateSkillPathConventions(content, path.relative(resolved.projectRoot, file))
+      );
     }
   }
 
@@ -107,7 +114,7 @@ function formatHumanReport(result) {
   }
   return [
     `❌ Path validation failed (${result.errors.length} issue(s))`,
-    ...result.errors.map(error => `- ${error}`),
+    ...result.errors.map((error) => `- ${error}`),
   ].join('\n');
 }
 

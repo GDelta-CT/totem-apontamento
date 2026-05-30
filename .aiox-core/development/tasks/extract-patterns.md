@@ -8,7 +8,7 @@ Extract and document code patterns from the codebase. Analyzes code via AST and 
 
 ```yaml
 task: extract-patterns()
-agent: "@dev"
+agent: '@dev'
 responsável: Dex (Developer)
 responsavel_type: Agente
 atomic_layer: Workflow
@@ -26,7 +26,7 @@ inputs:
   - name: root
     type: string
     required: false
-    default: "."
+    default: '.'
     description: Project root path
 
   - name: output
@@ -92,6 +92,7 @@ pre-conditions:
 ## Implementation Steps
 
 ### Step 1: Check Help Flag
+
 ```javascript
 if (args.help) {
   displayHelp();
@@ -100,12 +101,14 @@ if (args.help) {
 ```
 
 ### Step 2: Initialize Pattern Extractor
+
 ```javascript
 const PatternExtractor = require('.aiox-core/infrastructure/scripts/pattern-extractor');
 const extractor = new PatternExtractor(args.root);
 ```
 
 ### Step 3: Detect Patterns
+
 ```javascript
 const patterns = await extractor.detectPatterns();
 ```
@@ -113,6 +116,7 @@ const patterns = await extractor.detectPatterns();
 ### Step 4: Execute Subcommand
 
 #### Extract (Default)
+
 ```javascript
 if (args.subcommand === 'extract' || !args.subcommand) {
   const markdown = extractor.generateMarkdown();
@@ -127,6 +131,7 @@ if (args.subcommand === 'extract' || !args.subcommand) {
 ```
 
 #### JSON Output
+
 ```javascript
 if (args.subcommand === 'json') {
   const json = extractor.toJSON();
@@ -141,6 +146,7 @@ if (args.subcommand === 'json') {
 ```
 
 #### Save to Default Location
+
 ```javascript
 if (args.subcommand === 'save') {
   const savedPath = await extractor.savePatterns(args.output);
@@ -149,6 +155,7 @@ if (args.subcommand === 'save') {
 ```
 
 #### Merge with Existing
+
 ```javascript
 if (args.subcommand === 'merge') {
   const mergedPath = await extractor.mergeWithExisting(args.output);
@@ -205,6 +212,7 @@ Output File:
 ## Output Formats
 
 ### Markdown Output (Default)
+
 ```markdown
 # Project Patterns
 
@@ -216,7 +224,7 @@ Output File:
 - [State Management](#state-management)
 - [API Calls](#api-calls)
 - [Error Handling](#error-handling)
-...
+  ...
 
 ## State Management
 
@@ -227,18 +235,18 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 interface ExampleState {
-  data: Data | null;
-  loading: boolean;
-  ...
+data: Data | null;
+loading: boolean;
+...
 }
 
 export const useExampleStore = create<ExampleState>()(
-  persist(
-    (set, get) => ({
-      ...
-    }),
-    { name: 'example-storage' }
-  )
+persist(
+(set, get) => ({
+...
+}),
+{ name: 'example-storage' }
+)
 );
 \`\`\`
 
@@ -250,6 +258,7 @@ export const useExampleStore = create<ExampleState>()(
 ```
 
 ### JSON Output
+
 ```json
 {
   "generated": "2026-01-28T14:00:00Z",
@@ -271,6 +280,7 @@ export const useExampleStore = create<ExampleState>()(
 ```
 
 ### Summary Output
+
 ```text
 Scanning patterns in: /path/to/project
 Patterns saved to: .aiox/patterns.md
@@ -326,14 +336,15 @@ references:
 
 ## Error Handling
 
-| Error | Cause | Resolution |
-|-------|-------|------------|
-| Project root not found | Invalid path | Use --root to specify correct path |
-| No code files found | Empty project | Ensure project has .ts/.tsx/.js files |
-| Permission denied | File access | Check directory permissions |
-| Invalid category | Typo in category name | Use exact category name from help |
+| Error                  | Cause                 | Resolution                            |
+| ---------------------- | --------------------- | ------------------------------------- |
+| Project root not found | Invalid path          | Use --root to specify correct path    |
+| No code files found    | Empty project         | Ensure project has .ts/.tsx/.js files |
+| Permission denied      | File access           | Check directory permissions           |
+| Invalid category       | Typo in category name | Use exact category name from help     |
 
 **Error Recovery Strategy:**
+
 ```javascript
 try {
   const patterns = await extractor.detectPatterns();
@@ -377,11 +388,11 @@ node .aiox-core/infrastructure/scripts/pattern-extractor.js [command] [options]
 ## Metadata
 
 ```yaml
-story: "7.3"
-epic: "Epic 7 - Memory Layer"
+story: '7.3'
+epic: 'Epic 7 - Memory Layer'
 version: 1.0.0
 created: 2026-01-29
-author: "@dev (Dex)"
+author: '@dev (Dex)'
 dependencies:
   modules:
     - .aiox-core/infrastructure/scripts/pattern-extractor.js

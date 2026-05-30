@@ -26,9 +26,7 @@ async function run(context) {
     };
   }
 
-  const missing = EXPECTED_HOOKS.filter(
-    (hook) => !fs.existsSync(path.join(huskyDir, hook)),
-  );
+  const missing = EXPECTED_HOOKS.filter((hook) => !fs.existsSync(path.join(huskyDir, hook)));
 
   if (missing.length === 0) {
     return {

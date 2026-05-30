@@ -122,7 +122,7 @@ class Epic5Executor extends EpicExecutor {
           failedEpic,
           strategy,
           result: recoveryResult,
-        }),
+        })
       );
 
       return this._completeExecution({

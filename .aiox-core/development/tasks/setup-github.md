@@ -22,16 +22,19 @@ Configure complete GitHub DevOps infrastructure for user projects created with A
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous setup with sensible defaults
 - Skip optional components, install essential DevOps
 - **Best for:** Experienced developers, quick setup
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations for each component
 - **Best for:** Learning, first-time setup, team onboarding
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Full analysis phase before any configuration
 - Zero ambiguity execution
 - **Best for:** Enterprise environments, strict policies
@@ -277,10 +280,10 @@ changelog:
 ```yaml
 elicit: true
 interaction_points:
-  - project_type: "What type of project is this? (node/python/go/rust/mixed)"
-  - workflows_select: "Which workflows do you want to install?"
-  - branch_protection: "Enable branch protection for main? (requires GitHub Pro for private repos)"
-  - secrets_configure: "Which secrets do you want to configure?"
+  - project_type: 'What type of project is this? (node/python/go/rust/mixed)'
+  - workflows_select: 'Which workflows do you want to install?'
+  - branch_protection: 'Enable branch protection for main? (requires GitHub Pro for private repos)'
+  - secrets_configure: 'Which secrets do you want to configure?'
 ```
 
 ---
@@ -839,6 +842,7 @@ Write-Host "✅ Setup report saved to .aiox/devops-setup-report.yaml"
 **Error:** `Resource not accessible by personal access token`
 
 **Fix:**
+
 1. For private repos on free tier, branch protection requires GitHub Pro
 2. Re-authenticate with correct scopes: `gh auth login --scopes repo,admin:repo_hook`
 3. Manual setup via GitHub UI: Settings → Branches
@@ -848,6 +852,7 @@ Write-Host "✅ Setup report saved to .aiox/devops-setup-report.yaml"
 **Error:** `Invalid workflow file`
 
 **Fix:**
+
 1. Validate YAML syntax: `yamllint .github/workflows/ci.yml`
 2. Check for tab characters (use spaces only)
 3. Verify action versions are valid
@@ -855,6 +860,7 @@ Write-Host "✅ Setup report saved to .aiox/devops-setup-report.yaml"
 ### Issue 3: CodeRabbit not reviewing PRs
 
 **Fix:**
+
 1. Verify GitHub App is installed: https://github.com/apps/coderabbitai
 2. Check app has access to the repository
 3. Verify .coderabbit.yaml is in the default branch

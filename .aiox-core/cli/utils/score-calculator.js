@@ -16,9 +16,9 @@
  */
 function calculateScores(results, query) {
   const queryLower = query.toLowerCase();
-  const queryWords = queryLower.split(/\s+/).filter(w => w.length > 0);
+  const queryWords = queryLower.split(/\s+/).filter((w) => w.length > 0);
 
-  return results.map(result => {
+  return results.map((result) => {
     let score = result.score || 0;
 
     // Boost for exact ID match
@@ -38,9 +38,9 @@ function calculateScores(results, query) {
     }
 
     // Boost for tag matches
-    const tags = (result.tags || []).map(t => t.toLowerCase());
-    const tagMatchCount = queryWords.filter(word =>
-      tags.some(tag => tag === word || tag.includes(word)),
+    const tags = (result.tags || []).map((t) => t.toLowerCase());
+    const tagMatchCount = queryWords.filter((word) =>
+      tags.some((tag) => tag === word || tag.includes(word))
     ).length;
 
     if (tagMatchCount > 0) {
@@ -49,7 +49,7 @@ function calculateScores(results, query) {
     }
 
     // Boost for category match
-    if (result.category && queryWords.some(w => result.category.toLowerCase().includes(w))) {
+    if (result.category && queryWords.some((w) => result.category.toLowerCase().includes(w))) {
       score = Math.min(100, score + 5);
     }
 
@@ -87,7 +87,7 @@ function sortByScore(results) {
 function normalizeScores(results) {
   if (results.length === 0) return results;
 
-  const scores = results.map(r => r.score);
+  const scores = results.map((r) => r.score);
   const maxScore = Math.max(...scores);
   const minScore = Math.min(...scores);
   const range = maxScore - minScore;
@@ -97,7 +97,7 @@ function normalizeScores(results) {
     return results;
   }
 
-  return results.map(result => ({
+  return results.map((result) => ({
     ...result,
     score: Math.round(((result.score - minScore) / range) * 100),
   }));
@@ -138,7 +138,7 @@ function calculateRelevanceScore(worker, query, options = {}) {
   }
 
   // Tag matching
-  const tags = (worker.tags || []).map(t => t.toLowerCase());
+  const tags = (worker.tags || []).map((t) => t.toLowerCase());
   for (const tag of tags) {
     if (tag === queryLower) {
       score += 50 * weights.tagMatch;
@@ -171,7 +171,7 @@ function calculateRelevanceScore(worker, query, options = {}) {
 function boostExactMatches(results, query) {
   const queryLower = query.toLowerCase();
 
-  return results.map(result => {
+  return results.map((result) => {
     let boostedScore = result.score;
 
     // Exact ID match gets top score
@@ -201,13 +201,13 @@ function calculateSearchAccuracy(results, expectedId) {
     };
   }
 
-  const position = results.findIndex(r => r.id === expectedId);
+  const position = results.findIndex((r) => r.id === expectedId);
 
   return {
     found: position !== -1,
     position: position,
     isFirst: position === 0,
-    accuracy: position === 0 ? 100 : position > 0 ? Math.max(0, 100 - (position * 10)) : 0,
+    accuracy: position === 0 ? 100 : position > 0 ? Math.max(0, 100 - position * 10) : 0,
   };
 }
 

@@ -11,7 +11,9 @@ function Header() {
           <span className="logo-text">AIOX Health</span>
         </Link>
         <nav className="header-nav">
-          <Link to="/" className="nav-link">Dashboard</Link>
+          <Link to="/" className="nav-link">
+            Dashboard
+          </Link>
         </nav>
       </div>
     </header>

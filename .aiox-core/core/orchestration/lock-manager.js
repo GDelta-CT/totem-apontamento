@@ -105,7 +105,9 @@ class LockManager {
           await this._removeLock(lockPath);
         } else {
           // Lock is active — retry after delay (AC4.7)
-          this._log(`Lock active for ${resource}, retrying in ${RETRY_DELAY_MS}ms (attempt ${attempt}/${MAX_RETRIES})`);
+          this._log(
+            `Lock active for ${resource}, retrying in ${RETRY_DELAY_MS}ms (attempt ${attempt}/${MAX_RETRIES})`
+          );
 
           if (attempt < MAX_RETRIES) {
             await this._sleep(RETRY_DELAY_MS);

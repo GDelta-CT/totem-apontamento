@@ -1,7 +1,7 @@
 workflow:
   id: story-development-cycle
   name: Story Development Cycle
-  version: "1.0"
+  version: '1.0'
   description: >-
     Ciclo completo de desenvolvimento de stories. Automatiza o fluxo desde a criação
     até a entrega com quality gate: create → validate → implement → QA review.
@@ -28,7 +28,7 @@ workflow:
       default: true
     - mode: preflight
       description: Planejamento completo antes da execução - análise upfront de requisitos e dependências
-      prompts: "10-15"
+      prompts: '10-15'
 
   phases:
     - phase_1: Story Creation

@@ -40,7 +40,10 @@ const { GateEvaluator, GateVerdict } = require('./gate-evaluator');
 const { AgentInvoker, SUPPORTED_AGENTS: _SUPPORTED_AGENTS } = require('./agent-invoker');
 
 // Dashboard Integration (Story 0.8)
-const { DashboardIntegration, NotificationType: _NotificationType } = require('./dashboard-integration');
+const {
+  DashboardIntegration,
+  NotificationType: _NotificationType,
+} = require('./dashboard-integration');
 
 // Optional chalk for colored output
 let chalk;
@@ -227,7 +230,7 @@ class MasterOrchestrator extends EventEmitter {
       projectRoot,
       '.aiox',
       'master-orchestrator',
-      this.storyId ? `${this.storyId}.json` : 'current.json',
+      this.storyId ? `${this.storyId}.json` : 'current.json'
     );
 
     // Log initialization
@@ -1022,7 +1025,7 @@ class MasterOrchestrator extends EventEmitter {
           shouldRetry: result.shouldRetry,
           escalated: result.escalated,
         })}`,
-        { level: result.success ? 'info' : 'warn' },
+        { level: result.success ? 'info' : 'warn' }
       );
 
       // Track retry count
@@ -1339,7 +1342,7 @@ class MasterOrchestrator extends EventEmitter {
       }
 
       return states.sort(
-        (a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime(),
+        (a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime()
       );
     } catch (error) {
       this._log(`Failed to list states: ${error.message}`, { level: 'warn' });
@@ -1357,7 +1360,7 @@ class MasterOrchestrator extends EventEmitter {
     const totalEpics = Object.keys(EPIC_CONFIG).filter((num) => !EPIC_CONFIG[num].onDemand).length;
 
     const completedEpics = Object.values(state.epics).filter(
-      (epic) => epic.status === EpicStatus.COMPLETED,
+      (epic) => epic.status === EpicStatus.COMPLETED
     ).length;
 
     return Math.round((completedEpics / totalEpics) * 100);
@@ -1413,7 +1416,7 @@ class MasterOrchestrator extends EventEmitter {
     const totalEpics = Object.keys(EPIC_CONFIG).filter((num) => !EPIC_CONFIG[num].onDemand).length;
 
     const completedEpics = Object.values(this.executionState.epics).filter(
-      (epic) => epic.status === EpicStatus.COMPLETED,
+      (epic) => epic.status === EpicStatus.COMPLETED
     ).length;
 
     return Math.round((completedEpics / totalEpics) * 100);
@@ -1433,7 +1436,7 @@ class MasterOrchestrator extends EventEmitter {
         Object.entries(this.executionState.epics).map(([num, epic]) => [
           num,
           { status: epic.status, attempts: epic.attempts },
-        ]),
+        ])
       ),
       errors: this.executionState.errors.length,
     };
@@ -1468,7 +1471,7 @@ class MasterOrchestrator extends EventEmitter {
     }
 
     console.log(
-      `${chalk.dim(`[${timestamp}]`)} ${chalk.cyan('[MasterOrchestrator]')} ${icon} ${coloredMessage}`,
+      `${chalk.dim(`[${timestamp}]`)} ${chalk.cyan('[MasterOrchestrator]')} ${icon} ${coloredMessage}`
     );
 
     // Emit log event for external listeners

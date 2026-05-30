@@ -316,19 +316,19 @@ function validateModeSelection(selectedMode, detected) {
   if (selectedMode !== detected.mode) {
     if (selectedMode === InstallationMode.GREENFIELD && !detected.markers.isEmpty) {
       result.warnings.push(
-        'Selected greenfield but directory is not empty. Existing files may be overwritten.',
+        'Selected greenfield but directory is not empty. Existing files may be overwritten.'
       );
     }
 
     if (selectedMode === InstallationMode.FRAMEWORK_DEV && !detected.markers.isAioxCoreRepo) {
       result.warnings.push(
-        'Selected framework-dev but this does not appear to be the aiox-core repository.',
+        'Selected framework-dev but this does not appear to be the aiox-core repository.'
       );
     }
 
     if (selectedMode === InstallationMode.BROWNFIELD && detected.markers.isEmpty) {
       result.warnings.push(
-        'Selected brownfield but directory is empty. Consider using greenfield instead.',
+        'Selected brownfield but directory is empty. Consider using greenfield instead.'
       );
       result.suggestions.push(InstallationMode.GREENFIELD);
     }

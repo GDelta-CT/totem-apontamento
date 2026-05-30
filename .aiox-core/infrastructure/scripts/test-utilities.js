@@ -24,11 +24,7 @@ let utilities = [];
  */
 async function countIntegrationReferences(utilityName) {
   const basename = path.basename(utilityName, '.js');
-  const searchDirs = [
-    '.aiox-core/agents',
-    '.aiox-core/tasks',
-    'squads',
-  ];
+  const searchDirs = ['.aiox-core/agents', '.aiox-core/tasks', 'squads'];
 
   let totalCount = 0;
 
@@ -36,10 +32,9 @@ async function countIntegrationReferences(utilityName) {
     if (!fs.existsSync(dir)) continue;
 
     try {
-      const { stdout } = await execPromise(
-        `grep -r "${basename}" ${dir} 2>/dev/null | wc -l`,
-        { shell: '/bin/bash' },
-      );
+      const { stdout } = await execPromise(`grep -r "${basename}" ${dir} 2>/dev/null | wc -l`, {
+        shell: '/bin/bash',
+      });
       totalCount += parseInt(stdout.trim()) || 0;
     } catch {
       // Directory doesn't exist or grep failed - not a problem
@@ -93,11 +88,9 @@ async function testUtility(utilityFile) {
     // Classify based on results
     if (result.errors.length === 0 && result.exports.length > 0) {
       result.status = 'WORKING';
-      result.recommendation = result.integrationCount > 0
-        ? 'Keep - actively used'
-        : 'Keep but document usage';
+      result.recommendation =
+        result.integrationCount > 0 ? 'Keep - actively used' : 'Keep but document usage';
     }
-
   } catch (error) {
     result.errors.push(error.message);
 
@@ -135,13 +128,14 @@ async function runAudit() {
   console.log(`📁 Scanning directory: ${utilsDir}\n`);
 
   // Get all .js files except test-utilities.js itself
-  utilities = fs.readdirSync(utilsDir)
-    .filter(f => f.endsWith('.js') && f !== 'test-utilities.js')
+  utilities = fs
+    .readdirSync(utilsDir)
+    .filter((f) => f.endsWith('.js') && f !== 'test-utilities.js')
     .sort();
 
   results = [];
   console.log(`Found ${utilities.length} utilities to audit\n`);
-  console.log('=' .repeat(80));
+  console.log('='.repeat(80));
 
   let processed = 0;
 
@@ -154,19 +148,27 @@ async function runAudit() {
   }
 
   console.log('\n');
-  console.log('=' .repeat(80));
+  console.log('='.repeat(80));
 
   // Generate summary
-  const working = results.filter(r => r.status === 'WORKING');
-  const fixable = results.filter(r => r.status === 'FIXABLE');
-  const deprecated = results.filter(r => r.status === 'DEPRECATED');
-  const unknown = results.filter(r => r.status === 'UNKNOWN');
+  const working = results.filter((r) => r.status === 'WORKING');
+  const fixable = results.filter((r) => r.status === 'FIXABLE');
+  const deprecated = results.filter((r) => r.status === 'DEPRECATED');
+  const unknown = results.filter((r) => r.status === 'UNKNOWN');
 
   console.log('\n📊 AUDIT SUMMARY\n');
-  console.log(`✅ WORKING:     ${working.length} (${Math.round(working.length / utilities.length * 100)}%)`);
-  console.log(`🔧 FIXABLE:     ${fixable.length} (${Math.round(fixable.length / utilities.length * 100)}%)`);
-  console.log(`🗑️  DEPRECATED:  ${deprecated.length} (${Math.round(deprecated.length / utilities.length * 100)}%)`);
-  console.log(`❓ UNKNOWN:     ${unknown.length} (${Math.round(unknown.length / utilities.length * 100)}%)`);
+  console.log(
+    `✅ WORKING:     ${working.length} (${Math.round((working.length / utilities.length) * 100)}%)`
+  );
+  console.log(
+    `🔧 FIXABLE:     ${fixable.length} (${Math.round((fixable.length / utilities.length) * 100)}%)`
+  );
+  console.log(
+    `🗑️  DEPRECATED:  ${deprecated.length} (${Math.round((deprecated.length / utilities.length) * 100)}%)`
+  );
+  console.log(
+    `❓ UNKNOWN:     ${unknown.length} (${Math.round((unknown.length / utilities.length) * 100)}%)`
+  );
   console.log(`\n📦 Total Utilities: ${utilities.length}`);
 
   // Save detailed results to JSON for report generation
@@ -191,7 +193,7 @@ if (require.main === module) {
       console.log('\n✅ Audit complete!\n');
       process.exit(0);
     })
-    .catch(error => {
+    .catch((error) => {
       console.error('\n❌ Audit failed:', error);
       process.exit(1);
     });

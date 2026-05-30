@@ -4,26 +4,26 @@
 workflow:
   id: example-workflow
   name: Example Workflow
-  version: "1.0.0"
+  version: '1.0.0'
   description: Multi-step workflow that orchestrates tasks
   type: example
 
   triggers:
     - type: manual
-      command: "*example-command"
+      command: '*example-command'
 
   elicitation:
     enabled: true
     questions:
       - id: action_type
-        prompt: "What would you like to do?"
+        prompt: 'What would you like to do?'
         type: choice
         options:
           - Create new item
           - Update existing item
           - Delete item
       - id: item_name
-        prompt: "What is the name of the item?"
+        prompt: 'What is the name of the item?'
         type: text
         required: true
 
@@ -35,13 +35,13 @@ workflow:
     - step: execute_task
       id: run_task
       phase: 1
-      phase_name: "Execute Task"
+      phase_name: 'Execute Task'
       agent: example-agent
       task: example-task
       inputs:
-        input1: "{{elicitation.item_name}}"
+        input1: '{{elicitation.item_name}}'
         options:
-          action: "{{elicitation.action_type}}"
+          action: '{{elicitation.action_type}}'
       outputs:
         - task_result
       next: log_result
@@ -50,11 +50,11 @@ workflow:
     - step: log_result
       id: log_result
       phase: 2
-      phase_name: "Log Result"
+      phase_name: 'Log Result'
       agent: example-agent
       action: log-result
       inputs:
-        message: "Operation completed successfully"
+        message: 'Operation completed successfully'
       on_complete:
         status: success
 
@@ -65,11 +65,11 @@ workflow:
   error_handling:
     - id: notify_error
       action: notify
-      message: "Workflow failed: {{error.message}}"
+      message: 'Workflow failed: {{error.message}}'
       severity: error
 
   completion:
-    message: "Workflow completed successfully!"
+    message: 'Workflow completed successfully!'
     next_steps:
       - Review the output
       - Verify the changes

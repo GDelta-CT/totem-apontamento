@@ -1,8 +1,8 @@
 # Validate Agents Task
 
 ---
-execution_mode: programmatic  # TOK-3: PTC-eligible — batch-scan all agent files in single Bash block
----
+
+## execution_mode: programmatic # TOK-3: PTC-eligible — batch-scan all agent files in single Bash block
 
 ## Purpose
 
@@ -31,6 +31,7 @@ Expected agents: dev, qa, architect, pm, po, sm, analyst, data-engineer, ux-desi
 ### Step 2: Parse YAML Block
 
 For each agent file:
+
 1. Extract the YAML block between ` ```yaml ` and ` ``` ` fences
 2. Parse using `js-yaml.load()` (safe loader)
 3. If parse fails, try normalizing compact command format first
@@ -38,20 +39,21 @@ For each agent file:
 
 ### Step 3: Validate Required Fields
 
-| Field | Required | Default | Notes |
-|-------|----------|---------|-------|
-| `agent.id` | Yes | - | Must match filename |
-| `agent.name` | Yes | - | Human-readable name |
-| `agent.icon` | No | - | Emoji icon |
-| `persona_profile` | Yes | - | Must have greeting_levels |
-| `persona_profile.greeting_levels` | Yes | - | minimal, named, archetypal |
-| `persona.role` | Yes | - | Role description |
-| `commands` | Yes | [] | Array of command objects |
-| `activation-instructions` | Yes | - | Must include STEP 1-5 |
+| Field                             | Required | Default | Notes                      |
+| --------------------------------- | -------- | ------- | -------------------------- |
+| `agent.id`                        | Yes      | -       | Must match filename        |
+| `agent.name`                      | Yes      | -       | Human-readable name        |
+| `agent.icon`                      | No       | -       | Emoji icon                 |
+| `persona_profile`                 | Yes      | -       | Must have greeting_levels  |
+| `persona_profile.greeting_levels` | Yes      | -       | minimal, named, archetypal |
+| `persona.role`                    | Yes      | -       | Role description           |
+| `commands`                        | Yes      | []      | Array of command objects   |
+| `activation-instructions`         | Yes      | -       | Must include STEP 1-5      |
 
 ### Step 4: Validate Activation Pipeline Reference
 
 Check that STEP 3 in `activation-instructions` references:
+
 - `unified-activation-pipeline.js` (Story ACT-6)
 - NOT the old `greeting-builder.js` direct reference
 
@@ -60,16 +62,19 @@ Report as WARNING if still referencing old path.
 ### Step 5: Validate Dependencies
 
 For each agent's `dependencies.tasks` list:
+
 1. Check that each referenced task file exists in `.aiox-core/development/tasks/`
 2. Report missing dependencies as ERRORS
 
 For each agent's `dependencies.checklists` list:
+
 1. Check in `.aiox-core/development/checklists/`
 2. Report missing as WARNINGS
 
 ### Step 6: Validate Command Structure
 
 For each command in `commands` array:
+
 1. Must have `name` field (string)
 2. `description` is recommended (WARNING if missing)
 3. `visibility` array is recommended for session-aware filtering
@@ -116,4 +121,4 @@ Summary: 11 passed, 1 warning, 0 failed
 
 ---
 
-*Story ACT-6 | Task: validate-agents | Created 2026-02-06*
+_Story ACT-6 | Task: validate-agents | Created 2026-02-06_

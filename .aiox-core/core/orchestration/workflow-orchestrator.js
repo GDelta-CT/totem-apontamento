@@ -267,7 +267,7 @@ class WorkflowOrchestrator {
       try {
         const checklistResult = await this.checklistRunner.run(
           this._currentChecklist,
-          phase.creates,
+          phase.creates
         );
         validation.checks.push({
           type: 'checklist',
@@ -343,8 +343,8 @@ class WorkflowOrchestrator {
     console.log(chalk.blue(`\n🚀 Starting workflow: ${this.workflow.workflow?.name || 'Unknown'}`));
     console.log(
       chalk.gray(
-        `   Phases: ${sequence.length} | Mode: ${this.options.yolo ? 'YOLO' : 'Interactive'}`,
-      ),
+        `   Phases: ${sequence.length} | Mode: ${this.options.yolo ? 'YOLO' : 'Interactive'}`
+      )
     );
     console.log(chalk.gray(`   Parallel phases: ${parallelPhases.join(', ') || 'None'}`));
 
@@ -364,22 +364,22 @@ class WorkflowOrchestrator {
     // Log detection results
     console.log(
       chalk.gray(
-        `   📊 Database: ${this.techStackProfile.hasDatabase ? '✓' : '✗'} ${this.techStackProfile.database.type ? `(${this.techStackProfile.database.type})` : ''}`,
-      ),
+        `   📊 Database: ${this.techStackProfile.hasDatabase ? '✓' : '✗'} ${this.techStackProfile.database.type ? `(${this.techStackProfile.database.type})` : ''}`
+      )
     );
     console.log(
       chalk.gray(
-        `   🎨 Frontend: ${this.techStackProfile.hasFrontend ? '✓' : '✗'} ${this.techStackProfile.frontend.framework ? `(${this.techStackProfile.frontend.framework})` : ''}`,
-      ),
+        `   🎨 Frontend: ${this.techStackProfile.hasFrontend ? '✓' : '✗'} ${this.techStackProfile.frontend.framework ? `(${this.techStackProfile.frontend.framework})` : ''}`
+      )
     );
     console.log(
       chalk.gray(
-        `   🔧 Backend: ${this.techStackProfile.hasBackend ? '✓' : '✗'} ${this.techStackProfile.backend.type ? `(${this.techStackProfile.backend.type})` : ''}`,
-      ),
+        `   🔧 Backend: ${this.techStackProfile.hasBackend ? '✓' : '✗'} ${this.techStackProfile.backend.type ? `(${this.techStackProfile.backend.type})` : ''}`
+      )
     );
     console.log(chalk.gray(`   📝 TypeScript: ${this.techStackProfile.hasTypeScript ? '✓' : '✗'}`));
     console.log(
-      chalk.gray(`   📋 Applicable phases: ${this.techStackProfile.applicablePhases.join(', ')}`),
+      chalk.gray(`   📋 Applicable phases: ${this.techStackProfile.applicablePhases.join(', ')}`)
     );
     console.log(chalk.gray(`   🎯 Confidence: ${this.techStackProfile.confidence}%`));
     console.log(chalk.green('   ✅ Pre-flight detection complete\n'));
@@ -410,7 +410,7 @@ class WorkflowOrchestrator {
     if (summary.confidenceGate?.enabled && !summary.confidenceGate.passed) {
       await this.contextManager.markFailed(
         `Delivery confidence ${summary.deliveryConfidence.score}% below threshold ${summary.confidenceGate.threshold}%`,
-        this.executionState.currentPhase,
+        this.executionState.currentPhase
       );
     }
     return summary;
@@ -480,9 +480,9 @@ class WorkflowOrchestrator {
       const conditionResult = this.conditionEvaluator
         ? this.conditionEvaluator.shouldExecutePhase(phase)
         : {
-          shouldExecute: this._evaluateConditionLegacy(phase.condition),
-          reason: 'legacy_evaluation',
-        };
+            shouldExecute: this._evaluateConditionLegacy(phase.condition),
+            reason: 'legacy_evaluation',
+          };
 
       if (!conditionResult.shouldExecute) {
         const skipReason = conditionResult.reason;
@@ -508,7 +508,7 @@ class WorkflowOrchestrator {
       const missingDeps = await this._checkDependencies(phase.requires);
       if (missingDeps.length > 0) {
         console.log(
-          chalk.yellow(`   ⚠️  ${phaseName}: Missing dependencies: ${missingDeps.join(', ')}`),
+          chalk.yellow(`   ⚠️  ${phaseName}: Missing dependencies: ${missingDeps.join(', ')}`)
         );
         // In YOLO mode, continue anyway; otherwise, skip
         if (!this.options.yolo) {
@@ -543,7 +543,7 @@ class WorkflowOrchestrator {
           template: phase.template,
           executionProfile: this.executionProfile.profile,
           executionPolicy: this.executionProfile.policy,
-        },
+        }
       );
 
       // V3.1: Build dispatch payload using SkillDispatcher
@@ -565,13 +565,13 @@ class WorkflowOrchestrator {
       // Log dispatch info
       console.log(
         chalk.gray(
-          `   🚀 ${this.skillDispatcher.formatDispatchLog(dispatchPayload).split('\n')[0]}`,
-        ),
+          `   🚀 ${this.skillDispatcher.formatDispatchLog(dispatchPayload).split('\n')[0]}`
+        )
       );
       console.log(
         chalk.gray(
-          `   🛡️  Execution profile: ${this.executionProfile.profile} (${this.executionProfile.context})`,
-        ),
+          `   🛡️  Execution profile: ${this.executionProfile.profile} (${this.executionProfile.context})`
+        )
       );
 
       // Dispatch to subagent
@@ -608,16 +608,20 @@ class WorkflowOrchestrator {
       }
 
       // Save phase output to context
-      await this.contextManager.savePhaseOutput(phaseNum, {
-        agent: phase.agent,
-        action: phase.action,
-        task: phase.task,
-        result,
-        validation,
-        timestamp: new Date().toISOString(),
-      }, {
-        handoffTarget: this._getNextPhaseHandoffTarget(phaseNum),
-      });
+      await this.contextManager.savePhaseOutput(
+        phaseNum,
+        {
+          agent: phase.agent,
+          action: phase.action,
+          task: phase.task,
+          result,
+          validation,
+          timestamp: new Date().toISOString(),
+        },
+        {
+          handoffTarget: this._getNextPhaseHandoffTarget(phaseNum),
+        }
+      );
 
       // Notify phase complete
       this.options.onPhaseComplete(phase, result);

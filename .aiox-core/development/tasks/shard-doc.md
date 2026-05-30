@@ -70,16 +70,19 @@ If the user has @kayvan/markdown-tree-parser installed, use it and skip the manu
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -247,6 +250,7 @@ token_usage: ~1,500-5,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Cache template compilation; minimize data transformations; lazy load resources
 
 ---
@@ -265,7 +269,6 @@ updated_at: 2025-11-17
 ```
 
 ---
-
 
 ## Manual Method (if @kayvan/markdown-tree-parser is not available or user indicated manual method)
 
@@ -433,11 +436,11 @@ Portuguese Heading              → Translation Process              → Final F
 - **Mixed language**: If heading already has English terms, keep them (e.g., "Tech Stack Overview")
 
 **If heading is not Portuguese:**
+
 - Apply standard lowercase-dash-case conversion
 - No translation needed
 
 1. **Generate filename using translation rules above**:
-
    - **FIRST**: Check if document language appears to be Portuguese (look for accents, common PT words)
    - **IF Portuguese**: Apply translation from map above
    - **THEN**: Convert to lowercase-dash-case
@@ -447,7 +450,6 @@ Portuguese Heading              → Translation Process              → Final F
    - Example (Portuguese): "## Pilha Tecnológica" → `tech-stack.md`
 
 2. **Adjust heading levels**:
-
    - The level 2 heading becomes level 1 (# instead of ##) in the sharded new document
    - All subsection levels decrease by 1:
 
@@ -535,4 +537,3 @@ Document sharded successfully:
 - Preserve ALL formatting, including whitespace where significant
 - Handle edge cases like sections with code blocks containing ## symbols
 - Ensure the sharding is reversible (could reconstruct the original from shards)
- 

@@ -218,6 +218,7 @@ token_usage: ~800-2,500 tokens
 ```
 
 **Optimization Notes:**
+
 - Validate configuration early; use atomic writes; implement rollback checkpoints
 
 ---
@@ -238,18 +239,25 @@ updated_at: 2025-11-17
 ---
 
 tools:
-  - github-cli
+
+- github-cli
+
 # TODO: Create workflow-validation-checklist.md for validation (follow-up story needed)
+
 # checklists:
-#   - workflow-validation-checklist.md
+
+# - workflow-validation-checklist.md
+
 ---
 
 # Create Workflow
 
 ## Purpose
+
 To create a new workflow definition that orchestrates multiple agents and tasks for complex multi-step processes in Synkra AIOX.
 
 ## Prerequisites
+
 - User authorization verified
 - Clear understanding of workflow goals
 - Knowledge of participating agents and tasks
@@ -258,6 +266,7 @@ To create a new workflow definition that orchestrates multiple agents and tasks 
 ## Interactive Elicitation Process
 
 ### Step 0: Target Context
+
 ```
 ELICIT: Target Context
 1. Where should this workflow be created? (core / squad / hybrid)
@@ -265,6 +274,7 @@ ELICIT: Target Context
 ```
 
 ### Step 1: Workflow Overview
+
 ```
 ELICIT: Workflow Basic Information
 1. What is the workflow name? (e.g., "feature-development", "bug-fix")
@@ -274,6 +284,7 @@ ELICIT: Workflow Basic Information
 ```
 
 ### Step 2: Workflow Sequence Design
+
 ```text
 ELICIT: Workflow Sequence and Flow
 1. What are the main execution steps/phases? (e.g., "planning", "implementation", "testing")
@@ -284,6 +295,7 @@ ELICIT: Workflow Sequence and Flow
 ```
 
 ### Step 3: Agent Orchestration
+
 ```text
 ELICIT: Agent Participation
 For each workflow step:
@@ -294,6 +306,7 @@ For each workflow step:
 ```
 
 ### Step 4: Resource Requirements
+
 ```
 ELICIT: Resources and Dependencies
 1. What templates are needed?
@@ -312,6 +325,7 @@ ELICIT: Resources and Dependencies
    - Verify all resources exist
 
 2. **Generate Workflow Structure**
+
    ```yaml
    workflow:
      id: {workflow-name}
@@ -320,12 +334,12 @@ ELICIT: Resources and Dependencies
      description: {Purpose and overview}
      type: {greenfield|brownfield}
      scope: {ui|service|fullstack}
- 
+
      # Optional compatibility metadata (non-executable)
      phases:
        - phase_1: {phase label}
        - phase_2: {phase label}
- 
+
      # Canonical executable contract
      sequence:
        - step: {step-slug}
@@ -364,13 +378,15 @@ ELICIT: Resources and Dependencies
    - Include comprehensive documentation
 
 4.5. **Update Squad Manifest** (when target_context="squad" or "hybrid")
-   - Load `squads/{squad_name}/squad.yaml`
-   - Initialize `components.workflows` array if it does not exist
-   - Add workflow filename to `components.workflows[]` (skip if already present)
-   - Create backup of `squad.yaml` before saving
-   - Save updated manifest
+
+- Load `squads/{squad_name}/squad.yaml`
+- Initialize `components.workflows` array if it does not exist
+- Add workflow filename to `components.workflows[]` (skip if already present)
+- Create backup of `squad.yaml` before saving
+- Save updated manifest
 
 5. **Update Memory Layer**
+
    ```javascript
    await memoryClient.addMemory({
      type: 'workflow_created',
@@ -381,8 +397,8 @@ ELICIT: Resources and Dependencies
      metadata: {
        type: workflowType,
        sequence_steps: stepList,
-       agents: involvedAgents
-     }
+       agents: involvedAgents,
+     },
    });
    ```
 
@@ -393,6 +409,7 @@ ELICIT: Resources and Dependencies
    - Include troubleshooting guide
 
 ## Validation Checklist
+
 - [ ] Workflow name is unique and valid
 - [ ] All sequence steps have clear purposes
 - [ ] Agent assignments are valid
@@ -403,12 +420,14 @@ ELICIT: Resources and Dependencies
 - [ ] Memory layer updated
 
 ## Error Handling
+
 - If workflow exists: Offer versioning or update
 - If agents missing: List required agents
 - If circular dependency: Show cycle and suggest fix
 - If resources missing: List and offer to create
 
 ## Success Output
+
 ```
 ✅ Workflow '{workflow-name}' created successfully!
 📁 Location: {resolved-path}
@@ -424,6 +443,7 @@ ELICIT: Resources and Dependencies
 ```
 
 ## Workflow Execution Notes
+
 - Workflows are selected during project initialization
 - Each step execution is logged in memory
 - Progress tracking available through memory queries

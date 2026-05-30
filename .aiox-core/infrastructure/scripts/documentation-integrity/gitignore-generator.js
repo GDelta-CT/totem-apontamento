@@ -170,10 +170,7 @@ function mergeGitignore(existingContent, _options = {}) {
   }
 
   // Replace date placeholder
-  mergeSection = mergeSection.replace(
-    '{{GENERATED_DATE}}',
-    new Date().toISOString().split('T')[0],
-  );
+  mergeSection = mergeSection.replace('{{GENERATED_DATE}}', new Date().toISOString().split('T')[0]);
 
   // Append to existing content
   const merged = existingContent.trimEnd() + '\n\n' + mergeSection.trim() + '\n';

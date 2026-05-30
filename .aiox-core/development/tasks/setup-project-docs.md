@@ -32,45 +32,45 @@ responsible_type: Agent
 atomic_layer: Documentation
 
 inputs:
-- field: targetDir
-  type: string
-  source: User Input or cwd
-  required: false
-  validation: Valid directory path
+  - field: targetDir
+    type: string
+    source: User Input or cwd
+    required: false
+    validation: Valid directory path
 
-- field: projectName
-  type: string
-  source: User Input or package.json
-  required: false
-  validation: Non-empty string
+  - field: projectName
+    type: string
+    source: User Input or package.json
+    required: false
+    validation: Non-empty string
 
-- field: mode
-  type: string
-  source: User Input
-  required: false
-  validation: greenfield|brownfield|framework-dev
+  - field: mode
+    type: string
+    source: User Input
+    required: false
+    validation: greenfield|brownfield|framework-dev
 
-- field: executionMode
-  type: string
-  source: User Input
-  required: false
-  validation: yolo|interactive|pre-flight
+  - field: executionMode
+    type: string
+    source: User Input
+    required: false
+    validation: yolo|interactive|pre-flight
 
 outputs:
-- field: docs_generated
-  type: array
-  destination: docs/architecture/
-  persisted: true
+  - field: docs_generated
+    type: array
+    destination: docs/architecture/
+    persisted: true
 
-- field: core_config
-  type: file
-  destination: .aiox-core/core-config.yaml
-  persisted: true
+  - field: core_config
+    type: file
+    destination: .aiox-core/core-config.yaml
+    persisted: true
 
-- field: gitignore
-  type: file
-  destination: .gitignore
-  persisted: true
+  - field: gitignore
+    type: file
+    destination: .gitignore
+    persisted: true
 ```
 
 ---
@@ -231,6 +231,7 @@ token_usage: ~500-2,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Uses template-based generation for fast execution
 - Minimal file I/O with batched writes
 - Configuration-Driven Architecture reduces runtime decisions
@@ -254,8 +255,10 @@ updated_at: 2025-12-14
 ---
 
 tools:
-  - filesystem        # Read/write project files
-  - documentation-integrity  # Core module for this task
+
+- filesystem # Read/write project files
+- documentation-integrity # Core module for this task
+
 ---
 
 # Setup Project Documentation
@@ -271,7 +274,10 @@ Generate project-specific documentation and configuration using the Documentatio
 First, determine the installation mode based on project markers:
 
 ```javascript
-const { detectInstallationMode, collectMarkers } = require('./.aiox-core/infrastructure/scripts/documentation-integrity');
+const {
+  detectInstallationMode,
+  collectMarkers,
+} = require('./.aiox-core/infrastructure/scripts/documentation-integrity');
 
 const targetDir = process.cwd(); // or specified directory
 const detected = detectInstallationMode(targetDir);
@@ -284,11 +290,11 @@ console.log(`Reason: ${detected.reason}`);
 
 **Mode Descriptions:**
 
-| Mode | Description | Actions |
-|------|-------------|---------|
-| `framework-dev` | Contributing to aiox-core itself | Skip project setup, use existing config |
-| `greenfield` | New empty project | Full scaffolding, deployment config wizard |
-| `brownfield` | Existing project | Analyze and adapt, merge configurations |
+| Mode            | Description                      | Actions                                    |
+| --------------- | -------------------------------- | ------------------------------------------ |
+| `framework-dev` | Contributing to aiox-core itself | Skip project setup, use existing config    |
+| `greenfield`    | New empty project                | Full scaffolding, deployment config wizard |
+| `brownfield`    | Existing project                 | Analyze and adapt, merge configurations    |
 
 ### 2. Elicit Deployment Configuration (Greenfield/Brownfield)
 
@@ -322,14 +328,17 @@ For greenfield and brownfield projects, gather deployment preferences:
 Using the gathered context, generate project documentation:
 
 ```javascript
-const { buildDocContext, generateDocs } = require('./.aiox-core/infrastructure/scripts/documentation-integrity');
+const {
+  buildDocContext,
+  generateDocs,
+} = require('./.aiox-core/infrastructure/scripts/documentation-integrity');
 
 const context = buildDocContext(projectName, mode, markers, {
   // Custom overrides if needed
 });
 
 const result = generateDocs(targetDir, context, {
-  dryRun: false,  // Set true to preview
+  dryRun: false, // Set true to preview
 });
 
 console.log(`Generated ${result.filesCreated.length} documentation files`);
@@ -337,18 +346,23 @@ console.log(`Generated ${result.filesCreated.length} documentation files`);
 
 **Files Generated:**
 
-| File | Purpose |
-|------|---------|
-| `docs/architecture/source-tree.md` | Project structure documentation |
+| File                                    | Purpose                         |
+| --------------------------------------- | ------------------------------- |
+| `docs/architecture/source-tree.md`      | Project structure documentation |
 | `docs/architecture/coding-standards.md` | Coding conventions and patterns |
-| `docs/architecture/tech-stack.md` | Technology stack reference |
+| `docs/architecture/tech-stack.md`       | Technology stack reference      |
 
 ### 4. Generate Core Configuration
 
 Create the core-config.yaml with deployment settings:
 
 ```javascript
-const { buildConfigContext, generateConfig, DeploymentWorkflow, DeploymentPlatform } = require('./.aiox-core/infrastructure/scripts/documentation-integrity');
+const {
+  buildConfigContext,
+  generateConfig,
+  DeploymentWorkflow,
+  DeploymentPlatform,
+} = require('./.aiox-core/infrastructure/scripts/documentation-integrity');
 
 const configContext = buildConfigContext(projectName, mode, {
   workflow: DeploymentWorkflow.STAGING_FIRST,
@@ -371,11 +385,14 @@ const configResult = generateConfig(targetDir, mode, configContext);
 Handle .gitignore based on project state:
 
 ```javascript
-const { generateGitignoreFile, hasAioxIntegration } = require('./.aiox-core/infrastructure/scripts/documentation-integrity');
+const {
+  generateGitignoreFile,
+  hasAioxIntegration,
+} = require('./.aiox-core/infrastructure/scripts/documentation-integrity');
 
 const gitignoreResult = generateGitignoreFile(targetDir, markers, {
   projectName,
-  merge: mode === 'brownfield',  // Merge with existing for brownfield
+  merge: mode === 'brownfield', // Merge with existing for brownfield
 });
 
 console.log(`Gitignore ${gitignoreResult.mode}: ${gitignoreResult.path}`);
@@ -386,7 +403,10 @@ console.log(`Gitignore ${gitignoreResult.mode}: ${gitignoreResult.path}`);
 Confirm the deployment config can be loaded by other tasks:
 
 ```javascript
-const { loadDeploymentConfig, validateDeploymentConfig } = require('./.aiox-core/infrastructure/scripts/documentation-integrity');
+const {
+  loadDeploymentConfig,
+  validateDeploymentConfig,
+} = require('./.aiox-core/infrastructure/scripts/documentation-integrity');
 
 const deployConfig = loadDeploymentConfig(targetDir);
 const validation = validateDeploymentConfig(deployConfig);

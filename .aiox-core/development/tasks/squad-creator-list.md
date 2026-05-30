@@ -1,6 +1,6 @@
 ---
 task: List Squads
-responsavel: "@squad-creator"
+responsavel: '@squad-creator'
 responsavel_type: agent
 atomic_layer: task
 Entrada: |
@@ -10,12 +10,12 @@ Saida: |
   - squads: Lista de squads encontrados
   - count: Numero total de squads
 Checklist:
-  - "[ ] Usar squad-generator.listLocal()"
-  - "[ ] Formatar output conforme format"
-  - "[ ] Exibir informacoes basicas de cada squad"
+  - '[ ] Usar squad-generator.listLocal()'
+  - '[ ] Formatar output conforme format'
+  - '[ ] Exibir informacoes basicas de cada squad'
 ---
 
-# *list-squads
+# \*list-squads
 
 Lista todos os squads locais do projeto.
 
@@ -30,11 +30,11 @@ Lista todos os squads locais do projeto.
 
 ## Parametros
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `--path` | string | ./squads | Path to squads directory |
-| `--format` | string | table | Output format: table, json, yaml |
-| `--include-invalid` | flag | false | Include squads without valid manifest |
+| Parameter           | Type   | Default  | Description                           |
+| ------------------- | ------ | -------- | ------------------------------------- |
+| `--path`            | string | ./squads | Path to squads directory              |
+| `--format`          | string | table    | Output format: table, json, yaml      |
+| `--include-invalid` | flag   | false    | Include squads without valid manifest |
 
 ## Output Exemplo (Table)
 
@@ -97,11 +97,11 @@ path: ./squads
 
 ## Status Indicators
 
-| Status | Icon | Description |
-|--------|------|-------------|
-| valid | ✅ | Valid squad.yaml manifest |
-| deprecated | ⚠️ | Using config.yaml (deprecated) |
-| invalid | ❌ | No manifest found |
+| Status     | Icon | Description                    |
+| ---------- | ---- | ------------------------------ |
+| valid      | ✅   | Valid squad.yaml manifest      |
+| deprecated | ⚠️   | Using config.yaml (deprecated) |
+| invalid    | ❌   | No manifest found              |
 
 ## Flow
 
@@ -141,7 +141,7 @@ async function listSquads(options) {
 
   // Filter if needed
   if (!includeInvalid) {
-    squads = squads.filter(s => !s.invalid);
+    squads = squads.filter((s) => !s.invalid);
   }
 
   // Format output
@@ -166,9 +166,11 @@ function formatTable(squads, squadsPath) {
   let output = `Local Squads (${squadsPath}/)\n\n`;
 
   // Header
-  output += '┌' + '─'.repeat(22) + '┬' + '─'.repeat(9) + '┬' + '─'.repeat(30) + '┬' + '─'.repeat(8) + '┐\n';
+  output +=
+    '┌' + '─'.repeat(22) + '┬' + '─'.repeat(9) + '┬' + '─'.repeat(30) + '┬' + '─'.repeat(8) + '┐\n';
   output += '│ Name                 │ Version │ Description                  │ Status │\n';
-  output += '├' + '─'.repeat(22) + '┼' + '─'.repeat(9) + '┼' + '─'.repeat(30) + '┼' + '─'.repeat(8) + '┤\n';
+  output +=
+    '├' + '─'.repeat(22) + '┼' + '─'.repeat(9) + '┼' + '─'.repeat(30) + '┼' + '─'.repeat(8) + '┤\n';
 
   // Rows
   for (const squad of squads) {
@@ -179,12 +181,13 @@ function formatTable(squads, squadsPath) {
     output += `│ ${name} │ ${version} │ ${desc} │ ${status}     │\n`;
   }
 
-  output += '└' + '─'.repeat(22) + '┴' + '─'.repeat(9) + '┴' + '─'.repeat(30) + '┴' + '─'.repeat(8) + '┘\n';
+  output +=
+    '└' + '─'.repeat(22) + '┴' + '─'.repeat(9) + '┴' + '─'.repeat(30) + '┴' + '─'.repeat(8) + '┘\n';
 
   // Summary
-  const valid = squads.filter(s => !s.invalid && !s.deprecated).length;
-  const deprecated = squads.filter(s => s.deprecated).length;
-  const invalid = squads.filter(s => s.invalid).length;
+  const valid = squads.filter((s) => !s.invalid && !s.deprecated).length;
+  const deprecated = squads.filter((s) => s.deprecated).length;
+  const invalid = squads.filter((s) => s.invalid).length;
 
   output += `\nTotal: ${squads.length} squads`;
   if (deprecated > 0 || invalid > 0) {
@@ -212,14 +215,14 @@ Or download a public squad: @squad-creator *download-squad squad-name
 
 ## Error Handling
 
-| Error | Cause | Resolution |
-|-------|-------|------------|
-| `ENOENT` | Squads directory doesn't exist | Will return empty list |
-| `PERMISSION_DENIED` | Can't read directory | Check permissions |
+| Error               | Cause                          | Resolution             |
+| ------------------- | ------------------------------ | ---------------------- |
+| `ENOENT`            | Squads directory doesn't exist | Will return empty list |
+| `PERMISSION_DENIED` | Can't read directory           | Check permissions      |
 
 ## Related
 
 - **Agent:** @squad-creator (Craft)
 - **Script:** squad-generator.js (listLocal method)
-- **Create:** *create-squad
-- **Validate:** *validate-squad
+- **Create:** \*create-squad
+- **Validate:** \*validate-squad

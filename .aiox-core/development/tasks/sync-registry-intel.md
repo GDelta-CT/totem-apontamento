@@ -1,6 +1,7 @@
 # Task: Sync Registry Intel
 
 ## Metadata
+
 - **Task ID:** sync-registry-intel
 - **Agent:** @aiox-master
 - **Story:** NOG-2
@@ -45,6 +46,7 @@ const stats = await syncer.sync({ full: hasFullFlag });
 ### Step 3: Report Results
 
 Display sync statistics:
+
 - Total entities in registry
 - Entities processed (enriched)
 - Entities skipped (unchanged)
@@ -53,6 +55,7 @@ Display sync statistics:
 ### Step 4: Handle Fallback
 
 If no code intelligence provider is available:
+
 - Display: "No code intelligence provider available, skipping enrichment"
 - Exit gracefully with zero modifications
 

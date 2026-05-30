@@ -230,7 +230,7 @@ class WaveExecutor extends EventEmitter {
         if (this.rateLimitManager) {
           executionPromise = this.rateLimitManager.executeWithRetry(
             () => this.taskExecutor(task, context),
-            { taskId: task.id },
+            { taskId: task.id }
           );
         } else {
           executionPromise = this.taskExecutor(task, context);

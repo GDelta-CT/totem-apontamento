@@ -176,13 +176,7 @@ class FocusAreaRecommender {
     const primary = [];
 
     // Priority order for categories
-    const priorityOrder = [
-      'security',
-      'architecture',
-      'data-integrity',
-      'business-logic',
-      'api',
-    ];
+    const priorityOrder = ['security', 'architecture', 'data-integrity', 'business-logic', 'api'];
 
     // Add categories based on file analysis
     priorityOrder.forEach((cat) => {
@@ -301,10 +295,12 @@ class FocusAreaRecommender {
       ],
     };
 
-    return questionBank[category] || [
-      'Is this change necessary and well-implemented?',
-      'Are there any potential issues or risks?',
-    ];
+    return (
+      questionBank[category] || [
+        'Is this change necessary and well-implemented?',
+        'Are there any potential issues or risks?',
+      ]
+    );
   }
 
   /**
@@ -343,12 +339,8 @@ class FocusAreaRecommender {
     const criticalAreas = ['security', 'architecture', 'data-integrity'];
     const highAreas = ['business-logic', 'api'];
 
-    const hasCritical = recommendations.primary.some((p) =>
-      criticalAreas.includes(p.area),
-    );
-    const hasHigh = recommendations.primary.some((p) =>
-      highAreas.includes(p.area),
-    );
+    const hasCritical = recommendations.primary.some((p) => criticalAreas.includes(p.area));
+    const hasHigh = recommendations.primary.some((p) => highAreas.includes(p.area));
 
     if (hasCritical) return 'P0';
     if (hasHigh) return 'P1';

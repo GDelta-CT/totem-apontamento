@@ -184,6 +184,7 @@ token_usage: ~2,000-8,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Iterative analysis with depth limits; cache intermediate results; batch similar operations
 
 ---
@@ -212,6 +213,7 @@ This task requires the following configuration keys from `core-config.yaml`:
 - **`qaLocation`**: QA output directory (typically docs/qa) - Required to write quality reports and gate files
 
 **Loading Config:**
+
 ```javascript
 const yaml = require('js-yaml');
 const fs = require('fs');
@@ -231,18 +233,21 @@ Systematically audit all utilities in `.aiox-core/scripts/` to determine their f
 ## Classification Criteria
 
 ### ✅ WORKING
+
 - Executes without errors
 - Dependencies installed
 - Integrated with at least one agent/task
 - Documentation exists (inline or external)
 
 ### 🔧 FIXABLE
+
 - Executes with minor errors (missing deps, syntax fixes)
 - Core logic sound, needs integration
 - Fix effort estimated <4 hours
 - Concept valuable enough to justify fix
 
 ### 🗑️ DEPRECATED
+
 - Non-functional, major rewrites needed
 - Obsolete concept (replaced by better approach)
 - Fix effort >8 hours
@@ -259,6 +264,7 @@ node .aiox-core/scripts/test-utilities.js
 ```
 
 This will:
+
 - Attempt to require() each utility
 - Check for missing dependencies
 - Test exported functions
@@ -280,6 +286,7 @@ done
 ### Step 3: Manual Classification Review
 
 For utilities with ambiguous status:
+
 - Review source code quality
 - Estimate completion percentage
 - Assess concept value
@@ -298,6 +305,7 @@ Higher scores = higher priority for fixing
 ### Step 5: Make Story 3.19 Decision
 
 Determine if memory-layer capabilities exist:
+
 - Search for memory-related utilities
 - IF found AND classified FIXABLE:
   - Estimate fix effort vs 20h threshold
@@ -307,6 +315,7 @@ Determine if memory-layer capabilities exist:
 ### Step 6: Generate Audit Report
 
 Create comprehensive report with:
+
 - Summary statistics (X WORKING, Y FIXABLE, Z DEPRECATED)
 - Per-utility details (status, errors, integration count, recommendation)
 - Fix priority list (ranked FIXABLE utilities)
@@ -318,10 +327,12 @@ Create comprehensive report with:
 **Primary**: `UTILITIES-AUDIT-REPORT.md` in project root or docs/
 
 **Format**:
+
 ```markdown
 # Framework Utilities Audit Report
 
 ## Executive Summary
+
 - Total Utilities: X
 - ✅ WORKING: Y (Z%)
 - 🔧 FIXABLE: A (B%)
@@ -330,15 +341,19 @@ Create comprehensive report with:
 ## Detailed Findings
 
 ### WORKING Utilities
+
 ...
 
 ### FIXABLE Utilities (Priority Ranked)
+
 ...
 
 ### DEPRECATED Utilities (Cleanup Candidates)
+
 ...
 
 ## Story 3.19 Decision
+
 ...
 ```
 

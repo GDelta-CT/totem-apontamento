@@ -11,11 +11,11 @@ Requer decisão humana para continuar, pausar, revisar ou abortar.
 
 ```yaml
 task_id: story-checkpoint
-version: "1.0.0"
-agent: "@po"
-elicit: true  # REQUIRES human interaction
-epic: "11 - Projeto Bob"
-story: "11.3"
+version: '1.0.0'
+agent: '@po'
+elicit: true # REQUIRES human interaction
+epic: '11 - Projeto Bob'
+story: '11.3'
 ```
 
 ---
@@ -28,12 +28,12 @@ Pausar o workflow de desenvolvimento entre stories para perguntar ao usuário qu
 
 ## Inputs
 
-| Input | Type | Required | Description |
-|-------|------|----------|-------------|
-| `story_file` | path | Yes | Path to completed story file |
-| `pr_url` | string | No | URL of created PR (if push succeeded) |
-| `implementation` | object | No | Implementation details from development phase |
-| `review_result` | object | No | Quality gate review result |
+| Input            | Type   | Required | Description                                   |
+| ---------------- | ------ | -------- | --------------------------------------------- |
+| `story_file`     | path   | Yes      | Path to completed story file                  |
+| `pr_url`         | string | No       | URL of created PR (if push succeeded)         |
+| `implementation` | object | No       | Implementation details from development phase |
+| `review_result`  | object | No       | Quality gate review result                    |
 
 ---
 
@@ -44,21 +44,21 @@ Pausar o workflow de desenvolvimento entre stories para perguntar ao usuário qu
 ```yaml
 summary:
   story_completed:
-    file: "${story_file}"
-    executor: "${story.executor}"
-    quality_gate: "${story.quality_gate}"
+    file: '${story_file}'
+    executor: '${story.executor}'
+    quality_gate: '${story.quality_gate}'
 
   implementation:
-    files_created: "${implementation.files_created.length}"
-    files_modified: "${implementation.files_modified.length}"
-    tests_added: "${implementation.tests_added.length}"
+    files_created: '${implementation.files_created.length}'
+    files_modified: '${implementation.files_modified.length}'
+    tests_added: '${implementation.tests_added.length}'
 
   quality_gate:
-    verdict: "${review_result.verdict}"
-    score: "${review_result.score}"
+    verdict: '${review_result.verdict}'
+    score: '${review_result.score}'
 
   pr:
-    url: "${pr_url}"
+    url: '${pr_url}'
     status: "${pr_url ? 'Created' : 'Pending'}"
 ```
 
@@ -97,28 +97,28 @@ elicitation:
 
   options:
     - id: GO
-      label: "🚀 GO - Continue to next story"
+      label: '🚀 GO - Continue to next story'
       description: |
         Continue the development cycle with the next story in the epic.
         The workflow will automatically load and validate the next story.
       action: suggest_next_story
 
     - id: PAUSE
-      label: "⏸️ PAUSE - Save state and stop"
+      label: '⏸️ PAUSE - Save state and stop'
       description: |
         Save the current workflow state and stop execution.
         You can resume later with *workflow resume development-cycle.
       action: save_session_state
 
     - id: REVIEW
-      label: "🔍 REVIEW - Show what was done"
+      label: '🔍 REVIEW - Show what was done'
       description: |
         Display a detailed summary of all changes made in this story.
         Includes file diffs, test results, and quality gate findings.
       action: show_detailed_summary
 
     - id: ABORT
-      label: "⛔ ABORT - Stop the epic"
+      label: '⛔ ABORT - Stop the epic'
       description: |
         Stop working on this epic entirely.
         All progress is saved but the workflow will not continue.
@@ -149,7 +149,7 @@ elicitation:
 action: suggest_next_story
 steps:
   1_find_next:
-    description: "Find next story in epic"
+    description: 'Find next story in epic'
     logic: |
       - Read epic file to get story list
       - Find current story position
@@ -157,7 +157,7 @@ steps:
       - If no more stories, report "Epic complete"
 
   2_validate_next:
-    description: "Validate next story is ready"
+    description: 'Validate next story is ready'
     checks:
       - Has executor assigned
       - Has quality_gate assigned
@@ -165,7 +165,7 @@ steps:
       - Dependencies are met
 
   3_confirm:
-    description: "Confirm with user"
+    description: 'Confirm with user'
     prompt: |
       Next story: ${next_story.title}
       Executor: ${next_story.executor}
@@ -174,7 +174,7 @@ steps:
       Start development? (Y/n)
 
   4_transition:
-    description: "Transition to next story"
+    description: 'Transition to next story'
     actions:
       - Update workflow state with new story
       - Reset phase to 1_validation
@@ -187,20 +187,20 @@ steps:
 action: save_session_state
 steps:
   1_save_state:
-    description: "Persist workflow state"
-    location: ".aiox/workflow-state/${story_id}-state.yaml"
+    description: 'Persist workflow state'
+    location: '.aiox/workflow-state/${story_id}-state.yaml'
     content:
       workflow_id: development-cycle
-      current_story: "${story_file}"
-      current_phase: "6_checkpoint"
-      paused_at: "${timestamp}"
+      current_story: '${story_file}'
+      current_phase: '6_checkpoint'
+      paused_at: '${timestamp}'
       epic_progress:
         completed_stories: []
         remaining_stories: []
       accumulated_context: {}
 
   2_confirm:
-    description: "Confirm state saved"
+    description: 'Confirm state saved'
     message: |
       ✅ Workflow state saved!
 
@@ -211,7 +211,7 @@ steps:
         *validate-story-draft ${next_story}
 
   3_exit:
-    description: "Exit workflow"
+    description: 'Exit workflow'
     status: paused
 ```
 
@@ -221,7 +221,7 @@ steps:
 action: show_detailed_summary
 steps:
   1_gather_data:
-    description: "Collect all changes"
+    description: 'Collect all changes'
     data:
       - Git diff since workflow start
       - All files created/modified/deleted
@@ -230,7 +230,7 @@ steps:
       - PR details
 
   2_display:
-    description: "Show detailed summary"
+    description: 'Show detailed summary'
     format: |
       ═══════════════════════════════════════════════════════════════════
                          📊 DETAILED SUMMARY
@@ -270,8 +270,8 @@ steps:
       ═══════════════════════════════════════════════════════════════════
 
   3_return:
-    description: "Return to checkpoint"
-    action: "Re-display checkpoint options"
+    description: 'Return to checkpoint'
+    action: 'Re-display checkpoint options'
 ```
 
 ### ABORT Action: Stop Epic
@@ -280,7 +280,7 @@ steps:
 action: abort_epic
 steps:
   1_confirm:
-    description: "Confirm abort"
+    description: 'Confirm abort'
     prompt: |
       ⚠️ Are you sure you want to abort the epic?
 
@@ -292,12 +292,12 @@ steps:
       Abort? (yes/no)
 
   2_save_final_state:
-    description: "Save abort state"
-    location: ".aiox/workflow-state/${story_id}-state.yaml"
+    description: 'Save abort state'
+    location: '.aiox/workflow-state/${story_id}-state.yaml'
     status: aborted
 
   3_report:
-    description: "Report abort"
+    description: 'Report abort'
     message: |
       ⛔ Epic aborted.
 
@@ -310,7 +310,7 @@ steps:
         *workflow development-cycle ${next_incomplete_story}
 
   4_exit:
-    description: "Exit workflow"
+    description: 'Exit workflow'
     status: aborted
 ```
 
@@ -327,24 +327,24 @@ output:
   next_story:
     type: path
     optional: true
-    description: "Path to next story (only if GO)"
+    description: 'Path to next story (only if GO)'
 
   state_file:
     type: path
     optional: true
-    description: "Path to saved state file (if PAUSE or ABORT)"
+    description: 'Path to saved state file (if PAUSE or ABORT)'
 ```
 
 ---
 
 ## Error Handling
 
-| Error | Handling |
-|-------|----------|
-| No next story found | Display "Epic complete" message |
+| Error                | Handling                                |
+| -------------------- | --------------------------------------- |
+| No next story found  | Display "Epic complete" message         |
 | Next story not ready | Display warning, allow manual selection |
-| State save failed | Retry 3x, then warn user |
-| User timeout | Default to PAUSE after 30 minutes |
+| State save failed    | Retry 3x, then warn user                |
+| User timeout         | Default to PAUSE after 30 minutes       |
 
 ---
 
@@ -357,4 +357,4 @@ output:
 
 ---
 
-*Task created by @dev (Dex) for Story 11.3*
+_Task created by @dev (Dex) for Story 11.3_

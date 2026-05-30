@@ -103,7 +103,14 @@
         },
         "taskFormat": {
           "type": "string",
-          "enum": ["TASK-FORMAT-V1", "TASK-FORMAT-V2", "SCRIPT", "TEMPLATE", "CHECKLIST", "WORKFLOW"],
+          "enum": [
+            "TASK-FORMAT-V1",
+            "TASK-FORMAT-V2",
+            "SCRIPT",
+            "TEMPLATE",
+            "CHECKLIST",
+            "WORKFLOW"
+          ],
           "description": "Format specification the worker follows"
         },
         "executorTypes": {

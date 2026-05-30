@@ -47,7 +47,8 @@ function collectSessionStatus(projectRoot, sessionId) {
   });
 
   // Check activation_quality
-  const quality = session?.active_agent?.activation_quality || bridgeData?.activation_quality || null;
+  const quality =
+    session?.active_agent?.activation_quality || bridgeData?.activation_quality || null;
   fields.push({
     field: 'activation_quality',
     expected: 'full|partial|fallback',

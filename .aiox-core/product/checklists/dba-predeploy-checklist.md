@@ -25,7 +25,6 @@ Production safety is paramount.]]
 1. **Migration Validation:**
 
    [[LLM: Migrations must be safe and reversible]]
-
    - [ ] All migrations have been tested in development environment
    - [ ] Migrations are idempotent (safe to run multiple times)
    - [ ] Rollback scripts exist for all schema changes
@@ -35,7 +34,6 @@ Production safety is paramount.]]
 2. **Schema Review:**
 
    [[LLM: Schema changes can break applications. Verify carefully]]
-
    - [ ] No breaking changes to existing APIs/tables
    - [ ] Foreign key constraints are properly defined
    - [ ] Indexes exist for all foreign keys and frequently queried columns
@@ -45,7 +43,6 @@ Production safety is paramount.]]
 3. **Security Review:**
 
    [[LLM: Database security is critical. Check each item]]
-
    - [ ] RLS policies are enabled on all user-facing tables
    - [ ] RLS policies have been tested with positive and negative cases
    - [ ] No sensitive data exposed without proper authorization
@@ -55,7 +52,6 @@ Production safety is paramount.]]
 4. **Performance Review:**
 
    [[LLM: Performance issues in production are costly. Validate]]
-
    - [ ] Large table alterations have been planned for low-traffic periods
    - [ ] New indexes have been tested for query performance
    - [ ] No full table scans introduced on large tables
@@ -65,7 +61,6 @@ Production safety is paramount.]]
 5. **Backup & Recovery:**
 
    [[LLM: Always have a way back. Ensure recovery options]]
-
    - [ ] Database snapshot created before deployment
    - [ ] Rollback procedure documented and tested
    - [ ] Recovery time estimate documented
@@ -74,7 +69,6 @@ Production safety is paramount.]]
 6. **Documentation:**
 
    [[LLM: Future DBAs need to understand what changed]]
-
    - [ ] COMMENT ON statements added for new tables/columns
    - [ ] Migration notes document the purpose of changes
    - [ ] Breaking changes communicated to development team

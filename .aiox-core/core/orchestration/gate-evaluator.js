@@ -315,10 +315,15 @@ class GateEvaluator {
         break;
 
       case 'tests_pass': {
-        const hasResults = Array.isArray(epicResult.testResults) && epicResult.testResults.length > 0;
+        const hasResults =
+          Array.isArray(epicResult.testResults) && epicResult.testResults.length > 0;
         const allPass = hasResults && epicResult.testResults.every((t) => t.passed);
         result.passed = allPass;
-        result.message = !hasResults ? 'No test results' : (allPass ? 'All tests pass' : 'Some tests failed');
+        result.message = !hasResults
+          ? 'No test results'
+          : allPass
+            ? 'All tests pass'
+            : 'Some tests failed';
         result.severity = 'high';
         break;
       }
@@ -441,7 +446,7 @@ class GateEvaluator {
   getSummary() {
     const approved = this.results.filter((r) => r.verdict === GateVerdict.APPROVED).length;
     const needsRevision = this.results.filter(
-      (r) => r.verdict === GateVerdict.NEEDS_REVISION,
+      (r) => r.verdict === GateVerdict.NEEDS_REVISION
     ).length;
     const blocked = this.results.filter((r) => r.verdict === GateVerdict.BLOCKED).length;
 

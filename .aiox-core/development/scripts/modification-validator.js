@@ -16,7 +16,7 @@ class ModificationValidator {
       agent: this.validateAgentModification.bind(this),
       task: this.validateTaskModification.bind(this),
       workflow: this.validateWorkflowModification.bind(this),
-      template: this.validateTemplateModification.bind(this)
+      template: this.validateTemplateModification.bind(this),
     };
   }
 
@@ -34,7 +34,7 @@ class ModificationValidator {
       errors: [],
       warnings: [],
       suggestions: [],
-      breakingChanges: []
+      breakingChanges: [],
     };
 
     // Basic validation
@@ -81,7 +81,7 @@ class ModificationValidator {
       valid: true,
       errors: [],
       warnings: [],
-      suggestions: []
+      suggestions: [],
     };
 
     try {
@@ -125,9 +125,10 @@ class ModificationValidator {
 
       // Check for removed commands (breaking change)
       if (originalMeta.commands && modifiedMeta.commands) {
-        const removedCommands = Object.keys(originalMeta.commands)
-          .filter(cmd => !modifiedMeta.commands[cmd]);
-        
+        const removedCommands = Object.keys(originalMeta.commands).filter(
+          (cmd) => !modifiedMeta.commands[cmd]
+        );
+
         if (removedCommands.length > 0) {
           result.warnings.push(`Commands removed: ${removedCommands.join(', ')}`);
         }
@@ -136,7 +137,6 @@ class ModificationValidator {
       // Validate markdown content
       const markdownValidation = this.validateMarkdown(modifiedParts.markdown);
       this.mergeResults(result, markdownValidation);
-
     } catch (_error) {
       result.valid = false;
       result.errors.push(`Failed to parse agent content: ${error.message}`);
@@ -154,7 +154,7 @@ class ModificationValidator {
       valid: true,
       errors: [],
       warnings: [],
-      suggestions: []
+      suggestions: [],
     };
 
     // Check for required sections
@@ -209,7 +209,7 @@ class ModificationValidator {
       valid: true,
       errors: [],
       warnings: [],
-      suggestions: []
+      suggestions: [],
     };
 
     try {
@@ -258,7 +258,7 @@ class ModificationValidator {
       // Check for sequence gaps
       phaseSequences.sort((a, b) => a - b);
       for (let i = 1; i < phaseSequences.length; i++) {
-        if (phaseSequences[i] - phaseSequences[i-1] > 2) {
+        if (phaseSequences[i] - phaseSequences[i - 1] > 2) {
           result.warnings.push('Large gap in phase sequences detected');
         }
       }
@@ -268,10 +268,7 @@ class ModificationValidator {
         if (phase.entry_criteria) {
           for (const criteria of phase.entry_criteria) {
             // Check if criteria references valid artifacts or phases
-            const referencesValid = this.validateCriteriaReferences(
-              criteria,
-              modifiedWorkflow
-            );
+            const referencesValid = this.validateCriteriaReferences(criteria, modifiedWorkflow);
             if (!referencesValid) {
               result.warnings.push(
                 `Entry criteria '${criteria}' in phase '${phaseName}' may reference non-existent artifact`
@@ -280,7 +277,6 @@ class ModificationValidator {
           }
         }
       }
-
     } catch (_error) {
       result.valid = false;
       result.errors.push(`Failed to parse workflow: ${error.message}`);
@@ -298,7 +294,7 @@ class ModificationValidator {
       valid: true,
       errors: [],
       warnings: [],
-      suggestions: []
+      suggestions: [],
     };
 
     // Check for placeholder consistency
@@ -331,7 +327,7 @@ class ModificationValidator {
     const result = {
       valid: true,
       errors: [],
-      warnings: []
+      warnings: [],
     };
 
     const baseDir = path.join(process.cwd(), 'aiox-core');
@@ -340,7 +336,7 @@ class ModificationValidator {
       if (!Array.isArray(files)) continue;
 
       const typeDir = path.join(baseDir, type);
-      
+
       for (const file of files) {
         const filePath = path.join(typeDir, file);
         try {
@@ -362,7 +358,7 @@ class ModificationValidator {
     const result = {
       valid: true,
       errors: [],
-      warnings: []
+      warnings: [],
     };
 
     // Check for broken internal links
@@ -392,11 +388,11 @@ class ModificationValidator {
     const result = {
       valid: true,
       errors: [],
-      warnings: []
+      warnings: [],
     };
 
     const securityIssues = await this.securityChecker.checkContent(content);
-    
+
     if (securityIssues.length > 0) {
       for (const issue of securityIssues) {
         if (issue.severity === 'high') {
@@ -427,14 +423,15 @@ class ModificationValidator {
           const modifiedMeta = yaml.load(modifiedParts.yaml);
 
           if (originalMeta.commands && modifiedMeta.commands) {
-            const removedCommands = Object.keys(originalMeta.commands)
-              .filter(cmd => !modifiedMeta.commands[cmd]);
-            
+            const removedCommands = Object.keys(originalMeta.commands).filter(
+              (cmd) => !modifiedMeta.commands[cmd]
+            );
+
             if (removedCommands.length > 0) {
               breakingChanges.push({
                 type: 'removed_commands',
                 items: removedCommands,
-                impact: 'Users relying on these commands will need to update their workflows'
+                impact: 'Users relying on these commands will need to update their workflows',
               });
             }
           }
@@ -447,11 +444,11 @@ class ModificationValidator {
         // Check for changed output format
         const originalOutput = originalContent.match(/## Output Format[\s\S]*?```[\s\S]*?```/);
         const modifiedOutput = modifiedContent.match(/## Output Format[\s\S]*?```[\s\S]*?```/);
-        
+
         if (originalOutput && modifiedOutput && originalOutput[0] !== modifiedOutput[0]) {
           breakingChanges.push({
             type: 'output_format_changed',
-            impact: 'Components consuming this task output may need updates'
+            impact: 'Components consuming this task output may need updates',
           });
         }
         break;
@@ -465,13 +462,13 @@ class ModificationValidator {
           const originalPhases = Object.keys(originalWorkflow.phases || {});
           const modifiedPhases = Object.keys(modifiedWorkflow.phases || {});
 
-          const removedPhases = originalPhases.filter(p => !modifiedPhases.includes(p));
-          
+          const removedPhases = originalPhases.filter((p) => !modifiedPhases.includes(p));
+
           if (removedPhases.length > 0) {
             breakingChanges.push({
               type: 'removed_phases',
               items: removedPhases,
-              impact: 'Projects using this workflow may fail at removed phases'
+              impact: 'Projects using this workflow may fail at removed phases',
             });
           }
         } catch (_error) {
@@ -495,7 +492,7 @@ class ModificationValidator {
 
     return {
       yaml: match[1],
-      markdown: match[2]
+      markdown: match[2],
     };
   }
 
@@ -520,10 +517,10 @@ class ModificationValidator {
   validateCriteriaReferences(criteria, workflow) {
     // Simple check - could be enhanced
     const artifacts = new Set();
-    
+
     for (const phase of Object.values(workflow.phases || {})) {
       if (phase.artifacts) {
-        phase.artifacts.forEach(a => artifacts.add(a));
+        phase.artifacts.forEach((a) => artifacts.add(a));
       }
     }
 
@@ -545,7 +542,7 @@ class ModificationValidator {
     target.errors.push(...(source.errors || []));
     target.warnings.push(...(source.warnings || []));
     target.suggestions.push(...(source.suggestions || []));
-    
+
     if (source.valid === false) {
       target.valid = false;
     }

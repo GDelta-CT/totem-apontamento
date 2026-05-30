@@ -132,14 +132,14 @@ ideSync:
 
 Each IDE has a specific format for agent files:
 
-| IDE         | Format                  | Extension |
-| ----------- | ----------------------- | --------- |
-| Claude Code | Full markdown with YAML | `.md`     |
-| Codex CLI   | Full markdown with YAML | `.md`     |
-| Gemini CLI  | Full markdown with YAML | `.md`     |
-| GitHub Copilot | Full markdown with YAML | `.md`   |
-| Cursor      | Condensed rules         | `.md`     |
-| Antigravity | Cursor-style            | `.md`     |
+| IDE            | Format                  | Extension |
+| -------------- | ----------------------- | --------- |
+| Claude Code    | Full markdown with YAML | `.md`     |
+| Codex CLI      | Full markdown with YAML | `.md`     |
+| Gemini CLI     | Full markdown with YAML | `.md`     |
+| GitHub Copilot | Full markdown with YAML | `.md`     |
+| Cursor         | Condensed rules         | `.md`     |
+| Antigravity    | Cursor-style            | `.md`     |
 
 Platform-specific checks:
 

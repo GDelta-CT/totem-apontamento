@@ -11,16 +11,19 @@
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -188,6 +191,7 @@ token_usage: ~800-2,500 tokens
 ```
 
 **Optimization Notes:**
+
 - Validate configuration early; use atomic writes; implement rollback checkpoints
 
 ---
@@ -207,7 +211,6 @@ updated_at: 2025-11-17
 
 ---
 
-
 ## Inputs
 
 - `path` (string): Path to SQL seed file
@@ -219,6 +222,7 @@ updated_at: 2025-11-17
 ### 1. Pre-Flight Checks
 
 Ask user to confirm:
+
 - Seed file: `{path}`
 - Database: `$SUPABASE_DB_URL` (redacted)
 - Environment: (dev/staging/production)
@@ -327,6 +331,7 @@ echo "✓ Logged to supabase/docs/SEED_LOG.md"
 ## Output
 
 Display summary:
+
 ```
 ✅ SEED COMPLETE
 
@@ -374,6 +379,7 @@ VALUES ('Technology', 'technology');  -- Will fail on retry
 ## Error Handling
 
 If seed fails:
+
 1. Check error message in terminal
 2. Fix seed file
 3. Restore snapshot if needed: `*rollback {TS}_before_seed`

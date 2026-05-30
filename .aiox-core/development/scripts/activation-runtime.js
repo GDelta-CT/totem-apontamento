@@ -15,9 +15,11 @@ class ActivationRuntime {
    * @param {UnifiedActivationPipeline} [options.pipeline]
    */
   constructor(options = {}) {
-    this.pipeline = options.pipeline || new UnifiedActivationPipeline({
-      projectRoot: options.projectRoot,
-    });
+    this.pipeline =
+      options.pipeline ||
+      new UnifiedActivationPipeline({
+        projectRoot: options.projectRoot,
+      });
   }
 
   /**
@@ -41,7 +43,9 @@ class ActivationRuntime {
       const result = await this.activate(agentId, options);
       return result && typeof result.greeting === 'string' ? result.greeting : '';
     } catch (error) {
-      throw new Error(`ActivationRuntime.activateGreeting failed for "${agentId}": ${error.message}`);
+      throw new Error(
+        `ActivationRuntime.activateGreeting failed for "${agentId}": ${error.message}`
+      );
     }
   }
 }

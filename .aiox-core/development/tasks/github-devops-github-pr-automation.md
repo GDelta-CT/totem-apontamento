@@ -11,16 +11,19 @@
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -188,6 +191,7 @@ token_usage: ~3,000-10,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Break into smaller workflows; implement checkpointing; use async processing where possible
 
 ---
@@ -207,8 +211,8 @@ updated_at: 2025-11-17
 
 ---
 
-
 ## Prerequisites
+
 - GitHub CLI (`gh`) installed and authenticated
 - Feature branch pushed to remote
 - Repository context detected
@@ -257,7 +261,7 @@ function extractStoryInfo(storyPath) {
   return {
     id: storyId,
     title,
-    hasAcceptanceCriteria: !!acMatch
+    hasAcceptanceCriteria: !!acMatch,
   };
 }
 ```
@@ -281,7 +285,7 @@ function loadPRConfig() {
 
   // Default configuration (for projects without core-config)
   const defaults = {
-    title_format: 'story-first',  // Safe default for most projects
+    title_format: 'story-first', // Safe default for most projects
     include_story_id: true,
     conventional_commits: {
       enabled: false,
@@ -298,10 +302,10 @@ function loadPRConfig() {
         'perf/': 'perf',
         'ci/': 'ci',
         'style/': 'style',
-        'build/': 'build'
+        'build/': 'build',
       },
-      default_type: 'feat'
-    }
+      default_type: 'feat',
+    },
   };
 
   try {
@@ -374,9 +378,7 @@ function generateConventionalTitle(branchName, storyInfo, config) {
 
   // Generate description
   if (storyInfo && storyInfo.id && storyInfo.title) {
-    let cleanTitle = storyInfo.title
-      .replace(/^Story\s*\d+\.\d+[:\s-]*/i, '')
-      .trim();
+    let cleanTitle = storyInfo.title.replace(/^Story\s*\d+\.\d+[:\s-]*/i, '').trim();
     cleanTitle = cleanTitle.charAt(0).toLowerCase() + cleanTitle.slice(1);
 
     const storyRef = config.include_story_id ? ` [Story ${storyInfo.id}]` : '';
@@ -407,7 +409,7 @@ function generateStoryFirstTitle(branchName, storyInfo, config) {
   return branchName
     .replace(/^(feature|feat|fix|bugfix|hotfix|docs|chore|refactor|test|perf|ci|style|build)\//, '')
     .replace(/-/g, ' ')
-    .replace(/\b\w/g, c => c.toUpperCase());
+    .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 /**
@@ -418,7 +420,7 @@ function generateBranchBasedTitle(branchName, storyInfo, config) {
   const title = branchName
     .replace(/^(feature|feat|fix|bugfix|hotfix|docs|chore|refactor|test|perf|ci|style|build)\//, '')
     .replace(/-/g, ' ')
-    .replace(/\b\w/g, c => c.toUpperCase());
+    .replace(/\b\w/g, (c) => c.toUpperCase());
 
   if (config.include_story_id && storyInfo?.id) {
     return `${title} [Story ${storyInfo.id}]`;
@@ -436,7 +438,7 @@ Add to your project's `core-config.yaml`:
 github:
   pr:
     # Options: conventional | story-first | branch-based
-    title_format: conventional  # For semantic-release projects
+    title_format: conventional # For semantic-release projects
     # title_format: story-first  # For simple projects (default)
 
     include_story_id: true
@@ -451,19 +453,19 @@ github:
       default_type: feat
 
   semantic_release:
-    enabled: true  # Set false if not using semantic-release
+    enabled: true # Set false if not using semantic-release
 ```
 
 ## Title Format Examples
 
-| Format | Branch | Story | Generated Title |
-|--------|--------|-------|-----------------|
-| `conventional` | `feature/user-auth` | 6.17: User Auth | `feat: user auth [Story 6.17]` |
-| `conventional` | `fix/cli/parsing` | 6.18: CLI Fix | `fix(cli): cLI fix [Story 6.18]` |
-| `story-first` | `feature/user-auth` | 6.17: User Auth | `[Story 6.17] User Auth` |
-| `story-first` | `fix/cli-bug` | - | `Cli Bug` |
-| `branch-based` | `feature/user-auth` | 6.17 | `User Auth [Story 6.17]` |
-| `branch-based` | `docs/readme` | - | `Readme` |
+| Format         | Branch              | Story           | Generated Title                  |
+| -------------- | ------------------- | --------------- | -------------------------------- |
+| `conventional` | `feature/user-auth` | 6.17: User Auth | `feat: user auth [Story 6.17]`   |
+| `conventional` | `fix/cli/parsing`   | 6.18: CLI Fix   | `fix(cli): cLI fix [Story 6.18]` |
+| `story-first`  | `feature/user-auth` | 6.17: User Auth | `[Story 6.17] User Auth`         |
+| `story-first`  | `fix/cli-bug`       | -               | `Cli Bug`                        |
+| `branch-based` | `feature/user-auth` | 6.17            | `User Auth [Story 6.17]`         |
+| `branch-based` | `docs/readme`       | -               | `Readme`                         |
 
 ### Step 5: Generate PR Description
 
@@ -557,8 +559,11 @@ function determineBaseBranch(projectRoot) {
   // Check default branch from git
   try {
     const defaultBranch = execSync('git symbolic-ref refs/remotes/origin/HEAD', {
-      cwd: projectRoot
-    }).toString().trim().replace('refs/remotes/origin/', '');
+      cwd: projectRoot,
+    })
+      .toString()
+      .trim()
+      .replace('refs/remotes/origin/', '');
 
     return defaultBranch || 'main';
   } catch (error) {
@@ -583,16 +588,16 @@ gh pr create \
 ```javascript
 function assignReviewers(storyType, prNumber) {
   const reviewerMap = {
-    'feature': ['@dev-team'],
-    'bugfix': ['@qa-team'],
-    'docs': ['@tech-writer'],
-    'security': ['@security-team']
+    feature: ['@dev-team'],
+    bugfix: ['@qa-team'],
+    docs: ['@tech-writer'],
+    security: ['@security-team'],
   };
 
   const reviewers = reviewerMap[storyType] || ['@dev-team'];
 
   execSync(`gh pr edit ${prNumber} --add-reviewer ${reviewers.join(',')}`, {
-    cwd: projectRoot
+    cwd: projectRoot,
   });
 }
 ```
@@ -614,8 +619,10 @@ async function createPullRequest(storyPath) {
 
   // Get current branch
   const currentBranch = execSync('git branch --show-current', {
-    cwd: context.projectRoot
-  }).toString().trim();
+    cwd: context.projectRoot,
+  })
+    .toString()
+    .trim();
 
   console.log(`Branch: ${currentBranch}`);
 
@@ -634,7 +641,9 @@ async function createPullRequest(storyPath) {
   const prUrl = execSync(
     `gh pr create --title "${title}" --body "${description}" --base ${baseBranch}`,
     { cwd: context.projectRoot }
-  ).toString().trim();
+  )
+    .toString()
+    .trim();
 
   console.log(`\n✅ Pull Request created: ${prUrl}`);
 
@@ -659,6 +668,7 @@ Called by `@github-devops` via `*create-pr` command.
 ## Semantic-Release Integration (Optional)
 
 > **Note:** This section only applies when `core-config.yaml` has:
+>
 > - `github.pr.title_format: conventional`
 > - `github.semantic_release.enabled: true`
 >
@@ -666,20 +676,22 @@ Called by `@github-devops` via `*create-pr` command.
 
 **When enabled:** PRs merged via "Squash and merge" use the PR title as commit message, triggering semantic-release:
 
-| Branch Pattern | Generated Title | Release |
-|---------------|-----------------|---------|
-| `feature/user-auth` | `feat: user auth` | ✅ Minor |
+| Branch Pattern        | Generated Title         | Release  |
+| --------------------- | ----------------------- | -------- |
+| `feature/user-auth`   | `feat: user auth`       | ✅ Minor |
 | `feat/auth/sso-login` | `feat(auth): sso login` | ✅ Minor |
-| `fix/cli-parsing` | `fix: cli parsing` | ✅ Patch |
-| `docs/readme-update` | `docs: readme update` | ❌ None |
-| `chore/deps-update` | `chore: deps update` | ❌ None |
+| `fix/cli-parsing`     | `fix: cli parsing`      | ✅ Patch |
+| `docs/readme-update`  | `docs: readme update`   | ❌ None  |
+| `chore/deps-update`   | `chore: deps update`    | ❌ None  |
 
 For breaking changes, manually edit the PR title to include `!`:
+
 - `feat!: redesign authentication API [Story 7.1]`
 
 ## Configuration for Different Project Types
 
 ### NPM Package with Semantic-Release (aiox-core)
+
 ```yaml
 github:
   pr:
@@ -689,19 +701,21 @@ github:
 ```
 
 ### Simple Web App (no releases)
+
 ```yaml
 github:
   pr:
-    title_format: story-first  # [Story 6.17] Title
+    title_format: story-first # [Story 6.17] Title
   semantic_release:
     enabled: false
 ```
 
 ### Quick Prototypes
+
 ```yaml
 github:
   pr:
-    title_format: branch-based  # Just branch name as title
+    title_format: branch-based # Just branch name as title
     include_story_id: false
 ```
 
@@ -713,8 +727,10 @@ github:
 - Repository context from detector
 
 ## Handoff
+
 next_agent: @po
-next_command: *close-story {story-id}
+next_command: \*close-story {story-id}
 condition: PR merged successfully
 alternatives:
-  - agent: @dev, command: *apply-qa-fixes, condition: PR review requested changes
+
+- agent: @dev, command: \*apply-qa-fixes, condition: PR review requested changes

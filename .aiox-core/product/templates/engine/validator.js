@@ -23,7 +23,8 @@ class TemplateValidator {
    * @param {string} options.schemasDir - Path to schemas directory
    */
   constructor(options = {}) {
-    this.schemasDir = options.schemasDir ||
+    this.schemasDir =
+      options.schemasDir ||
       path.join(process.cwd(), '.aiox-core', 'product', 'templates', 'engine', 'schemas');
 
     this.ajv = new Ajv({
@@ -202,7 +203,7 @@ class TemplateValidator {
   formatErrors(errors) {
     if (!errors) return [];
 
-    return errors.map(error => {
+    return errors.map((error) => {
       const path = error.instancePath || '/';
       const message = error.message;
       const params = error.params;

@@ -236,17 +236,17 @@ impl PlaceOrderBuilder {
 
 ## Tech Stack
 
-| Category | Technology | Version | Purpose |
-| -------- | ---------- | ------- | ------- |
-| Language | Rust | 1.77+ | Runtime principal |
-| Web | Axum | ^0.8 | API HTTP assíncrona |
-| Async Runtime | Tokio | ^1.44 | Concurrency runtime |
-| DB | SQLx | ^0.8 | Queries tipadas async |
-| Serialization | Serde | ^1.0 | JSON parsing/encoding |
-| Errors | thiserror/anyhow | latest | Erros tipados + contexto |
-| Logging | tracing | ^0.1 | Telemetria estruturada |
-| Unit Test | rstest | latest | Parametrizacao de testes |
-| Integration Test | testcontainers | latest | Dependencias reais |
+| Category         | Technology       | Version | Purpose                  |
+| ---------------- | ---------------- | ------- | ------------------------ |
+| Language         | Rust             | 1.77+   | Runtime principal        |
+| Web              | Axum             | ^0.8    | API HTTP assíncrona      |
+| Async Runtime    | Tokio            | ^1.44   | Concurrency runtime      |
+| DB               | SQLx             | ^0.8    | Queries tipadas async    |
+| Serialization    | Serde            | ^1.0    | JSON parsing/encoding    |
+| Errors           | thiserror/anyhow | latest  | Erros tipados + contexto |
+| Logging          | tracing          | ^0.1    | Telemetria estruturada   |
+| Unit Test        | rstest           | latest  | Parametrizacao de testes |
+| Integration Test | testcontainers   | latest  | Dependencias reais       |
 
 ### Required Dependencies
 
@@ -268,14 +268,14 @@ cargo add --dev testcontainers
 
 ### Naming Conventions
 
-| Element | Convention | Example |
-| ------- | ---------- | ------- |
-| Modules | snake_case | `order_service` |
-| Structs/Enums | PascalCase | `OrderService`, `AppError` |
-| Traits | PascalCase noun | `OrderRepository` |
-| Functions | snake_case | `place_order` |
-| Constants | UPPER_SNAKE_CASE | `MAX_RETRIES` |
-| Tests | `should_*` | `should_reject_empty_items` |
+| Element       | Convention       | Example                     |
+| ------------- | ---------------- | --------------------------- |
+| Modules       | snake_case       | `order_service`             |
+| Structs/Enums | PascalCase       | `OrderService`, `AppError`  |
+| Traits        | PascalCase noun  | `OrderRepository`           |
+| Functions     | snake_case       | `place_order`               |
+| Constants     | UPPER_SNAKE_CASE | `MAX_RETRIES`               |
+| Tests         | `should_*`       | `should_reject_empty_items` |
 
 ### Critical Rules
 
@@ -371,12 +371,12 @@ Usar tipos owns em boundaries publicos para prompts mais objetivos.
 
 ## Bug Prevention Stack
 
-| Layer | Catches | Implementation |
-| ----- | ------- | -------------- |
-| Compiler ownership model | 40% | Borrow checker |
-| Clippy + lint rigor | 25% | `-D warnings` |
-| Unit/integration tests | 30% | cargo test + testcontainers |
-| E2E smoke | 5% | Fluxos criticos |
+| Layer                    | Catches | Implementation              |
+| ------------------------ | ------- | --------------------------- |
+| Compiler ownership model | 40%     | Borrow checker              |
+| Clippy + lint rigor      | 25%     | `-D warnings`               |
+| Unit/integration tests   | 30%     | cargo test + testcontainers |
+| E2E smoke                | 5%      | Fluxos criticos             |
 
 ---
 
@@ -468,8 +468,8 @@ pub async fn create_order(
 
 ## Changelog
 
-| Date       | Version | Changes |
-| ---------- | ------- | ------- |
+| Date       | Version | Changes             |
+| ---------- | ------- | ------------------- |
 | 2026-02-19 | 1.0.0   | Initial Rust preset |
 
 ---

@@ -93,7 +93,7 @@ class ConsoleReporter {
       (r) =>
         r.status === CheckStatus.FAIL ||
         r.status === CheckStatus.WARNING ||
-        r.status === CheckStatus.ERROR,
+        r.status === CheckStatus.ERROR
     );
 
     if (issues.length > 0) {

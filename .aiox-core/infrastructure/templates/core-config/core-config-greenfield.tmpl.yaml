@@ -9,9 +9,9 @@
 project:
   type: USER_PROJECT
   mode: greenfield
-  name: "{{PROJECT_NAME}}"
-  created: "{{GENERATED_DATE}}"
-  version: "0.1.0"
+  name: '{{PROJECT_NAME}}'
+  created: '{{GENERATED_DATE}}'
+  version: '0.1.0'
 
 # =============================================================================
 # DEV CONTEXT LOADING
@@ -29,55 +29,55 @@ devLoadAlwaysFiles:
 # =============================================================================
 deployment:
   # Workflow type: staging-first (with staging branch) or direct-to-main
-  workflow: {{DEPLOYMENT_WORKFLOW}}
+  workflow: { { DEPLOYMENT_WORKFLOW } }
 
   # Branch routing configuration
   branches:
     # These branch patterns will target staging (if staging-first workflow)
     staging_targets:
-      - "feature/*"
-      - "fix/*"
-      - "docs/*"
-      - "chore/*"
-      - "refactor/*"
-      - "test/*"
+      - 'feature/*'
+      - 'fix/*'
+      - 'docs/*'
+      - 'chore/*'
+      - 'refactor/*'
+      - 'test/*'
 
     # These branch patterns will target production directly (emergency fixes)
     production_targets:
-      - "hotfix/*"
+      - 'hotfix/*'
 
     # Branch names
-    staging_branch: {{STAGING_BRANCH}}
-    production_branch: {{PRODUCTION_BRANCH}}
+    staging_branch: { { STAGING_BRANCH } }
+    production_branch: { { PRODUCTION_BRANCH } }
 
     # Default PR target for ambiguous cases
-    default_target: {{DEFAULT_TARGET}}
+    default_target: { { DEFAULT_TARGET } }
 
   # Environment configuration
   environments:
     staging:
-      name: "{{STAGING_ENV_NAME}}"
-      branch: {{STAGING_BRANCH}}
+      name: '{{STAGING_ENV_NAME}}'
+      branch: { { STAGING_BRANCH } }
       auto_deploy: true
-      platform: "{{DEPLOYMENT_PLATFORM}}"
-      url: "${STAGING_URL}"
-      promotion_message: "After validation, create PR to {{PRODUCTION_BRANCH}} for production"
+      platform: '{{DEPLOYMENT_PLATFORM}}'
+      url: '${STAGING_URL}'
+      promotion_message: 'After validation, create PR to {{PRODUCTION_BRANCH}} for production'
 
     production:
-      name: "{{PRODUCTION_ENV_NAME}}"
-      branch: {{PRODUCTION_BRANCH}}
+      name: '{{PRODUCTION_ENV_NAME}}'
+      branch: { { PRODUCTION_BRANCH } }
       auto_deploy: true
-      platform: "{{DEPLOYMENT_PLATFORM}}"
-      url: "${PRODUCTION_URL}"
-      promotion_message: "This is the final production deployment"
+      platform: '{{DEPLOYMENT_PLATFORM}}'
+      url: '${PRODUCTION_URL}'
+      promotion_message: 'This is the final production deployment'
 
   # Quality gates for PRs
   quality_gates:
-    lint: {{QUALITY_LINT}}
-    typecheck: {{QUALITY_TYPECHECK}}
-    tests: {{QUALITY_TESTS}}
-    security_scan: {{QUALITY_SECURITY}}
-    min_coverage: {{MIN_COVERAGE}}
+    lint: { { QUALITY_LINT } }
+    typecheck: { { QUALITY_TYPECHECK } }
+    tests: { { QUALITY_TESTS } }
+    security_scan: { { QUALITY_SECURITY } }
+    min_coverage: { { MIN_COVERAGE } }
 
   # PR defaults
   pr_defaults:
@@ -85,8 +85,8 @@ deployment:
     draft_by_default: false
     include_deployment_info: true
     labels:
-      staging: ["staging", "needs-review"]
-      production: ["production", "promotion"]
+      staging: ['staging', 'needs-review']
+      production: ['production', 'promotion']
 
 # =============================================================================
 # GITHUB INTEGRATION
@@ -103,13 +103,13 @@ github:
     # - "conventional": For semantic-release (feat: description [Story X.Y])
     # - "story-first": Simple format ([Story X.Y] Description) - DEFAULT
     # - "branch-based": Just branch name as title
-    title_format: {{PR_TITLE_FORMAT}}
+    title_format: { { PR_TITLE_FORMAT } }
 
     include_story_id: true
 
     # Only used when title_format: conventional
     conventional_commits:
-      enabled: {{CONVENTIONAL_COMMITS_ENABLED}}
+      enabled: { { CONVENTIONAL_COMMITS_ENABLED } }
       branch_type_map:
         feature/: feat
         feat/: feat
@@ -127,7 +127,7 @@ github:
 
   # Semantic Release (only for NPM packages)
   semantic_release:
-    enabled: {{SEMANTIC_RELEASE_ENABLED}}
+    enabled: { { SEMANTIC_RELEASE_ENABLED } }
 
 # =============================================================================
 # AGENT CONFIGURATION
@@ -140,7 +140,7 @@ agents:
 
   qa:
     run_on_pr: true
-    coverage_threshold: {{MIN_COVERAGE}}
+    coverage_threshold: { { MIN_COVERAGE } }
 
   devops:
     auto_detect_workflow: true

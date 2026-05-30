@@ -104,7 +104,7 @@ class BrownfieldHandler extends EventEmitter {
     // Workflow path
     this.workflowPath = path.join(
       projectRoot,
-      '.aiox-core/development/workflows/brownfield-discovery.yaml',
+      '.aiox-core/development/workflows/brownfield-discovery.yaml'
     );
 
     // Phase progress tracking
@@ -218,12 +218,12 @@ Quer que eu comece?`;
     const surfaceChecker = this._getSurfaceChecker();
     const surfaceResult = surfaceChecker
       ? surfaceChecker.shouldSurface({
-        valid_options_count: 2,
-        options_with_tradeoffs: [
-          '1. Sim — Iniciar análise completa do projeto (4-8 horas)',
-          '2. Não — Pular análise e usar configurações padrão',
-        ].join('\n'),
-      })
+          valid_options_count: 2,
+          options_with_tradeoffs: [
+            '1. Sim — Iniciar análise completa do projeto (4-8 horas)',
+            '2. Não — Pular análise e usar configurações padrão',
+          ].join('\n'),
+        })
       : { should_surface: true };
 
     return {
@@ -522,7 +522,10 @@ Quer que eu comece?`;
         }
 
         // Check testing
-        if (reportContent.includes('testes configurados') || reportContent.includes('tests configured')) {
+        if (
+          reportContent.includes('testes configurados') ||
+          reportContent.includes('tests configured')
+        ) {
           summary.testingConfigured = true;
         }
       } catch {
@@ -701,7 +704,11 @@ Quer que eu comece?`;
       const exists = await sessionState.exists();
       if (exists) {
         await sessionState.loadSessionState();
-        await sessionState.recordPhaseChange(`brownfield_${phase}`, 'brownfield-discovery', '@architect');
+        await sessionState.recordPhaseChange(
+          `brownfield_${phase}`,
+          'brownfield-discovery',
+          '@architect'
+        );
         this._log(`Phase recorded in session state: ${phase}`);
       }
     } catch (error) {

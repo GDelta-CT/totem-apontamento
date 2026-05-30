@@ -1,19 +1,23 @@
 # An
+
 ## Execution Modes
 
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -181,6 +185,7 @@ token_usage: ~2,000-8,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Iterative analysis with depth limits; cache intermediate results; batch similar operations
 
 ---
@@ -203,19 +208,23 @@ updated_at: 2025-11-17
 alyze Impact - AIOX Developer Task
 
 ## Purpose
+
 Analyze the potential impact of proposed component modifications on the broader Synkra AIOX framework.
 
 ## Command Pattern
+
 ```
 *analyze-impact <modification-type> <component-path> [options]
 ```
 
 ## Parameters
+
 - `modification-type`: Type of modification (modify, deprecate, remove, refactor)
 - `component-path`: Path to the component being modified
 - `options`: Impact analysis configuration
 
 ### Options
+
 - `--depth <level>`: Analysis depth (shallow, medium, deep)
 - `--include-tests`: Include test file impact analysis
 - `--risk-threshold <level>`: Risk threshold for warnings (low, medium, high, critical)
@@ -225,6 +234,7 @@ Analyze the potential impact of proposed component modifications on the broader 
 - `--exclude-external`: Exclude external dependency analysis
 
 ## Examples
+
 ```bash
 # Analyze impact of modifying an agent
 *analyze-impact modify aiox-core/agents/weather-agent.md --depth deep --include-tests
@@ -266,7 +276,7 @@ class AnalyzeImpactTask {
 
       // Parse and validate parameters
       const config = await this.parseParameters(params);
-      
+
       // Initialize dependencies
       await this.initializeDependencies();
 
@@ -279,18 +289,31 @@ class AnalyzeImpactTask {
 
       // Predict change propagation
       console.log(chalk.gray('Predicting change propagation...'));
-      const propagationAnalysis = await this.predictChangePropagation(targetComponent, dependencyImpact, config);
+      const propagationAnalysis = await this.predictChangePropagation(
+        targetComponent,
+        dependencyImpact,
+        config
+      );
 
       // Assess modification risks
       console.log(chalk.gray('Assessing modification risks...'));
-      const riskAssessment = await this.assessModificationRisks(targetComponent, dependencyImpact, propagationAnalysis, config);
-
-      // Generate comprehensive impact report
-      const impactReport = await this.generateImpactReport(targetComponent, {
+      const riskAssessment = await this.assessModificationRisks(
+        targetComponent,
         dependencyImpact,
         propagationAnalysis,
-        riskAssessment
-      }, config);
+        config
+      );
+
+      // Generate comprehensive impact report
+      const impactReport = await this.generateImpactReport(
+        targetComponent,
+        {
+          dependencyImpact,
+          propagationAnalysis,
+          riskAssessment,
+        },
+        config
+      );
 
       // Display impact summary
       await this.displayImpactSummary(impactReport);
@@ -311,12 +334,14 @@ class AnalyzeImpactTask {
         if (!config.approveHighRisk) {
           const approved = await this.handleHighRiskApproval(impactReport);
           if (!approved) {
-            console.log(chalk.yellow('\\n⚠ High-risk modification requires approval before proceeding'));
+            console.log(
+              chalk.yellow('\\n⚠ High-risk modification requires approval before proceeding')
+            );
             return {
               success: true,
               requiresApproval: true,
               riskLevel: riskAssessment.overallRisk,
-              impactSummary: impactReport.summary
+              impactSummary: impactReport.summary,
             };
           }
         }
@@ -324,7 +349,9 @@ class AnalyzeImpactTask {
 
       // Display completion summary
       console.log(chalk.green('\\n✅ Impact analysis completed'));
-      console.log(chalk.gray(`   Components analyzed: ${dependencyImpact.affectedComponents.length}`));
+      console.log(
+        chalk.gray(`   Components analyzed: ${dependencyImpact.affectedComponents.length}`)
+      );
       console.log(chalk.gray(`   Risk level: ${this.formatRiskLevel(riskAssessment.overallRisk)}`));
       console.log(chalk.gray(`   Propagation depth: ${propagationAnalysis.maxDepth}`));
 
@@ -335,9 +362,8 @@ class AnalyzeImpactTask {
         affectedComponents: dependencyImpact.affectedComponents.length,
         propagationDepth: propagationAnalysis.maxDepth,
         requiresApproval: false,
-        impactReport: config.outputFormat === 'json' ? impactReport : impactReport.summary
+        impactReport: config.outputFormat === 'json' ? impactReport : impactReport.summary,
       };
-
     } catch (error) {
       console.error(chalk.red(`\\n❌ Impact analysis failed: ${error.message}`));
       throw error;
@@ -358,13 +384,13 @@ class AnalyzeImpactTask {
       outputFormat: 'text',
       saveReport: null,
       approveHighRisk: false,
-      excludeExternal: false
+      excludeExternal: false,
     };
 
     // Parse options
     for (let i = 2; i < params.length; i++) {
       const param = params[i];
-      
+
       if (param === '--include-tests') {
         config.includeTests = true;
       } else if (param === '--approve-high-risk') {
@@ -385,7 +411,9 @@ class AnalyzeImpactTask {
     // Validation
     const validModificationTypes = ['modify', 'deprecate', 'remove', 'refactor'];
     if (!validModificationTypes.includes(config.modificationType)) {
-      throw new Error(`Invalid modification type: ${config.modificationType}. Must be one of: ${validModificationTypes.join(', ')}`);
+      throw new Error(
+        `Invalid modification type: ${config.modificationType}. Must be one of: ${validModificationTypes.join(', ')}`
+      );
     }
 
     const validDepths = ['shallow', 'medium', 'deep'];
@@ -395,12 +423,16 @@ class AnalyzeImpactTask {
 
     const validRiskThresholds = ['low', 'medium', 'high', 'critical'];
     if (!validRiskThresholds.includes(config.riskThreshold)) {
-      throw new Error(`Invalid risk threshold: ${config.riskThreshold}. Must be one of: ${validRiskThresholds.join(', ')}`);
+      throw new Error(
+        `Invalid risk threshold: ${config.riskThreshold}. Must be one of: ${validRiskThresholds.join(', ')}`
+      );
     }
 
     const validOutputFormats = ['text', 'json', 'visual', 'html'];
     if (!validOutputFormats.includes(config.outputFormat)) {
-      throw new Error(`Invalid output format: ${config.outputFormat}. Must be one of: ${validOutputFormats.join(', ')}`);
+      throw new Error(
+        `Invalid output format: ${config.outputFormat}. Must be one of: ${validOutputFormats.join(', ')}`
+      );
     }
 
     return config;
@@ -428,7 +460,6 @@ class AnalyzeImpactTask {
       // Initialize approval workflow
       const ApprovalWorkflow = require('../scripts/approval-workflow');
       this.approvalWorkflow = new ApprovalWorkflow({ rootPath: this.rootPath });
-
     } catch (error) {
       throw new Error(`Failed to initialize dependencies: ${error.message}`);
     }
@@ -436,7 +467,7 @@ class AnalyzeImpactTask {
 
   async validateTargetComponent(config) {
     const fullPath = path.resolve(this.rootPath, config.componentPath);
-    
+
     try {
       const stats = await fs.stat(fullPath);
       if (!stats.isFile()) {
@@ -452,9 +483,8 @@ class AnalyzeImpactTask {
         type: componentType,
         content: content,
         size: stats.size,
-        lastModified: stats.mtime.toISOString()
+        lastModified: stats.mtime.toISOString(),
       };
-
     } catch (error) {
       if (error.code === 'ENOENT') {
         throw new Error(`Component not found: ${config.componentPath}`);
@@ -468,14 +498,14 @@ class AnalyzeImpactTask {
       depth: config.depth,
       includeTests: config.includeTests,
       excludeExternal: config.excludeExternal,
-      modificationType: config.modificationType
+      modificationType: config.modificationType,
     });
   }
 
   async predictChangePropagation(targetComponent, dependencyImpact, config) {
     return await this.propagationPredictor.predictPropagation(targetComponent, dependencyImpact, {
       depth: config.depth,
-      modificationType: config.modificationType
+      modificationType: config.modificationType,
     });
   }
 
@@ -484,7 +514,7 @@ class AnalyzeImpactTask {
       dependencyImpact,
       propagationAnalysis,
       modificationType: config.modificationType,
-      riskThreshold: config.riskThreshold
+      riskThreshold: config.riskThreshold,
     });
   }
 
@@ -497,7 +527,7 @@ class AnalyzeImpactTask {
       targetComponent: {
         path: targetComponent.path,
         type: targetComponent.type,
-        size: targetComponent.size
+        size: targetComponent.size,
       },
       modificationType: config.modificationType,
       analysisDepth: config.depth,
@@ -506,15 +536,15 @@ class AnalyzeImpactTask {
         affectedComponents: dependencyImpact.affectedComponents.length,
         propagationDepth: propagationAnalysis.maxDepth,
         criticalIssues: riskAssessment.criticalIssues.length,
-        recommendations: riskAssessment.recommendations.length
+        recommendations: riskAssessment.recommendations.length,
       },
       dependencyAnalysis: dependencyImpact,
       propagationAnalysis: propagationAnalysis,
       riskAssessment: riskAssessment,
       metadata: {
         analysisTimestamp: new Date().toISOString(),
-        configUsed: config
-      }
+        configUsed: config,
+      },
     };
 
     return report;
@@ -523,7 +553,7 @@ class AnalyzeImpactTask {
   async displayImpactSummary(report) {
     console.log(chalk.blue('\\n📊 Impact Analysis Results'));
     console.log(chalk.gray('━'.repeat(50)));
-    
+
     console.log(`Target: ${chalk.white(report.targetComponent.path)}`);
     console.log(`Modification: ${chalk.white(report.modificationType)}`);
     console.log(`Risk Level: ${this.formatRiskLevel(report.summary.overallRisk)}`);
@@ -547,8 +577,8 @@ class AnalyzeImpactTask {
       const topImpacted = report.dependencyAnalysis.affectedComponents
         .sort((a, b) => b.impactScore - a.impactScore)
         .slice(0, 5);
-      
-      topImpacted.forEach(component => {
+
+      topImpacted.forEach((component) => {
         const riskIcon = component.impactScore > 8 ? '🔴' : component.impactScore > 5 ? '🟡' : '🟢';
         console.log(`  ${riskIcon} ${component.path} (impact: ${component.impactScore}/10)`);
       });
@@ -558,7 +588,7 @@ class AnalyzeImpactTask {
   async generateVisualRepresentation(report, config) {
     const visualData = await this.visualGenerator.generateImpactVisualization(report, {
       format: config.outputFormat,
-      includeInteractive: config.outputFormat === 'html'
+      includeInteractive: config.outputFormat === 'html',
     });
 
     if (config.outputFormat === 'visual') {
@@ -594,19 +624,21 @@ class AnalyzeImpactTask {
     console.log(chalk.yellow('\\n⚠ HIGH RISK MODIFICATION DETECTED'));
     console.log(chalk.gray('This modification may have significant impact on the framework.\\n'));
 
-    const { approved } = await inquirer.prompt([{
-      type: 'confirm',
-      name: 'approved',
-      message: `Proceed with ${report.summary.overallRisk} risk modification of ${report.targetComponent.path}?`,
-      default: false
-    }]);
+    const { approved } = await inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'approved',
+        message: `Proceed with ${report.summary.overallRisk} risk modification of ${report.targetComponent.path}?`,
+        default: false,
+      },
+    ]);
 
     if (approved) {
       // Log approval for audit trail
       await this.approvalWorkflow.logApproval(report, {
         approvedBy: 'user',
         approvalTimestamp: new Date().toISOString(),
-        riskLevel: report.summary.overallRisk
+        riskLevel: report.summary.overallRisk,
       });
     }
 
@@ -620,12 +652,12 @@ class AnalyzeImpactTask {
     if (filePath.includes('/tasks/')) return 'task';
     if (filePath.includes('/workflows/')) return 'workflow';
     if (filePath.includes('/utils/')) return 'util';
-    
+
     // Analyze content for type hints
     if (content.includes('class') && content.includes('execute')) return 'task';
     if (content.includes('agent_name') || content.includes('Agent')) return 'agent';
     if (content.includes('workflow_steps') || content.includes('Workflow')) return 'workflow';
-    
+
     return 'unknown';
   }
 
@@ -634,7 +666,7 @@ class AnalyzeImpactTask {
       low: chalk.green,
       medium: chalk.yellow,
       high: chalk.red,
-      critical: chalk.red.bold
+      critical: chalk.red.bold,
     };
     return colors[riskLevel] ? colors[riskLevel](riskLevel.toUpperCase()) : riskLevel;
   }
@@ -662,19 +694,22 @@ class AnalyzeImpactTask {
     
     <h3>Dependency Impact</h3>
     <div class="component-list">
-        ${report.dependencyAnalysis.affectedComponents.map(comp => 
-          `<div class="component-item">
+        ${report.dependencyAnalysis.affectedComponents
+          .map(
+            (comp) =>
+              `<div class="component-item">
              <strong>${comp.path}</strong> (Impact: ${comp.impactScore}/10)
              <br><small>${comp.reason}</small>
            </div>`
-        ).join('')}
+          )
+          .join('')}
     </div>
     
     <h3>Risk Assessment</h3>
     <ul>
-        ${report.riskAssessment.recommendations.map(rec => 
-          `<li><strong>${rec.title}</strong><br>${rec.description}</li>`
-        ).join('')}
+        ${report.riskAssessment.recommendations
+          .map((rec) => `<li><strong>${rec.title}</strong><br>${rec.description}</li>`)
+          .join('')}
     </ul>
 </body>
 </html>`;
@@ -700,32 +735,38 @@ Recommendations: ${report.summary.recommendations}
 
 AFFECTED COMPONENTS
 ------------------
-${report.dependencyAnalysis.affectedComponents.map(comp => 
-  `- ${comp.path} (Impact: ${comp.impactScore}/10)
+${report.dependencyAnalysis.affectedComponents
+  .map(
+    (comp) =>
+      `- ${comp.path} (Impact: ${comp.impactScore}/10)
     Reason: ${comp.reason}`
-).join('\\n')}
+  )
+  .join('\\n')}
 
 RECOMMENDATIONS
 --------------
-${report.riskAssessment.recommendations.map((rec, index) => 
-  `${index + 1}. ${rec.title}
+${report.riskAssessment.recommendations
+  .map(
+    (rec, index) =>
+      `${index + 1}. ${rec.title}
      ${rec.description}`
-).join('\\n\\n')}
+  )
+  .join('\\n\\n')}
 
 RISK FACTORS
 -----------
-${report.riskAssessment.riskFactors.map(factor => 
-  `- ${factor.type}: ${factor.description} (Severity: ${factor.severity})`
-).join('\\n')}
+${report.riskAssessment.riskFactors
+  .map((factor) => `- ${factor.type}: ${factor.description} (Severity: ${factor.severity})`)
+  .join('\\n')}
 `;
   }
 
   getRiskColor(riskLevel) {
     const colors = {
       low: '#28a745',
-      medium: '#ffc107', 
+      medium: '#ffc107',
       high: '#dc3545',
-      critical: '#721c24'
+      critical: '#721c24',
     };
     return colors[riskLevel] || '#6c757d';
   }
@@ -737,18 +778,21 @@ module.exports = AnalyzeImpactTask;
 ## Validation Rules
 
 ### Input Validation
+
 - Modification type must be valid (modify, deprecate, remove, refactor)
 - Component path must exist and be accessible
 - Analysis depth must be recognized level
 - Risk threshold must be valid level
 
 ### Safety Checks
+
 - High-risk modifications require approval workflow
 - Critical modifications generate detailed warnings
 - External dependency analysis can be excluded for security
 - Report generation validates output paths
 
 ### Analysis Requirements
+
 - Dependency analysis must trace all connections
 - Risk assessment must consider modification type
 - Propagation prediction must respect analysis depth
@@ -757,30 +801,35 @@ module.exports = AnalyzeImpactTask;
 ## Integration Points
 
 ### Dependency Impact Analyzer
+
 - Analyzes component dependencies and reverse dependencies
 - Calculates impact scores for affected components
 - Traces dependency chains to specified depth
 - Identifies breaking change potential
 
 ### Change Propagation Predictor
+
 - Predicts how changes will propagate through the system
 - Models cascading effects of modifications
 - Estimates propagation depth and scope
 - Identifies potential bottlenecks and failure points
 
 ### Risk Assessment System
+
 - Evaluates modification risks across multiple dimensions
 - Considers component criticality and usage patterns
 - Generates actionable recommendations
 - Provides risk mitigation strategies
 
 ### Visual Impact Generator
+
 - Creates visual representations of impact analysis
 - Supports multiple output formats (ASCII, HTML, JSON)
 - Generates interactive impact maps for complex scenarios
 - Provides exportable reports and visualizations
 
 ### Approval Workflow
+
 - Manages approval process for high-risk modifications
 - Maintains audit trail of approval decisions
 - Integrates with user approval prompts
@@ -789,6 +838,7 @@ module.exports = AnalyzeImpactTask;
 ## Output Structure
 
 ### Success Response
+
 ```json
 {
   "success": true,
@@ -806,6 +856,7 @@ module.exports = AnalyzeImpactTask;
 ```
 
 ### High-Risk Response
+
 ```json
 {
   "success": true,
@@ -820,6 +871,7 @@ module.exports = AnalyzeImpactTask;
 ```
 
 ## Security Considerations
+
 - Validate all file paths to prevent directory traversal
 - Sanitize component paths and modification descriptions
 - Ensure approval workflow cannot be bypassed for critical changes
@@ -827,8 +879,10 @@ module.exports = AnalyzeImpactTask;
 - Log all high-risk modification attempts for audit
 
 ## Handoff
+
 next_agent: @analyst
-next_command: *research {topic}
+next_command: \*research {topic}
 condition: Complexity class is STANDARD or COMPLEX (research needed)
 alternatives:
-  - agent: @pm, command: *write-spec, condition: Complexity class is SIMPLE (skip research) 
+
+- agent: @pm, command: \*write-spec, condition: Complexity class is SIMPLE (skip research)

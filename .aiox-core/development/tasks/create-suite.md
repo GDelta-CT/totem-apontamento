@@ -10,23 +10,26 @@ tools:
 
 **Agent:** aiox-developer  
 **Version:** 1.0  
-**Command:** *create-suite
+**Command:** \*create-suite
 
 ## Execution Modes
 
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -194,6 +197,7 @@ token_usage: ~1,000-3,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Parallelize independent operations; reuse atom results; implement early exits
 
 ---
@@ -213,21 +217,24 @@ updated_at: 2025-11-17
 
 ---
 
-
 ## Description
+
 Creates multiple related components in a single batch operation with dependency resolution and transaction support.
 
 ## Context Required
+
 - Project structure understanding
 - Component relationships
 - Existing components for dependency resolution
 
 ## Prerequisites
+
 - aiox-developer agent is active
 - Template system is configured
 - team-manifest.yaml exists
 
 ## Interactive Elicitation
+
 1. Suite type selection (agent package, workflow suite, task collection, custom)
 2. Component configuration based on suite type
 3. Dependency validation
@@ -237,55 +244,67 @@ Creates multiple related components in a single batch operation with dependency 
 ## Workflow Steps
 
 ### 1. Suite Type Selection
+
 - **Action:** Choose from predefined suite types or custom
 - **Validation:** Ensure suite type is supported
 
 ### 2. Configure Components
+
 - **Action:** Gather configuration for each component in suite
 - **Validation:** Validate naming conventions and dependencies
 
 ### 3. Analyze Dependencies
+
 - **Action:** Build dependency graph between components
 - **Validation:** Check for circular dependencies
 
 ### 4. Preview Suite
+
 - **Action:** Show preview of all components to be created
 - **Validation:** User confirmation required
 
 ### 5. Create Components
+
 - **Action:** Create components in dependency order
 - **Validation:** Each component must be created successfully
 
 ### 6. Update Manifest
+
 - **Action:** Update team-manifest.yaml with all new components
 - **Validation:** Manifest must remain valid YAML
 
 ## Error Handling
+
 - **Missing Dependencies:** Prompt to create or select existing
 - **Name Conflicts:** Show existing components and suggest alternatives
 - **Creation Failures:** Offer rollback of entire transaction
 - **Manifest Errors:** Show diff and allow manual correction
 
 ## Output
+
 - Success/failure status for each component
 - Transaction ID for potential rollback
 - Updated manifest with all new components
 - Summary of created files and locations
 
 ## Security Considerations
+
 - All generated code is validated by SecurityChecker
 - File paths are sanitized to prevent traversal
 - Transaction log is write-protected
 
 ## Notes
+
 - Supports atomic creation (all or nothing)
 - Transaction log enables rollback functionality
 - Dependency resolution ensures correct creation order
 
 ## Handoff
+
 next_agent: @dev
-next_command: *run-tests
+next_command: \*run-tests
 condition: Test suite created, ready for execution
 alternatives:
-  - agent: @qa, command: *review {story-id}, condition: Tests written as part of review
-- Preview functionality helps prevent mistakes 
+
+- agent: @qa, command: \*review {story-id}, condition: Tests written as part of review
+- Preview functionality helps prevent mistakes

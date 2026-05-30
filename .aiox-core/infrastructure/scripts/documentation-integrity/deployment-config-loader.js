@@ -179,7 +179,7 @@ function getTargetBranch(sourceBranch, deploymentConfig) {
 
   // Conservative fallback with warning
   console.warn(
-    `[deployment-config-loader] Unknown default_target "${branches.default_target}", falling back to production`,
+    `[deployment-config-loader] Unknown default_target "${branches.default_target}", falling back to production`
   );
   return productionBranch;
 }

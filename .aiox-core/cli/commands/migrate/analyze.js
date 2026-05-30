@@ -31,7 +31,18 @@ const MODULE_MAPPING = {
       'data/**',
       'docs/**',
     ],
-    directories: ['registry', 'quality-gates', 'manifest', 'utils', 'elicitation', 'session', 'config', 'mcp', 'data', 'docs'],
+    directories: [
+      'registry',
+      'quality-gates',
+      'manifest',
+      'utils',
+      'elicitation',
+      'session',
+      'config',
+      'mcp',
+      'data',
+      'docs',
+    ],
   },
   development: {
     target: 'development',
@@ -47,19 +58,12 @@ const MODULE_MAPPING = {
   },
   product: {
     target: 'product',
-    patterns: [
-      'cli/**',
-      'api/**',
-    ],
+    patterns: ['cli/**', 'api/**'],
     directories: ['cli', 'api'],
   },
   infrastructure: {
     target: 'infrastructure',
-    patterns: [
-      'hooks/**',
-      'telemetry/**',
-      'integrations/**',
-    ],
+    patterns: ['hooks/**', 'telemetry/**', 'integrations/**'],
     directories: ['hooks', 'telemetry', 'integrations'],
   },
 };
@@ -83,8 +87,8 @@ async function detectV2Structure(projectRoot) {
 
   // Check for v4.0.4 modular structure (core, development, product, infrastructure dirs)
   const v21Modules = ['core', 'development', 'product', 'infrastructure'];
-  const hasV21Structure = v21Modules.every(module =>
-    fs.existsSync(path.join(aioxCoreDir, module)),
+  const hasV21Structure = v21Modules.every((module) =>
+    fs.existsSync(path.join(aioxCoreDir, module))
   );
 
   if (hasV21Structure) {
@@ -98,9 +102,7 @@ async function detectV2Structure(projectRoot) {
 
   // Check for v2.0 flat structure
   const v20Indicators = ['agents', 'tasks', 'registry', 'cli'];
-  const hasV20Structure = v20Indicators.some(dir =>
-    fs.existsSync(path.join(aioxCoreDir, dir)),
-  );
+  const hasV20Structure = v20Indicators.some((dir) => fs.existsSync(path.join(aioxCoreDir, dir)));
 
   if (hasV20Structure) {
     return {
@@ -333,10 +335,10 @@ function analyzeImports(plan) {
   return {
     totalImportableFiles: importPaths.length,
     byModule: {
-      core: importPaths.filter(f => f.module === 'core').length,
-      development: importPaths.filter(f => f.module === 'development').length,
-      product: importPaths.filter(f => f.module === 'product').length,
-      infrastructure: importPaths.filter(f => f.module === 'infrastructure').length,
+      core: importPaths.filter((f) => f.module === 'core').length,
+      development: importPaths.filter((f) => f.module === 'development').length,
+      product: importPaths.filter((f) => f.module === 'product').length,
+      infrastructure: importPaths.filter((f) => f.module === 'infrastructure').length,
     },
     files: importPaths,
   };

@@ -184,6 +184,7 @@ token_usage: ~1,000-3,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Parallelize independent operations; reuse atom results; implement early exits
 
 ---
@@ -204,22 +205,27 @@ updated_at: 2025-11-17
 ---
 
 # No checklists needed - analytical pattern learning task, no deliverables requiring validation
+
 ---
 
 # Learn Patterns - AIOX Developer Task
 
 ## Purpose
+
 Learn patterns from successful modifications to improve future meta-agent suggestions and automation.
 
 ## Command Pattern
+
 ```
 *learn-patterns [options]
 ```
 
 ## Parameters
+
 - `options`: Pattern learning configuration
 
 ### Options
+
 - `--from-history <count>`: Learn from last N modifications (default: 50)
 - `--type <types>`: Comma-separated pattern types to learn (code,structural,refactoring,dependency,performance)
 - `--component <path>`: Learn patterns specific to a component
@@ -232,6 +238,7 @@ Learn patterns from successful modifications to improve future meta-agent sugges
 - `--suggest <modification-id>`: Get pattern suggestions for a modification
 
 ## Examples
+
 ```bash
 # Learn from recent modification history
 *learn-patterns --from-history 100
@@ -274,7 +281,7 @@ class LearnPatternsTask {
 
       // Parse parameters
       const config = await this.parseParameters(params);
-      
+
       // Initialize dependencies
       await this.initializeDependencies();
 
@@ -301,9 +308,8 @@ class LearnPatternsTask {
         success: true,
         patternsLearned: result.patternsLearned || 0,
         totalPatterns: result.totalPatterns || this.patternLearner.patterns.size,
-        suggestions: result.suggestions || []
+        suggestions: result.suggestions || [],
       };
-
     } catch (error) {
       console.error(chalk.red(`\n❌ Pattern learning failed: ${error.message}`));
       throw error;
@@ -321,7 +327,7 @@ class LearnPatternsTask {
       import: null,
       analyze: false,
       reset: false,
-      suggest: null
+      suggest: null,
     };
 
     for (let i = 0; i < params.length; i++) {
@@ -334,7 +340,7 @@ class LearnPatternsTask {
       } else if (param.startsWith('--from-history') && params[i + 1]) {
         config.fromHistory = parseInt(params[++i]);
       } else if (param.startsWith('--type') && params[i + 1]) {
-        config.types = params[++i].split(',').map(t => t.trim());
+        config.types = params[++i].split(',').map((t) => t.trim());
       } else if (param.startsWith('--component') && params[i + 1]) {
         config.component = params[++i];
       } else if (param.startsWith('--threshold') && params[i + 1]) {
@@ -376,7 +382,6 @@ class LearnPatternsTask {
 
       const ComponentRegistry = require('../scripts/component-registry');
       this.componentRegistry = new ComponentRegistry({ rootPath: this.rootPath });
-
     } catch (error) {
       throw new Error(`Failed to initialize dependencies: ${error.message}`);
     }
@@ -384,7 +389,7 @@ class LearnPatternsTask {
 
   async learnPatterns(config) {
     console.log(chalk.blue('\n📚 Learning from modification history...'));
-    
+
     // Update learner configuration
     this.patternLearner.learningThreshold = config.minOccurrences;
     this.patternLearner.similarityThreshold = config.threshold;
@@ -394,9 +399,9 @@ class LearnPatternsTask {
     console.log(chalk.gray(`Loaded ${modifications.length} modifications for analysis`));
 
     // Filter successful modifications
-    const successfulMods = modifications.filter(mod => 
-      mod.status === 'completed' && 
-      (!mod.rollback || mod.rollback.status !== 'rolled_back')
+    const successfulMods = modifications.filter(
+      (mod) =>
+        mod.status === 'completed' && (!mod.rollback || mod.rollback.status !== 'rolled_back')
     );
     console.log(chalk.gray(`Found ${successfulMods.length} successful modifications`));
 
@@ -406,7 +411,7 @@ class LearnPatternsTask {
 
     for (let i = 0; i < successfulMods.length; i++) {
       const mod = successfulMods[i];
-      
+
       try {
         // Record modification for pattern learning
         const learned = await this.patternLearner.recordModification(mod);
@@ -427,7 +432,7 @@ class LearnPatternsTask {
     return {
       patternsLearned: patternsLearned,
       totalPatterns: this.patternLearner.patterns.size,
-      modificationsAnalyzed: successfulMods.length
+      modificationsAnalyzed: successfulMods.length,
     };
   }
 
@@ -436,15 +441,12 @@ class LearnPatternsTask {
 
     if (config.component) {
       // Load modifications for specific component
-      modifications = await this.modificationHistory.getComponentHistory(
-        config.component,
-        { limit: config.fromHistory }
-      );
+      modifications = await this.modificationHistory.getComponentHistory(config.component, {
+        limit: config.fromHistory,
+      });
     } else {
       // Load recent modifications
-      modifications = await this.modificationHistory.getRecentModifications(
-        config.fromHistory
-      );
+      modifications = await this.modificationHistory.getRecentModifications(config.fromHistory);
     }
 
     return modifications;
@@ -455,14 +457,16 @@ class LearnPatternsTask {
     console.log(chalk.gray('━'.repeat(50)));
 
     const analytics = this.patternLearner.getAnalytics();
-    
+
     // Overall statistics
     console.log(chalk.blue('\n📈 Overall Statistics:'));
     console.log(`Total patterns: ${chalk.white(analytics.totalPatterns)}`);
     console.log(`Total occurrences: ${chalk.white(analytics.totalOccurrences)}`);
-    console.log(`Average confidence: ${chalk.white((analytics.averageConfidence * 100).toFixed(1) + '%')}`);
+    console.log(
+      `Average confidence: ${chalk.white((analytics.averageConfidence * 100).toFixed(1) + '%')}`
+    );
     console.log(`High confidence patterns: ${chalk.white(analytics.highConfidenceCount)}`);
-    
+
     // Pattern type breakdown
     console.log(chalk.blue('\n📑 Pattern Types:'));
     Object.entries(analytics.patternsByType).forEach(([type, patterns]) => {
@@ -473,21 +477,22 @@ class LearnPatternsTask {
 
     // Component-specific analysis
     if (config.component) {
-      const componentPatterns = Array.from(this.patternLearner.patterns.values())
-        .filter(p => p.metadata.components && p.metadata.components.includes(config.component));
-      
+      const componentPatterns = Array.from(this.patternLearner.patterns.values()).filter(
+        (p) => p.metadata.components && p.metadata.components.includes(config.component)
+      );
+
       console.log(chalk.blue(`\n🔍 Component Analysis: ${config.component}`));
       console.log(`Patterns applicable: ${chalk.white(componentPatterns.length)}`);
-      
+
       // Show top patterns for component
-      const topPatterns = componentPatterns
-        .sort((a, b) => b.confidence - a.confidence)
-        .slice(0, 5);
-      
+      const topPatterns = componentPatterns.sort((a, b) => b.confidence - a.confidence).slice(0, 5);
+
       if (topPatterns.length > 0) {
         console.log(chalk.gray('\nTop patterns:'));
         topPatterns.forEach((pattern, index) => {
-          console.log(`  ${index + 1}. ${pattern.description} (${(pattern.confidence * 100).toFixed(0)}% confidence)`);
+          console.log(
+            `  ${index + 1}. ${pattern.description} (${(pattern.confidence * 100).toFixed(0)}% confidence)`
+          );
         });
       }
     }
@@ -496,7 +501,7 @@ class LearnPatternsTask {
     const recentPatterns = Array.from(this.patternLearner.patterns.values())
       .sort((a, b) => new Date(b.lastSeen) - new Date(a.lastSeen))
       .slice(0, 5);
-    
+
     console.log(chalk.blue('\n🕐 Recently Active Patterns:'));
     recentPatterns.forEach((pattern, index) => {
       const lastSeen = new Date(pattern.lastSeen);
@@ -521,7 +526,7 @@ class LearnPatternsTask {
     const suggestions = this.patternLearner.suggestPatterns(modification, {
       types: config.types,
       minConfidence: 0.6,
-      maxSuggestions: 10
+      maxSuggestions: 10,
     });
 
     if (suggestions.length === 0) {
@@ -531,46 +536,52 @@ class LearnPatternsTask {
 
     // Display suggestions
     console.log(chalk.green(`Found ${suggestions.length} applicable patterns:\n`));
-    
+
     suggestions.forEach((suggestion, index) => {
       console.log(chalk.blue(`${index + 1}. ${suggestion.pattern.description}`));
       console.log(`   Type: ${chalk.gray(suggestion.pattern.type)}`);
       console.log(`   Confidence: ${this.formatConfidence(suggestion.confidence)}`);
       console.log(`   Relevance: ${this.formatRelevance(suggestion.relevance)}`);
-      
+
       if (suggestion.pattern.metadata.successRate) {
-        console.log(`   Success rate: ${chalk.green((suggestion.pattern.metadata.successRate * 100).toFixed(0) + '%')}`);
+        console.log(
+          `   Success rate: ${chalk.green((suggestion.pattern.metadata.successRate * 100).toFixed(0) + '%')}`
+        );
       }
-      
+
       if (suggestion.applicationGuide) {
         console.log(chalk.gray('   Application guide:'));
         suggestion.applicationGuide.steps.forEach((step, stepIndex) => {
           console.log(chalk.gray(`     ${stepIndex + 1}. ${step}`));
         });
       }
-      
+
       console.log('');
     });
 
     // Ask if user wants to apply suggestions
     if (suggestions.length > 0) {
-      const { applyPatterns } = await inquirer.prompt([{
-        type: 'confirm',
-        name: 'applyPatterns',
-        message: 'Would you like to apply any of these patterns?',
-        default: false
-      }]);
+      const { applyPatterns } = await inquirer.prompt([
+        {
+          type: 'confirm',
+          name: 'applyPatterns',
+          message: 'Would you like to apply any of these patterns?',
+          default: false,
+        },
+      ]);
 
       if (applyPatterns) {
-        const { selectedPatterns } = await inquirer.prompt([{
-          type: 'checkbox',
-          name: 'selectedPatterns',
-          message: 'Select patterns to apply:',
-          choices: suggestions.map((s, i) => ({
-            name: `${s.pattern.description} (${(s.confidence * 100).toFixed(0)}%)`,
-            value: i
-          }))
-        }]);
+        const { selectedPatterns } = await inquirer.prompt([
+          {
+            type: 'checkbox',
+            name: 'selectedPatterns',
+            message: 'Select patterns to apply:',
+            choices: suggestions.map((s, i) => ({
+              name: `${s.pattern.description} (${(s.confidence * 100).toFixed(0)}%)`,
+              value: i,
+            })),
+          },
+        ]);
 
         // Apply selected patterns
         for (const index of selectedPatterns) {
@@ -584,60 +595,54 @@ class LearnPatternsTask {
 
   async applyPattern(suggestion, modification) {
     console.log(chalk.blue(`\n🔧 Applying pattern: ${suggestion.pattern.description}`));
-    
+
     try {
       // Implementation would depend on pattern type
       // This is a placeholder for the actual pattern application logic
       console.log(chalk.green('✅ Pattern applied successfully'));
-      
+
       // Record pattern application
-      this.patternLearner.recordPatternApplication(
-        suggestion.pattern.id,
-        modification.id,
-        true
-      );
+      this.patternLearner.recordPatternApplication(suggestion.pattern.id, modification.id, true);
     } catch (error) {
       console.error(chalk.red(`Failed to apply pattern: ${error.message}`));
-      
+
       // Record failed application
-      this.patternLearner.recordPatternApplication(
-        suggestion.pattern.id,
-        modification.id,
-        false
-      );
+      this.patternLearner.recordPatternApplication(suggestion.pattern.id, modification.id, false);
     }
   }
 
   async exportPatterns(exportPath) {
     console.log(chalk.blue('\n📤 Exporting patterns...'));
-    
+
     const exportData = {
       version: 1,
       exportDate: new Date().toISOString(),
       patterns: Array.from(this.patternLearner.patterns.entries()).map(([id, pattern]) => ({
         id,
-        ...pattern
+        ...pattern,
       })),
       metadata: {
         totalPatterns: this.patternLearner.patterns.size,
         learningThreshold: this.patternLearner.learningThreshold,
-        similarityThreshold: this.patternLearner.similarityThreshold
-      }
+        similarityThreshold: this.patternLearner.similarityThreshold,
+      },
     };
 
     await fs.writeFile(exportPath, JSON.stringify(exportData, null, 2));
-    console.log(chalk.green(`✅ Exported ${exportData.patterns.length} patterns to: ${exportPath}`));
+    console.log(
+      chalk.green(`✅ Exported ${exportData.patterns.length} patterns to: ${exportPath}`)
+    );
 
     return {
       exported: true,
       patternCount: exportData.patterns.length,
-      exportPath
+      exportPath,
     };
   }
 
   async importPatterns(importPath) {
     console.log(chalk.blue('\n📥 Importing patterns...'));
-    
+
     try {
       const content = await fs.readFile(importPath, 'utf-8');
       const importData = JSON.parse(content);
@@ -647,16 +652,18 @@ class LearnPatternsTask {
       }
 
       // Ask for import strategy
-      const { strategy } = await inquirer.prompt([{
-        type: 'list',
-        name: 'strategy',
-        message: 'Import strategy:',
-        choices: [
-          { name: 'Merge with existing patterns', value: 'merge' },
-          { name: 'Replace all patterns', value: 'replace' },
-          { name: 'Cancel import', value: 'cancel' }
-        ]
-      }]);
+      const { strategy } = await inquirer.prompt([
+        {
+          type: 'list',
+          name: 'strategy',
+          message: 'Import strategy:',
+          choices: [
+            { name: 'Merge with existing patterns', value: 'merge' },
+            { name: 'Replace all patterns', value: 'replace' },
+            { name: 'Cancel import', value: 'cancel' },
+          ],
+        },
+      ]);
 
       if (strategy === 'cancel') {
         console.log(chalk.yellow('Import cancelled'));
@@ -671,7 +678,7 @@ class LearnPatternsTask {
       let imported = 0;
       for (const pattern of importData.patterns) {
         const { id, ...patternData } = pattern;
-        
+
         if (strategy === 'merge' && this.patternLearner.patterns.has(id)) {
           // Merge with existing pattern
           const existing = this.patternLearner.patterns.get(id);
@@ -690,9 +697,8 @@ class LearnPatternsTask {
       return {
         imported: true,
         patternCount: imported,
-        totalPatterns: this.patternLearner.patterns.size
+        totalPatterns: this.patternLearner.patterns.size,
       };
-
     } catch (error) {
       throw new Error(`Import failed: ${error.message}`);
     }
@@ -700,13 +706,15 @@ class LearnPatternsTask {
 
   async resetPatterns() {
     console.log(chalk.yellow('\n⚠️ Pattern Reset'));
-    
-    const { confirmReset } = await inquirer.prompt([{
-      type: 'confirm',
-      name: 'confirmReset',
-      message: 'Are you sure you want to reset all learned patterns?',
-      default: false
-    }]);
+
+    const { confirmReset } = await inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'confirmReset',
+        message: 'Are you sure you want to reset all learned patterns?',
+        default: false,
+      },
+    ]);
 
     if (!confirmReset) {
       console.log(chalk.gray('Reset cancelled'));
@@ -727,7 +735,7 @@ class LearnPatternsTask {
     const sources = [
       path.join(this.rootPath, '.aiox', 'modifications', `${modificationId}.json`),
       path.join(this.rootPath, '.aiox', 'history', `${modificationId}.json`),
-      path.join(this.rootPath, '.aiox', 'proposals', `${modificationId}.json`)
+      path.join(this.rootPath, '.aiox', 'proposals', `${modificationId}.json`),
     ];
 
     for (const source of sources) {
@@ -807,6 +815,7 @@ module.exports = LearnPatternsTask;
 ## Pattern Types
 
 ### Code Transformation Patterns
+
 - Variable renaming conventions
 - Function extraction patterns
 - Error handling additions
@@ -814,6 +823,7 @@ module.exports = LearnPatternsTask;
 - Code modernization patterns
 
 ### Structural Patterns
+
 - Component organization changes
 - Module restructuring
 - Interface modifications
@@ -821,6 +831,7 @@ module.exports = LearnPatternsTask;
 - File organization patterns
 
 ### Refactoring Patterns
+
 - Method extraction
 - Class decomposition
 - Interface segregation
@@ -828,6 +839,7 @@ module.exports = LearnPatternsTask;
 - Code consolidation
 
 ### Dependency Patterns
+
 - Package updates
 - Import reorganization
 - Dependency injection
@@ -835,6 +847,7 @@ module.exports = LearnPatternsTask;
 - API versioning
 
 ### Performance Patterns
+
 - Caching implementations
 - Query optimizations
 - Lazy loading patterns
@@ -844,6 +857,7 @@ module.exports = LearnPatternsTask;
 ## Learning Process
 
 ### Pattern Extraction
+
 1. Analyze successful modifications
 2. Extract change patterns using AST
 3. Calculate pattern similarity
@@ -851,6 +865,7 @@ module.exports = LearnPatternsTask;
 5. Build pattern templates
 
 ### Pattern Validation
+
 1. Check minimum occurrences
 2. Verify success rate
 3. Validate consistency
@@ -858,6 +873,7 @@ module.exports = LearnPatternsTask;
 5. Calculate confidence score
 
 ### Pattern Application
+
 1. Match current context
 2. Suggest relevant patterns
 3. Provide application guide
@@ -867,24 +883,28 @@ module.exports = LearnPatternsTask;
 ## Integration Points
 
 ### Pattern Learner Utility
+
 - Core pattern learning engine
 - Pattern storage and retrieval
 - Similarity calculations
 - Suggestion generation
 
 ### Modification History
+
 - Access to past modifications
 - Success/failure tracking
 - Component change history
 - Impact analysis data
 
 ### Component Registry
+
 - Component metadata
 - Dependency information
 - Usage patterns
 - Performance metrics
 
 ## Security Considerations
+
 - Validate pattern sources
 - Prevent malicious patterns
 - Audit pattern applications
@@ -892,10 +912,11 @@ module.exports = LearnPatternsTask;
 - Control pattern sharing
 
 ## Best Practices
+
 1. Learn from diverse modifications
 2. Set appropriate thresholds
 3. Regularly analyze patterns
 4. Export valuable patterns
 5. Monitor pattern effectiveness
 6. Update patterns over time
-7. Share patterns across teams 
+7. Share patterns across teams

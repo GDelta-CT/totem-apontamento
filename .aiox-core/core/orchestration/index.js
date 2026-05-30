@@ -54,11 +54,7 @@ const {
 } = require('./workflow-executor');
 
 // Story 11.4: Surface Checker (Projeto Bob)
-const {
-  SurfaceChecker,
-  createSurfaceChecker,
-  shouldSurface,
-} = require('./surface-checker');
+const { SurfaceChecker, createSurfaceChecker, shouldSurface } = require('./surface-checker');
 
 // Story 11.5: Session State Persistence (Projeto Bob)
 const {
@@ -123,10 +119,7 @@ const {
 } = require('./bob-status-writer');
 
 // Story 12.7: Message Formatter (Educational Mode)
-const {
-  MessageFormatter,
-  createMessageFormatter,
-} = require('./message-formatter');
+const { MessageFormatter, createMessageFormatter } = require('./message-formatter');
 
 // Story 12.8: Brownfield Handler (Projeto Bob)
 const {

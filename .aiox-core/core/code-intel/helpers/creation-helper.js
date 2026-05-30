@@ -35,11 +35,15 @@ async function getCodebaseContext(targetPath) {
 
     try {
       project = await enricher.describeProject(path);
-    } catch { /* skip — partial result ok */ }
+    } catch {
+      /* skip — partial result ok */
+    }
 
     try {
       conventions = await enricher.getConventions(path);
-    } catch { /* skip — partial result ok */ }
+    } catch {
+      /* skip — partial result ok */
+    }
 
     // Return null only if we got nothing at all
     if (!project && !conventions) return null;
@@ -77,19 +81,23 @@ async function checkDuplicateArtefact(name, description) {
     try {
       const searchText = description || name;
       dupes = await enricher.detectDuplicates(searchText, { path: '.' });
-    } catch { /* skip — partial result ok */ }
+    } catch {
+      /* skip — partial result ok */
+    }
 
     try {
       refs = await client.findReferences(name);
-    } catch { /* skip — partial result ok */ }
+    } catch {
+      /* skip — partial result ok */
+    }
 
-    const hasMatches = (dupes && dupes.matches && dupes.matches.length > 0) ||
-      (refs && refs.length > 0);
+    const hasMatches =
+      (dupes && dupes.matches && dupes.matches.length > 0) || (refs && refs.length > 0);
 
     if (!hasMatches) return null;
 
     return {
-      duplicates: dupes ? (dupes.matches || []) : [],
+      duplicates: dupes ? dupes.matches || [] : [],
       references: refs || [],
       warning: _formatDuplicateWarning(name, dupes, refs),
     };
@@ -125,7 +133,9 @@ async function enrichRegistryEntry(entityName, entityPath) {
         // Deduplicate
         usedBy = [...new Set(usedBy)];
       }
-    } catch { /* skip — partial result ok */ }
+    } catch {
+      /* skip — partial result ok */
+    }
 
     try {
       if (entityPath) {
@@ -134,7 +144,9 @@ async function enrichRegistryEntry(entityName, entityPath) {
           dependencies = deps;
         }
       }
-    } catch { /* skip — partial result ok */ }
+    } catch {
+      /* skip — partial result ok */
+    }
 
     // Return null only if we got nothing at all
     if (!usedBy && !dependencies) return null;

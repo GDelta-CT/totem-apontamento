@@ -35,7 +35,14 @@ function _safeCollect(name, fn) {
   try {
     return fn();
   } catch (error) {
-    return { error: true, collector: name, message: error.message, checks: [], fields: [], entries: [] };
+    return {
+      error: true,
+      collector: name,
+      message: error.message,
+      checks: [],
+      fields: [],
+      entries: [],
+    };
   }
 }
 
@@ -55,14 +62,19 @@ function _collectAll(projectRoot, options) {
   const manifestPath = path.join(synapsePath, 'manifest');
 
   const hook = _safeCollect('hook', () => collectHookStatus(projectRoot));
-  const session = _safeCollect('session', () => collectSessionStatus(projectRoot, options.sessionId));
+  const session = _safeCollect('session', () =>
+    collectSessionStatus(projectRoot, options.sessionId)
+  );
   const manifest = _safeCollect('manifest', () => collectManifestIntegrity(projectRoot));
   const parsedManifest = _safeCollect('parsedManifest', () => parseManifest(manifestPath));
 
   const promptCount = session?.raw?.session?.prompt_count || 0;
-  const activeAgentId = session?.raw?.bridgeData?.id || session?.raw?.session?.active_agent?.id || null;
+  const activeAgentId =
+    session?.raw?.bridgeData?.id || session?.raw?.session?.active_agent?.id || null;
 
-  const pipeline = _safeCollect('pipeline', () => collectPipelineSimulation(promptCount, activeAgentId, parsedManifest));
+  const pipeline = _safeCollect('pipeline', () =>
+    collectPipelineSimulation(promptCount, activeAgentId, parsedManifest)
+  );
   const uap = _safeCollect('uap', () => collectUapBridgeStatus(projectRoot));
 
   return { hook, session, manifest, pipeline, uap };

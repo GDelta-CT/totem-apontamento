@@ -13,7 +13,7 @@ const { validatePaths } = require('./validate-paths');
 
 function parseArgs(argv = process.argv.slice(2)) {
   const args = new Set(
-    argv.filter((arg) => !arg.startsWith('--contract=') && !arg.startsWith('--diff=')),
+    argv.filter((arg) => !arg.startsWith('--contract=') && !arg.startsWith('--diff='))
   );
   const contractArg = argv.find((arg) => arg.startsWith('--contract='));
   const diffArg = argv.find((arg) => arg.startsWith('--diff='));
@@ -46,7 +46,7 @@ function getDefaultContractPath(projectRoot = process.cwd()) {
     'infrastructure',
     'contracts',
     'compatibility',
-    'aiox-4.0.4.yaml',
+    'aiox-4.0.4.yaml'
   );
 }
 
@@ -105,11 +105,11 @@ function validateCompatibilityContract(contract, resultById, options = {}) {
 
     const rowRegex = new RegExp(
       `\\|\\s*${escapeRegex(displayName)}\\s*\\|\\s*${escapeRegex(expectedStatus || '')}\\s*\\|`,
-      'i',
+      'i'
     );
     if (!rowRegex.test(docsContent)) {
       violations.push(
-        `Docs matrix mismatch for "${displayName}": expected status "${expectedStatus}" in ${options.docsPathRelative}`,
+        `Docs matrix mismatch for "${displayName}": expected status "${expectedStatus}" in ${options.docsPathRelative}`
       );
     }
 
@@ -157,11 +157,19 @@ function diffCompatibilityContracts(currentContract, previousContract) {
 
   const currentGlobalChecks = sortUnique(currentContract.global_required_checks || []);
   const previousGlobalChecks = sortUnique(previousContract.global_required_checks || []);
-  const globalChecksAdded = currentGlobalChecks.filter((item) => !previousGlobalChecks.includes(item));
-  const globalChecksRemoved = previousGlobalChecks.filter((item) => !currentGlobalChecks.includes(item));
+  const globalChecksAdded = currentGlobalChecks.filter(
+    (item) => !previousGlobalChecks.includes(item)
+  );
+  const globalChecksRemoved = previousGlobalChecks.filter(
+    (item) => !currentGlobalChecks.includes(item)
+  );
 
-  const currentByIde = Object.fromEntries((currentContract.ide_matrix || []).map((item) => [item.ide, item]));
-  const previousByIde = Object.fromEntries((previousContract.ide_matrix || []).map((item) => [item.ide, item]));
+  const currentByIde = Object.fromEntries(
+    (currentContract.ide_matrix || []).map((item) => [item.ide, item])
+  );
+  const previousByIde = Object.fromEntries(
+    (previousContract.ide_matrix || []).map((item) => [item.ide, item])
+  );
   const ideKeys = sortUnique([...Object.keys(currentByIde), ...Object.keys(previousByIde)]);
 
   const ideChanges = [];
@@ -209,10 +217,10 @@ function diffCompatibilityContracts(currentContract, previousContract) {
     },
     ide_changes: ideChanges,
     has_changes:
-      releaseChanged
-      || globalChecksAdded.length > 0
-      || globalChecksRemoved.length > 0
-      || ideChanges.length > 0,
+      releaseChanged ||
+      globalChecksAdded.length > 0 ||
+      globalChecksRemoved.length > 0 ||
+      ideChanges.length > 0,
   };
 }
 
@@ -283,7 +291,7 @@ function formatHumanReport(result) {
   }
   if (result.contractDiff) {
     lines.push(
-      `Contract Diff: ${result.contractDiff.from_release || 'unknown'} -> ${result.contractDiff.to_release || 'unknown'}`,
+      `Contract Diff: ${result.contractDiff.from_release || 'unknown'} -> ${result.contractDiff.to_release || 'unknown'}`
     );
     if (!result.contractDiff.has_changes) {
       lines.push('- no changes');

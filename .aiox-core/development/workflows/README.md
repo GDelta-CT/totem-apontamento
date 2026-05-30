@@ -5,6 +5,7 @@ This directory contains workflow definitions for the Synkra AIOX framework. Work
 ## Available Workflows
 
 ### Development Workflows
+
 - **brownfield-discovery.yaml** - Comprehensive technical debt assessment for existing projects
 - **brownfield-fullstack.yaml** - Workflow for existing full-stack projects
 - **brownfield-service.yaml** - Workflow for existing service/backend projects
@@ -20,6 +21,7 @@ This directory contains workflow definitions for the Synkra AIOX framework. Work
 The `setup-environment` workflow helps developers configure their IDE for optimal AIOX development experience.
 
 ### Features
+
 - Backs up existing IDE configurations
 - Applies AIOX-specific development rules
 - Verifies GitHub CLI installation and authentication
@@ -28,27 +30,32 @@ The `setup-environment` workflow helps developers configure their IDE for optima
 ### Usage
 
 From the aiox-master agent:
+
 ```
 @aiox-master
 *setup-environment
 ```
 
 Or directly via npm:
+
 ```bash
 npm run setup:environment
 ```
 
 ### What It Does
+
 2. **GitHub CLI Check** - Ensures GitHub CLI is installed and authenticated
 3. **Backup Creation** - Saves existing rules before making changes
 4. **Rule Application** - Copies AIOX-specific rules to appropriate locations
 5. **Verification** - Confirms successful setup
 
 ### IDE Rule Locations
+
 - **Cursor**: `.cursorules`
 - **Claude Code**: `.claude/CLAUDE.md`
 
 ### Requirements
+
 - Node.js 18+
 - One or more supported IDEs installed
 - GitHub CLI (recommended)
@@ -58,6 +65,7 @@ npm run setup:environment
 Workflows are defined in YAML format. See existing workflows for examples.
 
 ### Workflow Structure
+
 ```yaml
 workflow:
   id: unique-workflow-id
@@ -65,7 +73,7 @@ workflow:
   description: What this workflow does
   type: configuration|development|deployment
   metadata:
-    elicit: true  # If user interaction required
+    elicit: true # If user interaction required
     confirmation_required: true
   sequence:
     - step: step_slug
@@ -81,6 +89,7 @@ workflow:
 ```
 
 ## Best Practices
+
 1. Keep workflows focused on a single objective
 2. Include error handling for each step
 3. Provide clear user feedback

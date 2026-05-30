@@ -11,16 +11,19 @@
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -188,6 +191,7 @@ token_usage: ~3,000-10,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Break into smaller workflows; implement checkpointing; use async processing where possible
 
 ---
@@ -206,7 +210,6 @@ updated_at: 2025-11-17
 ```
 
 ---
-
 
 ## Inputs
 
@@ -319,17 +322,17 @@ else
   echo "❌ ROLLBACK FAILED"
   echo "Emergency snapshot available: $EMERGENCY"
   echo "Attempting to restore from emergency snapshot..."
-  
+
   # Try to restore emergency snapshot
   psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f "$EMERGENCY"
-  
+
   if [ $? -eq 0 ]; then
     echo "✓ Restored from emergency snapshot"
   else
     echo "❌ Emergency restore also failed - DATABASE MAY BE INCONSISTENT"
     echo "Manual intervention required"
   fi
-  
+
   exit 1
 fi
 ```
@@ -344,7 +347,7 @@ echo ""
 # Count schema objects
 echo "Schema object counts:"
 psql "$SUPABASE_DB_URL" -t -c \
-"SELECT 
+"SELECT
   (SELECT COUNT(*) FROM pg_tables WHERE schemaname='public') AS tables,
   (SELECT COUNT(*) FROM pg_policies WHERE schemaname='public') AS policies,
   (SELECT COUNT(*) FROM pg_proc WHERE pronamespace='public'::regnamespace) AS functions;"
@@ -354,10 +357,10 @@ echo ""
 echo "Quick sanity checks:"
 psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 <<'SQL'
 -- Check tables exist
-SELECT 'Tables exist' AS check, COUNT(*) > 0 AS pass 
+SELECT 'Tables exist' AS check, COUNT(*) > 0 AS pass
 FROM pg_tables WHERE schemaname='public';
 
--- Check functions exist  
+-- Check functions exist
 SELECT 'Functions exist' AS check, COUNT(*) > 0 AS pass
 FROM pg_proc WHERE pronamespace='public'::regnamespace;
 
@@ -418,11 +421,13 @@ If issues detected:
 ```
 
 **Pros**:
+
 - ✅ Fast
 - ✅ Complete schema state
 - ✅ Tested with pg_dump
 
 **Cons**:
+
 - ❌ Data preserved (may be incompatible)
 - ❌ Requires prior snapshot
 
@@ -451,11 +456,13 @@ COMMIT;
 ```
 
 **Pros**:
+
 - ✅ Precise control
 - ✅ Documented undo process
 - ✅ Can be tested
 
 **Cons**:
+
 - ❌ Must write manually
 - ❌ Easy to forget steps
 - ❌ Must maintain with migration
@@ -470,11 +477,13 @@ COMMIT;
 ```
 
 **Pros**:
+
 - ✅ No data loss risk
 - ✅ Maintains history
 - ✅ Safe in production
 
 **Cons**:
+
 - ❌ More work
 - ❌ Leaves intermediate state in history
 
@@ -482,14 +491,14 @@ COMMIT;
 
 ## Rollback Decision Matrix
 
-| Situation | Strategy | Command |
-|-----------|----------|---------|
+| Situation                | Strategy         | Command                         |
+| ------------------------ | ---------------- | ------------------------------- |
 | Migration failed mid-way | Restore snapshot | `*rollback snapshot_before.sql` |
-| Schema breaks app | Restore snapshot | `*rollback snapshot_before.sql` |
-| Wrong migration applied | Restore snapshot | `*rollback snapshot_before.sql` |
-| Minor bug in function | Forward fix | Create fix migration |
-| Data corruption risk | Forward fix | Don't rollback |
-| Production with users | Forward fix | Avoid schema rollback |
+| Schema breaks app        | Restore snapshot | `*rollback snapshot_before.sql` |
+| Wrong migration applied  | Restore snapshot | `*rollback snapshot_before.sql` |
+| Minor bug in function    | Forward fix      | Create fix migration            |
+| Data corruption risk     | Forward fix      | Don't rollback                  |
+| Production with users    | Forward fix      | Avoid schema rollback           |
 
 ---
 
@@ -510,12 +519,14 @@ Before executing rollback:
 ## Rollback in Different Environments
 
 ### Development
+
 ```bash
 # Fast and loose - just do it
 *rollback snapshot.sql
 ```
 
 ### Staging
+
 ```bash
 # Test the rollback process
 *rollback snapshot.sql
@@ -524,6 +535,7 @@ Before executing rollback:
 ```
 
 ### Production
+
 ```bash
 # CAREFUL - follow full checklist
 # 1. Notify stakeholders
@@ -552,6 +564,7 @@ Before executing rollback:
 **No rollback needed**: Database unchanged
 
 **Next steps**:
+
 1. Fix migration file
 2. `*dry-run` to test
 3. `*apply-migration` again
@@ -610,6 +623,7 @@ COMMIT;
 **Fix**: Snapshot should have `DROP ... IF EXISTS` statements
 
 Check snapshot file:
+
 ```bash
 grep -c "DROP.*IF EXISTS" snapshot.sql
 ```
@@ -620,6 +634,7 @@ If missing, regenerate snapshot with `--clean --if-exists` flags.
 
 **Problem**: Application incompatible with rolled-back schema  
 **Solutions**:
+
 1. Deploy previous app version
 2. Fix app code to work with old schema
 3. Roll forward with new migration instead
@@ -642,11 +657,11 @@ Check database connectivity and disk space
 
 ```sql
 -- Find orphaned triggers
-SELECT tgname FROM pg_trigger 
+SELECT tgname FROM pg_trigger
 WHERE tgrelid NOT IN (SELECT oid FROM pg_class);
 
 -- Find orphaned indexes
-SELECT indexname FROM pg_indexes 
+SELECT indexname FROM pg_indexes
 WHERE tablename NOT IN (SELECT tablename FROM pg_tables);
 ```
 
@@ -679,18 +694,21 @@ WHERE tablename NOT IN (SELECT tablename FROM pg_tables);
 Instead of rollback, consider:
 
 ### Blue-Green Deployment
+
 - Keep old schema running
 - Deploy new app + schema separately
 - Switch traffic when ready
 - Rollback = switch back
 
 ### Feature Flags
+
 - Deploy schema changes
 - Keep old code paths active
 - Toggle features via flags
 - Rollback = flip flag
 
 ### Backward Compatible Migrations
+
 - Add new columns as nullable
 - Keep old columns temporarily
 - Remove old columns in later migration

@@ -18,50 +18,50 @@ const PORTUGUESE_CHARS = /[áàâãéêíóôõúüç]/i;
 
 // Common Portuguese terms that should be translated
 const PORTUGUESE_TERMS = {
-  'visao': 'vision',
-  'viso': 'vision',
-  'produto': 'product',
-  'problema': 'problem',
-  'objetivos': 'objectives',
-  'glossario': 'glossary',
-  'glossrio': 'glossary',
-  'terminologia': 'terminology',
-  'premissas': 'assumptions',
-  'restricoes': 'constraints',
-  'restries': 'constraints',
-  'stakeholders': 'stakeholders', // OK
-  'requisitos': 'requirements',
-  'arquitetura': 'architecture',
-  'tecnologia': 'technology',
-  'pilha': 'stack',
-  'padroes': 'standards',
-  'padres': 'standards',
-  'estrutura': 'structure',
-  'arvore': 'tree',
-  'seguranca': 'security',
-  'desempenho': 'performance',
-  'escalabilidade': 'scalability',
-  'confiabilidade': 'reliability',
-  'conformidade': 'compliance',
-  'riscos': 'risks',
-  'tecnicos': 'technical',
-  'tecnico': 'technical',
-  'negocio': 'business',
-  'negcios': 'business',
-  'infraestrutura': 'infrastructure',
-  'dados': 'data',
-  'banco': 'database',
-  'esquema': 'schema',
-  'testes': 'tests',
-  'estrategia': 'strategy',
-  'estratgia': 'strategy',
-  'metadados': 'metadata',
-  'indice': 'index',
-  'ndice': 'index',
-  'decisoes': 'decisions',
-  'decises': 'decisions',
-  'decisao': 'decision',
-  'deciso': 'decision'
+  visao: 'vision',
+  viso: 'vision',
+  produto: 'product',
+  problema: 'problem',
+  objetivos: 'objectives',
+  glossario: 'glossary',
+  glossrio: 'glossary',
+  terminologia: 'terminology',
+  premissas: 'assumptions',
+  restricoes: 'constraints',
+  restries: 'constraints',
+  stakeholders: 'stakeholders', // OK
+  requisitos: 'requirements',
+  arquitetura: 'architecture',
+  tecnologia: 'technology',
+  pilha: 'stack',
+  padroes: 'standards',
+  padres: 'standards',
+  estrutura: 'structure',
+  arvore: 'tree',
+  seguranca: 'security',
+  desempenho: 'performance',
+  escalabilidade: 'scalability',
+  confiabilidade: 'reliability',
+  conformidade: 'compliance',
+  riscos: 'risks',
+  tecnicos: 'technical',
+  tecnico: 'technical',
+  negocio: 'business',
+  negcios: 'business',
+  infraestrutura: 'infrastructure',
+  dados: 'data',
+  banco: 'database',
+  esquema: 'schema',
+  testes: 'tests',
+  estrategia: 'strategy',
+  estratgia: 'strategy',
+  metadados: 'metadata',
+  indice: 'index',
+  ndice: 'index',
+  decisoes: 'decisions',
+  decises: 'decisions',
+  decisao: 'decision',
+  deciso: 'decision',
 };
 
 // Expected standard filenames (architecture)
@@ -75,7 +75,7 @@ const STANDARD_FILES = [
   'database-schema.md',
   'data-models.md',
   'api-design.md',
-  'architecture-diagram.md'
+  'architecture-diagram.md',
 ];
 
 class FilenameValidator {
@@ -109,7 +109,7 @@ class FilenameValidator {
       this.errors.push({
         file: path.join(directory, filename),
         issue: 'Contains Portuguese characters (accents)',
-        suggestion: this.removeAccents(basename) + '.md'
+        suggestion: this.removeAccents(basename) + '.md',
       });
       return;
     }
@@ -122,7 +122,7 @@ class FilenameValidator {
         this.errors.push({
           file: path.join(directory, filename),
           issue: `Contains Portuguese term: "${ptTerm}"`,
-          suggestion: suggested + '.md'
+          suggestion: suggested + '.md',
         });
       }
     }
@@ -137,7 +137,7 @@ class FilenameValidator {
 
   report() {
     console.log('\n📋 AIOX Filename Validation Report\n');
-    console.log('=' .repeat(60));
+    console.log('='.repeat(60));
 
     if (this.errors.length === 0 && this.warnings.length === 0) {
       console.log('✅ All filenames are valid!\n');
@@ -146,7 +146,7 @@ class FilenameValidator {
 
     if (this.warnings.length > 0) {
       console.log('\n⚠️  Warnings:\n');
-      this.warnings.forEach(warning => {
+      this.warnings.forEach((warning) => {
         console.log(`   ${warning}`);
       });
     }

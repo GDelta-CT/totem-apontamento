@@ -17,16 +17,19 @@
 **Choose your execution mode** (if applicable for this task):
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Experienced developers, simple tasks, time-sensitive work
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions, collaborative work
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Questionnaire before execution
 - Zero ambiguity execution
@@ -126,6 +129,7 @@ pre-conditions:
 ### Mode: YOLO (Autonomous)
 
 **Execution:**
+
 1. Read task definition
 2. Validate pre-conditions automatically
 3. Execute workflow with autonomous decisions
@@ -134,8 +138,10 @@ pre-conditions:
 6. Return standardized output
 
 **Decision Logging:**
+
 ```markdown
 ## Decision: {Title}
+
 **Context:** {What problem}
 **Options:** [{Option A}, {Option B}]
 **Selected:** {Option}
@@ -150,6 +156,7 @@ pre-conditions:
 ### Mode: Interactive (Balanced) **[DEFAULT]**
 
 **Execution:**
+
 1. Read task definition
 2. Present summary to user
 3. Validate pre-conditions with user
@@ -160,11 +167,13 @@ pre-conditions:
 8. Return standardized output
 
 **Decision Checkpoints:**
+
 - {Decision point 1 description}
 - {Decision point 2 description}
 - {Decision point 3 description}
 
 **Educational Explanations:**
+
 - Before decision: Explain options and trade-offs
 - After decision: Explain why it's a good fit
 - During execution: Explain what's happening and why
@@ -176,6 +185,7 @@ pre-conditions:
 ### Mode: Pre-Flight Planning (Comprehensive)
 
 **Execution:**
+
 1. **Analysis Phase:**
    - Read task definition completely
    - Identify ALL ambiguities and decision points
@@ -208,11 +218,13 @@ pre-conditions:
 **Purpose:** {What this step accomplishes}
 
 **Actions:**
+
 1. {Action 1}
 2. {Action 2}
 3. {Action 3}
 
 **Validation:**
+
 - {Validation check 1}
 - {Validation check 2}
 
@@ -221,10 +233,15 @@ pre-conditions:
 ```javascript
 // Use agent's vocabulary and tone
 const verb = selectFromVocabulary(agent.persona_profile.communication.vocabulary);
-const statusMessage = generatePersonalizedStatus(agent.persona_profile.communication.tone, verb, result);
+const statusMessage = generatePersonalizedStatus(
+  agent.persona_profile.communication.tone,
+  verb,
+  result
+);
 ```
 
 **Example status messages by archetype:**
+
 - **Builder (Dex):** "✅ Implementei com sucesso. {detail}."
 - **Guardian (Quinn):** "✅ Validado rigorosamente. {detail}."
 - **Balancer (Pax):** "✅ Equilibrei todas as dependências. {detail}."
@@ -493,15 +510,16 @@ acceptance-criteria:
 
 **Error Strategies:**
 
-| Strategy | When to Use | Example |
-|----------|-------------|---------|
-| **retry** | Transient errors (API timeout, rate limit) | AI call failed with 429 |
-| **fallback** | Recoverable errors (AI failed, use default) | Template not found → use default |
-| **abort** | Critical errors (invalid input, missing dependency) | Required file not found → abort |
+| Strategy     | When to Use                                         | Example                          |
+| ------------ | --------------------------------------------------- | -------------------------------- |
+| **retry**    | Transient errors (API timeout, rate limit)          | AI call failed with 429          |
+| **fallback** | Recoverable errors (AI failed, use default)         | Template not found → use default |
+| **abort**    | Critical errors (invalid input, missing dependency) | Required file not found → abort  |
 
 **Fallback Plans:**
 
 ### Missing Input
+
 ```yaml
 **Error Handling:**
 - strategy: fallback
@@ -519,6 +537,7 @@ acceptance-criteria:
 ```
 
 ### Missing Template
+
 ```yaml
 **Error Handling:**
 - strategy: fallback
@@ -536,6 +555,7 @@ acceptance-criteria:
 ```
 
 ### Missing Tool
+
 ```yaml
 **Error Handling:**
 - strategy: abort
@@ -555,6 +575,7 @@ acceptance-criteria:
 ```
 
 ### Missing Data
+
 ```yaml
 **Error Handling:**
 - strategy: fallback
@@ -572,6 +593,7 @@ acceptance-criteria:
 ```
 
 ### Checklist Failure
+
 ```yaml
 **Error Handling:**
 - strategy: retry
@@ -599,13 +621,13 @@ function generateErrorMessage(agent, errorType, errorDetails) {
   const { archetype, tone, vocabulary } = agent.persona_profile.communication;
 
   const templates = {
-    Builder: "⚠️ {verb} falhou. Vou debugar e reconstruir.",
-    Guardian: "⚠️ Validação falhou. Bloqueando até resolução.",
-    Balancer: "⚠️ Conflito detectado. Vou mediar e encontrar solução.",
-    Visionary: "⚠️ Planejamento interrompido. Preciso revisar estratégia.",
+    Builder: '⚠️ {verb} falhou. Vou debugar e reconstruir.',
+    Guardian: '⚠️ Validação falhou. Bloqueando até resolução.',
+    Balancer: '⚠️ Conflito detectado. Vou mediar e encontrar solução.',
+    Visionary: '⚠️ Planejamento interrompido. Preciso revisar estratégia.',
   };
 
-  return templates[archetype] || "⚠️ Erro detectado. Aplicando fallback.";
+  return templates[archetype] || '⚠️ Erro detectado. Aplicando fallback.';
 }
 ```
 
@@ -652,26 +674,30 @@ function generateErrorMessage(agent, errorType, errorDetails) {
 
 **Agent:** {agent.name} ({agent.persona_profile.archetype})
 **Task:** {task.name}
-**Mode:** {execution_mode}                  # yolo | interactive | preflight
+**Mode:** {execution_mode} # yolo | interactive | preflight
 **Started:** {timestamp.start}
 **Completed:** {timestamp.end}
-**Duration:** {duration}                    ← ALWAYS LINE 7 (familiaridade)
-**Tokens Used:** {tokens.total} total       ← ALWAYS LINE 8 (familiaridade)
+**Duration:** {duration} ← ALWAYS LINE 7 (familiaridade)
+**Tokens Used:** {tokens.total} total ← ALWAYS LINE 8 (familiaridade)
 
 ---
 
 ### Status
-{status_icon} {PERSONALIZED_STATUS_MESSAGE}  ← PERSONALITY SLOT
+
+{status_icon} {PERSONALIZED_STATUS_MESSAGE} ← PERSONALITY SLOT
 
 **Examples:**
+
 - Dex: "✅ Implementei com sucesso. 3 componentes criados."
 - Quinn: "✅ Validado rigorosamente. 47 edge cases testados."
 - Pax: "✅ Equilibrei as dependências. Tudo alinhado."
 
 ### Output
+
 {task_specific_content}
 
-### Metrics                                  ← ALWAYS LAST SECTION (familiaridade)
+### Metrics ← ALWAYS LAST SECTION (familiaridade)
+
 - Tests: {tests.passed}/{tests.total}
 - Coverage: {coverage}%
 - Linting: {lint.status}
@@ -680,15 +706,18 @@ function generateErrorMessage(agent, errorType, errorDetails) {
 - {task_specific_metric}: {value}
 
 ---
-{agent.persona_profile.signature_closing}   ← PERSONALITY SLOT
+
+{agent.persona_profile.signature_closing} ← PERSONALITY SLOT
 ```
 
 **Personality Injection Points:**
+
 1. Status message (use agent vocabulary)
 2. Signature closing (agent signature)
 3. Emoji selection (from archetype palette)
 
 **Fixed Positions (NEVER change):**
+
 1. Section order: Header → Status → Output → Metrics
 2. Duration (line 7)
 3. Tokens (line 8)
@@ -767,8 +796,9 @@ describe('{Task Name}', () => {
 
       expect(result.output).toContain(agent.persona_profile.signature_closing);
 
-      const hasVocabularyWord = agent.persona_profile.communication.vocabulary
-        .some(word => result.statusMessage.includes(word));
+      const hasVocabularyWord = agent.persona_profile.communication.vocabulary.some((word) =>
+        result.statusMessage.includes(word)
+      );
       expect(hasVocabularyWord).toBe(true);
     });
   });
@@ -805,7 +835,7 @@ describe('{Task Name}', () => {
 
     it('should use cache when available', () => {
       const result1 = executeTask(task, inputs);
-      const result2 = executeTask(task, inputs);  // Should use cache
+      const result2 = executeTask(task, inputs); // Should use cache
 
       if (task.performance.cacheable) {
         expect(result2.usedCache).toBe(true);

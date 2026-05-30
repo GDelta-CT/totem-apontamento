@@ -182,6 +182,7 @@ token_usage: ~1,000-3,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Parallelize independent operations; reuse atom results; implement early exits
 
 ---
@@ -202,25 +203,31 @@ updated_at: 2025-11-17
 ---
 
 checklists:
-  - change-checklist.md
+
+- change-checklist.md
+
 ---
 
 # Propose Modification - AIOX Developer Task
 
 ## Purpose
+
 Create and submit modification proposals for collaborative review and approval within the Synkra AIOX framework.
 
 ## Command Pattern
+
 ```
 *propose-modification <component-path> <modification-type> [options]
 ```
 
 ## Parameters
+
 - `component-path`: Path to the component to modify
 - `modification-type`: Type of modification (modify, refactor, deprecate, enhance)
 - `options`: Additional proposal configuration
 
 ### Options
+
 - `--title <title>`: Title for the proposal
 - `--description <desc>`: Detailed description of changes
 - `--priority <level>`: Priority level (low, medium, high, critical)
@@ -232,6 +239,7 @@ Create and submit modification proposals for collaborative review and approval w
 - `--test-results`: Attach test results
 
 ## Examples
+
 ```bash
 # Propose agent enhancement
 *propose-modification aiox-core/agents/weather-agent.md enhance --title "Add caching support" --description "Implement response caching to reduce API calls" --priority medium
@@ -268,7 +276,7 @@ class ProposeModificationTask {
 
       // Parse and validate parameters
       const config = await this.parseParameters(params);
-      
+
       // Initialize dependencies
       await this.initializeDependencies();
 
@@ -309,7 +317,7 @@ class ProposeModificationTask {
       console.log(chalk.gray(`   Proposal ID: ${result.proposalId}`));
       console.log(chalk.gray(`   Status: ${result.status}`));
       console.log(chalk.gray(`   Reviewers: ${config.assignees.join(', ') || 'None assigned'}`));
-      
+
       if (result.webUrl) {
         console.log(chalk.blue(`   View proposal: ${result.webUrl}`));
       }
@@ -321,9 +329,8 @@ class ProposeModificationTask {
         component: component.path,
         modificationType: config.modificationType,
         priority: config.priority,
-        assignees: config.assignees
+        assignees: config.assignees,
       };
-
     } catch (error) {
       console.error(chalk.red(`\n❌ Proposal creation failed: ${error.message}`));
       throw error;
@@ -332,7 +339,9 @@ class ProposeModificationTask {
 
   async parseParameters(params) {
     if (params.length < 2) {
-      throw new Error('Usage: *propose-modification <component-path> <modification-type> [options]');
+      throw new Error(
+        'Usage: *propose-modification <component-path> <modification-type> [options]'
+      );
     }
 
     const config = {
@@ -346,19 +355,21 @@ class ProposeModificationTask {
       isDraft: false,
       linkedIssues: [],
       includeImpactAnalysis: false,
-      testResults: null
+      testResults: null,
     };
 
     // Validate modification type
     const validTypes = ['modify', 'refactor', 'deprecate', 'enhance'];
     if (!validTypes.includes(config.modificationType)) {
-      throw new Error(`Invalid modification type: ${config.modificationType}. Must be one of: ${validTypes.join(', ')}`);
+      throw new Error(
+        `Invalid modification type: ${config.modificationType}. Must be one of: ${validTypes.join(', ')}`
+      );
     }
 
     // Parse options
     for (let i = 2; i < params.length; i++) {
       const param = params[i];
-      
+
       if (param === '--draft') {
         config.isDraft = true;
       } else if (param === '--impact-analysis') {
@@ -370,11 +381,11 @@ class ProposeModificationTask {
       } else if (param.startsWith('--priority') && params[i + 1]) {
         config.priority = params[++i];
       } else if (param.startsWith('--tags') && params[i + 1]) {
-        config.tags = params[++i].split(',').map(t => t.trim());
+        config.tags = params[++i].split(',').map((t) => t.trim());
       } else if (param.startsWith('--assignees') && params[i + 1]) {
-        config.assignees = params[++i].split(',').map(a => a.trim());
+        config.assignees = params[++i].split(',').map((a) => a.trim());
       } else if (param.startsWith('--link-issues') && params[i + 1]) {
-        config.linkedIssues = params[++i].split(',').map(id => id.trim());
+        config.linkedIssues = params[++i].split(',').map((id) => id.trim());
       } else if (param.startsWith('--test-results') && params[i + 1]) {
         config.testResults = params[++i];
       }
@@ -383,7 +394,9 @@ class ProposeModificationTask {
     // Validate priority
     const validPriorities = ['low', 'medium', 'high', 'critical'];
     if (!validPriorities.includes(config.priority)) {
-      throw new Error(`Invalid priority: ${config.priority}. Must be one of: ${validPriorities.join(', ')}`);
+      throw new Error(
+        `Invalid priority: ${config.priority}. Must be one of: ${validPriorities.join(', ')}`
+      );
     }
 
     return config;
@@ -399,7 +412,6 @@ class ProposeModificationTask {
 
       const NotificationService = require('../scripts/notification-service');
       this.notificationService = new NotificationService({ rootPath: this.rootPath });
-
     } catch (error) {
       throw new Error(`Failed to initialize dependencies: ${error.message}`);
     }
@@ -407,7 +419,7 @@ class ProposeModificationTask {
 
   async validateComponent(componentPath) {
     const fullPath = path.resolve(this.rootPath, componentPath);
-    
+
     try {
       const stats = await fs.stat(fullPath);
       if (!stats.isFile()) {
@@ -422,9 +434,8 @@ class ProposeModificationTask {
         fullPath: fullPath,
         type: componentType,
         content: content,
-        lastModified: stats.mtime
+        lastModified: stats.mtime,
       };
-
     } catch (error) {
       if (error.code === 'ENOENT') {
         throw new Error(`Component not found: ${componentPath}`);
@@ -450,8 +461,8 @@ class ProposeModificationTask {
         createdBy: process.env.USER || 'aiox-developer',
         createdAt: new Date().toISOString(),
         lastModified: new Date().toISOString(),
-        version: 1
-      }
+        version: 1,
+      },
     };
 
     // Add modification type specific fields
@@ -460,21 +471,21 @@ class ProposeModificationTask {
         proposal.deprecationInfo = {
           targetRemovalDate: null,
           migrationPath: null,
-          affectedComponents: []
+          affectedComponents: [],
         };
         break;
       case 'enhance':
         proposal.enhancementInfo = {
           newCapabilities: [],
           performanceImpact: null,
-          backwardCompatible: true
+          backwardCompatible: true,
         };
         break;
       case 'refactor':
         proposal.refactorInfo = {
           scope: 'component', // component, module, system
           breakingChanges: false,
-          codeQualityMetrics: {}
+          codeQualityMetrics: {},
         };
         break;
     }
@@ -486,16 +497,15 @@ class ProposeModificationTask {
     try {
       const impact = await this.impactAnalyzer.analyzeDependencyImpact(component, {
         modificationType: config.modificationType,
-        depth: 'deep'
+        depth: 'deep',
       });
 
       return {
         affectedComponents: impact.affectedComponents.length,
         criticalDependencies: impact.impactCategories?.critical || [],
         riskLevel: this.calculateRiskLevel(impact),
-        summary: this.generateImpactSummary(impact)
+        summary: this.generateImpactSummary(impact),
       };
-
     } catch (error) {
       console.warn(chalk.yellow(`Impact analysis failed: ${error.message}`));
       return null;
@@ -508,7 +518,7 @@ class ProposeModificationTask {
       return {
         source: testResultsPath,
         content: content,
-        attachedAt: new Date().toISOString()
+        attachedAt: new Date().toISOString(),
       };
     } catch (error) {
       console.warn(chalk.yellow(`Failed to attach test results: ${error.message}`));
@@ -526,7 +536,7 @@ class ProposeModificationTask {
         name: 'title',
         message: 'Proposal title:',
         default: proposal.title,
-        validate: input => input.length > 0 || 'Title is required'
+        validate: (input) => input.length > 0 || 'Title is required',
       });
     }
 
@@ -536,7 +546,7 @@ class ProposeModificationTask {
         type: 'editor',
         name: 'description',
         message: 'Detailed description (opens editor):',
-        default: this.getDescriptionTemplate(config.modificationType)
+        default: this.getDescriptionTemplate(config.modificationType),
       });
     }
 
@@ -546,10 +556,10 @@ class ProposeModificationTask {
         type: 'input',
         name: 'targetRemovalDate',
         message: 'Target removal date (YYYY-MM-DD):',
-        validate: input => {
+        validate: (input) => {
           if (!input) return true;
           return /^\d{4}-\d{2}-\d{2}$/.test(input) || 'Invalid date format';
-        }
+        },
       });
     }
 
@@ -565,8 +575,8 @@ class ProposeModificationTask {
           'Extended error handling',
           'Improved logging',
           'New integrations',
-          'Other'
-        ]
+          'Other',
+        ],
       });
     }
 
@@ -575,7 +585,7 @@ class ProposeModificationTask {
         type: 'confirm',
         name: 'breakingChanges',
         message: 'Will this refactoring introduce breaking changes?',
-        default: false
+        default: false,
       });
     }
 
@@ -587,9 +597,9 @@ class ProposeModificationTask {
       choices: [
         { name: 'Urgent (1-2 days)', value: 'urgent' },
         { name: 'Normal (3-5 days)', value: 'normal' },
-        { name: 'Low priority (1 week+)', value: 'low' }
+        { name: 'Low priority (1 week+)', value: 'low' },
       ],
-      default: 'normal'
+      default: 'normal',
     });
 
     const answers = await inquirer.prompt(questions);
@@ -598,25 +608,25 @@ class ProposeModificationTask {
     const details = {
       title: answers.title || config.title,
       description: answers.description || config.description,
-      reviewTimeline: answers.reviewTimeline
+      reviewTimeline: answers.reviewTimeline,
     };
 
     // Add modification-specific details
     if (config.modificationType === 'deprecate' && answers.targetRemovalDate) {
       details.deprecationInfo = {
-        targetRemovalDate: answers.targetRemovalDate
+        targetRemovalDate: answers.targetRemovalDate,
       };
     }
 
     if (config.modificationType === 'enhance' && answers.newCapabilities) {
       details.enhancementInfo = {
-        newCapabilities: answers.newCapabilities
+        newCapabilities: answers.newCapabilities,
       };
     }
 
     if (config.modificationType === 'refactor') {
       details.refactorInfo = {
-        breakingChanges: answers.breakingChanges
+        breakingChanges: answers.breakingChanges,
       };
     }
 
@@ -635,9 +645,8 @@ class ProposeModificationTask {
         proposalId: proposal.proposalId,
         status: proposal.status,
         webUrl: this.generateProposalUrl(proposal.proposalId),
-        createdAt: proposal.metadata.createdAt
+        createdAt: proposal.metadata.createdAt,
       };
-
     } catch (error) {
       throw new Error(`Failed to submit proposal: ${error.message}`);
     }
@@ -653,7 +662,7 @@ class ProposeModificationTask {
     // Update proposals index
     const indexFile = path.join(proposalsDir, 'index.json');
     let index = { proposals: [] };
-    
+
     try {
       const existing = await fs.readFile(indexFile, 'utf-8');
       index = JSON.parse(existing);
@@ -669,7 +678,7 @@ class ProposeModificationTask {
       status: proposal.status,
       priority: proposal.priority,
       createdAt: proposal.metadata.createdAt,
-      createdBy: proposal.metadata.createdBy
+      createdBy: proposal.metadata.createdBy,
     });
 
     await fs.writeFile(indexFile, JSON.stringify(index, null, 2));
@@ -682,11 +691,10 @@ class ProposeModificationTask {
         proposalId: result.proposalId,
         title: result.title,
         priority: result.priority,
-        url: result.webUrl
+        url: result.webUrl,
       });
 
       console.log(chalk.gray(`   Notifications sent to: ${assignees.join(', ')}`));
-
     } catch (error) {
       console.warn(chalk.yellow(`Failed to send notifications: ${error.message}`));
     }
@@ -718,8 +726,8 @@ class ProposeModificationTask {
         critical: impact.impactCategories?.critical?.length || 0,
         high: impact.impactCategories?.high?.length || 0,
         medium: impact.impactCategories?.medium?.length || 0,
-        low: impact.impactCategories?.low?.length || 0
-      }
+        low: impact.impactCategories?.low?.length || 0,
+      },
     };
   }
 
@@ -779,7 +787,7 @@ class ProposeModificationTask {
 [Detail how changes will be implemented]
 
 ### Validation
-[Describe validation approach]`
+[Describe validation approach]`,
     };
 
     return templates[modificationType] || templates.modify;
@@ -797,6 +805,7 @@ module.exports = ProposeModificationTask;
 ## Validation Rules
 
 ### Input Validation
+
 - Component path must exist and be accessible
 - Modification type must be valid
 - Priority must be recognized level
@@ -804,12 +813,14 @@ module.exports = ProposeModificationTask;
 - Linked issues should be valid issue IDs
 
 ### Proposal Requirements
+
 - Title and description are required (prompted if not provided)
 - Draft proposals can be incomplete
 - Non-draft proposals must have complete information
 - Impact analysis is recommended for high priority changes
 
 ### Review Process
+
 - Proposals start in 'draft' or 'pending_review' status
 - Assignees are notified upon submission
 - Review timeline expectations are set
@@ -818,26 +829,30 @@ module.exports = ProposeModificationTask;
 ## Integration Points
 
 ### Proposal System
+
 - Manages proposal lifecycle and storage
 - Handles versioning and history tracking
 - Coordinates review workflows
 - Integrates with notification system
 
 ### Impact Analysis
+
 - Optional but recommended for significant changes
 - Provides risk assessment for reviewers
 - Identifies affected components
 - Helps prioritize review efforts
 
 ### Notification Service
+
 - Notifies assigned reviewers
 - Sends updates on proposal status changes
 - Supports multiple notification channels
 - Tracks notification delivery
 
 ## Security Considerations
+
 - Validate all user inputs to prevent injection
 - Ensure proper access control for proposals
 - Sanitize file paths and content
 - Log all proposal activities for audit
-- Protect sensitive component information 
+- Protect sensitive component information

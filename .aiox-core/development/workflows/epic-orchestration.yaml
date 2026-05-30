@@ -16,8 +16,8 @@
 
 workflow:
   id: epic-orchestration
-  name: "Epic Wave Orchestration"
-  version: "1.0.0"
+  name: 'Epic Wave Orchestration'
+  version: '1.0.0'
   description: >-
     Reusable template for executing epics with wave-based parallel development.
     Stories within each wave run the full development-cycle workflow
@@ -58,21 +58,21 @@ workflow:
 
   config:
     # These values are OVERRIDDEN by the project-specific execution plan
-    epicId: "${epicId}"
-    epicIndex: "${epicIndex}"
-    storyBasePath: "${storyBasePath}"
+    epicId: '${epicId}'
+    epicIndex: '${epicIndex}'
+    storyBasePath: '${storyBasePath}'
 
     # Parallel execution defaults
     maxConcurrency: 4
     worktreeIsolation: true
 
     # Timeouts
-    storyTimeout: 7200000       # 2 hours per story (development-cycle total)
-    gateTimeout: 1800000        # 30 min per wave gate
-    totalTimeout: 43200000      # 12 hours total
+    storyTimeout: 7200000 # 2 hours per story (development-cycle total)
+    gateTimeout: 1800000 # 30 min per wave gate
+    totalTimeout: 43200000 # 12 hours total
 
     # Quality gates
-    gatePolicy: strict          # strict | lenient | skip
+    gatePolicy: strict # strict | lenient | skip
     requireIntegrationReview: true
 
   # ═══════════════════════════════════════════════════════════════════════════════════
@@ -94,8 +94,8 @@ workflow:
     ref: development-cycle
     per_story: true
     checkpoint_mode:
-      in_wave: auto_go           # Don't pause between parallel stories
-      between_waves: interactive  # Pause for human decision between waves
+      in_wave: auto_go # Don't pause between parallel stories
+      between_waves: interactive # Pause for human decision between waves
 
   # ═══════════════════════════════════════════════════════════════════════════════════
   #                              WAVE EXECUTION PATTERN
@@ -115,27 +115,25 @@ workflow:
   #   └─────────────────────────────────────────────────────┘
 
   wave_pattern:
-
     # Step 1: Per-story development (parallel within wave)
     story_execution:
       parallel: true
-      max_concurrency: "${config.maxConcurrency}"
-      worktree_isolation: "${config.worktreeIsolation}"
+      max_concurrency: '${config.maxConcurrency}'
+      worktree_isolation: '${config.worktreeIsolation}'
       workflow: development-cycle
       inputs:
-        story_file: "${story.file}"
+        story_file: '${story.file}'
         epic_context:
-          epicId: "${config.epicId}"
-          waveNumber: "${wave.number}"
-          totalWaves: "${wave.total}"
+          epicId: '${config.epicId}'
+          waveNumber: '${wave.number}'
+          totalWaves: '${wave.total}'
 
     # Step 2: Wave gate (sequential, after all stories in wave complete)
     wave_gate:
-      description: "Integration review after wave completes"
+      description: 'Integration review after wave completes'
       steps:
-
         - id: integration-review
-          agent: "${wave.gate_agent}"
+          agent: '${wave.gate_agent}'
           action: review_wave_integration
           notes: |
             Review focus (per-story QA already done in development-cycle):
@@ -162,10 +160,10 @@ workflow:
       agent: po
       elicit: true
       options:
-        GO: "Continue to next wave"
-        PAUSE: "Save state, stop execution"
-        REVIEW: "Show wave summary before deciding"
-        ABORT: "Stop the epic"
+        GO: 'Continue to next wave'
+        PAUSE: 'Save state, stop execution'
+        REVIEW: 'Show wave summary before deciding'
+        ABORT: 'Stop the epic'
       on_go: next_wave
       on_pause: save_state
       on_abort: abort_epic
@@ -177,9 +175,9 @@ workflow:
   state:
     persistence:
       enabled: true
-      location: ".aiox/workflow-state/"
+      location: '.aiox/workflow-state/'
       format: json
-      file: "${config.epicId}-pipeline.json"
+      file: '${config.epicId}-pipeline.json'
 
     tracked_fields:
       - current_wave
@@ -209,7 +207,7 @@ workflow:
       escalation: wave_gate
 
     gate_failed:
-      description: "Wave integration gate failed"
+      description: 'Wave integration gate failed'
       action: |
         - Identify failing stories/integrations
         - Create fix tasks for specific issues
@@ -219,7 +217,7 @@ workflow:
       escalation: human
 
     merge_conflict:
-      description: "Conflict during wave branch merge"
+      description: 'Conflict during wave branch merge'
       action: |
         - Follow merge order from execution plan
         - Resolve conflicts in recommended order
@@ -298,24 +296,24 @@ workflow:
 
   related:
     - id: development-cycle
-      role: "Inner loop - runs per story within each wave"
+      role: 'Inner loop - runs per story within each wave'
       file: development-cycle.yaml
 
     - id: qa-loop
-      role: "QA review cycle - used within development-cycle Phase 4"
+      role: 'QA review cycle - used within development-cycle Phase 4'
       file: qa-loop.yaml
 
     - id: auto-worktree
-      role: "Worktree creation - used for parallel story isolation"
+      role: 'Worktree creation - used for parallel story isolation'
       file: auto-worktree.yaml
 
     - id: story-development-cycle
-      role: "Simplified story cycle (legacy) - use development-cycle instead"
+      role: 'Simplified story cycle (legacy) - use development-cycle instead'
       file: story-development-cycle.yaml
 
 metadata:
-  author: "@pm (Bob) + @architect (Aria)"
-  created: "2026-02-06"
+  author: '@pm (Bob) + @architect (Aria)'
+  created: '2026-02-06'
   version: 1.0.0
   tags:
     - epic-orchestration

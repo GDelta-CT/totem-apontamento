@@ -64,9 +64,7 @@ class SurfaceChecker {
    * @param {string} [criteriaPath] - Path to criteria YAML file (optional, uses default)
    */
   constructor(criteriaPath = null) {
-    this.criteriaPath =
-      criteriaPath ||
-      path.join(__dirname, 'bob-surface-criteria.yaml');
+    this.criteriaPath = criteriaPath || path.join(__dirname, 'bob-surface-criteria.yaml');
     this.criteria = null;
     this._loaded = false;
   }

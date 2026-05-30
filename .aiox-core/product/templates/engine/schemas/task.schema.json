@@ -44,7 +44,15 @@
     },
     "type": {
       "type": "string",
-      "enum": ["Development", "Design", "Testing", "Documentation", "Research", "Bugfix", "Refactor"],
+      "enum": [
+        "Development",
+        "Design",
+        "Testing",
+        "Documentation",
+        "Research",
+        "Bugfix",
+        "Refactor"
+      ],
       "description": "Task type"
     },
     "inputs": {

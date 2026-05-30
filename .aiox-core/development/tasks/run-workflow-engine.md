@@ -262,6 +262,7 @@ Invocation N: continue → load state → [end marker] → final report → DONE
 Initialize a new workflow and execute the first action step.
 
 **1. Resolve workflow path** based on `target_context`:
+
 - `core` → `.aiox-core/development/workflows/{workflow_name}.yaml`
 - `squad` → `squads/{squad_name}/workflows/{workflow_name}.yaml`
 - `hybrid` → `squads/{squad_name}/workflows/{workflow_name}.yaml`
@@ -269,6 +270,7 @@ Initialize a new workflow and execute the first action step.
 Read the workflow YAML file.
 
 **2. Validate workflow** using WorkflowValidator:
+
 - Must pass validation before proceeding
 - Display any warnings to the user
 - If validation fails → abort with error details
@@ -277,13 +279,13 @@ Read the workflow YAML file.
 
 ```yaml
 engine_state:
-  workflow_id: {workflow.id}
-  workflow_name: {workflow.name}
-  instance_id: "{workflow_id}-engine-{timestamp}"
-  target_context: {target_context}
-  squad_name: {squad_name}
+  workflow_id: { workflow.id }
+  workflow_name: { workflow.name }
+  instance_id: '{workflow_id}-engine-{timestamp}'
+  target_context: { target_context }
+  squad_name: { squad_name }
   mode: engine
-  started_at: {ISO timestamp}
+  started_at: { ISO timestamp }
   status: active
   current_step_index: 0
   current_phase: null
@@ -293,6 +295,7 @@ engine_state:
 ```
 
 **4. Display header:**
+
 ```
 === Workflow Engine Started: {workflow_name} ===
 Mode: ENGINE (real subagent spawning, step-by-step)
@@ -366,11 +369,12 @@ Skip the current step (only if marked `optional: true`).
 **3. Verify** the step has `optional: true`. If not → error: "Step {id} is not optional."
 
 **4. Record skip** in state:
+
 ```yaml
 step_results:
-  {step_id}:
+  { step_id }:
     status: skipped
-    skipped_at: {timestamp}
+    skipped_at: { timestamp }
 ```
 
 **5. Advance `current_step_index`** past the skipped step.
@@ -390,6 +394,7 @@ Abort the workflow.
 **2. Set status to `aborted`.**
 
 **3. Generate abort report:**
+
 ```
 === Workflow Aborted: {workflow_name} ===
 Instance: {instance_id}
@@ -475,6 +480,7 @@ PROCEDURE advance_and_execute(state, workflow):
 ```
 
 **Display format after each action step:**
+
 ```
 [Step {N}/{total_actions}] @{agent}: {action}
   Status: {completed|failed}
@@ -544,8 +550,8 @@ For each step with `elicit: true`, the orchestrator collects input BEFORE spawni
 
 ```yaml
 user_input:
-  {field_name}: "{user_response}"
-  {field_name}: "{user_response}"
+  { field_name }: '{user_response}'
+  { field_name }: '{user_response}'
 ```
 
 6. Pass this block as `{{USER_INPUT}}` in the subagent prompt
@@ -683,6 +689,7 @@ Extracts structured output from the subagent's response.
 ```
 
 If the YAML block cannot be parsed:
+
 - Extract `status` from any line containing "status: completed" or "status: failed"
 - Extract individual output values by searching for each expected output key
 - Log a warning that structured parsing failed
@@ -717,18 +724,19 @@ For each step with `meta: routing`:
 
 ```yaml
 decisions:
-  - step: {routing_step_id}
-    condition: {condition}
-    evaluated_value: {the value checked}
-    route_chosen: {route_name}
-    action: {loop_back|continue|complete}
-    target: {target_step_id if applicable}
-    timestamp: {ISO timestamp}
+  - step: { routing_step_id }
+    condition: { condition }
+    evaluated_value: { the value checked }
+    route_chosen: { route_name }
+    action: { loop_back|continue|complete }
+    target: { target_step_id if applicable }
+    timestamp: { ISO timestamp }
 ```
 
 ### Threshold Extraction Rules
 
 Parse the route key name to extract comparison:
+
 - `*_below_{N}` → value < N
 - `*_{N}_to_{M}` → N <= value <= M
 - `*_{N}_plus` → value >= N
@@ -741,6 +749,7 @@ Parse the route key name to extract comparison:
 ### Manual Routing Fallback
 
 If no route matches the evaluated value:
+
 1. Display current values to the user
 2. List available routes with their descriptions
 3. Use AskUserQuestion to let user choose

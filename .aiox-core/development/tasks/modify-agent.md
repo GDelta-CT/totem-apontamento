@@ -198,6 +198,7 @@ token_usage: ~800-2,500 tokens
 ```
 
 **Optimization Notes:**
+
 - Validate configuration early; use atomic writes; implement rollback checkpoints
 
 ---
@@ -218,7 +219,9 @@ updated_at: 2025-11-17
 ---
 
 checklists:
-  - change-checklist.md
+
+- change-checklist.md
+
 ---
 
 # Modify Agent Task
@@ -251,6 +254,7 @@ To safely modify existing agent definitions while preserving their structure, ma
 ### 2. Modification Intent Processing
 
 If user provides high-level intent (e.g., "add memory integration capability"):
+
 - Analyze current agent capabilities
 - Determine required changes:
   - New dependencies to add
@@ -259,6 +263,7 @@ If user provides high-level intent (e.g., "add memory integration capability"):
   - Documentation updates
 
 If user provides specific changes:
+
 - Validate change format and targets
 - Check for conflicts with existing structure
 - Ensure changes maintain agent consistency
@@ -266,6 +271,7 @@ If user provides specific changes:
 ### 3. Dependency Resolution
 
 For new dependencies being added:
+
 - Verify files exist in respective directories
 - Check for circular dependencies
 - Validate dependency compatibility
@@ -279,6 +285,7 @@ For new dependencies being added:
 ### 4. Generate Modification Diff
 
 Create a visual diff showing:
+
 ```diff
 @@ Agent: {agent-name} @@
 --- Current Version
@@ -288,7 +295,7 @@ Create a visual diff showing:
   tasks:
     - existing-task.md
 +   - new-capability-task.md
-    
+
 @@ Commands @@
   - help: Show available commands
 + - new-command: Description of new capability
@@ -302,6 +309,7 @@ Create a visual diff showing:
 ### 5. Validation Pipeline
 
 Run comprehensive validation checks:
+
 - YAML syntax validation
 - Markdown structure integrity
 - Dependency existence verification
@@ -312,6 +320,7 @@ Run comprehensive validation checks:
 ### 6. User Approval Flow
 
 Present to user:
+
 1. Summary of changes
 2. Visual diff
 3. Impact analysis:
@@ -325,6 +334,7 @@ Request explicit approval before applying changes.
 ### 7. Apply Modifications
 
 Upon approval:
+
 1. Write modified content to agent file
 2. Update component metadata registry
 3. Create git commit with descriptive message
@@ -342,6 +352,7 @@ Upon approval:
 ### 9. Rollback Capability
 
 If issues detected or user requests rollback:
+
 1. Restore from timestamped backup
 2. Revert git commit
 3. Update metadata registry
@@ -395,4 +406,4 @@ Agent ready for use with enhanced capabilities.
 - Uses `component-metadata.js` for registry updates
 - Integrates with `git-wrapper.js` for version control
 - Leverages `yaml-validator.js` for syntax checking
-- Coordinates with `rollback-handler.js` for recovery 
+- Coordinates with `rollback-handler.js` for recovery

@@ -25,44 +25,48 @@ class ModificationRiskAssessment {
    */
   async assessRisks(targetComponent, analysisData, options = {}) {
     const assessmentId = `risk-${Date.now()}`;
-    
+
     try {
       console.log(chalk.blue(`⚠️ Assessing modification risks for: ${targetComponent.path}`));
-      
+
       const config = {
         riskThreshold: options.riskThreshold || 'medium',
         includeMitigations: options.includeMitigations !== false,
-        assessmentDepth: options.assessmentDepth || 'comprehensive', 
+        assessmentDepth: options.assessmentDepth || 'comprehensive',
         modificationType: options.modificationType || 'modify',
         ...options,
       };
 
       // Analyze risk factors across multiple dimensions
-      const riskDimensions = await this.analyzeRiskDimensions(targetComponent, analysisData, config);
-      
+      const riskDimensions = await this.analyzeRiskDimensions(
+        targetComponent,
+        analysisData,
+        config
+      );
+
       // Calculate overall risk score
       const overallRisk = this.calculateOverallRisk(riskDimensions);
-      
+
       // Identify critical issues
       const criticalIssues = this.identifyCriticalIssues(riskDimensions, analysisData);
-      
+
       // Generate risk factors list
       const riskFactors = this.generateRiskFactors(riskDimensions, analysisData);
-      
+
       // Create risk mitigation recommendations
       const recommendations = await this.generateRiskRecommendations(
         targetComponent,
         riskDimensions,
         criticalIssues,
-        config,
+        config
       );
-      
+
       // Generate risk timeline and impact projection
       const riskProjection = await this.generateRiskProjection(
         targetComponent,
         riskDimensions,
         analysisData,
-        config,
+        config
       );
 
       const assessment = {
@@ -101,7 +105,6 @@ class ModificationRiskAssessment {
       console.log(chalk.gray(`   Recommendations: ${recommendations.length}`));
 
       return assessment;
-
     } catch (error) {
       console.error(chalk.red(`Risk assessment failed: ${error.message}`));
       throw error;
@@ -113,8 +116,14 @@ class ModificationRiskAssessment {
    */
   async analyzeRiskDimensions(targetComponent, analysisData, config) {
     const dimensions = {
-      dependency_risk: await this.assessDependencyRisk(targetComponent, analysisData.dependencyImpact),
-      propagation_risk: await this.assessPropagationRisk(targetComponent, analysisData.propagationAnalysis),
+      dependency_risk: await this.assessDependencyRisk(
+        targetComponent,
+        analysisData.dependencyImpact
+      ),
+      propagation_risk: await this.assessPropagationRisk(
+        targetComponent,
+        analysisData.propagationAnalysis
+      ),
       structural_risk: await this.assessStructuralRisk(targetComponent, config),
       operational_risk: await this.assessOperationalRisk(targetComponent, analysisData, config),
       security_risk: await this.assessSecurityRisk(targetComponent, config),
@@ -171,8 +180,8 @@ class ModificationRiskAssessment {
     }
 
     // Framework core dependencies are high risk
-    const frameworkCoreComponents = dependencyImpact.affectedComponents.filter(comp => 
-      comp.path.includes('aiox-core') && comp.impactScore >= 7,
+    const frameworkCoreComponents = dependencyImpact.affectedComponents.filter(
+      (comp) => comp.path.includes('aiox-core') && comp.impactScore >= 7
     ).length;
 
     if (frameworkCoreComponents > 0) {
@@ -227,9 +236,11 @@ class ModificationRiskAssessment {
     }
 
     // Breaking changes in propagation
-    const breakingChanges = [...(propagationAnalysis.directEffects || []), ...(propagationAnalysis.cascadingEffects || [])]
-      .filter(effect => effect.changeType?.severity === 'breaking').length;
-    
+    const breakingChanges = [
+      ...(propagationAnalysis.directEffects || []),
+      ...(propagationAnalysis.cascadingEffects || []),
+    ].filter((effect) => effect.changeType?.severity === 'breaking').length;
+
     if (breakingChanges > 0) {
       risk.score += 3;
       risk.factors.push(`${breakingChanges} breaking changes in propagation`);
@@ -307,7 +318,8 @@ class ModificationRiskAssessment {
     // File size and complexity risk
     try {
       const stats = await fs.stat(targetComponent.fullPath || targetComponent.path);
-      if (stats.size > 50000) { // Large files are riskier to modify
+      if (stats.size > 50000) {
+        // Large files are riskier to modify
         risk.score += 1;
         risk.factors.push('Large file size increases modification risk');
       }
@@ -351,18 +363,21 @@ class ModificationRiskAssessment {
     }
 
     // Error handling and recovery
-    const hasErrorHandling = targetComponent.content && 
+    const hasErrorHandling =
+      targetComponent.content &&
       (targetComponent.content.includes('try') || targetComponent.content.includes('catch'));
-    
+
     if (!hasErrorHandling && targetComponent.type !== 'task') {
       risk.score += 1;
       risk.factors.push('Component lacks comprehensive error handling');
     }
 
     // Monitoring and observability
-    const hasLogging = targetComponent.content && 
-      (targetComponent.content.includes('console.log') || targetComponent.content.includes('logger'));
-    
+    const hasLogging =
+      targetComponent.content &&
+      (targetComponent.content.includes('console.log') ||
+        targetComponent.content.includes('logger'));
+
     if (!hasLogging && (targetComponent.type === 'agent' || targetComponent.type === 'workflow')) {
       risk.score += 1;
       risk.factors.push('Limited observability for operational monitoring');
@@ -392,30 +407,39 @@ class ModificationRiskAssessment {
     }
 
     // External network access
-    if (targetComponent.content && 
-        (targetComponent.content.includes('http') || targetComponent.content.includes('fetch') || 
-         targetComponent.content.includes('axios'))) {
+    if (
+      targetComponent.content &&
+      (targetComponent.content.includes('http') ||
+        targetComponent.content.includes('fetch') ||
+        targetComponent.content.includes('axios'))
+    ) {
       risk.score += 2;
       risk.factors.push('Component makes external network requests');
     }
 
     // Process execution
-    if (targetComponent.content && 
-        (targetComponent.content.includes('exec') || targetComponent.content.includes('spawn'))) {
+    if (
+      targetComponent.content &&
+      (targetComponent.content.includes('exec') || targetComponent.content.includes('spawn'))
+    ) {
       risk.score += 3;
       risk.factors.push('Component executes external processes');
     }
 
     // User input handling
-    if (targetComponent.content && 
-        (targetComponent.content.includes('input') || targetComponent.content.includes('prompt'))) {
+    if (
+      targetComponent.content &&
+      (targetComponent.content.includes('input') || targetComponent.content.includes('prompt'))
+    ) {
       risk.score += 1;
       risk.factors.push('Component handles user input');
     }
 
     // Removal of security components
-    if (config.modificationType === 'remove' && 
-        (targetComponent.path.includes('security') || targetComponent.path.includes('validation'))) {
+    if (
+      config.modificationType === 'remove' &&
+      (targetComponent.path.includes('security') || targetComponent.path.includes('validation'))
+    ) {
       risk.score += 4;
       risk.factors.push('Removing security-related component');
     }
@@ -438,8 +462,11 @@ class ModificationRiskAssessment {
     };
 
     // API changes
-    if (targetComponent.content && 
-        (targetComponent.content.includes('module.exports') || targetComponent.content.includes('export'))) {
+    if (
+      targetComponent.content &&
+      (targetComponent.content.includes('module.exports') ||
+        targetComponent.content.includes('export'))
+    ) {
       if (config.modificationType === 'refactor' || config.modificationType === 'modify') {
         risk.score += 2;
         risk.factors.push('Modification may change public API');
@@ -496,9 +523,9 @@ class ModificationRiskAssessment {
     }
 
     // Multiple file dependencies
-    const hasMultipleDependencies = targetComponent.content && 
-      (targetComponent.content.match(/require\s*\(/g) || []).length > 5;
-    
+    const hasMultipleDependencies =
+      targetComponent.content && (targetComponent.content.match(/require\s*\(/g) || []).length > 5;
+
     if (hasMultipleDependencies) {
       risk.score += 1;
       risk.factors.push('Multiple dependencies complicate rollback');
@@ -511,8 +538,10 @@ class ModificationRiskAssessment {
     }
 
     // Database or persistent storage
-    if (targetComponent.content && 
-        (targetComponent.content.includes('database') || targetComponent.content.includes('storage'))) {
+    if (
+      targetComponent.content &&
+      (targetComponent.content.includes('database') || targetComponent.content.includes('storage'))
+    ) {
       risk.score += 2;
       risk.factors.push('Persistent storage changes complicate rollback');
     }
@@ -536,7 +565,7 @@ class ModificationRiskAssessment {
 
     // Check if component has tests
     const testFiles = await this.findComponentTestFiles(targetComponent);
-    
+
     if (testFiles.length === 0) {
       risk.score += 3;
       risk.factors.push('No existing tests found for component');
@@ -549,16 +578,19 @@ class ModificationRiskAssessment {
     if (targetComponent.content) {
       const functionCount = (targetComponent.content.match(/function\s+\w+/g) || []).length;
       const methodCount = (targetComponent.content.match(/\w+\s*\([^)]*\)\s*{/g) || []).length;
-      
-      if ((functionCount + methodCount) > 5 && testFiles.length < 2) {
+
+      if (functionCount + methodCount > 5 && testFiles.length < 2) {
         risk.score += 2;
         risk.factors.push('Complex component with insufficient tests');
       }
     }
 
     // Integration testing gap
-    const hasIntegrationTests = testFiles.some(test => test.includes('integration'));
-    if (!hasIntegrationTests && (targetComponent.type === 'agent' || targetComponent.type === 'workflow')) {
+    const hasIntegrationTests = testFiles.some((test) => test.includes('integration'));
+    if (
+      !hasIntegrationTests &&
+      (targetComponent.type === 'agent' || targetComponent.type === 'workflow')
+    ) {
       risk.score += 2;
       risk.factors.push('Missing integration tests for critical component');
     }
@@ -596,7 +628,7 @@ class ModificationRiskAssessment {
 
     const overallScore = totalWeight > 0 ? weightedScore / totalWeight : 0;
     const roundedScore = Math.round(overallScore * 10) / 10;
-    
+
     return {
       score: roundedScore,
       level: this.scoresToRiskLevel(roundedScore),
@@ -629,14 +661,16 @@ class ModificationRiskAssessment {
         severity: 'critical',
         score: 9,
         description: 'Critical components affected by modification',
-        factors: [`${analysisData.dependencyImpact.impactCategories.critical.length} critical dependencies`],
+        factors: [
+          `${analysisData.dependencyImpact.impactCategories.critical.length} critical dependencies`,
+        ],
       });
     }
 
     if (analysisData.propagationAnalysis?.criticalPaths?.length > 2) {
       criticalIssues.push({
         dimension: 'propagation_critical',
-        severity: 'critical',  
+        severity: 'critical',
         score: 8,
         description: 'Multiple critical propagation paths detected',
         factors: [`${analysisData.propagationAnalysis.criticalPaths.length} critical paths`],
@@ -850,11 +884,31 @@ class ModificationRiskAssessment {
 
     // Risk timeline
     const riskEvents = [
-      { time: 'T+0h', event: 'Modification applied', risk_level: riskDimensions.structural_risk?.score || 0 },
-      { time: 'T+1h', event: 'Immediate effects manifest', risk_level: riskDimensions.operational_risk?.score || 0 },
-      { time: 'T+24h', event: 'Dependency effects emerge', risk_level: riskDimensions.dependency_risk?.score || 0 },
-      { time: 'T+1w', event: 'Propagation effects stabilize', risk_level: riskDimensions.propagation_risk?.score || 0 },
-      { time: 'T+1m', event: 'Long-term stability assessment', risk_level: Math.max(riskDimensions.compatibility_risk?.score || 0, 2) },
+      {
+        time: 'T+0h',
+        event: 'Modification applied',
+        risk_level: riskDimensions.structural_risk?.score || 0,
+      },
+      {
+        time: 'T+1h',
+        event: 'Immediate effects manifest',
+        risk_level: riskDimensions.operational_risk?.score || 0,
+      },
+      {
+        time: 'T+24h',
+        event: 'Dependency effects emerge',
+        risk_level: riskDimensions.dependency_risk?.score || 0,
+      },
+      {
+        time: 'T+1w',
+        event: 'Propagation effects stabilize',
+        risk_level: riskDimensions.propagation_risk?.score || 0,
+      },
+      {
+        time: 'T+1m',
+        event: 'Long-term stability assessment',
+        risk_level: Math.max(riskDimensions.compatibility_risk?.score || 0, 2),
+      },
     ];
 
     projection.risk_timeline = riskEvents;
@@ -876,7 +930,13 @@ class ModificationRiskAssessment {
     const testFiles = [];
     const possibleTestPaths = [
       path.join(this.rootPath, 'tests', 'unit', component.type, `${component.name}.test.js`),
-      path.join(this.rootPath, 'tests', 'integration', component.type, `${component.name}.integration.test.js`),
+      path.join(
+        this.rootPath,
+        'tests',
+        'integration',
+        component.type,
+        `${component.name}.integration.test.js`
+      ),
       path.join(this.rootPath, 'test', `${component.name}.test.js`),
     ];
 
@@ -920,17 +980,17 @@ class ModificationRiskAssessment {
     // Higher structural and operational risks decay slower
     const structuralWeight = riskDimensions.structural_risk?.score || 0;
     const operationalWeight = riskDimensions.operational_risk?.score || 0;
-    
+
     const avgWeight = (structuralWeight + operationalWeight) / 2;
-    
+
     if (avgWeight >= 7) return 'slow';
     if (avgWeight >= 4) return 'medium';
     return 'fast';
   }
 
   calculateMonitoringPeriod(riskDimensions) {
-    const maxRisk = Math.max(...Object.values(riskDimensions).map(risk => risk.score));
-    
+    const maxRisk = Math.max(...Object.values(riskDimensions).map((risk) => risk.score));
+
     if (maxRisk >= 8) return '1 month';
     if (maxRisk >= 6) return '2 weeks';
     if (maxRisk >= 4) return '1 week';
@@ -951,18 +1011,21 @@ class ModificationRiskAssessment {
 
   calculateRiskDistribution() {
     const distribution = { low: 0, medium: 0, high: 0, critical: 0 };
-    
-    this.assessmentHistory.forEach(assessment => {
+
+    this.assessmentHistory.forEach((assessment) => {
       distribution[assessment.riskLevel]++;
     });
-    
+
     return distribution;
   }
 
   calculateAverageRiskScore() {
     if (this.assessmentHistory.length === 0) return 0;
-    
-    const totalScore = this.assessmentHistory.reduce((sum, assessment) => sum + assessment.riskScore, 0);
+
+    const totalScore = this.assessmentHistory.reduce(
+      (sum, assessment) => sum + assessment.riskScore,
+      0
+    );
     return Math.round((totalScore / this.assessmentHistory.length) * 10) / 10;
   }
 }

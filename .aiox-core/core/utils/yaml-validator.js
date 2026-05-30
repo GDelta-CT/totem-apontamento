@@ -79,7 +79,6 @@ class YAMLValidator {
 
       // General validations
       this.validateGeneral(results.parsed, results);
-
     } catch (error) {
       results.valid = false;
       results.errors.push({
@@ -106,10 +105,12 @@ class YAMLValidator {
       return {
         valid: false,
         filePath,
-        errors: [{
-          type: 'file_error',
-          message: `Could not read file: ${error.message}`,
-        }],
+        errors: [
+          {
+            type: 'file_error',
+            message: `Could not read file: ${error.message}`,
+          },
+        ],
       };
     }
   }
@@ -136,21 +137,13 @@ class YAMLValidator {
     if (rules.structure) {
       for (const [field, fieldRules] of Object.entries(rules.structure)) {
         if (data[field]) {
-          this.validateFieldStructure(
-            data[field],
-            field,
-            fieldRules,
-            results,
-          );
+          this.validateFieldStructure(data[field], field, fieldRules, results);
         }
       }
     }
 
     // Warn about unknown fields
-    const allKnownFields = [
-      ...(rules.required || []),
-      ...(rules.optional || []),
-    ];
+    const allKnownFields = [...(rules.required || []), ...(rules.optional || [])];
 
     for (const field of Object.keys(data)) {
       if (!allKnownFields.includes(field)) {
@@ -329,8 +322,10 @@ class YAMLValidator {
       // Handle key-value pairs
       else if (trimmed.includes(':')) {
         // Pop stack until we find the right level
-        while (indentStack.length > 1 &&
-               line.length - line.trimStart().length < indentStack[indentStack.length - 1]) {
+        while (
+          indentStack.length > 1 &&
+          line.length - line.trimStart().length < indentStack[indentStack.length - 1]
+        ) {
           indentStack.pop();
         }
 
@@ -338,8 +333,12 @@ class YAMLValidator {
         fixedLines.push(' '.repeat(currentLevel) + trimmed);
 
         // If this opens a new block, push new indent level
-        if (trimmed.endsWith(':') || (i + 1 < lines.length && lines[i + 1].trim() &&
-            lines[i + 1].length - lines[i + 1].trimStart().length > currentLevel)) {
+        if (
+          trimmed.endsWith(':') ||
+          (i + 1 < lines.length &&
+            lines[i + 1].trim() &&
+            lines[i + 1].length - lines[i + 1].trimStart().length > currentLevel)
+        ) {
           indentStack.push(currentLevel + 2);
         }
       } else {
@@ -356,10 +355,7 @@ class YAMLValidator {
    */
   fixQuotes(content) {
     // Fix unquoted strings that need quotes
-    return content.replace(
-      /^(\s*\w+):\s*([^"'\n]*[:{}|>&*!%@`][^"'\n]*)$/gm,
-      '$1: "$2"',
-    );
+    return content.replace(/^(\s*\w+):\s*([^"'\n]*[:{}|>&*!%@`][^"'\n]*)$/gm, '$1: "$2"');
   }
 
   /**

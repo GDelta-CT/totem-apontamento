@@ -44,13 +44,13 @@ atomic_layer: [Atom | Molecule | Organism | Template | Page | Config | Strategy 
       tipo: pre-condition
       blocker: [true|false]
       validação: [validation logic or test path]
-  
+
   post-conditions:
     - [ ] [condition description]
       tipo: post-condition
       blocker: [true|false]
       validação: [validation logic or test path]
-  
+
   acceptance-criteria:
     - [ ] [acceptance description]
       tipo: acceptance
@@ -119,11 +119,13 @@ atomic_layer: [Atom | Molecule | Organism | Template | Page | Config | Strategy 
 **Purpose:** Unique identifier for the task function.
 
 **Validation:**
+
 - Must be unique across workflow
 - Must be valid JavaScript function name
 - Must end with `()`
 
 **Examples:**
+
 ```yaml
 task: loadFormatConfig()
 task: analyzeBrief()
@@ -141,6 +143,7 @@ task: designCTAComponent()
 **Purpose:** Human-readable name of the responsible entity.
 
 **Examples:**
+
 ```yaml
 responsável: Creative Director
 responsável: format-loader.js
@@ -159,12 +162,14 @@ responsável: Brad Frost Clone
 **Purpose:** Defines the executor type for orchestration, cost tracking, and error handling.
 
 **Validation:**
+
 - Must be one of the 4 allowed values
 - Determines execution environment
 
 **Decision Tree:** See `EXECUTOR-DECISION-TREE.md`
 
 **Examples:**
+
 ```yaml
 responsavel_type: Agente  # AI-powered execution
 responsavel_type: Worker  # Script-based execution
@@ -179,16 +184,19 @@ responsavel_type: Clone   # Mind emulation with heuristics
 **Type:** `enum`  
 **Required:** ✅ Yes (for design-related tasks), ⚠️ Optional (for config/strategy)  
 **Values:**
+
 - **Atomic Design:** `Atom | Molecule | Organism | Template | Page`
 - **Other Layers:** `Config | Strategy | Content | Media | Layout | Analysis`
 
 **Purpose:** Maps task to Atomic Design layer for architecture validation.
 
 **Validation:**
+
 - Design tasks MUST specify Atomic Design layer
 - Non-design tasks SHOULD specify functional layer
 
 **Examples:**
+
 ```yaml
 atomic_layer: Atom       # Step 7a: Design CTA (single component)
 atomic_layer: Molecule   # Step 8a: Compose Text Group (title + body + cta)
@@ -222,14 +230,14 @@ atomic_layer: Strategy   # Step 3: Analyze Brief
 
 **Field Details:**
 
-| Sub-field | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `campo` | string | ✅ Yes | Field name (camelCase) |
-| `tipo` | string | ✅ Yes | Type definition (see Type System below) |
-| `origem` | string | ✅ Yes | Source step ID or "config" or "user input" |
-| `obrigatório` | boolean | ✅ Yes | Whether field is required |
-| `padrão` | any | ⚠️ Optional | Default value if not provided |
-| `validação` | string | ⚠️ Optional | Validation rule or JSON Schema reference |
+| Sub-field     | Type    | Required    | Description                                |
+| ------------- | ------- | ----------- | ------------------------------------------ |
+| `campo`       | string  | ✅ Yes      | Field name (camelCase)                     |
+| `tipo`        | string  | ✅ Yes      | Type definition (see Type System below)    |
+| `origem`      | string  | ✅ Yes      | Source step ID or "config" or "user input" |
+| `obrigatório` | boolean | ✅ Yes      | Whether field is required                  |
+| `padrão`      | any     | ⚠️ Optional | Default value if not provided              |
+| `validação`   | string  | ⚠️ Optional | Validation rule or JSON Schema reference   |
 
 **Examples:**
 
@@ -278,13 +286,13 @@ atomic_layer: Strategy   # Step 3: Analyze Brief
 
 **Field Details:**
 
-| Sub-field | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `campo` | string | ✅ Yes | Field name (camelCase) |
-| `tipo` | string | ✅ Yes | Type definition |
-| `destino` | string or array | ✅ Yes | Destination step(s) or "state" or "output" |
-| `persistido` | boolean | ✅ Yes | Whether saved to ad-spec.json or DB |
-| `cache_key` | string | ⚠️ Optional | Cache key if output is cacheable |
+| Sub-field    | Type            | Required    | Description                                |
+| ------------ | --------------- | ----------- | ------------------------------------------ |
+| `campo`      | string          | ✅ Yes      | Field name (camelCase)                     |
+| `tipo`       | string          | ✅ Yes      | Type definition                            |
+| `destino`    | string or array | ✅ Yes      | Destination step(s) or "state" or "output" |
+| `persistido` | boolean         | ✅ Yes      | Whether saved to ad-spec.json or DB        |
+| `cache_key`  | string          | ⚠️ Optional | Cache key if output is cacheable           |
 
 **Examples:**
 
@@ -328,14 +336,14 @@ atomic_layer: Strategy   # Step 3: Analyze Brief
       blocker: [true|false]
       validação: [logic or test path]
       error_message: [message if fails]
-  
+
   post-conditions:
     - [ ] [description]
       tipo: post-condition
       blocker: [true|false]
       validação: [logic or test path]
       rollback: [true|false]
-  
+
   acceptance-criteria:
     - [ ] [description]
       tipo: acceptance
@@ -378,13 +386,13 @@ atomic_layer: Strategy   # Step 3: Analyze Brief
           throw new Error("Brand typography not loaded");
         }
       error_message: "Brand typography missing or invalid"
-    
+
     - [ ] adCopy.title is not empty
       tipo: pre-condition
       blocker: true
       validação: "expect(adCopy.title).toBeTruthy()"
       error_message: "Copy title is required"
-  
+
   post-conditions:
     - [ ] typography.title.htmlContent is valid HTML
       tipo: post-condition
@@ -393,7 +401,7 @@ atomic_layer: Strategy   # Step 3: Analyze Brief
         const isValid = await validateHTML(typography.title.htmlContent);
         if (!isValid) throw new Error("Invalid HTML");
       rollback: false
-    
+
     - [ ] All required transformations applied
       tipo: post-condition
       blocker: true
@@ -401,7 +409,7 @@ atomic_layer: Strategy   # Step 3: Analyze Brief
         expect(typography.title.transformations).toBeInstanceOf(Array);
         expect(typography.title.transformations.length).toBeGreaterThan(0);
       rollback: false
-  
+
   acceptance-criteria:
     - [ ] Typography matches brand voice (bold, uppercase for urgent CTAs)
       tipo: acceptance
@@ -409,7 +417,7 @@ atomic_layer: Strategy   # Step 3: Analyze Brief
       story: STORY-006
       manual_check: false
       test: "tests/typography-brand-voice.test.js"
-    
+
     - [ ] Transformations are visually appealing
       tipo: acceptance
       blocker: false
@@ -439,13 +447,13 @@ atomic_layer: Strategy   # Step 3: Analyze Brief
 
 **Template Types:**
 
-| Type | Purpose | Example |
-|------|---------|---------|
-| `input` | Validates input schema | `templates/input-schemas/analyze-brief.json` |
-| `output` | Validates output schema | `templates/output-schemas/analyze-brief.json` |
-| `prompt` | AI agent prompt structure | `Squads/.../analyze-ad-brief.md` |
-| `ui` | Human interface form | `templates/ui-forms/manual-approval.html` |
-| `script` | Worker script template | `templates/scripts/image-processor.sh` |
+| Type     | Purpose                   | Example                                       |
+| -------- | ------------------------- | --------------------------------------------- |
+| `input`  | Validates input schema    | `templates/input-schemas/analyze-brief.json`  |
+| `output` | Validates output schema   | `templates/output-schemas/analyze-brief.json` |
+| `prompt` | AI agent prompt structure | `Squads/.../analyze-ad-brief.md`              |
+| `ui`     | Human interface form      | `templates/ui-forms/manual-approval.html`     |
+| `script` | Worker script template    | `templates/scripts/image-processor.sh`        |
 
 **Examples:**
 
@@ -464,7 +472,7 @@ atomic_layer: Strategy   # Step 3: Analyze Brief
   type: script
   version: 1.0.0
   variables: [format_id, orientation]
-  
+
 # Humano executor with UI form
 **Template:**
 - path: templates/ui-forms/manual-review-ad-quality.html
@@ -481,6 +489,7 @@ atomic_layer: Strategy   # Step 3: Analyze Brief
 **Required:** ⚠️ Recommended (to document reusability)
 
 **Purpose:** Catalogs reusable tools/functions used by the task, enabling:
+
 - **Reusability tracking** (which tasks share tools)
 - **Versioning** (tool updates affect which tasks)
 - **Cost tracking** (tool API costs)
@@ -506,18 +515,18 @@ atomic_layer: Strategy   # Step 3: Analyze Brief
     used_for: AIOX agent caller with retry logic
     shared_with: [Step 3, Step 4, Step 5, Step 6, Step 7, Step 8, Step 9, Step 11]
     cost: varies by agent
-    
+
 - validateHTML:
     version: 2.1.0
     used_for: HTML validation using htmlhint
     shared_with: [Step 6, Step 13]
-    
+
 - detectFaces:
     version: 1.0.0
     used_for: Face detection via OpenRouter Gemini 2.5 Flash
     shared_with: [Step 10]
     cost: $0.002 per image
-    
+
 - validateContrast:
     version: 1.0.0
     used_for: WCAG AA color contrast validation
@@ -551,12 +560,12 @@ atomic_layer: Strategy   # Step 3: Analyze Brief
     description: Loads format configuration from JSON file
     language: javascript
     version: 1.0.0
-    
+
 - scripts/utils/face-detection.js:
     description: Wrapper for OpenRouter face detection API
     language: javascript
     version: 1.2.0
-    
+
 - scripts/export/puppeteer-renderer.js:
     description: Renders HTML to PNG using Puppeteer
     language: javascript
@@ -645,11 +654,11 @@ atomic_layer: Strategy   # Step 3: Analyze Brief
 
 **Strategies:**
 
-| Strategy | When to Use | Example |
-|----------|-------------|---------|
-| `retry` | Transient errors (API timeout, rate limit) | AI agent call failed with 429 |
-| `fallback` | Recoverable errors (AI failed, use default) | Template selection → fallback to default |
-| `abort` | Critical errors (invalid brand_id, missing template) | Brand not found → abort workflow |
+| Strategy   | When to Use                                          | Example                                  |
+| ---------- | ---------------------------------------------------- | ---------------------------------------- |
+| `retry`    | Transient errors (API timeout, rate limit)           | AI agent call failed with 429            |
+| `fallback` | Recoverable errors (AI failed, use default)          | Template selection → fallback to default |
+| `abort`    | Critical errors (invalid brand_id, missing template) | Brand not found → abort workflow         |
 
 **Examples:**
 
@@ -781,25 +790,37 @@ AdAnalysis             # References schemas/AdAnalysis.json
 ```javascript
 function validateTask(task) {
   const required = ['task', 'responsável', 'responsavel_type', 'atomic_layer', 'Entrada', 'Saída'];
-  
+
   for (const field of required) {
     if (!task[field]) {
       throw new Error(`Missing required field: ${field}`);
     }
   }
-  
+
   // Validate executor type
   const validExecutors = ['Agente', 'Worker', 'Humano', 'Clone'];
   if (!validExecutors.includes(task.responsavel_type)) {
     throw new Error(`Invalid responsavel_type: ${task.responsavel_type}`);
   }
-  
+
   // Validate atomic layer
-  const validLayers = ['Atom', 'Molecule', 'Organism', 'Template', 'Page', 'Config', 'Strategy', 'Content', 'Media', 'Layout', 'Analysis'];
+  const validLayers = [
+    'Atom',
+    'Molecule',
+    'Organism',
+    'Template',
+    'Page',
+    'Config',
+    'Strategy',
+    'Content',
+    'Media',
+    'Layout',
+    'Analysis',
+  ];
   if (!validLayers.includes(task.atomic_layer)) {
     throw new Error(`Invalid atomic_layer: ${task.atomic_layer}`);
   }
-  
+
   return true;
 }
 ```
@@ -809,15 +830,16 @@ function validateTask(task) {
 ```javascript
 function validateInputOutput(io, type) {
   const required = ['campo', 'tipo', 'origem', 'obrigatório'];
-  
+
   for (const item of io) {
     for (const field of required) {
-      if (!item[field] && field !== 'origem') {  // origem not required for output
+      if (!item[field] && field !== 'origem') {
+        // origem not required for output
         throw new Error(`${type} missing required field: ${field}`);
       }
     }
   }
-  
+
   return true;
 }
 ```
@@ -866,7 +888,7 @@ atomic_layer: Strategy
       tipo: pre-condition
       blocker: true
       validação: "expect(brief_text.length).toBeGreaterThanOrEqual(50)"
-  
+
   post-conditions:
     - [ ] adAnalysis contains all required fields
       tipo: post-condition
@@ -874,7 +896,7 @@ atomic_layer: Strategy
       validação: |
         expect(adAnalysis.goal).toBeTruthy();
         expect(adAnalysis.urgencyLevel).toMatch(/high|medium|low/);
-  
+
   acceptance-criteria:
     - [ ] Analysis aligns with brand voice
       tipo: acceptance
@@ -969,7 +991,7 @@ atomic_layer: Config
         if (!validFormats.includes(format_id)) {
           throw new Error(`Invalid format_id: ${format_id}`);
         }
-  
+
   post-conditions:
     - [ ] formatConfig.safeZones are defined
       tipo: post-condition
@@ -977,7 +999,7 @@ atomic_layer: Config
       validação: |
         expect(formatConfig.safeZones).toBeDefined();
         expect(formatConfig.safeZones.top).toBeGreaterThan(0);
-    
+
     - [ ] formatConfig.contentArea.height calculated correctly
       tipo: post-condition
       blocker: true
@@ -1074,14 +1096,14 @@ atomic_layer: Page
         if (!fs.existsSync(final_ad_png)) {
           throw new Error(`Ad PNG not found: ${final_ad_png}`);
         }
-  
+
   acceptance-criteria:
     - [ ] Ad meets all quality criteria
       tipo: acceptance
       blocker: false
       story: STORY-QA
       manual_check: true
-    
+
     - [ ] Reviewer provided detailed feedback
       tipo: acceptance
       blocker: false
@@ -1162,7 +1184,7 @@ atomic_layer: Atom
       tipo: pre-condition
       blocker: true
       validação: "expect(ctaComponent).toBeDefined()"
-  
+
   post-conditions:
     - [ ] No Atomic Design violations detected
       tipo: post-condition
@@ -1174,7 +1196,7 @@ atomic_layer: Atom
             throw new Error(`Atomic Design violations: ${criticalViolations.map(v => v.message).join(', ')}`);
           }
         }
-    
+
     - [ ] All components are context-agnostic (no positioning)
       tipo: post-condition
       blocker: true
@@ -1185,7 +1207,7 @@ atomic_layer: Atom
         if (badgeComponent && (badgeComponent.position || badgeComponent.size)) {
           throw new Error("Badge component has positioning data (DECISION-03 violation)");
         }
-  
+
   acceptance-criteria:
     - [ ] Components follow Brad Frost's Atomic Design principles
       tipo: acceptance
@@ -1352,7 +1374,7 @@ atomic_layer: Strategy    # ← ADDED
       tipo: pre-condition
       blocker: true
       validação: "expect(brief_text.length).toBeGreaterThanOrEqual(50)"
-  
+
   post-conditions:
     - [ ] adAnalysis contains all required fields
       tipo: post-condition
@@ -1399,16 +1421,16 @@ atomic_layer: Strategy    # ← ADDED
 
 ## Version History
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0.0 | 2025-11-13 | Brad Frost Clone | Initial specification |
+| Version | Date       | Author           | Changes               |
+| ------- | ---------- | ---------------- | --------------------- |
+| 1.0.0   | 2025-11-13 | Brad Frost Clone | Initial specification |
 
 ---
 
 **END OF TASK FORMAT SPECIFICATION**
 
 **Related Documents:**
+
 - `EXECUTOR-DECISION-TREE.md` - How to choose executor type
 - `TEMPLATE-SYSTEM-GUIDE.md` - Template design patterns
 - `TOOLS-AND-SCRIPTS-CATALOG.md` - Available tools reference
-

@@ -153,12 +153,13 @@ class PipelineMetrics {
   getSummary() {
     const values = Object.values(this.layers);
     return {
-      total_ms: this.totalStart != null && this.totalEnd != null
-        ? Number(this.totalEnd - this.totalStart) / 1e6
-        : 0,
-      layers_loaded: values.filter(l => l.status === 'ok').length,
-      layers_skipped: values.filter(l => l.status === 'skipped').length,
-      layers_errored: values.filter(l => l.status === 'error').length,
+      total_ms:
+        this.totalStart != null && this.totalEnd != null
+          ? Number(this.totalEnd - this.totalStart) / 1e6
+          : 0,
+      layers_loaded: values.filter((l) => l.status === 'ok').length,
+      layers_skipped: values.filter((l) => l.status === 'skipped').length,
+      layers_errored: values.filter((l) => l.status === 'error').length,
       total_rules: values.reduce((sum, l) => sum + (l.rules || 0), 0),
       per_layer: this.layers,
     };
@@ -232,7 +233,8 @@ class SynapseEngine {
    * @returns {Promise<{ xml: string, metrics: object }>}
    */
   async process(prompt, session, processConfig) {
-    const safeProcessConfig = (processConfig && typeof processConfig === 'object') ? processConfig : {};
+    const safeProcessConfig =
+      processConfig && typeof processConfig === 'object' ? processConfig : {};
     const mergedConfig = { ...this.config, ...safeProcessConfig };
     const metrics = new PipelineMetrics();
     metrics.totalStart = process.hrtime.bigint();
@@ -316,10 +318,14 @@ class SynapseEngine {
       const hints = await this.memoryBridge.getMemoryHints(
         (session && session.activeAgent) || (session && session.active_agent) || '',
         bracket,
-        tokenBudget,
+        tokenBudget
       );
       if (hints.length > 0) {
-        const memoryResult = { layer: 'memory', rules: hints, metadata: { layer: 'memory', source: 'memory' } };
+        const memoryResult = {
+          layer: 'memory',
+          rules: hints,
+          metadata: { layer: 'memory', source: 'memory' },
+        };
         results.push(memoryResult);
         previousLayers.push(memoryResult);
       }
@@ -340,7 +346,7 @@ class SynapseEngine {
       mergedConfig.devmode === true,
       summary,
       tokenBudget,
-      needsHandoffWarning(bracket),
+      needsHandoffWarning(bracket)
     );
 
     return { xml, metrics: summary, bracket };
@@ -385,7 +391,8 @@ class SynapseEngine {
       }
       fs.writeFileSync(
         path.join(metricsDir, 'hook-metrics.json'),
-        JSON.stringify(data, null, 2), 'utf8',
+        JSON.stringify(data, null, 2),
+        'utf8'
       );
     } catch {
       // Fire-and-forget: never block the hook pipeline

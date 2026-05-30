@@ -37,14 +37,12 @@ class TemplateEngine {
     // Store baseDir as instance property for predictable path resolution
     this.baseDir = options.baseDir || process.cwd();
 
-    this.templatesDir = options.templatesDir ||
-      path.join(this.baseDir, '.aiox-core', 'product', 'templates');
+    this.templatesDir =
+      options.templatesDir || path.join(this.baseDir, '.aiox-core', 'product', 'templates');
 
-    this.schemasDir = options.schemasDir ||
-      path.join(this.templatesDir, 'engine', 'schemas');
+    this.schemasDir = options.schemasDir || path.join(this.templatesDir, 'engine', 'schemas');
 
-    this.outputDir = options.outputDir ||
-      path.join(this.baseDir, 'docs');
+    this.outputDir = options.outputDir || path.join(this.baseDir, 'docs');
 
     this.interactive = options.interactive !== false;
 
@@ -80,7 +78,7 @@ class TemplateEngine {
     if (!SUPPORTED_TYPES.includes(templateType)) {
       throw new Error(
         `Unsupported template type: ${templateType}. ` +
-        `Supported types: ${SUPPORTED_TYPES.join(', ')}`,
+          `Supported types: ${SUPPORTED_TYPES.join(', ')}`
       );
     }
 
@@ -162,7 +160,10 @@ class TemplateEngine {
     const dir = outputDirs[templateType] || 'docs';
     const number = variables.number ? `-${String(variables.number).padStart(3, '0')}` : '';
     const slug = variables.title
-      ? `-${variables.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 50)}`
+      ? `-${variables.title
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .slice(0, 50)}`
       : '';
 
     // Use baseDir for predictable path resolution instead of fragile '..' navigation
@@ -206,7 +207,7 @@ class TemplateEngine {
       type: templateType,
       name: template.metadata.template_name,
       version: template.metadata.version,
-      variables: template.variables.map(v => ({
+      variables: template.variables.map((v) => ({
         name: v.name,
         type: v.type,
         required: v.required,

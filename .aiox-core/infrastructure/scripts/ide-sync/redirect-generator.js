@@ -165,7 +165,7 @@ function writeRedirects(redirects, dryRun = false) {
  */
 function getRedirectFilenames(redirectsConfig) {
   const redirects = redirectsConfig || DEFAULT_REDIRECTS;
-  return Object.keys(redirects).map(id => `${id}.md`);
+  return Object.keys(redirects).map((id) => `${id}.md`);
 }
 
 module.exports = {

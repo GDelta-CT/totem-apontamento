@@ -18,21 +18,21 @@
 
 ## 📋 Lista de prompts disponíveis
 
-| Arquivo | Pra quê serve | Complexidade |
-|---|---|---|
-| `001-aplicar-migration-rls.txt` | Aplicar migration 001 que fecha o vazamento de RLS | 🟢 Baixa |
-| `002-criar-multi-tenant.txt` | Criar estrutura multi-tenant (oficinas + oficina_id) | 🟡 Média |
-| `003-audit-log.txt` | Adicionar audit log e timestamps | 🟢 Baixa |
-| `99-template-vazio.txt` | Template para criar novos prompts | — |
+| Arquivo                         | Pra quê serve                                        | Complexidade |
+| ------------------------------- | ---------------------------------------------------- | ------------ |
+| `001-aplicar-migration-rls.txt` | Aplicar migration 001 que fecha o vazamento de RLS   | 🟢 Baixa     |
+| `002-criar-multi-tenant.txt`    | Criar estrutura multi-tenant (oficinas + oficina_id) | 🟡 Média     |
+| `003-audit-log.txt`             | Adicionar audit log e timestamps                     | 🟢 Baixa     |
+| `99-template-vazio.txt`         | Template para criar novos prompts                    | —            |
 
 ---
 
 ## 🤖 Qual agente usar?
 
-| Complexidade | Agente sugerido | Por quê |
-|---|---|---|
-| 🟢 Baixa | Gemini Flash | Tarefa mecânica, economiza cota |
-| 🟡 Média | Gemini Pro | Precisa entender contexto |
-| 🔴 Alta | Claude Opus (se tiver) | Decisões arquiteturais |
+| Complexidade | Agente sugerido        | Por quê                         |
+| ------------ | ---------------------- | ------------------------------- |
+| 🟢 Baixa     | Gemini Flash           | Tarefa mecânica, economiza cota |
+| 🟡 Média     | Gemini Pro             | Precisa entender contexto       |
+| 🔴 Alta      | Claude Opus (se tiver) | Decisões arquiteturais          |
 
 **Regra de ouro:** sempre comece pelo agente mais barato. Se ele falhar, escala pro próximo.

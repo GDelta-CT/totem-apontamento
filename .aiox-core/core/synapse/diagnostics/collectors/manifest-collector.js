@@ -52,9 +52,7 @@ function collectManifestIntegrity(projectRoot) {
   }
 
   // Check for orphaned domain files (files not in manifest)
-  const manifestFileNames = new Set(
-    Object.values(manifest.domains).map((d) => d.file),
-  );
+  const manifestFileNames = new Set(Object.values(manifest.domains).map((d) => d.file));
 
   try {
     const allFiles = fs.readdirSync(synapsePath);

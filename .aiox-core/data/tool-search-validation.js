@@ -17,12 +17,16 @@ const REGISTRY_PATH = path.resolve(__dirname, 'tool-registry.yaml');
 // Test queries that should find specific tools (AC 7: 5+ test queries)
 const TEST_QUERIES = [
   { query: 'search the web for information', expectedTool: 'exa', category: 'web-search' },
-  { query: 'browser screenshot automation', expectedTool: 'playwright', category: 'browser-automation' },
+  {
+    query: 'browser screenshot automation',
+    expectedTool: 'playwright',
+    category: 'browser-automation',
+  },
   { query: 'scrape social media data', expectedTool: 'apify', category: 'web-scraping' },
   { query: 'analyze code dependencies', expectedTool: 'code-graph', category: 'code-intelligence' },
   { query: 'code analysis intelligence', expectedTool: 'nogic', category: 'code-intelligence' },
   { query: 'look up library documentation', expectedTool: 'context7', category: 'documentation' },
-  { query: 'database query optimization', expectedTool: 'supabase', category: 'database' }
+  { query: 'database query optimization', expectedTool: 'supabase', category: 'database' },
 ];
 
 function parseKeywords(content) {
@@ -86,7 +90,7 @@ function parseKeywords(content) {
 
 function matchQuery(query, tool) {
   const queryWords = query.toLowerCase().split(/\s+/);
-  const keywords = tool.keywords.map(k => k.toLowerCase());
+  const keywords = tool.keywords.map((k) => k.toLowerCase());
   const category = (tool.category || '').toLowerCase();
 
   let score = 0;
@@ -130,10 +134,14 @@ function validate() {
     const found = top3.includes(test.expectedTool);
 
     if (found) {
-      console.log(`✅ "${test.query}" → found '${test.expectedTool}' in top-3 [${top3.join(', ')}]`);
+      console.log(
+        `✅ "${test.query}" → found '${test.expectedTool}' in top-3 [${top3.join(', ')}]`
+      );
       passed++;
     } else {
-      console.log(`❌ "${test.query}" → expected '${test.expectedTool}' but got [${top3.join(', ')}]`);
+      console.log(
+        `❌ "${test.query}" → expected '${test.expectedTool}' but got [${top3.join(', ')}]`
+      );
       failed++;
     }
   }
@@ -158,7 +166,9 @@ function validate() {
   console.log('\n=== Search Limit Guidance ===\n');
   console.log('AC 6: Maximum 2 tool searches per turn');
   console.log('Implementation: CLAUDE.md guidance section (not programmatic hard limit)');
-  console.log('Rationale: Claude Code manages Tool Search internally; guidance limits excessive use');
+  console.log(
+    'Rationale: Claude Code manages Tool Search internally; guidance limits excessive use'
+  );
 
   const allPassed = failed === 0;
   console.log(`\n${allPassed ? '✅' : '❌'} Overall: ${allPassed ? 'PASS' : 'FAIL'}`);

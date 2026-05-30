@@ -37,7 +37,7 @@ class Epic3Executor extends EpicExecutor {
       '.aiox-core',
       'development',
       'workflows',
-      'spec-pipeline.yaml',
+      'spec-pipeline.yaml'
     );
   }
 

@@ -32,7 +32,7 @@ function formatText(output, options = {}) {
 
   if (!quiet) {
     const fixable = output.checks.filter(
-      (r) => (r.status === 'WARN' || r.status === 'FAIL') && r.fixCommand,
+      (r) => (r.status === 'WARN' || r.status === 'FAIL') && r.fixCommand
     );
 
     if (fixable.length > 0) {

@@ -116,7 +116,8 @@ async function executeAdd(server, options) {
 
   // Handle enable/disable existing server
   // --enable enables an existing server, --disable (without other add options) disables it
-  const isToggleOperation = options.enable || (options.disable && !options.type && !options.url && !options.command);
+  const isToggleOperation =
+    options.enable || (options.disable && !options.type && !options.url && !options.command);
   if (isToggleOperation) {
     const enabled = Boolean(options.enable);
     console.log(`${enabled ? 'Enabling' : 'Disabling'} server "${server}"...\n`);
@@ -155,7 +156,7 @@ async function executeAdd(server, options) {
       serverConfig.command = options.command;
 
       if (options.args) {
-        serverConfig.args = options.args.split(',').map(a => a.trim());
+        serverConfig.args = options.args.split(',').map((a) => a.trim());
       }
 
       if (options.env) {
@@ -182,7 +183,7 @@ async function executeAdd(server, options) {
     // Show server details
     if (options.verbose) {
       const servers = listServers();
-      const added = servers.servers.find(s => s.name === server);
+      const added = servers.servers.find((s) => s.name === server);
       if (added) {
         console.log('\nServer details:');
         console.log(`  Name: ${added.name}`);
@@ -200,7 +201,7 @@ async function executeAdd(server, options) {
     if (template && !serverConfig) {
       console.log('\nNote: Used built-in template.');
       if (template.env) {
-        const envVars = Object.keys(template.env).filter(k => template.env[k].startsWith('${'));
+        const envVars = Object.keys(template.env).filter((k) => template.env[k].startsWith('${'));
         if (envVars.length > 0) {
           console.log('Required environment variables:');
           for (const varName of envVars) {

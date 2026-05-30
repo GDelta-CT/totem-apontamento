@@ -15,9 +15,7 @@ function Card({ title, subtitle, children, className = '', onClick, variant = 'd
           {subtitle && <p className="card-subtitle">{subtitle}</p>}
         </div>
       )}
-      <div className="card-content">
-        {children}
-      </div>
+      <div className="card-content">{children}</div>
     </div>
   );
 }

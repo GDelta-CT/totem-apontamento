@@ -81,7 +81,7 @@ class MarkdownReporter {
       (r) =>
         r.status === CheckStatus.FAIL ||
         r.status === CheckStatus.WARNING ||
-        r.status === CheckStatus.ERROR,
+        r.status === CheckStatus.ERROR
     );
 
     if (issues.length > 0) {
@@ -264,7 +264,7 @@ class MarkdownReporter {
       const emoji = statusEmoji[result.status] || '•';
       const duration = result.duration ? `${result.duration}ms` : '-';
       lines.push(
-        `| ${result.name} | ${result.domain} | ${result.severity} | ${emoji} ${result.status} | ${duration} |`,
+        `| ${result.name} | ${result.domain} | ${result.severity} | ${emoji} ${result.status} | ${duration} |`
       );
     }
 
@@ -307,7 +307,7 @@ class MarkdownReporter {
       .filter(
         (r) =>
           r.status === CheckStatus.WARNING ||
-          (r.severity === CheckSeverity.LOW && r.status !== CheckStatus.PASS),
+          (r.severity === CheckSeverity.LOW && r.status !== CheckStatus.PASS)
       )
       .map((r) => ({
         name: r.name,

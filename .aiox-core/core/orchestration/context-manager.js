@@ -407,10 +407,10 @@ class ContextManager {
     const phases = Object.values(state.phases || {});
     const weights = {
       test_coverage: 0.25,
-      ac_completion: 0.30,
-      risk_score_inv: 0.20,
+      ac_completion: 0.3,
+      risk_score_inv: 0.2,
       debt_score_inv: 0.15,
-      regression_clear: 0.10,
+      regression_clear: 0.1,
     };
     const components = {
       test_coverage: this._calculateTestCoverage(phases),
@@ -422,7 +422,7 @@ class ContextManager {
 
     const scoreBase = Object.keys(weights).reduce(
       (acc, key) => acc + (components[key] || 0) * weights[key],
-      0,
+      0
     );
     const score = Number((scoreBase * 100).toFixed(2));
     const threshold = this._resolveConfidenceThreshold();
@@ -492,7 +492,9 @@ class ContextManager {
       } else if (Array.isArray(result.acceptance_criteria)) {
         hasExplicitData = true;
         total += result.acceptance_criteria.length;
-        done += result.acceptance_criteria.filter((item) => item?.done || item?.status === 'done').length;
+        done += result.acceptance_criteria.filter(
+          (item) => item?.done || item?.status === 'done'
+        ).length;
       }
     }
 
@@ -513,7 +515,9 @@ class ContextManager {
    */
   _calculateRiskInverseScore(phases) {
     const totalRisks = phases.reduce((sum, phase) => {
-      const handoffRisks = Array.isArray(phase?.handoff?.open_risks) ? phase.handoff.open_risks.length : 0;
+      const handoffRisks = Array.isArray(phase?.handoff?.open_risks)
+        ? phase.handoff.open_risks.length
+        : 0;
       const resultRisks = this._extractOpenRisks(phase).length;
       return sum + Math.max(handoffRisks, resultRisks);
     }, 0);
@@ -559,9 +563,10 @@ class ContextManager {
         const type = String(check?.type || '').toLowerCase();
         const pathValue = String(check?.path || '').toLowerCase();
         const checklist = String(check?.checklist || '').toLowerCase();
-        const isRegression = type.includes('regression')
-          || pathValue.includes('regression')
-          || checklist.includes('regression');
+        const isRegression =
+          type.includes('regression') ||
+          pathValue.includes('regression') ||
+          checklist.includes('regression');
 
         if (!isRegression) continue;
         totalRegressionChecks += 1;

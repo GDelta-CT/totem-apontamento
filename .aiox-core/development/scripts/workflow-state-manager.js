@@ -436,7 +436,7 @@ class WorkflowStateManager {
   getProgress(state) {
     const total = state.steps.length;
     const completed = state.steps.filter(
-      (s) => s.status === 'completed' || s.status === 'skipped',
+      (s) => s.status === 'completed' || s.status === 'skipped'
     ).length;
     const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
 
@@ -552,10 +552,17 @@ class WorkflowStateManager {
     for (const step of state.steps) {
       let statusIcon;
       switch (step.status) {
-        case 'completed': statusIcon = '[x]'; break;
-        case 'skipped': statusIcon = '[-]'; break;
-        case 'in_progress': statusIcon = '[>]'; break;
-        default: statusIcon = '[ ]';
+        case 'completed':
+          statusIcon = '[x]';
+          break;
+        case 'skipped':
+          statusIcon = '[-]';
+          break;
+        case 'in_progress':
+          statusIcon = '[>]';
+          break;
+        default:
+          statusIcon = '[ ]';
       }
 
       const isCurrent = step.step_index === state.current_step_index && state.status === 'active';
@@ -605,14 +612,15 @@ class WorkflowStateManager {
 
     // Sanitize squad_name to prevent path traversal
     const squadName = state.squad_name;
-    if (squadName && (squadName.includes('..') || squadName.includes('/') || squadName.includes('\\'))) {
+    if (
+      squadName &&
+      (squadName.includes('..') || squadName.includes('/') || squadName.includes('\\'))
+    ) {
       return { corePath, squadPath: null };
     }
 
     // Both 'squad' and 'hybrid' have a squad path
-    const squadPath = squadName
-      ? path.join(this.basePath, 'squads', squadName, 'agents')
-      : null;
+    const squadPath = squadName ? path.join(this.basePath, 'squads', squadName, 'agents') : null;
 
     return { corePath, squadPath };
   }
@@ -631,7 +639,12 @@ class WorkflowStateManager {
    */
   _generateInstanceId(workflowId) {
     // Sanitize workflowId to prevent path traversal
-    if (!workflowId || workflowId.includes('..') || workflowId.includes('/') || workflowId.includes('\\')) {
+    if (
+      !workflowId ||
+      workflowId.includes('..') ||
+      workflowId.includes('/') ||
+      workflowId.includes('\\')
+    ) {
       throw new Error('workflow.id contains invalid path characters');
     }
     const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');

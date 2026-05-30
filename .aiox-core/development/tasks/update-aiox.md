@@ -39,6 +39,7 @@ The script uses sparse clone + file comparison:
 6. **User decides** - Commit to apply or checkout to cancel
 
 **Why this approach:**
+
 - Sparse clone is fast (~5 seconds)
 - O(n) comparison vs O(n²) nested loops
 - Local-only files always preserved
@@ -50,24 +51,24 @@ The script uses sparse clone + file comparison:
 
 These paths are automatically preserved (local-only files are backed up and restored):
 
-| Path | Reason |
-|------|--------|
-| `.aiox-core/squads/` | Custom copywriters, data, ralph |
+| Path                    | Reason                          |
+| ----------------------- | ------------------------------- |
+| `.aiox-core/squads/`    | Custom copywriters, data, ralph |
 | `.aiox-core/marketing/` | Marketing-specific agents/tasks |
-| `source/` | Business context YAML |
-| `Knowledge/` | Knowledge bases |
-| `.aiox-core/context/` | Compiled contexts |
-| `CLAUDE.md` | Project rules |
-| `.claude/commands/` | Custom commands |
-| `.claude/rules/` | Custom rules |
-| `.antigravity/` | Antigravity config |
-| `.gemini/` | Gemini config |
-| `MCPs/` | MCP integrations |
-| `Contexto/` | Business context |
-| `Output/` | Deliverables |
-| `docs/` | Project documentation |
-| `scripts/` | Python scripts |
-| `.env` | Secrets |
+| `source/`               | Business context YAML           |
+| `Knowledge/`            | Knowledge bases                 |
+| `.aiox-core/context/`   | Compiled contexts               |
+| `CLAUDE.md`             | Project rules                   |
+| `.claude/commands/`     | Custom commands                 |
+| `.claude/rules/`        | Custom rules                    |
+| `.antigravity/`         | Antigravity config              |
+| `.gemini/`              | Gemini config                   |
+| `MCPs/`                 | MCP integrations                |
+| `Contexto/`             | Business context                |
+| `Output/`               | Deliverables                    |
+| `docs/`                 | Project documentation           |
+| `scripts/`              | Python scripts                  |
+| `.env`                  | Secrets                         |
 
 ---
 
@@ -121,11 +122,11 @@ git diff --stat
 
 ## Error Handling
 
-| Error | Cause | Resolution |
-|-------|-------|------------|
-| "Commit changes first" | Uncommitted changes | Agent auto-commits before running script |
-| "Failed to fetch upstream" | Network issue | Check internet connection |
-| Merge conflicts | File changed both locally and upstream | Script auto-resolves by preserving local |
+| Error                      | Cause                                  | Resolution                               |
+| -------------------------- | -------------------------------------- | ---------------------------------------- |
+| "Commit changes first"     | Uncommitted changes                    | Agent auto-commits before running script |
+| "Failed to fetch upstream" | Network issue                          | Check internet connection                |
+| Merge conflicts            | File changed both locally and upstream | Script auto-resolves by preserving local |
 
 ---
 
@@ -143,9 +144,9 @@ git checkout -- .aiox-core/
 
 ## Changelog
 
-| Version | Date | Changes |
-|---------|------|---------|
-| 4.0.0 | 2026-01-31 | **SIMPLIFIED:** Git-native approach, 15-line bash script replaces 847-line JS |
-| 3.1.0 | 2026-01-30 | Dynamic protection for squad commands |
-| 3.0.0 | 2026-01-29 | YOLO mode with rsync |
-| 1.0.0 | 2026-01-29 | Initial version (verbose, interactive) |
+| Version | Date       | Changes                                                                       |
+| ------- | ---------- | ----------------------------------------------------------------------------- |
+| 4.0.0   | 2026-01-31 | **SIMPLIFIED:** Git-native approach, 15-line bash script replaces 847-line JS |
+| 3.1.0   | 2026-01-30 | Dynamic protection for squad commands                                         |
+| 3.0.0   | 2026-01-29 | YOLO mode with rsync                                                          |
+| 1.0.0   | 2026-01-29 | Initial version (verbose, interactive)                                        |

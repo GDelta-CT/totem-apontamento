@@ -47,11 +47,15 @@ function collectConsistencyMetrics(projectRoot) {
   if (!uapData || !hookData) {
     return {
       available: true,
-      checks: [{
-        name: 'data-completeness',
-        status: 'WARN',
-        detail: !uapData ? 'UAP metrics missing — only Hook available' : 'Hook metrics missing — only UAP available',
-      }],
+      checks: [
+        {
+          name: 'data-completeness',
+          status: 'WARN',
+          detail: !uapData
+            ? 'UAP metrics missing — only Hook available'
+            : 'Hook metrics missing — only UAP available',
+        },
+      ],
       score: 0,
       maxScore: 4,
     };
@@ -129,11 +133,21 @@ function _checkAgent(uapData, projectRoot) {
  */
 function _checkTimestamp(uapData, hookData) {
   if (!uapData.timestamp || !hookData.timestamp) {
-    return { name: 'timestamp', status: 'WARN', detail: 'Missing timestamp in one or both metrics' };
+    return {
+      name: 'timestamp',
+      status: 'WARN',
+      detail: 'Missing timestamp in one or both metrics',
+    };
   }
-  const gap = Math.abs(new Date(uapData.timestamp).getTime() - new Date(hookData.timestamp).getTime());
+  const gap = Math.abs(
+    new Date(uapData.timestamp).getTime() - new Date(hookData.timestamp).getTime()
+  );
   if (gap <= MAX_TIMESTAMP_GAP_MS) {
-    return { name: 'timestamp', status: 'PASS', detail: `Gap: ${Math.round(gap / 1000)}s (within ${MAX_TIMESTAMP_GAP_MS / 1000}s)` };
+    return {
+      name: 'timestamp',
+      status: 'PASS',
+      detail: `Gap: ${Math.round(gap / 1000)}s (within ${MAX_TIMESTAMP_GAP_MS / 1000}s)`,
+    };
   }
   return {
     name: 'timestamp',
@@ -154,15 +168,27 @@ function _checkQuality(uapData, hookData) {
   const layersLoaded = hookData.layersLoaded || 0;
 
   if (quality === 'fallback' && layersLoaded > 0) {
-    return { name: 'quality', status: 'PASS', detail: `UAP fallback but Hook loaded ${layersLoaded} layers (Hook independent)` };
+    return {
+      name: 'quality',
+      status: 'PASS',
+      detail: `UAP fallback but Hook loaded ${layersLoaded} layers (Hook independent)`,
+    };
   }
   if (quality === 'full' && layersLoaded === 0) {
     return { name: 'quality', status: 'WARN', detail: 'UAP full quality but Hook loaded 0 layers' };
   }
   if (quality === 'full' && layersLoaded > 0) {
-    return { name: 'quality', status: 'PASS', detail: `UAP ${quality}, Hook ${layersLoaded} layers` };
+    return {
+      name: 'quality',
+      status: 'PASS',
+      detail: `UAP ${quality}, Hook ${layersLoaded} layers`,
+    };
   }
-  return { name: 'quality', status: 'PASS', detail: `UAP ${quality || 'unknown'}, Hook ${layersLoaded} layers` };
+  return {
+    name: 'quality',
+    status: 'PASS',
+    detail: `UAP ${quality || 'unknown'}, Hook ${layersLoaded} layers`,
+  };
 }
 
 module.exports = { collectConsistencyMetrics, MAX_TIMESTAMP_GAP_MS };

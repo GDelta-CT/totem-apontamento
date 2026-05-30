@@ -28,7 +28,7 @@ class VisualImpactGenerator {
       horizontal: '─',
       riskLevels: {
         critical: '🔴',
-        high: '🟠', 
+        high: '🟠',
         medium: '🟡',
         low: '🟢',
       },
@@ -56,10 +56,10 @@ class VisualImpactGenerator {
    */
   async generateImpactVisualization(impactReport, options = {}) {
     const visualId = `visual-${Date.now()}`;
-    
+
     try {
       console.log(chalk.blue('🎨 Generating visual impact representation...'));
-      
+
       const config = {
         format: options.format || 'visual',
         includeInteractive: options.includeInteractive || false,
@@ -94,16 +94,16 @@ class VisualImpactGenerator {
 
       // Generate impact summary
       visualization.impactSummary = this.generateImpactSummary(impactReport);
-      
+
       // Generate component relationship map
       visualization.relationshipMap = await this.generateRelationshipMap(impactReport, config);
-      
+
       // Generate risk heatmap
       visualization.riskHeatmap = this.generateRiskHeatmap(impactReport, config);
 
       // Cache the visualization
       this.visualCache.set(visualId, visualization);
-      
+
       // Add to generation history
       this.generationHistory.push({
         visualId: visualId,
@@ -115,10 +115,13 @@ class VisualImpactGenerator {
 
       console.log(chalk.green('✅ Visual impact representation generated'));
       console.log(chalk.gray(`   Format: ${config.format}`));
-      console.log(chalk.gray(`   Components visualized: ${impactReport.dependencyAnalysis.affectedComponents.length}`));
+      console.log(
+        chalk.gray(
+          `   Components visualized: ${impactReport.dependencyAnalysis.affectedComponents.length}`
+        )
+      );
 
       return visualization;
-
     } catch (error) {
       console.error(chalk.red(`Visual generation failed: ${error.message}`));
       throw error;
@@ -131,7 +134,7 @@ class VisualImpactGenerator {
   async generateAsciiVisualization(impactReport, config) {
     const lines = [];
     const template = this.visualTemplates.get('impact_tree');
-    
+
     // Header
     lines.push('');
     lines.push('📊 IMPACT ANALYSIS VISUALIZATION');
@@ -141,7 +144,7 @@ class VisualImpactGenerator {
     // Target component
     const targetIcon = this.getComponentIcon(impactReport.targetComponent.type);
     const riskIcon = template.riskLevels[impactReport.riskAssessment.overallRisk] || '⚪';
-    
+
     lines.push(`${targetIcon} Target Component: ${impactReport.targetComponent.path}`);
     lines.push(`${riskIcon} Risk Level: ${impactReport.riskAssessment.overallRisk.toUpperCase()}`);
     lines.push(`🔄 Modification: ${impactReport.modificationType}`);
@@ -160,8 +163,10 @@ class VisualImpactGenerator {
     if (impactReport.dependencyAnalysis.affectedComponents.length > 0) {
       lines.push('🌳 DEPENDENCY IMPACT TREE');
       lines.push('─'.repeat(30));
-      
-      const dependencyTree = this.buildDependencyTree(impactReport.dependencyAnalysis.affectedComponents);
+
+      const dependencyTree = this.buildDependencyTree(
+        impactReport.dependencyAnalysis.affectedComponents
+      );
       const treeLines = this.renderDependencyTree(dependencyTree, config);
       lines.push(...treeLines);
       lines.push('');
@@ -171,12 +176,12 @@ class VisualImpactGenerator {
     if (impactReport.riskAssessment.riskFactors.length > 0) {
       lines.push('⚠️  RISK BREAKDOWN');
       lines.push('─'.repeat(30));
-      
-      impactReport.riskAssessment.riskFactors.slice(0, 8).forEach(factor => {
+
+      impactReport.riskAssessment.riskFactors.slice(0, 8).forEach((factor) => {
         const riskIcon = this.getRiskIcon(factor.severity);
         lines.push(`${riskIcon} ${factor.category}: ${factor.description}`);
         if (factor.factors.length > 0) {
-          factor.factors.slice(0, 2).forEach(f => {
+          factor.factors.slice(0, 2).forEach((f) => {
             lines.push(`   • ${f}`);
           });
         }
@@ -188,11 +193,11 @@ class VisualImpactGenerator {
     if (impactReport.propagationAnalysis.criticalPaths?.length > 0) {
       lines.push('🛤️  CRITICAL PROPAGATION PATHS');
       lines.push('─'.repeat(30));
-      
+
       impactReport.propagationAnalysis.criticalPaths.slice(0, 3).forEach((path, index) => {
         lines.push(`Path ${index + 1}: Impact ${path.totalImpact}/10, Depth ${path.maxDepth}`);
         if (path.effects && path.effects.length > 0) {
-          path.effects.slice(0, 3).forEach(effect => {
+          path.effects.slice(0, 3).forEach((effect) => {
             const componentIcon = this.getComponentIcon(effect.affectedComponentType);
             lines.push(`  ${componentIcon} ${effect.affectedComponent}`);
           });
@@ -205,7 +210,7 @@ class VisualImpactGenerator {
     if (impactReport.riskAssessment.recommendations.length > 0) {
       lines.push('💡 KEY RECOMMENDATIONS');
       lines.push('─'.repeat(30));
-      
+
       impactReport.riskAssessment.recommendations.slice(0, 5).forEach((rec, index) => {
         const priorityIcon = this.getPriorityIcon(rec.priority);
         lines.push(`${priorityIcon} ${index + 1}. ${rec.title}`);
@@ -520,7 +525,7 @@ class VisualImpactGenerator {
         riskLevel: impactReport.riskAssessment.overallRisk,
       },
       nodes: this.generateNodes(impactReport),
-      edges: this.generateEdges(impactReport), 
+      edges: this.generateEdges(impactReport),
       clusters: this.generateClusters(impactReport),
       riskHeatmap: this.generateRiskHeatmap(impactReport, config),
       timeline: this.generateTimelineData(impactReport),
@@ -563,7 +568,7 @@ class VisualImpactGenerator {
     };
 
     // Direct relationships
-    impactReport.dependencyAnalysis.affectedComponents.forEach(component => {
+    impactReport.dependencyAnalysis.affectedComponents.forEach((component) => {
       map.relationships.push({
         source: impactReport.targetComponent.path,
         target: component.path,
@@ -575,7 +580,7 @@ class VisualImpactGenerator {
 
     // Propagation relationships
     if (impactReport.propagationAnalysis.directEffects) {
-      impactReport.propagationAnalysis.directEffects.forEach(effect => {
+      impactReport.propagationAnalysis.directEffects.forEach((effect) => {
         map.relationships.push({
           source: effect.targetComponent,
           target: effect.affectedComponent,
@@ -588,7 +593,7 @@ class VisualImpactGenerator {
 
     // Component type clusters
     const typeGroups = {};
-    impactReport.dependencyAnalysis.affectedComponents.forEach(component => {
+    impactReport.dependencyAnalysis.affectedComponents.forEach((component) => {
       if (!typeGroups[component.type]) {
         typeGroups[component.type] = [];
       }
@@ -630,7 +635,7 @@ class VisualImpactGenerator {
     }
 
     // Component risk scores
-    impactReport.dependencyAnalysis.affectedComponents.slice(0, 20).forEach(component => {
+    impactReport.dependencyAnalysis.affectedComponents.slice(0, 20).forEach((component) => {
       heatmap.components.push({
         name: component.path,
         type: component.type,
@@ -650,13 +655,13 @@ class VisualImpactGenerator {
 
   buildDependencyTree(affectedComponents) {
     const tree = { name: 'Impact Tree', children: [] };
-    
+
     // Group by impact level
     const byImpact = {
-      critical: affectedComponents.filter(c => c.impactScore >= 9),
-      high: affectedComponents.filter(c => c.impactScore >= 7 && c.impactScore < 9),
-      medium: affectedComponents.filter(c => c.impactScore >= 4 && c.impactScore < 7),
-      low: affectedComponents.filter(c => c.impactScore < 4),
+      critical: affectedComponents.filter((c) => c.impactScore >= 9),
+      high: affectedComponents.filter((c) => c.impactScore >= 7 && c.impactScore < 9),
+      medium: affectedComponents.filter((c) => c.impactScore >= 4 && c.impactScore < 7),
+      low: affectedComponents.filter((c) => c.impactScore < 4),
     };
 
     Object.entries(byImpact).forEach(([level, components]) => {
@@ -664,7 +669,7 @@ class VisualImpactGenerator {
         const levelNode = {
           name: `${level.toUpperCase()} Impact (${components.length})`,
           level: level,
-          children: components.slice(0, 10).map(c => ({
+          children: components.slice(0, 10).map((c) => ({
             name: c.path,
             type: c.type,
             score: c.impactScore,
@@ -683,7 +688,7 @@ class VisualImpactGenerator {
     const template = this.visualTemplates.get('impact_tree');
     const indent = '  '.repeat(depth);
     const connector = isLast ? template.lastBranch : template.branch;
-    
+
     if (depth === 0) {
       lines.push(`${template.root} ${tree.name}`);
     } else {
@@ -704,7 +709,10 @@ class VisualImpactGenerator {
   }
 
   generateComponentListHtml(components) {
-    return components.slice(0, 20).map(component => `
+    return components
+      .slice(0, 20)
+      .map(
+        (component) => `
       <div class="component-item">
         <div class="component-info">
           <div class="component-name">${this.getComponentIcon(component.type)} ${component.path}</div>
@@ -712,11 +720,16 @@ class VisualImpactGenerator {
         </div>
         <div class="impact-score">${component.impactScore}/10</div>
       </div>
-    `).join('');
+    `
+      )
+      .join('');
   }
 
   generateRiskFactorsHtml(riskFactors) {
-    return riskFactors.slice(0, 8).map(factor => `
+    return riskFactors
+      .slice(0, 8)
+      .map(
+        (factor) => `
       <div class="risk-factor">
         <div class="risk-factor-header">
           <div class="risk-factor-name">${factor.category}</div>
@@ -724,24 +737,34 @@ class VisualImpactGenerator {
         </div>
         <div class="risk-factor-desc">${factor.description}</div>
         <ul class="risk-factor-list">
-          ${factor.factors.slice(0, 3).map(f => `<li>${f}</li>`).join('')}
+          ${factor.factors
+            .slice(0, 3)
+            .map((f) => `<li>${f}</li>`)
+            .join('')}
         </ul>
       </div>
-    `).join('');
+    `
+      )
+      .join('');
   }
 
   generateRecommendationsHtml(recommendations) {
-    return recommendations.slice(0, 6).map(rec => `
+    return recommendations
+      .slice(0, 6)
+      .map(
+        (rec) => `
       <div class="recommendation">
         <div class="recommendation-title">${this.getPriorityIcon(rec.priority)} ${rec.title}</div>
         <div class="recommendation-desc">${rec.description}</div>
       </div>
-    `).join('');
+    `
+      )
+      .join('');
   }
 
   generateNodes(impactReport) {
     const nodes = [];
-    
+
     // Target node
     nodes.push({
       id: impactReport.targetComponent.path,
@@ -753,7 +776,7 @@ class VisualImpactGenerator {
     });
 
     // Affected component nodes
-    impactReport.dependencyAnalysis.affectedComponents.forEach(component => {
+    impactReport.dependencyAnalysis.affectedComponents.forEach((component) => {
       nodes.push({
         id: component.path,
         type: 'affected',
@@ -770,9 +793,9 @@ class VisualImpactGenerator {
 
   generateEdges(impactReport) {
     const edges = [];
-    
+
     // Dependency edges
-    impactReport.dependencyAnalysis.affectedComponents.forEach(component => {
+    impactReport.dependencyAnalysis.affectedComponents.forEach((component) => {
       edges.push({
         source: impactReport.targetComponent.path,
         target: component.path,
@@ -784,7 +807,7 @@ class VisualImpactGenerator {
 
     // Propagation edges
     if (impactReport.propagationAnalysis.directEffects) {
-      impactReport.propagationAnalysis.directEffects.forEach(effect => {
+      impactReport.propagationAnalysis.directEffects.forEach((effect) => {
         edges.push({
           source: effect.targetComponent,
           target: effect.affectedComponent,
@@ -800,10 +823,10 @@ class VisualImpactGenerator {
 
   generateClusters(impactReport) {
     const clusters = [];
-    
+
     // Group by component type
     const typeGroups = {};
-    impactReport.dependencyAnalysis.affectedComponents.forEach(component => {
+    impactReport.dependencyAnalysis.affectedComponents.forEach((component) => {
       if (!typeGroups[component.type]) {
         typeGroups[component.type] = [];
       }
@@ -824,9 +847,9 @@ class VisualImpactGenerator {
 
   generateTimelineData(impactReport) {
     const timeline = [];
-    
+
     if (impactReport.riskAssessment.riskProjection?.risk_timeline) {
-      impactReport.riskAssessment.riskProjection.risk_timeline.forEach(event => {
+      impactReport.riskAssessment.riskProjection.risk_timeline.forEach((event) => {
         timeline.push({
           time: event.time,
           event: event.event,
@@ -894,8 +917,8 @@ class VisualImpactGenerator {
 
   calculateRiskDistribution(impactReport) {
     const distribution = { low: 0, medium: 0, high: 0, critical: 0 };
-    
-    impactReport.dependencyAnalysis.affectedComponents.forEach(component => {
+
+    impactReport.dependencyAnalysis.affectedComponents.forEach((component) => {
       const riskLevel = this.scoresToRiskLevel(component.impactScore);
       distribution[riskLevel]++;
     });
@@ -905,8 +928,8 @@ class VisualImpactGenerator {
 
   calculateComponentTypeDistribution(impactReport) {
     const distribution = {};
-    
-    impactReport.dependencyAnalysis.affectedComponents.forEach(component => {
+
+    impactReport.dependencyAnalysis.affectedComponents.forEach((component) => {
       distribution[component.type] = (distribution[component.type] || 0) + 1;
     });
 
@@ -929,17 +952,17 @@ class VisualImpactGenerator {
     const dimensions = Object.keys(impactReport.riskAssessment.riskDimensions || {});
     const components = impactReport.dependencyAnalysis.affectedComponents.slice(0, 10);
 
-    components.forEach(component => {
+    components.forEach((component) => {
       const row = {
         component: component.path,
         scores: {},
       };
-      
-      dimensions.forEach(dimension => {
+
+      dimensions.forEach((dimension) => {
         // Simplified calculation - in practice would be more sophisticated
         row.scores[dimension] = Math.min(10, component.impactScore + Math.random() * 2);
       });
-      
+
       matrix.push(row);
     });
 
@@ -1046,7 +1069,7 @@ class VisualImpactGenerator {
 
   calculateFormatDistribution() {
     const distribution = {};
-    this.generationHistory.forEach(gen => {
+    this.generationHistory.forEach((gen) => {
       distribution[gen.format] = (distribution[gen.format] || 0) + 1;
     });
     return distribution;

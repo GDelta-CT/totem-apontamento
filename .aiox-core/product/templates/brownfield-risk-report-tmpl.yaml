@@ -4,7 +4,7 @@
 template:
   id: brownfield-risk-report
   name: Brownfield Migration Risk Report
-  version: "1.0"
+  version: '1.0'
   type: product
   description: >
     Template for generating risk assessment reports during brownfield
@@ -15,13 +15,12 @@ template:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 sections:
-
   # ─────────────────────────────────────────────────────────────────────────────
   # EXECUTIVE SUMMARY
   # ─────────────────────────────────────────────────────────────────────────────
 
   executive_summary:
-    title: "Executive Summary"
+    title: 'Executive Summary'
     content: |
       ## 📊 Risk Assessment Summary
 
@@ -51,107 +50,106 @@ sections:
   # ─────────────────────────────────────────────────────────────────────────────
 
   phase_risks:
-    title: "Phase-Specific Risk Analysis"
+    title: 'Phase-Specific Risk Analysis'
     phases:
-
       discovery:
-        name: "Discovery Phase"
-        description: "Initial codebase analysis and documentation"
+        name: 'Discovery Phase'
+        description: 'Initial codebase analysis and documentation'
         typical_risks:
           - id: DISC-001
-            name: "Incomplete Documentation"
-            description: "Existing system poorly documented, discovery may miss critical components"
+            name: 'Incomplete Documentation'
+            description: 'Existing system poorly documented, discovery may miss critical components'
             probability: medium
             impact: high
-            mitigation: "Cross-reference with running system, interview stakeholders"
+            mitigation: 'Cross-reference with running system, interview stakeholders'
           - id: DISC-002
-            name: "Hidden Dependencies"
-            description: "Undocumented external services or databases"
+            name: 'Hidden Dependencies'
+            description: 'Undocumented external services or databases'
             probability: medium
             impact: critical
-            mitigation: "Network traffic analysis, env var audit"
+            mitigation: 'Network traffic analysis, env var audit'
           - id: DISC-003
-            name: "Time Underestimation"
-            description: "Discovery takes longer than 4-8h estimate"
+            name: 'Time Underestimation'
+            description: 'Discovery takes longer than 4-8h estimate'
             probability: low
             impact: medium
-            mitigation: "Checkpoint after each sub-phase, adjust timeline"
+            mitigation: 'Checkpoint after each sub-phase, adjust timeline'
 
       planning:
-        name: "Planning Phase"
-        description: "PRD and architecture design"
+        name: 'Planning Phase'
+        description: 'PRD and architecture design'
         typical_risks:
           - id: PLAN-001
-            name: "Scope Creep"
-            description: "Technical debt resolution expands beyond initial estimate"
+            name: 'Scope Creep'
+            description: 'Technical debt resolution expands beyond initial estimate'
             probability: high
             impact: medium
-            mitigation: "Fixed scope per phase, explicit out-of-scope list"
+            mitigation: 'Fixed scope per phase, explicit out-of-scope list'
           - id: PLAN-002
-            name: "Architecture Mismatch"
-            description: "Proposed architecture conflicts with existing constraints"
+            name: 'Architecture Mismatch'
+            description: 'Proposed architecture conflicts with existing constraints'
             probability: medium
             impact: high
-            mitigation: "Validate with existing code, incremental changes only"
+            mitigation: 'Validate with existing code, incremental changes only'
           - id: PLAN-003
-            name: "Stakeholder Misalignment"
-            description: "Business priorities differ from technical recommendations"
+            name: 'Stakeholder Misalignment'
+            description: 'Business priorities differ from technical recommendations'
             probability: medium
             impact: high
-            mitigation: "Executive report before implementation, explicit tradeoffs"
+            mitigation: 'Executive report before implementation, explicit tradeoffs'
 
       migration:
-        name: "Migration Phase"
-        description: "Implementation of changes"
+        name: 'Migration Phase'
+        description: 'Implementation of changes'
         typical_risks:
           - id: MIG-001
-            name: "Breaking Changes"
-            description: "New code breaks existing functionality"
+            name: 'Breaking Changes'
+            description: 'New code breaks existing functionality'
             probability: medium
             impact: critical
-            mitigation: "Feature flags, comprehensive test coverage before changes"
+            mitigation: 'Feature flags, comprehensive test coverage before changes'
           - id: MIG-002
-            name: "Data Loss"
-            description: "Database migration causes data corruption or loss"
+            name: 'Data Loss'
+            description: 'Database migration causes data corruption or loss'
             probability: low
             impact: critical
-            mitigation: "Backup before migration, dry-run on staging, rollback script ready"
+            mitigation: 'Backup before migration, dry-run on staging, rollback script ready'
           - id: MIG-003
-            name: "Downtime"
-            description: "Migration requires extended system downtime"
+            name: 'Downtime'
+            description: 'Migration requires extended system downtime'
             probability: medium
             impact: high
-            mitigation: "Zero-downtime migration strategy, maintenance window planning"
+            mitigation: 'Zero-downtime migration strategy, maintenance window planning'
 
       rollout:
-        name: "Rollout Phase"
-        description: "Progressive deployment"
+        name: 'Rollout Phase'
+        description: 'Progressive deployment'
         typical_risks:
           - id: ROLL-001
-            name: "Performance Degradation"
-            description: "New code slower than existing implementation"
+            name: 'Performance Degradation'
+            description: 'New code slower than existing implementation'
             probability: medium
             impact: high
-            mitigation: "Load testing before rollout, monitoring during rollout"
+            mitigation: 'Load testing before rollout, monitoring during rollout'
           - id: ROLL-002
-            name: "User Disruption"
-            description: "Changed UX confuses existing users"
+            name: 'User Disruption'
+            description: 'Changed UX confuses existing users'
             probability: medium
             impact: medium
-            mitigation: "Gradual rollout (10% → 50% → 100%), feedback collection"
+            mitigation: 'Gradual rollout (10% → 50% → 100%), feedback collection'
           - id: ROLL-003
-            name: "Rollback Failure"
-            description: "Unable to revert to previous state"
+            name: 'Rollback Failure'
+            description: 'Unable to revert to previous state'
             probability: low
             impact: critical
-            mitigation: "Test rollback before production rollout, checkpoint commits"
+            mitigation: 'Test rollback before production rollout, checkpoint commits'
 
   # ─────────────────────────────────────────────────────────────────────────────
   # RISK MATRIX
   # ─────────────────────────────────────────────────────────────────────────────
 
   risk_matrix:
-    title: "Risk Assessment Matrix"
+    title: 'Risk Assessment Matrix'
     content: |
       ## Risk Classification
 
@@ -179,7 +177,7 @@ sections:
   # ─────────────────────────────────────────────────────────────────────────────
 
   mitigation_plan:
-    title: "Mitigation Plan"
+    title: 'Mitigation Plan'
     content: |
       ## Mitigation Strategies
 
@@ -202,7 +200,7 @@ sections:
   # ─────────────────────────────────────────────────────────────────────────────
 
   rollback_strategy:
-    title: "Rollback Strategy"
+    title: 'Rollback Strategy'
     content: |
       ## Rollback Checkpoints
 
@@ -241,7 +239,7 @@ sections:
   # ─────────────────────────────────────────────────────────────────────────────
 
   sign_off:
-    title: "Sign-Off"
+    title: 'Sign-Off'
     content: |
       ## Phase Approval
 
@@ -269,8 +267,8 @@ sections:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 usage:
-  command: "@analyst → *create-doc brownfield-risk-report"
-  output: "docs/reports/BROWNFIELD-RISK-REPORT-{{phase}}.md"
+  command: '@analyst → *create-doc brownfield-risk-report'
+  output: 'docs/reports/BROWNFIELD-RISK-REPORT-{{phase}}.md'
   triggers:
     - Before each brownfield phase transition
     - When new risks are identified

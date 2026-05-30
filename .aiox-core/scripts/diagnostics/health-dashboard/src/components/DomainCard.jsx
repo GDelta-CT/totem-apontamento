@@ -5,11 +5,11 @@ import HealthScore from './HealthScore';
 import './DomainCard.css';
 
 const DOMAIN_ICONS = {
-  project: '\uD83D\uDD27',   // wrench
-  local: '\uD83D\uDCBB',     // laptop
+  project: '\uD83D\uDD27', // wrench
+  local: '\uD83D\uDCBB', // laptop
   repository: '\uD83D\uDCE6', // package
   deployment: '\uD83D\uDE80', // rocket
-  services: '\uD83D\uDD17'   // link
+  services: '\uD83D\uDD17', // link
 };
 
 const DOMAIN_LABELS = {
@@ -17,7 +17,7 @@ const DOMAIN_LABELS = {
   local: 'Local Environment',
   repository: 'Repository Health',
   deployment: 'Deployment',
-  services: 'Service Integration'
+  services: 'Service Integration',
 };
 
 /**
@@ -38,11 +38,11 @@ function DomainCard({ domain, data }) {
     critical: 0,
     high: 0,
     medium: 0,
-    low: 0
+    low: 0,
   };
 
   if (data?.checks) {
-    data.checks.forEach(check => {
+    data.checks.forEach((check) => {
       if (check.status === 'failed' && check.severity) {
         const key = check.severity.toLowerCase();
         if (issueCounts.hasOwnProperty(key)) {
@@ -53,7 +53,7 @@ function DomainCard({ domain, data }) {
   }
 
   const totalIssues = Object.values(issueCounts).reduce((a, b) => a + b, 0);
-  const passedChecks = data?.checks?.filter(c => c.status === 'passed').length || 0;
+  const passedChecks = data?.checks?.filter((c) => c.status === 'passed').length || 0;
   const totalChecks = data?.checks?.length || 0;
 
   return (

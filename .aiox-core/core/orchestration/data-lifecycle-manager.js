@@ -149,7 +149,9 @@ class DataLifecycleManager {
       const ageInDays = (now - lastUpdated) / (1000 * 60 * 60 * 24);
 
       if (ageInDays <= this.options.staleSessionDays) {
-        this._log(`Session state is ${Math.round(ageInDays)} days old (threshold: ${this.options.staleSessionDays})`);
+        this._log(
+          `Session state is ${Math.round(ageInDays)} days old (threshold: ${this.options.staleSessionDays})`
+        );
         return 0;
       }
 
@@ -302,7 +304,8 @@ class DataLifecycleManager {
    * @private
    */
   _logCleanupSummary(result) {
-    const hasCleanup = result.locksRemoved > 0 || result.sessionsArchived > 0 || result.snapshotsRemoved > 0;
+    const hasCleanup =
+      result.locksRemoved > 0 || result.sessionsArchived > 0 || result.snapshotsRemoved > 0;
 
     if (hasCleanup || this.options.debug) {
       const message = `🧹 Cleanup: ${result.locksRemoved} locks removidos, ${result.sessionsArchived} sessions arquivadas, ${result.snapshotsRemoved} snapshots removidos`;

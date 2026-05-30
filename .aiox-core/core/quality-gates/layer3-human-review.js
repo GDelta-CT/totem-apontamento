@@ -79,7 +79,9 @@ class Layer3HumanReview extends BaseLayer {
     if (verbose) {
       const summary = this.getSummary();
       const icon = signoffResult.signedOff ? '✅' : '⏳';
-      console.log(`\n${icon} Layer 3 ${signoffResult.signedOff ? 'SIGNED OFF' : 'PENDING'} (${this.formatDuration(summary.duration)})`);
+      console.log(
+        `\n${icon} Layer 3 ${signoffResult.signedOff ? 'SIGNED OFF' : 'PENDING'} (${this.formatDuration(summary.duration)})`
+      );
     }
 
     return this.getSummary();
@@ -272,7 +274,9 @@ class Layer3HumanReview extends BaseLayer {
 
         if (!isExpired) {
           if (verbose) {
-            console.log(`  ✓ Signed off by ${signoff.reviewer} at ${new Date(signoff.timestamp).toLocaleString()}`);
+            console.log(
+              `  ✓ Signed off by ${signoff.reviewer} at ${new Date(signoff.timestamp).toLocaleString()}`
+            );
           }
 
           return {

@@ -25,8 +25,7 @@ async function run(context) {
     };
   }
 
-  const jsFiles = fs.readdirSync(dashboardDir)
-    .filter((f) => f.endsWith('.js'));
+  const jsFiles = fs.readdirSync(dashboardDir).filter((f) => f.endsWith('.js'));
 
   if (jsFiles.length === 0) {
     return {

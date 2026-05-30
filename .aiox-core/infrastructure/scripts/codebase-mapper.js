@@ -76,12 +76,24 @@ const CONFIG = {
   ],
   // File extensions to analyze for patterns
   codeExtensions: [
-    '.js', '.mjs', '.cjs',
-    '.ts', '.tsx', '.jsx',
-    '.py', '.rb', '.go',
-    '.java', '.kt', '.scala',
-    '.rs', '.cpp', '.c', '.h',
-    '.vue', '.svelte',
+    '.js',
+    '.mjs',
+    '.cjs',
+    '.ts',
+    '.tsx',
+    '.jsx',
+    '.py',
+    '.rb',
+    '.go',
+    '.java',
+    '.kt',
+    '.scala',
+    '.rs',
+    '.cpp',
+    '.c',
+    '.h',
+    '.vue',
+    '.svelte',
   ],
   // Config file names to detect
   configFiles: [
@@ -122,23 +134,23 @@ const CONFIG = {
 const PatternDetectors = {
   // State management patterns
   stateManagement: {
-    'zustand': {
+    zustand: {
       patterns: [/import.*from ['"]zustand['"]/, /create\s*\(/],
       files: ['**/stores/**', '**/store/**'],
     },
-    'redux': {
+    redux: {
       patterns: [/import.*from ['"]@reduxjs\/toolkit['"]/, /createSlice\(/, /configureStore\(/],
       files: ['**/store/**', '**/slices/**', '**/reducers/**'],
     },
-    'mobx': {
+    mobx: {
       patterns: [/import.*from ['"]mobx['"]/, /@observable/, /@action/],
       files: ['**/stores/**'],
     },
-    'vuex': {
+    vuex: {
       patterns: [/import.*from ['"]vuex['"]/, /createStore\(/],
       files: ['**/store/**'],
     },
-    'pinia': {
+    pinia: {
       patterns: [/import.*from ['"]pinia['"]/, /defineStore\(/],
       files: ['**/stores/**'],
     },
@@ -154,7 +166,7 @@ const PatternDetectors = {
       patterns: [/export.*fetch/, /async.*fetch\(/],
       files: ['**/lib/api.*', '**/utils/api.*', '**/services/api.*'],
     },
-    'axios': {
+    axios: {
       patterns: [/import.*from ['"]axios['"]/, /axios\.create\(/],
       files: ['**/lib/axios.*', '**/services/**'],
     },
@@ -162,15 +174,15 @@ const PatternDetectors = {
       patterns: [/import.*from ['"]@tanstack\/react-query['"]/, /useQuery\(/, /useMutation\(/],
       files: ['**/hooks/**', '**/queries/**'],
     },
-    'swr': {
+    swr: {
       patterns: [/import.*from ['"]swr['"]/, /useSWR\(/],
       files: ['**/hooks/**'],
     },
-    'trpc': {
+    trpc: {
       patterns: [/import.*from ['"]@trpc\//, /trpc\.router\(/],
       files: ['**/trpc/**', '**/server/routers/**'],
     },
-    'graphql': {
+    graphql: {
       patterns: [/import.*from ['"]@apollo\/client['"]/, /gql`/, /useQuery\(/],
       files: ['**/graphql/**', '**/*.graphql'],
     },
@@ -178,11 +190,11 @@ const PatternDetectors = {
 
   // Testing patterns
   testingPatterns: {
-    'jest': {
+    jest: {
       patterns: [/describe\(/, /it\(/, /test\(/, /expect\(/],
       files: ['**/__tests__/**', '**/*.test.*', '**/*.spec.*'],
     },
-    'vitest': {
+    vitest: {
       patterns: [/import.*from ['"]vitest['"]/, /vi\.fn\(/],
       files: ['**/__tests__/**', '**/*.test.*', '**/*.spec.*'],
     },
@@ -190,11 +202,11 @@ const PatternDetectors = {
       patterns: [/import.*from ['"]@testing-library\/react['"]/, /render\(/, /screen\./],
       files: ['**/__tests__/**', '**/*.test.*'],
     },
-    'cypress': {
+    cypress: {
       patterns: [/cy\./, /describe\(/, /it\(/],
       files: ['**/cypress/**', '**/*.cy.*'],
     },
-    'playwright': {
+    playwright: {
       patterns: [/import.*from ['"]@playwright\/test['"]/, /test\(/, /expect\(/],
       files: ['**/e2e/**', '**/*.spec.ts'],
     },
@@ -371,7 +383,7 @@ class CodebaseMapper {
    * @private
    */
   _isExcludedFile(name) {
-    return CONFIG.excludeFiles.some(pattern => {
+    return CONFIG.excludeFiles.some((pattern) => {
       if (pattern.startsWith('*')) {
         return name.endsWith(pattern.slice(1));
       }
@@ -516,7 +528,7 @@ class CodebaseMapper {
    * @private
    */
   _matchesPattern(content, patterns) {
-    return patterns.some(pattern => pattern.test(content));
+    return patterns.some((pattern) => pattern.test(content));
   }
 
   /**
@@ -575,15 +587,15 @@ class CodebaseMapper {
     };
 
     // Detect from config files
-    const eslintConfig = this._configFiles.find(f => f.name.startsWith('.eslintrc'));
-    const prettierConfig = this._configFiles.find(f => f.name.startsWith('.prettierrc'));
+    const eslintConfig = this._configFiles.find((f) => f.name.startsWith('.eslintrc'));
+    const prettierConfig = this._configFiles.find((f) => f.name.startsWith('.prettierrc'));
 
     if (eslintConfig || prettierConfig) {
       conventions.linting = eslintConfig ? 'ESLint' : 'Prettier';
     }
 
     // Detect TypeScript usage
-    const tsConfig = this._configFiles.find(f => f.name === 'tsconfig.json');
+    const tsConfig = this._configFiles.find((f) => f.name === 'tsconfig.json');
     if (tsConfig) {
       conventions.language = 'TypeScript';
       conventions.typeChecking = 'strict'; // Default assumption
@@ -632,8 +644,7 @@ class CodebaseMapper {
       }
     }
 
-    const dominant = Object.entries(namingPatterns)
-      .sort((a, b) => b[1] - a[1])[0];
+    const dominant = Object.entries(namingPatterns).sort((a, b) => b[1] - a[1])[0];
 
     if (dominant[1] > 0) {
       return `${dominant[0]} (${dominant[1]} files)`;
@@ -1013,11 +1024,11 @@ class CodebaseMapper {
 
       stats: {
         totalFiles: this._fileIndex.size,
-        codeFiles: [...this._fileIndex.values()].filter(f =>
+        codeFiles: [...this._fileIndex.values()].filter((f) =>
           CONFIG.codeExtensions.includes(f.extension)
         ).length,
-        testFiles: [...this._fileIndex.values()].filter(f => f.hasTests).length,
-        components: [...this._fileIndex.values()].filter(f => f.isComponent).length,
+        testFiles: [...this._fileIndex.values()].filter((f) => f.hasTests).length,
+        components: [...this._fileIndex.values()].filter((f) => f.isComponent).length,
         configFiles: this._configFiles.length,
       },
 
@@ -1126,8 +1137,12 @@ class CodebaseMapper {
         },
         dependencies: {
           runtime: {
-            added: newMap.dependencies.runtime.filter(d => !existingMap.dependencies.runtime.includes(d)),
-            removed: existingMap.dependencies.runtime.filter(d => !newMap.dependencies.runtime.includes(d)),
+            added: newMap.dependencies.runtime.filter(
+              (d) => !existingMap.dependencies.runtime.includes(d)
+            ),
+            removed: existingMap.dependencies.runtime.filter(
+              (d) => !newMap.dependencies.runtime.includes(d)
+            ),
           },
         },
       },
@@ -1249,15 +1264,23 @@ Acceptance Criteria Coverage:
           console.log(`  Previous: ${diff.previousMappedAt}`);
           console.log(`  Current:  ${diff.currentMappedAt}`);
           console.log(`\nChanges:`);
-          console.log(`  Files: ${diff.changes.files.added >= 0 ? '+' : ''}${diff.changes.files.added}`);
-          console.log(`  Services: ${diff.changes.services.previous} -> ${diff.changes.services.current}`);
+          console.log(
+            `  Files: ${diff.changes.files.added >= 0 ? '+' : ''}${diff.changes.files.added}`
+          );
+          console.log(
+            `  Services: ${diff.changes.services.previous} -> ${diff.changes.services.current}`
+          );
           console.log(`  Patterns changed: ${diff.changes.patterns.changed ? 'Yes' : 'No'}`);
 
           if (diff.changes.dependencies.runtime.added.length > 0) {
-            console.log(`  Dependencies added: ${diff.changes.dependencies.runtime.added.join(', ')}`);
+            console.log(
+              `  Dependencies added: ${diff.changes.dependencies.runtime.added.join(', ')}`
+            );
           }
           if (diff.changes.dependencies.runtime.removed.length > 0) {
-            console.log(`  Dependencies removed: ${diff.changes.dependencies.runtime.removed.join(', ')}`);
+            console.log(
+              `  Dependencies removed: ${diff.changes.dependencies.runtime.removed.join(', ')}`
+            );
           }
         }
         break;

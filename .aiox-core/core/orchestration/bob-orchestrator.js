@@ -98,7 +98,9 @@ class BobOrchestrator {
     this.lockManager = new LockManager(projectRoot, { debug: this.options.debug });
 
     // Story 12.5: Data Lifecycle Manager
-    this.dataLifecycleManager = new DataLifecycleManager(projectRoot, { debug: this.options.debug });
+    this.dataLifecycleManager = new DataLifecycleManager(projectRoot, {
+      debug: this.options.debug,
+    });
 
     // Story 12.8: Brownfield Handler
     this.brownfieldHandler = new BrownfieldHandler(projectRoot, {
@@ -220,9 +222,11 @@ class BobOrchestrator {
       const agentName = agentNameMap[agent] || agentNameMap[agent.replace('@', '')] || agent;
       this.observabilityPanel.setCurrentAgent(agentId, agentName, task, `Greenfield: ${task}`);
       this._log(`Greenfield panel updated: agent=${agentId}, task=${task}`);
-      this.bobStatusWriter.updateAgent(agentId, agentName, task, `Greenfield: ${task}`).catch((err) => {
-        this._log(`BobStatusWriter error: ${err.message}`);
-      });
+      this.bobStatusWriter
+        .updateAgent(agentId, agentName, task, `Greenfield: ${task}`)
+        .catch((err) => {
+          this._log(`BobStatusWriter error: ${err.message}`);
+        });
     });
 
     this.greenfieldHandler.on('terminalSpawn', ({ agent, pid, task }) => {
@@ -449,7 +453,9 @@ class BobOrchestrator {
       // Session state might have been loaded by previous operations
       this.educationalMode = this._resolveEducationalMode();
       this.messageFormatter.setEducationalMode(this.educationalMode);
-      this.observabilityPanel.setMode(this.educationalMode ? PanelMode.DETAILED : PanelMode.MINIMAL);
+      this.observabilityPanel.setMode(
+        this.educationalMode ? PanelMode.DETAILED : PanelMode.MINIMAL
+      );
       this._log(`Educational mode resolved: ${this.educationalMode}`);
 
       // Story 12.6: Start observability panel (AC1, AC3, AC7)
@@ -671,7 +677,11 @@ class BobOrchestrator {
     const normalizedId = storyId.replace('story-', '').replace('.story', '');
 
     // Try active stories first
-    const activePath = path.join(this.projectRoot, 'docs/stories/active', `${normalizedId}.story.md`);
+    const activePath = path.join(
+      this.projectRoot,
+      'docs/stories/active',
+      `${normalizedId}.story.md`
+    );
     if (fs.existsSync(activePath)) {
       return activePath;
     }

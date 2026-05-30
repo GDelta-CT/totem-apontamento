@@ -25,7 +25,6 @@ Releases represent commitment to quality.]]
 1. **Version Management:**
 
    [[LLM: Version numbers communicate change significance]]
-
    - [ ] Version number follows semantic versioning (MAJOR.MINOR.PATCH)
    - [ ] Version bump type is appropriate for changes:
      - MAJOR: Breaking changes
@@ -38,7 +37,6 @@ Releases represent commitment to quality.]]
 2. **Quality Gates:**
 
    [[LLM: All quality checks must pass before release]]
-
    - [ ] All pre-push checklist items completed
    - [ ] All tests pass on release branch
    - [ ] Build succeeds for all target environments
@@ -48,7 +46,6 @@ Releases represent commitment to quality.]]
 3. **Changelog:**
 
    [[LLM: Changelog communicates what changed to users]]
-
    - [ ] CHANGELOG.md updated with new version section
    - [ ] All significant changes documented
    - [ ] Breaking changes clearly marked
@@ -58,7 +55,6 @@ Releases represent commitment to quality.]]
 4. **Documentation:**
 
    [[LLM: Users need updated documentation]]
-
    - [ ] README reflects current state
    - [ ] Installation instructions verified
    - [ ] API documentation current
@@ -68,7 +64,6 @@ Releases represent commitment to quality.]]
 5. **Pre-Release Testing:**
 
    [[LLM: Final verification before going public]]
-
    - [ ] Release candidate tested in staging environment
    - [ ] Critical user flows verified
    - [ ] Upgrade path tested (from previous version)
@@ -78,7 +73,6 @@ Releases represent commitment to quality.]]
 6. **Communication:**
 
    [[LLM: Stakeholders need to know about releases]]
-
    - [ ] Release notes prepared for GitHub
    - [ ] Team notified of pending release
    - [ ] Users notified of breaking changes (if any)
@@ -88,7 +82,6 @@ Releases represent commitment to quality.]]
 7. **Rollback Plan:**
 
    [[LLM: Always have a way back]]
-
    - [ ] Previous version tagged and accessible
    - [ ] Rollback procedure documented
    - [ ] Database rollback scripts ready (if applicable)
@@ -98,7 +91,6 @@ Releases represent commitment to quality.]]
 8. **Release Execution:**
 
    [[LLM: Execute release carefully]]
-
    - [ ] All commits included in release
    - [ ] Tag created and pushed
    - [ ] GitHub release created with notes

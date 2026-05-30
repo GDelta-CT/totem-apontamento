@@ -10,7 +10,7 @@ let chalk;
 try {
   chalk = require('chalk');
 } catch {
-  chalk = { blue: s => s, green: s => s, red: s => s, yellow: s => s };
+  chalk = { blue: (s) => s, green: (s) => s, red: (s) => s, yellow: (s) => s };
 }
 let tmp;
 try {
@@ -99,8 +99,8 @@ class SandboxTester {
         const relativePath = path.relative(rootPath, fullPath);
 
         // Check if excluded
-        const isExcluded = exclude.some(pattern =>
-          relativePath.includes(pattern) || entry.name === pattern,
+        const isExcluded = exclude.some(
+          (pattern) => relativePath.includes(pattern) || entry.name === pattern
         );
 
         if (isExcluded) continue;
@@ -156,10 +156,7 @@ class SandboxTester {
    * Run tests in sandbox
    */
   async runTests(options = {}) {
-    const {
-      testCommand = 'npm test',
-      timeout = 60000,
-    } = options;
+    const { testCommand = 'npm test', timeout = 60000 } = options;
 
     try {
       if (!this.sandboxPath) {
@@ -190,10 +187,7 @@ class SandboxTester {
    * Run lint checks in sandbox
    */
   async runLint(options = {}) {
-    const {
-      lintCommand = 'npm run lint',
-      timeout = 30000,
-    } = options;
+    const { lintCommand = 'npm run lint', timeout = 30000 } = options;
 
     try {
       if (!this.sandboxPath) {
@@ -322,26 +316,16 @@ class SandboxTester {
       const originalFiles = await this.getProjectFiles(originalPath);
       const sandboxFiles = await this.getProjectFiles(this.sandboxPath);
 
-      const originalSet = new Set(originalFiles.map(f =>
-        path.relative(originalPath, f),
-      ));
-      const sandboxSet = new Set(sandboxFiles.map(f =>
-        path.relative(this.sandboxPath, f),
-      ));
+      const originalSet = new Set(originalFiles.map((f) => path.relative(originalPath, f)));
+      const sandboxSet = new Set(sandboxFiles.map((f) => path.relative(this.sandboxPath, f)));
 
       // Find changes
       for (const file of sandboxSet) {
         if (!originalSet.has(file)) {
           comparison.filesAdded.push(file);
         } else {
-          const originalContent = await fs.readFile(
-            path.join(originalPath, file),
-            'utf-8',
-          );
-          const sandboxContent = await fs.readFile(
-            path.join(this.sandboxPath, file),
-            'utf-8',
-          );
+          const originalContent = await fs.readFile(path.join(originalPath, file), 'utf-8');
+          const sandboxContent = await fs.readFile(path.join(this.sandboxPath, file), 'utf-8');
 
           if (originalContent !== sandboxContent) {
             comparison.filesChanged.push(file);

@@ -11,16 +11,19 @@
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Fetch, classify, and present prioritized list
 - Minimal user interaction
 - **Best for:** Quick overview of issue backlog
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Present classification, ask user for priority adjustments
 - Discuss trade-offs between quick wins vs high-impact
 - **Best for:** Sprint planning, deciding next work
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Deep analysis of each issue with cross-references
 - Dependency mapping between issues
 - **Best for:** Major backlog grooming sessions
@@ -113,13 +116,13 @@ gh issue list --state open --limit 50 --json number,title,updatedAt --jq '.[] | 
 
 For each issue, determine:
 
-| Dimension | Values | How to Determine |
-|-----------|--------|-----------------|
-| **Type** | BUG, FEATURE, ENHANCEMENT, DOCS, CHORE, SECURITY | From labels + title keywords + issue body |
-| **Severity** | P0-Critical, P1-High, P2-Medium, P3-Low, P4-Cosmetic | Impact on users, workaround availability |
-| **Effort** | XS (<1h), S (1-4h), M (4-8h), L (1-2d), XL (>2d) | Files affected, complexity, research needed |
-| **Impact** | HIGH, MEDIUM, LOW | Users affected x frequency x severity |
-| **Quick Win** | YES/NO | Effort <= S AND Severity >= P2 |
+| Dimension     | Values                                               | How to Determine                            |
+| ------------- | ---------------------------------------------------- | ------------------------------------------- |
+| **Type**      | BUG, FEATURE, ENHANCEMENT, DOCS, CHORE, SECURITY     | From labels + title keywords + issue body   |
+| **Severity**  | P0-Critical, P1-High, P2-Medium, P3-Low, P4-Cosmetic | Impact on users, workaround availability    |
+| **Effort**    | XS (<1h), S (1-4h), M (4-8h), L (1-2d), XL (>2d)     | Files affected, complexity, research needed |
+| **Impact**    | HIGH, MEDIUM, LOW                                    | Users affected x frequency x severity       |
+| **Quick Win** | YES/NO                                               | Effort <= S AND Severity >= P2              |
 
 **Classification Heuristics:**
 
@@ -161,12 +164,12 @@ effort_penalty: XS=0, S=1, M=3, L=5, XL=8
 
 **Priority Tiers:**
 
-| Tier | Score Range | Action |
-|------|------------|--------|
-| **NOW** | >= 30 | Resolve immediately (P0/P1, security) |
-| **NEXT** | 20-29 | Resolve in current sprint |
-| **SOON** | 10-19 | Schedule for next sprint |
-| **BACKLOG** | < 10 | Keep in backlog, review monthly |
+| Tier        | Score Range | Action                                |
+| ----------- | ----------- | ------------------------------------- |
+| **NOW**     | >= 30       | Resolve immediately (P0/P1, security) |
+| **NEXT**    | 20-29       | Resolve in current sprint             |
+| **SOON**    | 10-19       | Schedule for next sprint              |
+| **BACKLOG** | < 10        | Keep in backlog, review monthly       |
 
 ### Phase 4: Present to User
 
@@ -210,6 +213,7 @@ Pick an issue number to investigate, or say "resolve #N".
 **elicit: true**
 
 Present the triage report and wait for user to:
+
 1. Select an issue to investigate → hand off to `*resolve-issue {number}`
 2. Adjust priorities → re-sort and present again
 3. Close stale issues → `gh issue close {number} --comment "Closing as stale"`

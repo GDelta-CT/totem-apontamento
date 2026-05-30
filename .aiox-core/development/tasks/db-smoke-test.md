@@ -13,16 +13,19 @@
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -190,6 +193,7 @@ token_usage: ~800-2,500 tokens
 ```
 
 **Optimization Notes:**
+
 - Validate configuration early; use atomic writes; implement rollback checkpoints
 
 ---
@@ -208,7 +212,6 @@ updated_at: 2025-11-17
 ```
 
 ---
-
 
 ### 1. Locate Smoke Test File
 
@@ -241,6 +244,7 @@ psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f "$SMOKE_TEST"
 ### 3. Report Results
 
 **If successful:**
+
 ```
 ✅ Smoke Test Passed
 
@@ -252,6 +256,7 @@ Checks completed:
 ```
 
 **If failed:**
+
 ```
 ❌ Smoke Test Failed
 
@@ -269,22 +274,26 @@ Review errors above and:
 Basic smoke tests typically check:
 
 ### Schema Objects
+
 - Expected tables exist
 - Expected views exist
 - Expected functions exist
 - Expected triggers exist
 
 ### RLS Coverage
+
 - RLS enabled on sensitive tables
 - Policies exist and are named correctly
 - Basic RLS queries don't error
 
 ### Data Integrity
+
 - Foreign keys valid
 - Check constraints valid
 - Sample queries return expected results
 
 ### Performance
+
 - Basic queries complete in reasonable time
 - No missing indexes on FKs
 
@@ -299,17 +308,17 @@ Create `supabase/tests/smoke/v_X_Y_Z.sql`:
 SET client_min_messages = warning;
 
 -- Table count
-SELECT COUNT(*) AS tables FROM information_schema.tables 
+SELECT COUNT(*) AS tables FROM information_schema.tables
 WHERE table_schema='public';
 -- Expected: 15
 
 -- RLS enabled
-SELECT tablename FROM pg_tables 
+SELECT tablename FROM pg_tables
 WHERE schemaname='public' AND rowsecurity = false;
 -- Expected: empty (all tables have RLS)
 
 -- Critical functions exist
-SELECT proname FROM pg_proc 
+SELECT proname FROM pg_proc
 WHERE pronamespace = 'public'::regnamespace
 AND proname IN ('function1', 'function2');
 -- Expected: 2 rows

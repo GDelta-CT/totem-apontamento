@@ -18,12 +18,14 @@
 ## PATTERN DETECTION
 
 ### Buttons
+
 - [ ] Button instances counted accurately
 - [ ] Unique button patterns identified
 - [ ] Redundancy factor calculated (instances / unique)
 - [ ] Most-used buttons captured
 
 ### Colors
+
 - [ ] Hex colors extracted (#RGB, #RRGGBB)
 - [ ] RGB/RGBA colors extracted
 - [ ] Total unique colors counted
@@ -31,16 +33,19 @@
 - [ ] Redundancy factor calculated
 
 ### Spacing
+
 - [ ] Padding values extracted
 - [ ] Margin values extracted
 - [ ] Unique spacing values counted
 
 ### Typography
+
 - [ ] Font families identified
 - [ ] Font sizes extracted
 - [ ] Font weights counted
 
 ### Forms
+
 - [ ] Input elements counted
 - [ ] Form elements counted
 - [ ] Unique patterns identified
@@ -71,18 +76,21 @@
 ## NEXT STEPS DECISION
 
 **If redundancy factors >3x:**
-- ✅ Proceed to *consolidate
+
+- ✅ Proceed to \*consolidate
 - Significant pattern reduction opportunity
 
 **If redundancy factors <2x:**
+
 - ⚠️ Codebase is relatively clean
 - Consider if design system is worth investment
 
 **If colors >50 or buttons >20:**
+
 - 🚨 Major technical debt
 - Strong candidate for consolidation
 
 ---
 
-**Reviewer:** ________ **Date:** ________
+**Reviewer:** **\_\_\_\_** **Date:** **\_\_\_\_**
 **Audit Quality:** [ ] Excellent [ ] Good [ ] Needs Review

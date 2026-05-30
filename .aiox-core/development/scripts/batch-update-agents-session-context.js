@@ -31,19 +31,23 @@ async function updateAgent(agentFile) {
 
     // Pattern 1: Update activation-instructions
     const activationPattern = /(- STEP 2\.5: Load project status.*\n)( {2}- STEP 3: Greet user)/s;
-    const activationReplacement = '$1  - STEP 2.6: Load session context using .aiox-core/scripts/session-context-loader.js to detect previous agent and workflow state\n$2';
+    const activationReplacement =
+      '$1  - STEP 2.6: Load session context using .aiox-core/scripts/session-context-loader.js to detect previous agent and workflow state\n$2';
 
     content = content.replace(activationPattern, activationReplacement);
 
     // Pattern 2: Add STEP 3.6 after STEP 3.5
-    const step36Pattern = /(- STEP 3\.5: Introduce yourself.*\n)( {2}- STEP 4: Display project status)/s;
-    const step36Replacement = '$1  - STEP 3.6: Display session context if available (from STEP 2.6) showing previous agent and recent commands\n$2';
+    const step36Pattern =
+      /(- STEP 3\.5: Introduce yourself.*\n)( {2}- STEP 4: Display project status)/s;
+    const step36Replacement =
+      '$1  - STEP 3.6: Display session context if available (from STEP 2.6) showing previous agent and recent commands\n$2';
 
     content = content.replace(step36Pattern, step36Replacement);
 
     // Pattern 3: Add *session-info command to Utilities section
     const utilitiesPattern = /(# Utilities\n)( {2}- (?:guide|help|exit))/;
-    const utilitiesReplacement = '$1  - session-info: Show current session details (agent history, commands)\n$2';
+    const utilitiesReplacement =
+      '$1  - session-info: Show current session details (agent history, commands)\n$2';
 
     content = content.replace(utilitiesPattern, utilitiesReplacement);
 
@@ -60,7 +64,7 @@ async function updateAgent(agentFile) {
 
 async function main() {
   console.log('🚀 Batch Update: Adding Session Context to Agents');
-  console.log('=' +  '='.repeat(50));
+  console.log('=' + '='.repeat(50));
 
   let successCount = 0;
   let failCount = 0;
@@ -86,7 +90,7 @@ async function main() {
 
 // Run if executed directly
 if (require.main === module) {
-  main().catch(error => {
+  main().catch((error) => {
     console.error('❌ Fatal error:', error);
     process.exit(1);
   });

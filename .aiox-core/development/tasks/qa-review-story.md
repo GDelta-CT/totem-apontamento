@@ -1,9 +1,9 @@
 ---
 tools:
-  - github-cli        # Code review and PR management
-  - browser           # End-to-end testing and UI validation
-  - context7          # Research testing frameworks and best practices
-  - supabase          # Database testing and data validation
+  - github-cli # Code review and PR management
+  - browser # End-to-end testing and UI validation
+  - context7 # Research testing frameworks and best practices
+  - supabase # Database testing and data validation
 checklists:
   - qa-master-checklist.md
 ---
@@ -17,16 +17,19 @@ Perform a comprehensive test architecture review with quality gate decision. Thi
 **Choose your execution mode:**
 
 ### 1. YOLO Mode - Fast, Autonomous (0-1 prompts)
+
 - Autonomous decision making with logging
 - Minimal user interaction
 - **Best for:** Simple, deterministic tasks
 
 ### 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**
+
 - Explicit decision checkpoints
 - Educational explanations
 - **Best for:** Learning, complex decisions
 
 ### 3. Pre-Flight Planning - Comprehensive Upfront Planning
+
 - Task analysis phase (identify all ambiguities)
 - Zero ambiguity execution
 - **Best for:** Ambiguous requirements, critical work
@@ -194,6 +197,7 @@ token_usage: ~2,000-8,000 tokens
 ```
 
 **Optimization Notes:**
+
 - Iterative analysis with depth limits; cache intermediate results; batch similar operations
 
 ---
@@ -212,7 +216,6 @@ updated_at: 2025-11-17
 ```
 
 ---
-
 
 ## Inputs
 
@@ -296,12 +299,12 @@ Execute CodeRabbit self-healing **FIRST** before manual review:
 
 #### Severity Handling
 
-| Severity | Behavior | Notes |
-|----------|----------|-------|
+| Severity     | Behavior                  | Notes                                   |
+| ------------ | ------------------------- | --------------------------------------- |
 | **CRITICAL** | Auto-fix (max 3 attempts) | Security vulnerabilities, breaking bugs |
-| **HIGH** | Auto-fix (max 3 attempts) | Significant quality problems |
-| **MEDIUM** | Create tech debt issue | Document for future sprint |
-| **LOW** | Note in review | Nits, no action required |
+| **HIGH**     | Auto-fix (max 3 attempts) | Significant quality problems            |
+| **MEDIUM**   | Create tech debt issue    | Document for future sprint              |
+| **LOW**      | Note in review            | Nits, no action required                |
 
 #### Implementation Code
 
@@ -321,11 +324,13 @@ async function runQACodeRabbitSelfHealing(storyPath) {
     const output = await runCodeRabbitCLI('committed --base main');
     const issues = parseCodeRabbitOutput(output);
 
-    const criticalIssues = issues.filter(i => i.severity === 'CRITICAL');
-    const highIssues = issues.filter(i => i.severity === 'HIGH');
-    const mediumIssues = issues.filter(i => i.severity === 'MEDIUM');
+    const criticalIssues = issues.filter((i) => i.severity === 'CRITICAL');
+    const highIssues = issues.filter((i) => i.severity === 'HIGH');
+    const mediumIssues = issues.filter((i) => i.severity === 'MEDIUM');
 
-    console.log(`   Found: ${criticalIssues.length} CRITICAL, ${highIssues.length} HIGH, ${mediumIssues.length} MEDIUM`);
+    console.log(
+      `   Found: ${criticalIssues.length} CRITICAL, ${highIssues.length} HIGH, ${mediumIssues.length} MEDIUM`
+    );
 
     // No CRITICAL or HIGH issues = success
     if (criticalIssues.length === 0 && highIssues.length === 0) {
@@ -364,6 +369,7 @@ async function runQACodeRabbitSelfHealing(storyPath) {
 #### Integration with Gate Decision
 
 If self-healing fails:
+
 - Gate automatically set to FAIL
 - `top_issues` populated from remaining CodeRabbit issues
 - `status_reason` includes "CodeRabbit self-healing exhausted"
@@ -704,11 +710,13 @@ After review:
 - **No Action Required**: The sync happens transparently when using story-manager utilities. If sync fails, story file is still saved locally with a warning message.
 
 ## Handoff
+
 next_agent: @dev
-next_command: *apply-qa-fixes
+next_command: \*apply-qa-fixes
 condition: QA verdict is REJECT
 alternatives:
-  - agent: @devops, command: *push, condition: QA verdict is APPROVE
-  - agent: @dev, command: *fix-qa-issues, condition: Structured fix from QA_FIX_REQUEST.md
 
-- **Manual Sync**: If needed, use: `npm run sync-story -- --story {epic}.{story}` 
+- agent: @devops, command: \*push, condition: QA verdict is APPROVE
+- agent: @dev, command: \*fix-qa-issues, condition: Structured fix from QA_FIX_REQUEST.md
+
+- **Manual Sync**: If needed, use: `npm run sync-story -- --story {epic}.{story}`
