@@ -10,7 +10,7 @@
 
 ### 1. Aplicar Migration 001 — Fechar vazamento de RLS
 
-- **Status:** 🟡 Pendente
+- **Status:** ✅ Concluído (aplicada em produção; replicada no projeto de teste)
 - **Complexidade:** 🟢 BAIXA
 - **Onde:** Supabase Studio (https://supabase.com/dashboard) → SQL Editor
 - **Tempo:** 5 minutos
@@ -40,7 +40,7 @@
 
 ### 3. Migration 002 — Estrutura multi-tenant
 
-- **Status:** 🔵 Aguardando 001
+- **Status:** ✅ Concluído (aplicada em produção; replicada no projeto de teste)
 - **Complexidade:** 🟡 MÉDIA
 - **Agente recomendado:** Gemini Pro ou Claude (qualquer um)
 - **Tempo:** 15 minutos seu, 30 minutos o agente
@@ -65,6 +65,16 @@
 ---
 
 ## 🚀 SEMANAS 3-4 — Auth real
+
+### ✅ Fase 1 — Auth da oficina (device) + `oficina_id` no JWT — CONCLUÍDA (validada no teste)
+
+- **Status:** ✅ Concluído no projeto de **teste** (`pvrnimckfgdmgjrjueap`, São Paulo)
+- **O que ficou pronto:**
+  - **Arquitetura:** a OFICINA autentica o **device** (totem) com Supabase Auth; login manual 1× no kiosk; sessão persiste/renova.
+  - **Banco (teste):** role `'totem'` adicionado a `user_oficinas`; _Custom Access Token Hook_ injeta `oficina_id` (e `oficina_role`) como claim de topo no JWT; trigger `BEFORE INSERT` (`set_oficina_id_from_jwt`) preenche `oficina_id` nas 4 tabelas; device `totem-demo@gdelta-totem.com` vinculado à Oficina Demo.
+  - **App:** `client.ts` com `persistSession`/`autoRefreshToken` ligados; componente `DeviceAuthGate` (tela "Login da Oficina"); `/totem` envolto pelo gate.
+  - **Validado:** JWT do device traz `oficina_id`; bater ponto grava com `oficina_id` preenchido pelo trigger (erro de NOT NULL resolvido).
+- **Observação:** ainda **falta** o PIN do operário (item 8) e mover as queries para API Routes (item 5). A migration que remove as policies abertas do `anon` (isolamento real) fica **por último**, depois das API Routes.
 
 ### 6. Implementar Supabase Auth (admin)
 
@@ -102,7 +112,7 @@
 
 ### 11. Layout do `/admin` (sidebar + topbar)
 
-- **Status:** 🔵 Aguardando 9
+- **Status:** 🟡 Parcial — topbar + navegação por cards já existem nas telas do admin
 - **Complexidade:** 🟢 BAIXA
 - **Tempo:** 1 hora
 
@@ -114,7 +124,7 @@
 
 ### 13. Página `/admin/producao` (Pátio)
 
-- **Status:** 🔵 Aguardando 12
+- **Status:** ✅ Construída (01/06/2026) — kanban por etapa (8 colunas) + 4 estados do operário + KPIs + auto-refresh 20s. Lógica validada com cenário real no teste. Falta revisão humana.
 - **Complexidade:** 🟡 MÉDIA
 - **Tempo:** 2-3 horas
 

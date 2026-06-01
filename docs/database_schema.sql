@@ -1,4 +1,4 @@
--- Script SQL para Supabase/PostgreSQL - GR Reparos Automotivo
+-- Script SQL para Supabase/PostgreSQL - G Delta
 
 -- 1. Tabela de Funcionários (Controle de Níveis e Comportamento)
 CREATE TABLE funcionarios (

@@ -24,8 +24,11 @@ export function getSupabase(): SupabaseClient {
   if (_client) return _client;
   _client = createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!, {
     auth: {
-      persistSession: false,
-      autoRefreshToken: false,
+      // Sessão do device (oficina) persiste no kiosk e se renova sozinha.
+      // É essa sessão autenticada que carrega o oficina_id no JWT (Fase 1),
+      // usado pelo RLS e pelos triggers que preenchem oficina_id nas escritas.
+      persistSession: true,
+      autoRefreshToken: true,
     },
     global: {
       headers: { 'x-client-info': 'gdelta-totem/1.0' },

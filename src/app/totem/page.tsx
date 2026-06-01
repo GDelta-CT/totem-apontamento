@@ -46,6 +46,17 @@ import {
   type TipoPontoId,
   type TipoPontoInfo,
 } from '@/lib/supabase/client';
+import { DeviceAuthGate } from './DeviceAuthGate';
+
+// Wrapper: exige sessão do device (oficina) antes de abrir o totem.
+// Assim os hooks de dados só rodam quando há JWT com oficina_id.
+export default function TotemPage() {
+  return (
+    <DeviceAuthGate>
+      <TotemApp />
+    </DeviceAuthGate>
+  );
+}
 
 type Tela =
   | 'selecionar-funcionario'
@@ -65,7 +76,7 @@ type Tela =
   | 'finalizar-confirmar'
   | 'tarefa-finalizada';
 
-export default function TotemPage() {
+function TotemApp() {
   const [tela, setTela] = useState<Tela>('selecionar-funcionario');
   const [funcionario, setFuncionario] = useState<Funcionario | null>(null);
   const [resultadoOS, setResultadoOS] = useState<FetchState<OrdemServico>>({
@@ -463,7 +474,8 @@ function Header({
   return (
     <header className="totem-header">
       <div className="brand">
-        <span className="brand-mark">GR</span>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className="brand-mark" src="/gdelta-symbol.png" alt="G Delta" />
         <span className="brand-name">GDelta · Apontamento</span>
         {emTarefa && <span className="status-pill">EM TAREFA</span>}
         {pausada && <span className="status-pill pausado">PAUSADO</span>}
@@ -1507,14 +1519,10 @@ function Estilos() {
         flex-wrap: wrap;
       }
       .brand-mark {
-        background: var(--warn);
-        color: #000;
-        font-weight: 900;
-        font-size: 20px;
-        letter-spacing: 1px;
-        padding: 6px 12px;
-        border-radius: 4px;
-        font-family: 'JetBrains Mono', monospace;
+        height: 38px;
+        width: auto;
+        object-fit: contain;
+        display: block;
       }
       .brand-name {
         font-weight: 700;

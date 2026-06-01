@@ -5,12 +5,16 @@
 
 ---
 
-## 📍 Estado atual (atualizado: **_/_**/\_\_\_)
+## 📍 Estado atual (atualizado: **01/06/2026**)
 
-- **Fase do projeto:** Pré-MVP (consertando fundação)
+- **Fase do projeto:** Pré-MVP → multi-tenant + auth em andamento
 - **Maturidade técnica:** 2/10 (segundo diagnóstico 360°)
-- **Próxima entrega:** Migration 001 — fechar vazamento de RLS
-- **Bloqueado por:** Nada. Pronto pra executar.
+- **Fase 1 (auth da oficina + `oficina_id` no JWT):** ✅ **Concluída e validada no projeto de TESTE** (São Paulo). Detalhes em "O que JÁ está pronto".
+- **Passo 1 (CRUD do Admin):** ✅ **Concluído no TESTE** — telas `/admin/os` e `/admin/funcionarios`, migrations 003/004/005 aplicadas, login admin (`admin@gdelta.com`) com papel `dono`. Testado contra o banco (criar/editar/placa-única-parcial/soft-delete).
+- **Passo 3 (visão operacional ao vivo):** ✅ **Construído** — `/admin/producao` (kanban por etapa + 4 estados do operário, auto-refresh 20s). Lógica validada com cenário real.
+- **Próxima entrega:** revisão humana + commit; depois mover queries para API Routes + PIN do operário no servidor. (Por último: migration que remove as policies abertas do `anon` → isolamento real.)
+- **Bloqueado por:** Nada. ⚠️ Pendente: revisão do fundador + `git push` (não autorizado ainda).
+- **Ambientes:** trabalho no projeto de **teste** `pvrnimckfgdmgjrjueap` (SP). **Produção** `ccpxwnbxvmadcafxnbjs` (Oregon) intocada. ⚠️ Em produção o totem está quebrado para o `anon` (faltam GRANTs nas tabelas-base) — correção só sob ordem explícita.
 
 ---
 
@@ -40,17 +44,20 @@
 - [x] Tela `/diagnostico` para debug
 - [x] Conexão com Supabase funcionando
 - [x] Conhecimento de domínio do CEO (Eliel) consolidado na planilha gerencial
+- [x] Migrations **001 (RLS)** + **002 (multi-tenant)** aplicadas — produção e replicadas no teste
+- [x] **Fase 1 — Auth da oficina (device) + `oficina_id` no JWT** — validada no **teste**: o device autentica via Supabase Auth (login manual no kiosk), um _Custom Access Token Hook_ injeta `oficina_id` como claim, e um trigger `BEFORE INSERT` preenche `oficina_id` nas escritas (bater ponto grava sem erro)
 
 ---
 
 ## 🚧 O que está EM CONSTRUÇÃO
 
-- [ ] Migration 001 — Ativar RLS no Supabase **← PRÓXIMA ENTREGA**
-- [ ] Migration 002 — Multi-tenant (tabela `oficinas` + `oficina_id`)
-- [ ] Migration 003 — Audit log + `created_at`/`updated_at` em todas as tabelas
-- [ ] API Routes — Mover queries de Supabase do frontend para o backend
-- [ ] Auth real — Login do admin via Supabase Auth (email/senha)
-- [ ] Auth do operário — PIN 6 dígitos com bcrypt
+- [x] Migration 001 — Ativar RLS no Supabase _(aplicada: prod + teste)_
+- [x] Migration 002 — Multi-tenant (tabela `oficinas` + `oficina_id`) _(aplicada: prod + teste)_
+- [x] Auth da oficina (device) + `oficina_id` no JWT — **Fase 1** _(validada no teste)_
+- [ ] Migration "fechamento" — remover as policies abertas do `anon` (isolamento real) **← por último, depois das API Routes**
+- [ ] API Routes — Mover queries de Supabase do frontend para o backend **← próxima**
+- [ ] Auth real — Login do admin (dono) via Supabase Auth (email/senha) + tela `/admin`
+- [ ] Auth do operário — PIN 6 dígitos validado no servidor (bcrypt)
 - [ ] Refactor — Quebrar `/totem/page.tsx` (75KB) em componentes
 - [ ] Dashboard `/admin` — Home + 4 sub-páginas
 - [ ] Backup automático — workflow GitHub Actions agendado
@@ -122,5 +129,5 @@
 
 ---
 
-> **Última atualização:** 23 de maio de 2026
+> **Última atualização:** 30 de maio de 2026 — Fase 1 (auth da oficina + `oficina_id` no JWT) concluída e validada no teste
 > **Próxima revisão:** sempre que algo grande mudar
