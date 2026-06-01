@@ -1,22 +1,17 @@
 'use client';
 
 /**
- * Totem GDelta — Fase 5 Parte 2: Bloqueio e Auto-Pausa
+ * Totem GDelta — Apontamento (produtividade).
  *
- * Adições da Parte 2 (em cima da Parte 1):
- * - Bloqueia "CONSULTAR OS" se operário não bateu ENTRADA hoje
- * - Tela amarela "Bate sua entrada primeiro" com atalho pra bater entrada
- * - Auto-pausa de tarefa em andamento ao bater SAIR PRO ALMOÇO ou FIM DO EXPEDIENTE
- * - Tela especial mostrando "Sua tarefa foi pausada automaticamente"
+ * Fluxo: toca no nome → busca a OS pela placa → escolhe a etapa → roda o
+ * cronômetro (trabalhar / pausar / finalizar). Sem ponto/jornada: a GDelta é
+ * produto de produtividade, não de presença (camada de ponto removida).
  */
 
 import { useEffect, useMemo, useState } from 'react';
 import {
-  baterPonto,
-  baterPontoComAutoPausa,
   buscarApontamentoAtivo,
   buscarOSPorPlaca,
-  consultarSituacaoPonto,
   finalizarApontamento,
   formatarHora,
   iniciarApontamento,
@@ -28,23 +23,17 @@ import {
   useFuncionariosAtivos,
   useTempoPausado,
   type FetchState,
-  type ResultadoBaterPonto,
 } from '@/lib/supabase/queries';
 import {
   ETAPAS,
   MOTIVOS_PAUSA,
-  TIPOS_PONTO,
   buscarEtapa,
   buscarMotivoPausa,
-  buscarTipoPonto,
   type Apontamento,
   type EtapaInfo,
   type Funcionario,
   type MotivoPausaId,
   type OrdemServico,
-  type SituacaoPonto,
-  type TipoPontoId,
-  type TipoPontoInfo,
 } from '@/lib/supabase/client';
 import { DeviceAuthGate } from './DeviceAuthGate';
 
@@ -61,11 +50,6 @@ export default function TotemPage() {
 type Tela =
   | 'selecionar-funcionario'
   | 'verificar-recovery'
-  | 'menu'
-  | 'bloqueio-sem-entrada'
-  | 'bater-ponto'
-  | 'ponto-confirmado'
-  | 'tarefa-auto-pausada'
   | 'consultar-os'
   | 'resultado-os'
   | 'selecionar-etapa'
@@ -87,15 +71,6 @@ function TotemApp() {
   const [osDoApontamento, setOsDoApontamento] = useState<OrdemServico | null>(null);
   const [erroAcao, setErroAcao] = useState<string | null>(null);
   const [carregandoAcao, setCarregandoAcao] = useState(false);
-  const [ultimoTipoPonto, setUltimoTipoPonto] = useState<TipoPontoInfo | null>(null);
-  const [autoPausaInfo, setAutoPausaInfo] = useState<{
-    osNome: string;
-    osPlaca: string;
-    motivo: MotivoPausaId;
-    tipoPonto: TipoPontoInfo;
-  } | null>(null);
-  // NOVO da Parte 2: situação de ponto carregada na hora do login
-  const [situacaoPonto, setSituacaoPonto] = useState<SituacaoPonto | null>(null);
 
   const voltarInicio = () => {
     setFuncionario(null);
@@ -104,9 +79,6 @@ function TotemApp() {
     setApontamentoAtivo(null);
     setOsDoApontamento(null);
     setErroAcao(null);
-    setUltimoTipoPonto(null);
-    setAutoPausaInfo(null);
-    setSituacaoPonto(null);
     setTela('selecionar-funcionario');
   };
 
@@ -125,20 +97,8 @@ function TotemApp() {
         setTela('trabalhando');
       }
     } else {
-      // Sem tarefa: carrega situação de ponto pra checar se já bateu entrada
-      const sit = await consultarSituacaoPonto(f.nome);
-      if (sit.status === 'success') {
-        setSituacaoPonto(sit.data);
-      }
-      setTela('menu');
-    }
-  };
-
-  const recarregarSituacaoPonto = async () => {
-    if (!funcionario) return;
-    const sit = await consultarSituacaoPonto(funcionario.nome);
-    if (sit.status === 'success') {
-      setSituacaoPonto(sit.data);
+      // Sem tarefa ativa: vai direto para a busca de OS (sem ponto, sem menu).
+      setTela('consultar-os');
     }
   };
 
@@ -205,79 +165,13 @@ function TotemApp() {
       setTela('tarefa-finalizada');
       setTimeout(() => {
         setOsDoApontamento(null);
-        setTela('menu');
+        voltarInicio();
       }, 3000);
     } else if (r.status === 'error') {
       setErroAcao(r.message);
     }
   };
 
-  // NOVO Parte 2: usa baterPontoComAutoPausa pra ALMOCO_SAIDA e FIM_EXPEDIENTE
-  const handleBaterPonto = async (tipo: TipoPontoId) => {
-    if (!funcionario) return;
-    setCarregandoAcao(true);
-    setErroAcao(null);
-
-    const r = await baterPontoComAutoPausa({
-      nomeFuncionario: funcionario.nome,
-      cargoFuncionario: funcionario.cargo,
-      tipo,
-    });
-
-    setCarregandoAcao(false);
-
-    if (r.status === 'success') {
-      const tipoInfo = buscarTipoPonto(tipo);
-      setUltimoTipoPonto(tipoInfo);
-
-      // Caso 1: bateu ponto E teve auto-pausa de tarefa
-      if (r.data.autopausa && tipoInfo) {
-        setAutoPausaInfo({
-          osNome: r.data.autopausa.os?.modelo_veiculo || 'tarefa',
-          osPlaca: r.data.autopausa.os?.placa || '',
-          motivo: r.data.autopausa.motivo,
-          tipoPonto: tipoInfo,
-        });
-        // Limpa tarefa ativa do estado (foi pausada)
-        setApontamentoAtivo(null);
-        setOsDoApontamento(null);
-        setTela('tarefa-auto-pausada');
-        // Auto-volta depois de 5 segundos
-        setTimeout(() => {
-          if (tipo === 'fim_expediente') {
-            voltarInicio();
-          } else {
-            recarregarSituacaoPonto();
-            setAutoPausaInfo(null);
-            setTela('menu');
-          }
-        }, 5000);
-        return;
-      }
-
-      // Caso 2: bateu ponto sem auto-pausa
-      setTela('ponto-confirmado');
-      setTimeout(() => {
-        if (tipo === 'fim_expediente') {
-          voltarInicio();
-        } else {
-          recarregarSituacaoPonto();
-          setTela('menu');
-        }
-      }, 3000);
-    } else if (r.status === 'error') {
-      setErroAcao(r.message);
-    }
-  };
-
-  // NOVO Parte 2: tentativa de consultar OS — bloqueia se sem entrada
-  const tentarConsultarOS = () => {
-    if (!situacaoPonto?.entrada) {
-      setTela('bloqueio-sem-entrada');
-      return;
-    }
-    setTela('consultar-os');
-  };
 
   return (
     <main className="totem-root">
@@ -301,48 +195,13 @@ function TotemApp() {
           <Carregando texto="Conferindo se você tinha tarefa em andamento..." />
         )}
 
-        {tela === 'menu' && funcionario && (
-          <TelaMenu
-            funcionario={funcionario}
-            jaBateuEntrada={!!situacaoPonto?.entrada}
-            onBaterPonto={() => setTela('bater-ponto')}
-            onConsultarOS={tentarConsultarOS}
-          />
-        )}
-
-        {tela === 'bloqueio-sem-entrada' && funcionario && (
-          <TelaBloqueioSemEntrada
-            funcionario={funcionario}
-            onBaterEntrada={() => setTela('bater-ponto')}
-            onVoltar={() => setTela('menu')}
-          />
-        )}
-
-        {tela === 'bater-ponto' && funcionario && (
-          <TelaBaterPonto
-            funcionario={funcionario}
-            carregando={carregandoAcao}
-            erro={erroAcao}
-            onBater={handleBaterPonto}
-            onVoltar={() => setTela('menu')}
-          />
-        )}
-
-        {tela === 'ponto-confirmado' && ultimoTipoPonto && (
-          <TelaPontoConfirmado tipo={ultimoTipoPonto} />
-        )}
-
-        {tela === 'tarefa-auto-pausada' && autoPausaInfo && (
-          <TelaTarefaAutoPausada info={autoPausaInfo} />
-        )}
-
         {tela === 'consultar-os' && (
           <TelaConsultarOS
             onResultado={(r) => {
               setResultadoOS(r);
               setTela('resultado-os');
             }}
-            onVoltar={() => setTela('menu')}
+            onVoltar={voltarInicio}
           />
         )}
 
@@ -358,7 +217,7 @@ function TotemApp() {
               setResultadoOS({ status: 'idle' });
               setTela('consultar-os');
             }}
-            onVoltar={() => setTela('menu')}
+            onVoltar={voltarInicio}
           />
         )}
 
@@ -442,7 +301,7 @@ function TotemApp() {
         )}
 
         {tela === 'tarefa-finalizada' && (
-          <TelaTarefaFinalizada onIrPraMenu={() => setTela('menu')} />
+          <TelaTarefaFinalizada onConcluir={voltarInicio} />
         )}
       </section>
 
@@ -533,314 +392,6 @@ function TelaSelecionarFuncionario({ onSelecionar }: { onSelecionar: (f: Funcion
           ))}
         </ul>
       )}
-    </div>
-  );
-}
-
-/* ─────────────── Tela: Menu (com badge se já bateu entrada) ─────────────── */
-
-function TelaMenu({
-  funcionario,
-  jaBateuEntrada,
-  onBaterPonto,
-  onConsultarOS,
-}: {
-  funcionario: Funcionario;
-  jaBateuEntrada: boolean;
-  onBaterPonto: () => void;
-  onConsultarOS: () => void;
-}) {
-  return (
-    <div className="tela">
-      <h1 className="tela-titulo">
-        OLÁ, <span className="destaque">{funcionario.nome.split(' ')[0]}</span>
-      </h1>
-      <p className="tela-sub">
-        O que você quer fazer agora?
-        {jaBateuEntrada && <span className="badge-entrada"> ✓ Entrada batida hoje</span>}
-      </p>
-
-      <div className="menu-acoes">
-        <button className="acao-grande acao-primaria" onClick={onBaterPonto}>
-          <span className="acao-icone" aria-hidden>
-            🕐
-          </span>
-          <span className="acao-titulo">BATER PONTO</span>
-          <span className="acao-sub">Entrada · Almoço · Saída</span>
-        </button>
-        <button
-          className={`acao-grande ${jaBateuEntrada ? 'acao-primaria' : 'acao-bloqueada'}`}
-          onClick={onConsultarOS}
-        >
-          <span className="acao-icone" aria-hidden>
-            {jaBateuEntrada ? '🔎' : '🔒'}
-          </span>
-          <span className="acao-titulo">CONSULTAR OS</span>
-          <span className="acao-sub">
-            {jaBateuEntrada ? 'Buscar e iniciar tarefa' : 'Bata sua entrada primeiro'}
-          </span>
-        </button>
-      </div>
-    </div>
-  );
-}
-
-/* ─────────────── Tela: Bloqueio Sem Entrada (NOVA Parte 2) ─────────────── */
-
-function TelaBloqueioSemEntrada({
-  funcionario,
-  onBaterEntrada,
-  onVoltar,
-}: {
-  funcionario: Funcionario;
-  onBaterEntrada: () => void;
-  onVoltar: () => void;
-}) {
-  return (
-    <div className="tela">
-      <div className="bloqueio-card">
-        <div className="bloqueio-icone" aria-hidden>
-          ⏱
-        </div>
-        <h1 className="bloqueio-titulo">BATE SUA ENTRADA PRIMEIRO</h1>
-        <p className="bloqueio-texto">
-          Olá, <strong>{funcionario.nome.split(' ')[0]}</strong>. Você ainda não bateu o ponto de
-          <strong> ENTRADA</strong> hoje.
-        </p>
-        <p className="bloqueio-texto">
-          Antes de iniciar qualquer tarefa, registre que você chegou. Isso garante que sua jornada
-          conte direitinho na folha de ponto.
-        </p>
-
-        <div className="acoes-linha" style={{ marginTop: 24 }}>
-          <button className="btn-secundario" onClick={onVoltar}>
-            VOLTAR PRO MENU
-          </button>
-          <button className="btn-primario btn-acao-grande" onClick={onBaterEntrada}>
-            ▶ BATER ENTRADA AGORA
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ─────────────── Tela: Bater Ponto ─────────────── */
-
-function TelaBaterPonto({
-  funcionario,
-  carregando,
-  erro,
-  onBater,
-  onVoltar,
-}: {
-  funcionario: Funcionario;
-  carregando: boolean;
-  erro: string | null;
-  onBater: (tipo: TipoPontoId) => void;
-  onVoltar: () => void;
-}) {
-  const [situacao, setSituacao] = useState<FetchState<SituacaoPonto>>({
-    status: 'loading',
-  });
-
-  useEffect(() => {
-    let cancelled = false;
-    consultarSituacaoPonto(funcionario.nome).then((r) => {
-      if (!cancelled) setSituacao(r);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [funcionario.nome]);
-
-  return (
-    <div className="tela">
-      <h1 className="tela-titulo">BATER PONTO</h1>
-      <p className="tela-sub">
-        Olá, <span className="destaque">{funcionario.nome.split(' ')[0]}</span>. Toque no batimento
-        que vai fazer agora.
-      </p>
-
-      {situacao.status === 'loading' && <Carregando texto="Consultando ponto do dia..." />}
-
-      {situacao.status === 'error' && <Erro mensagem={situacao.message} onTentar={onVoltar} />}
-
-      {situacao.status === 'success' && (
-        <>
-          <TimelinePonto situacao={situacao.data} />
-
-          <ul className="grid-ponto" style={{ marginTop: 24 }}>
-            {TIPOS_PONTO.map((tipo) => {
-              const registro = situacao.data[tipo.id];
-              const jaBateu = !!registro;
-              const proximo = situacao.data.proximoBatimentoPermitido;
-              const habilitado =
-                !carregando &&
-                !jaBateu &&
-                (tipo.id === proximo || (tipo.id === 'fim_expediente' && !!situacao.data.entrada));
-
-              return (
-                <li key={tipo.id}>
-                  <button
-                    className={`card-ponto card-ponto-${tipo.cor} ${jaBateu ? 'card-ponto-feito' : ''}`}
-                    onClick={() => onBater(tipo.id)}
-                    disabled={!habilitado}
-                    type="button"
-                  >
-                    <span className="card-ponto-icone" aria-hidden>
-                      {tipo.icone}
-                    </span>
-                    <div className="card-ponto-texto">
-                      <div className="card-ponto-nome">{tipo.nome}</div>
-                      {jaBateu && registro && (
-                        <div className="card-ponto-feito-tag">
-                          ✓ {formatarHora(registro.registrado_em)}
-                        </div>
-                      )}
-                      {!jaBateu && !habilitado && (
-                        <div className="card-ponto-bloqueado-tag">
-                          {tipo.id === 'entrada' ? 'Já bateu hoje' : 'Aguardando etapa anterior'}
-                        </div>
-                      )}
-                      {!jaBateu && habilitado && (
-                        <div className="card-ponto-disponivel-tag">{tipo.descricao}</div>
-                      )}
-                    </div>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-
-          {situacao.data.proximoBatimentoPermitido === null && (
-            <div className="info-encerrado" style={{ marginTop: 20 }}>
-              <span aria-hidden>✓</span> Você já encerrou o expediente de hoje. Bom descanso!
-            </div>
-          )}
-        </>
-      )}
-
-      {erro && (
-        <div className="erro-inline" style={{ marginTop: 20 }}>
-          <span aria-hidden>⚠</span> {erro}
-        </div>
-      )}
-
-      <div className="acoes-linha" style={{ marginTop: 28 }}>
-        <button className="btn-secundario" onClick={onVoltar} disabled={carregando}>
-          VOLTAR PRO MENU
-        </button>
-      </div>
-    </div>
-  );
-}
-
-/* ─────────────── Tela: Ponto Confirmado ─────────────── */
-
-function TelaPontoConfirmado({ tipo }: { tipo: TipoPontoInfo }) {
-  return (
-    <div className="tela tela-sucesso">
-      <div className={`sucesso-icone sucesso-icone-${tipo.cor}`}>✓</div>
-      <h1 className="tela-titulo">PONTO REGISTRADO!</h1>
-      <p className="tela-sub">
-        <span className="destaque">{tipo.nome}</span> · {formatarHora(new Date().toISOString())}
-      </p>
-      <p style={{ color: 'var(--ink-soft)', fontSize: 14, margin: 0 }}>
-        Voltando ao menu em segundos...
-      </p>
-    </div>
-  );
-}
-
-/* ─────────────── Tela: Tarefa Auto-Pausada (NOVA Parte 2) ─────────────── */
-
-function TelaTarefaAutoPausada({
-  info,
-}: {
-  info: {
-    osNome: string;
-    osPlaca: string;
-    motivo: MotivoPausaId;
-    tipoPonto: TipoPontoInfo;
-  };
-}) {
-  const motivoInfo = buscarMotivoPausa(info.motivo);
-  const ehFimExpediente = info.motivo === 'fim_expediente';
-
-  return (
-    <div className="tela tela-sucesso">
-      <div className={`sucesso-icone sucesso-icone-${info.tipoPonto.cor}`}>✓</div>
-      <h1 className="tela-titulo">PONTO REGISTRADO!</h1>
-      <p className="tela-sub">
-        <span className="destaque">{info.tipoPonto.nome}</span> ·{' '}
-        {formatarHora(new Date().toISOString())}
-      </p>
-
-      <div className="auto-pausa-card">
-        <div className="auto-pausa-tag">
-          <span aria-hidden>⏸</span> TAREFA PAUSADA AUTOMATICAMENTE
-        </div>
-        <div className="auto-pausa-veiculo">{info.osNome}</div>
-        {info.osPlaca && <div className="auto-pausa-placa">{formatarPlaca(info.osPlaca)}</div>}
-        {motivoInfo && (
-          <div className="auto-pausa-motivo">
-            Motivo: {motivoInfo.icone} <strong>{motivoInfo.nome}</strong>
-          </div>
-        )}
-        <div className="auto-pausa-aviso">
-          {ehFimExpediente
-            ? 'Sua tarefa foi salva. Amanhã, ao bater entrada, você poderá retomar de onde parou.'
-            : 'Quando voltar do almoço e bater ponto, você poderá retomar a tarefa de onde parou.'}
-        </div>
-      </div>
-
-      <p style={{ color: 'var(--ink-soft)', fontSize: 13, margin: 0 }}>
-        {ehFimExpediente ? 'Saindo em alguns segundos...' : 'Voltando ao menu em segundos...'}
-      </p>
-    </div>
-  );
-}
-
-/* ─────────────── Timeline do Ponto do Dia ─────────────── */
-
-function TimelinePonto({ situacao }: { situacao: SituacaoPonto }) {
-  const eventos: { tipo: TipoPontoInfo; hora: string }[] = [];
-  if (situacao.entrada)
-    eventos.push({ tipo: TIPOS_PONTO[0], hora: formatarHora(situacao.entrada.registrado_em) });
-  if (situacao.almoco_saida)
-    eventos.push({ tipo: TIPOS_PONTO[1], hora: formatarHora(situacao.almoco_saida.registrado_em) });
-  if (situacao.almoco_volta)
-    eventos.push({ tipo: TIPOS_PONTO[2], hora: formatarHora(situacao.almoco_volta.registrado_em) });
-  if (situacao.fim_expediente)
-    eventos.push({
-      tipo: TIPOS_PONTO[3],
-      hora: formatarHora(situacao.fim_expediente.registrado_em),
-    });
-
-  if (eventos.length === 0) {
-    return (
-      <div className="timeline-vazia">
-        <span aria-hidden>📅</span> Você ainda não bateu nenhum ponto hoje. Comece pela{' '}
-        <strong>ENTRADA</strong>.
-      </div>
-    );
-  }
-
-  return (
-    <div className="timeline-ponto">
-      <div className="timeline-titulo">SEU DIA ATÉ AGORA</div>
-      <ul className="timeline-lista">
-        {eventos.map((e, i) => (
-          <li key={i} className={`timeline-item timeline-item-${e.tipo.cor}`}>
-            <span className="timeline-icone" aria-hidden>
-              {e.tipo.icone}
-            </span>
-            <span className="timeline-nome">{e.tipo.nome}</span>
-            <span className="timeline-hora">{e.hora}</span>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }
@@ -959,7 +510,7 @@ function TelaResultadoOS({
 
           <div className="acoes-linha">
             <button className="btn-secundario" onClick={onVoltar}>
-              MENU
+              VOLTAR
             </button>
             <button className="btn-secundario" onClick={onNovaConsulta}>
               NOVA CONSULTA
@@ -1392,14 +943,14 @@ function TelaFinalizarConfirmar({
 
 /* ─────────────── Tela: Tarefa Finalizada ─────────────── */
 
-function TelaTarefaFinalizada({ onIrPraMenu }: { onIrPraMenu: () => void }) {
+function TelaTarefaFinalizada({ onConcluir }: { onConcluir: () => void }) {
   return (
     <div className="tela tela-sucesso">
       <div className="sucesso-icone">✓</div>
       <h1 className="tela-titulo">TAREFA FINALIZADA!</h1>
       <p className="tela-sub">Apontamento salvo. Bom trabalho!</p>
-      <button className="btn-primario" onClick={onIrPraMenu}>
-        VOLTAR PRO MENU
+      <button className="btn-primario" onClick={onConcluir}>
+        CONCLUIR
       </button>
     </div>
   );

@@ -13,9 +13,6 @@ import {
   type Funcionario,
   type MotivoPausaId,
   type OrdemServico,
-  type RegistroPonto,
-  type SituacaoPonto,
-  type TipoPontoId,
 } from './client';
 
 const TIMEOUT_MS = 8000;
@@ -328,201 +325,6 @@ export async function buscarApontamentoAtivo(
   }
 }
 
-/* ────────────────────── PONTO ELETRÔNICO (Fase 5) ────────────────────── */
-
-/**
- * Registra um batimento de ponto SIMPLES. Event Sourcing: sempre INSERT.
- * Use apenas para ENTRADA e VOLTAR DO ALMOÇO (que não precisam de auto-pausa).
- */
-export async function baterPonto(params: {
-  nomeFuncionario: string;
-  cargoFuncionario?: string | null;
-  tipo: TipoPontoId;
-  observacao?: string | null;
-}): Promise<FetchState<RegistroPonto>> {
-  try {
-    const result = await withTimeout(
-      getSupabase()
-        .from('pontos_eletronicos')
-        .insert({
-          nome_funcionario: params.nomeFuncionario,
-          cargo_funcionario: params.cargoFuncionario ?? null,
-          tipo: params.tipo,
-          observacao: params.observacao ?? null,
-        })
-        .select()
-        .single()
-    );
-    const { data, error } = result as {
-      data: RegistroPonto | null;
-      error: { message: string } | null;
-    };
-    if (error) return { status: 'error', message: traduzirErro(error.message) };
-    if (!data) return { status: 'error', message: 'Falha ao bater ponto.' };
-    return { status: 'success', data };
-  } catch (e) {
-    return {
-      status: 'error',
-      message: e instanceof Error ? e.message : 'Erro desconhecido.',
-    };
-  }
-}
-
-/**
- * Retorno de baterPontoComAutoPausa:
- * - ponto: o registro de ponto gravado
- * - autopausa: se uma tarefa foi auto-pausada por causa deste batimento
- *   (Fase 5 Parte 2: usado em ALMOCO_SAIDA e FIM_EXPEDIENTE)
- */
-export type ResultadoBaterPonto = {
-  ponto: RegistroPonto;
-  autopausa: {
-    apontamento: Apontamento;
-    os: OrdemServico | null;
-    motivo: MotivoPausaId;
-  } | null;
-};
-
-/**
- * Bate ponto E auto-pausa tarefa em andamento (se houver).
- *
- * Lógica:
- * 1. Verifica se o funcionário tem tarefa "Em andamento" agora
- * 2. Se tem, pausa ela com motivo correspondente ao tipo de ponto
- *    - "almoco_saida" → motivo "almoco"
- *    - "fim_expediente" → motivo "fim_expediente"
- * 3. Grava o batimento de ponto
- * 4. Retorna os 2 resultados (ponto + apontamento pausado, se aplicável)
- *
- * Se a tarefa já está Pausada (não Em andamento), não mexe nela.
- * Se não tem tarefa, só bate o ponto.
- */
-export async function baterPontoComAutoPausa(params: {
-  nomeFuncionario: string;
-  cargoFuncionario?: string | null;
-  tipo: TipoPontoId;
-}): Promise<FetchState<ResultadoBaterPonto>> {
-  // Mapeia tipo de ponto → motivo de pausa
-  const tipoParaMotivo: Partial<Record<TipoPontoId, MotivoPausaId>> = {
-    almoco_saida: 'almoco',
-    fim_expediente: 'fim_expediente',
-  };
-
-  const motivoAutoPausa = tipoParaMotivo[params.tipo];
-
-  // 1. Verifica se tem tarefa em andamento (não pausada)
-  let autopausaResult: ResultadoBaterPonto['autopausa'] = null;
-
-  if (motivoAutoPausa) {
-    const ativoResult = await buscarApontamentoAtivo(params.nomeFuncionario);
-    if (ativoResult.status === 'success' && ativoResult.data.status_tarefa === 'Em andamento') {
-      // Pausar essa tarefa
-      const pausaResult = await pausarApontamento({
-        apontamentoId: ativoResult.data.id,
-        motivo: motivoAutoPausa,
-      });
-      if (pausaResult.status === 'success') {
-        autopausaResult = {
-          apontamento: pausaResult.data,
-          os: ativoResult.data.ordem_servico,
-          motivo: motivoAutoPausa,
-        };
-      } else if (pausaResult.status === 'error') {
-        // Se falhou em pausar, NÃO bate ponto — evita inconsistência
-        return {
-          status: 'error',
-          message:
-            'Falha ao pausar tarefa em andamento. Ponto não foi registrado: ' + pausaResult.message,
-        };
-      }
-    }
-  }
-
-  // 2. Grava o batimento de ponto
-  const pontoResult = await baterPonto({
-    nomeFuncionario: params.nomeFuncionario,
-    cargoFuncionario: params.cargoFuncionario,
-    tipo: params.tipo,
-  });
-
-  if (pontoResult.status !== 'success') {
-    return pontoResult as FetchState<ResultadoBaterPonto>;
-  }
-
-  return {
-    status: 'success',
-    data: {
-      ponto: pontoResult.data,
-      autopausa: autopausaResult,
-    },
-  };
-}
-
-/**
- * Consulta a situação de ponto do funcionário HOJE.
- * Pega todos os batimentos do dia e calcula qual é o próximo permitido.
- */
-export async function consultarSituacaoPonto(
-  nomeFuncionario: string
-): Promise<FetchState<SituacaoPonto>> {
-  try {
-    const hojeInicio = new Date();
-    hojeInicio.setHours(0, 0, 0, 0);
-    const hojeInicioISO = hojeInicio.toISOString();
-
-    const result = await withTimeout(
-      getSupabase()
-        .from('pontos_eletronicos')
-        .select('id, nome_funcionario, cargo_funcionario, tipo, registrado_em, observacao')
-        .eq('nome_funcionario', nomeFuncionario)
-        .gte('registrado_em', hojeInicioISO)
-        .order('registrado_em', { ascending: true })
-    );
-    const { data, error } = result as {
-      data: RegistroPonto[] | null;
-      error: { message: string } | null;
-    };
-
-    if (error) return { status: 'error', message: traduzirErro(error.message) };
-
-    const registros = data ?? [];
-
-    const entrada = registros.filter((r) => r.tipo === 'entrada').pop() ?? null;
-    const almoco_saida = registros.filter((r) => r.tipo === 'almoco_saida').pop() ?? null;
-    const almoco_volta = registros.filter((r) => r.tipo === 'almoco_volta').pop() ?? null;
-    const fim_expediente = registros.filter((r) => r.tipo === 'fim_expediente').pop() ?? null;
-
-    let proximoBatimentoPermitido: TipoPontoId | null = null;
-    if (!entrada) {
-      proximoBatimentoPermitido = 'entrada';
-    } else if (!almoco_saida && !fim_expediente) {
-      proximoBatimentoPermitido = 'almoco_saida';
-    } else if (almoco_saida && !almoco_volta) {
-      proximoBatimentoPermitido = 'almoco_volta';
-    } else if (almoco_volta && !fim_expediente) {
-      proximoBatimentoPermitido = 'fim_expediente';
-    } else if (fim_expediente) {
-      proximoBatimentoPermitido = null;
-    }
-
-    return {
-      status: 'success',
-      data: {
-        entrada,
-        almoco_saida,
-        almoco_volta,
-        fim_expediente,
-        proximoBatimentoPermitido,
-      },
-    };
-  } catch (e) {
-    return {
-      status: 'error',
-      message: e instanceof Error ? e.message : 'Erro desconhecido.',
-    };
-  }
-}
-
 /* ────────────────────── UTILS ────────────────────── */
 
 export function normalizarPlaca(input: string): string {
@@ -561,7 +363,13 @@ export function useFocoAutomatico<T extends HTMLElement>() {
   return ref;
 }
 
-function parseISOComUTC(iso: string): number {
+/**
+ * Converte um timestamp do banco em epoch ms tratando-o como UTC.
+ * O Postgres grava `timestamp` SEM 'Z'; sem isso o JS interpretaria como hora
+ * local e erraria o cálculo pelo offset do fuso. Exportada para reuso (ex.:
+ * detecção de anomalias). Ver anomalias-queries.ts.
+ */
+export function parseISOComUTC(iso: string): number {
   const isoComUTC =
     iso.endsWith('Z') || /[+-]\d{2}:?\d{2}$/.test(iso) ? iso : iso.replace(' ', 'T') + 'Z';
   return new Date(isoComUTC).getTime();
