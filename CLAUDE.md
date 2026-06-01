@@ -11,7 +11,7 @@
 **GDelta-Totem** — SaaS de **produtividade OPERACIONAL** para oficinas de **funilaria e
 pintura**. Dois componentes:
 
-- **Totem** (tablet-quiosque): operário bate ponto → acha a OS pela placa → escolhe a
+- **Totem** (tablet-quiosque): operário toca no nome → acha a OS pela placa → escolhe a
   etapa → roda cronômetro/pausa (apontamento). Adoção é lei: **nenhuma ação comum pode
   custar mais de dois toques**.
 - **Painel** (`/admin`): o dono vê produtividade e saúde de prazos em tempo real.
@@ -71,11 +71,13 @@ Stack: Next.js 16 + React 19 + TypeScript + Tailwind v4 + Supabase + Vercel.
 
 ## Escopo MVP — TRAVADO (não reabrir)
 
-### Ponto / presença
+### Produtividade (sem ponto/jornada)
 
-Presença é só para **produtividade** (não RH/folha/CLT — o GDelta não toca na relação
-trabalhista). 2 batidas (entrada/saída); almoço é **pausa de apontamento**, não batida.
-Sem bater ponto → não loga trabalho.
+A GDelta é produto de **produtividade**, não de ponto/jornada (não RH/folha/CLT — não toca
+na relação trabalhista). **Não há camada de presença** (removida): o gancho de adoção é
+tocar no nome → achar a OS → iniciar a etapa. O trabalho é logado pelo **apontamento**
+(tarefa), não por batida de ponto. Almoço/fim de expediente = **pausas de apontamento**.
+A tabela `pontos_eletronicos` fica **deprecada** (não dropada).
 
 ### Modelo de tempo
 
@@ -84,9 +86,9 @@ Sem bater ponto → não loga trabalho.
 - **Um** apontamento ativo por operário (iniciar outro pausa o atual).
 - **Regra dos 15 min = regra de USO** (treino no dia 1, não cálculo do sistema): só pausa
   se a parada for prevista >15 min, escolhendo motivo; paradas curtas viram tempo trabalhado.
-- **Fim de expediente** (Auto Risco: 07:30–18:00, seg–sex): auto-pausa apontamentos abertos
-  (motivo "fim de expediente") **e** auto-fecha presença (auto-saída).
-- **Teto anti-fantasma:** apontamento ativo muito acima de ~10,5h → anomalia para o admin corrigir.
+- **Teto anti-fantasma:** apontamento ativo muito acima de ~10,5h → anomalia para o admin
+  corrigir. (Sem presença/fim-de-expediente automático: timer esquecido vira anomalia,
+  tratada só pela correção do admin sobre `apontamentos`.)
 - Tempos ancorados no relógio do **servidor**, nunca do tablet.
 
 ### Kanban / OS
@@ -145,8 +147,8 @@ bloqueio/motivo.
     MVP (editar tempo de apontamento, fechar fantasma, mover card); marca leve "editado pelo
     admin".
   - **Dono** → produtividade + saúde de prazos + ROI; **mais leitura**.
-- **4 estados do operário no painel:** produzindo / em pausa (com motivo) / presente sem
-  tarefa / ausente.
+- **3 estados do operário no painel:** produzindo / em pausa (com motivo) / sem tarefa
+  ativa. (Sem presença: a faixa mostra só quem teve apontamento hoje, derivado de apontamentos.)
 - Painel responde 2 perguntas do dono: **"todo mundo produzindo agora?"** e **"que carro
   está travado/lento?"**.
 - Operário acha o carro: lista buscável de carros **ativos** por placa, mais recentes primeiro.
@@ -157,7 +159,7 @@ bloqueio/motivo.
 1. **PRAZO = holofote** (grande na tela): carros dentro do prazo / perto de estourar +
    **ticket médio "dias na oficina × R$ do orçamento"** (revela barato-lento = prejuízo
    disfarçado × caro-rápido = ouro). **Fica no MVP.**
-2. **PRODUTIVIDADE INDIVIDUAL = fundação agora** (coletada + mostrada via os 4 estados);
+2. **PRODUTIVIDADE INDIVIDUAL = fundação agora** (coletada + mostrada via os 3 estados);
    ranking/reconhecimento = Fase 2 (não julgar pessoas em dado ainda não provado).
 
 **ROI derivado de hora-homem = fast-follow (não MVP):** só com taxas reais setadas pelo
@@ -197,7 +199,7 @@ totem → bater ponto grava, confirmado no navegador). App apontado ao teste via
 
 1. **Admin cria OS + funcionário** (CRUD — próximo passo)
 2. Totem aponta _(já existe — conectar ao multi-tenant)_
-3. Visão operacional ao vivo (kanban + 4 estados do operário)
+3. Visão operacional ao vivo (kanban + 3 estados do operário)
    - **3.5 — slot da visão de saúde de prazos do dono** (distinta do kanban operacional;
      logo após o passo 3)
 4. Correção do admin
@@ -252,9 +254,9 @@ curto ao fim de cada passo.
 
 ## Processo
 
-- AIOX **leve** por enquanto (fundador solo), MAS manter os **checks de segurança**
+- AIOX **ativo** sob governança plena (decisão do fundador, 01/06/2026), MAS manter os **checks de segurança**
   e a regra de **não publicar sem revisão**.
-- **AIOX dormente no piloto solo:** as regras em `.claude/rules/` (matriz de delegação,
-  workflows, governança de agentes) estão **suspensas** enquanto for fundador solo — **não
-  acionar os agentes nem a matriz de delegação**. Valem apenas os **checks de segurança**:
-  revisar antes de publicar, diff antes de salvar, um passo pequeno e reversível por vez.
+- **AIOX ATIVO (decisão do fundador, 01/06/2026):** as regras em `.claude/rules/` (matriz de delegação,
+  workflows, governança de agentes) estão **em vigor** — **devemos
+  acionar os agentes e a matriz de delegação** conforme definido. Os **checks de segurança** continuam valendo sobre tudo:
+  revisar antes de publicar, diff antes de salvar, um passo pequeno e reversível por vez. **Anti-colisão:** enquanto um executor estiver com posse de um build ativo, a escrita de código fica serializada — um por vez no mesmo arquivo/área — pra não conflitar nem atrasar.

@@ -4,7 +4,7 @@
  * /admin/producao — Visão Operacional AO VIVO (Passo 3 da ordem A.1).
  *
  * O "quadro do Daily Huddle": responde "todo mundo produzindo agora?" (faixa dos
- * 4 estados do operário) e "que carro está travado/lento?" (kanban por etapa +
+ * 3 estados do operário) e "que carro está travado/lento?" (kanban por etapa +
  * marca de bloqueio). Auto-atualiza a cada 20s. Só leitura.
  *
  * Padrão visual: tokens --gd-* + styled-jsx (mesmo do totem). Sem Tailwind no JSX.
@@ -101,8 +101,7 @@ function ResumoEstados({ visao }: { visao: VisaoLive }) {
   const cards: { label: string; valor: number; cor: string }[] = [
     { label: 'Produzindo', valor: r.produzindo, cor: '#1b7a3d' },
     { label: 'Em pausa', valor: r.em_pausa, cor: '#b8860b' },
-    { label: 'Sem tarefa', valor: r.presente_sem_tarefa, cor: '#13678d' },
-    { label: 'Ausentes', valor: r.ausente, cor: '#8a94a0' },
+    { label: 'Sem tarefa ativa', valor: r.sem_tarefa, cor: '#13678d' },
     { label: 'Carros ativos', valor: r.carrosAtivos, cor: '#0b3857' },
     { label: 'Bloqueados', valor: r.carrosBloqueados, cor: '#b42323' },
   ];
@@ -121,7 +120,7 @@ function ResumoEstados({ visao }: { visao: VisaoLive }) {
 }
 
 function FaixaOperarios({ visao }: { visao: VisaoLive }) {
-  const ordem: EstadoOperario[] = ['produzindo', 'em_pausa', 'presente_sem_tarefa', 'ausente'];
+  const ordem: EstadoOperario[] = ['produzindo', 'em_pausa', 'sem_tarefa'];
   const ops = [...visao.operarios].sort(
     (a, b) => ordem.indexOf(a.estado) - ordem.indexOf(b.estado)
   );

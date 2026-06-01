@@ -2,11 +2,11 @@
  * Camada de dados da VISÃO OPERACIONAL AO VIVO (Passo 3 da ordem A.1).
  *
  * Responde às 2 perguntas do dono (CLAUDE.md):
- *   1. "Todo mundo está produzindo agora?"  -> os 4 estados do operário.
+ *   1. "Todo mundo está produzindo agora?"  -> os 3 estados do operário.
  *   2. "Que carro está travado/lento?"      -> kanban por etapa + bloqueios.
  *
  * Arquivo NOVO e isolado: lê dados que o totem já grava (apontamentos,
- * pontos_eletronicos, ordens_servico). Não escreve nada, não toca no totem
+ * ordens_servico). Não escreve nada, não toca no totem
  * nem no RLS. Desfazer = apagar este arquivo. Tempos ancorados no servidor
  * (hora_inicio / registrado_em vêm do banco).
  */
@@ -37,8 +37,8 @@ function withTimeout<T>(promise: PromiseLike<T>, ms = TIMEOUT_MS): Promise<T> {
 
 /* ───────────────────────── Tipos ───────────────────────── */
 
-/** Os 4 estados do operário no painel (CLAUDE.md). */
-export type EstadoOperario = 'produzindo' | 'em_pausa' | 'presente_sem_tarefa' | 'ausente';
+/** Os 3 estados do operário no painel (produtividade-only, sem presença). */
+export type EstadoOperario = 'produzindo' | 'em_pausa' | 'sem_tarefa';
 
 export type OperarioLive = {
   nome: string;
@@ -88,8 +88,7 @@ export type VisaoLive = {
   resumo: {
     produzindo: number;
     em_pausa: number;
-    presente_sem_tarefa: number;
-    ausente: number;
+    sem_tarefa: number;
     carrosAtivos: number;
     carrosBloqueados: number;
   };
@@ -128,8 +127,12 @@ type OSRow = {
   motivo_bloqueio: string | null;
 };
 
-type FuncRow = { nome: string; cargo: string | null };
-type PontoRow = { nome_funcionario: string; tipo: string; registrado_em: string };
+type ApontHojeRow = {
+  nome_funcionario: string;
+  cargo_funcionario: string | null;
+  status_tarefa: string;
+  hora_inicio: string;
+};
 
 /**
  * Monta a visão ao vivo completa numa tirada só. Faz poucas queries amplas e
@@ -140,7 +143,7 @@ export async function carregarVisaoLive(): Promise<FetchState<VisaoLive>> {
     const sb = getSupabase();
     const hoje = inicioDeHojeISO();
 
-    const [osRes, apRes, funcRes, pontoRes] = await Promise.all([
+    const [osRes, apRes, apHojeRes] = await Promise.all([
       withTimeout(
         sb
           .from('ordens_servico')
@@ -159,27 +162,25 @@ export async function carregarVisaoLive(): Promise<FetchState<VisaoLive>> {
           .in('status_tarefa', ['Em andamento', 'Pausado'])
           .order('hora_inicio', { ascending: false })
       ),
-      withTimeout(sb.from('funcionarios').select('nome, cargo').eq('ativo', true)),
+      // apontamentos de HOJE (qualquer status) -> quem trabalhou hoje (p/ "sem tarefa ativa")
       withTimeout(
         sb
-          .from('pontos_eletronicos')
-          .select('nome_funcionario, tipo, registrado_em')
-          .gte('registrado_em', hoje)
-          .order('registrado_em', { ascending: true })
+          .from('apontamentos')
+          .select('nome_funcionario, cargo_funcionario, status_tarefa, hora_inicio')
+          .gte('hora_inicio', hoje)
+          .order('hora_inicio', { ascending: false })
       ),
     ]);
 
     const erro =
       (osRes as { error: { message: string } | null }).error ||
       (apRes as { error: { message: string } | null }).error ||
-      (funcRes as { error: { message: string } | null }).error ||
-      (pontoRes as { error: { message: string } | null }).error;
+      (apHojeRes as { error: { message: string } | null }).error;
     if (erro) return { status: 'error', message: erro.message };
 
     const oss = ((osRes as { data: OSRow[] | null }).data ?? []) as OSRow[];
     const apont = ((apRes as { data: ApontRow[] | null }).data ?? []) as ApontRow[];
-    const funcs = ((funcRes as { data: FuncRow[] | null }).data ?? []) as FuncRow[];
-    const pontos = ((pontoRes as { data: PontoRow[] | null }).data ?? []) as PontoRow[];
+    const apHoje = ((apHojeRes as { data: ApontHojeRow[] | null }).data ?? []) as ApontHojeRow[];
 
     // 1) apontamentos ativos por OS
     const ativosPorOS = new Map<string, ApontamentoAtivo[]>();
@@ -216,32 +217,35 @@ export async function carregarVisaoLive(): Promise<FetchState<VisaoLive>> {
       carros: carros.filter((c) => c.etapa_atual === et.id),
     }));
 
-    // 4) os 4 estados do operário
-    //    presença: tem 'entrada' hoje sem 'fim_expediente' posterior.
-    const ultimoTipoPonto = new Map<string, string>();
-    for (const p of pontos) ultimoTipoPonto.set(p.nome_funcionario, p.tipo); // ordenado asc -> fica o último
-    const presente = (nome: string) => {
-      const t = ultimoTipoPonto.get(nome);
-      return t != null && t !== 'fim_expediente';
-    };
-
-    // apontamento ativo por operário (o mais recente)
-    const apontPorOperario = new Map<string, ApontRow>();
-    for (const a of apont) if (!apontPorOperario.has(a.nome_funcionario)) apontPorOperario.set(a.nome_funcionario, a);
-
+    // 4) os 3 estados do operário — SEM presença/ponto.
+    //    A faixa mostra só quem TEVE apontamento hoje (ou tem um ativo agora),
+    //    derivado de apontamentos — nunca a lista inteira de funcionários.
     const placaPorOSId = new Map(oss.map((o) => [o.id, o.placa]));
 
-    const operarios: OperarioLive[] = funcs.map((f) => {
-      const ap = apontPorOperario.get(f.nome);
+    // apontamento ATIVO por operário (o mais recente) -> produzindo / em_pausa
+    const ativoPorOperario = new Map<string, ApontRow>();
+    for (const a of apont)
+      if (!ativoPorOperario.has(a.nome_funcionario)) ativoPorOperario.set(a.nome_funcionario, a);
+
+    // operários da faixa = união de "ativo agora" + "teve apontamento hoje"
+    const cargoPorOperario = new Map<string, string | null>();
+    for (const a of apHoje)
+      if (!cargoPorOperario.has(a.nome_funcionario))
+        cargoPorOperario.set(a.nome_funcionario, a.cargo_funcionario);
+    for (const a of apont)
+      if (!cargoPorOperario.has(a.nome_funcionario))
+        cargoPorOperario.set(a.nome_funcionario, a.cargo_funcionario);
+
+    const operarios: OperarioLive[] = [...cargoPorOperario.keys()].map((nome) => {
+      const ap = ativoPorOperario.get(nome);
       let estado: EstadoOperario;
       if (ap && ap.status_tarefa === 'Em andamento') estado = 'produzindo';
       else if (ap && ap.status_tarefa === 'Pausado') estado = 'em_pausa';
-      else if (presente(f.nome)) estado = 'presente_sem_tarefa';
-      else estado = 'ausente';
+      else estado = 'sem_tarefa';
 
       return {
-        nome: f.nome,
-        cargo: f.cargo,
+        nome,
+        cargo: cargoPorOperario.get(nome) ?? null,
         estado,
         placaAtual: ap ? (placaPorOSId.get(ap.ordem_servico_id) ?? null) : null,
         etapaAtual: ap?.etapa ?? null,
@@ -253,8 +257,7 @@ export async function carregarVisaoLive(): Promise<FetchState<VisaoLive>> {
     const resumo = {
       produzindo: operarios.filter((o) => o.estado === 'produzindo').length,
       em_pausa: operarios.filter((o) => o.estado === 'em_pausa').length,
-      presente_sem_tarefa: operarios.filter((o) => o.estado === 'presente_sem_tarefa').length,
-      ausente: operarios.filter((o) => o.estado === 'ausente').length,
+      sem_tarefa: operarios.filter((o) => o.estado === 'sem_tarefa').length,
       carrosAtivos: carros.length,
       carrosBloqueados: carros.filter((c) => c.bloqueado).length,
     };
@@ -265,10 +268,9 @@ export async function carregarVisaoLive(): Promise<FetchState<VisaoLive>> {
   }
 }
 
-/** Rótulos amigáveis dos 4 estados, para a UI. */
+/** Rótulos amigáveis dos 3 estados, para a UI. */
 export const ESTADO_LABEL: Record<EstadoOperario, { texto: string; cor: string }> = {
   produzindo: { texto: 'Produzindo', cor: '#1b7a3d' },
   em_pausa: { texto: 'Em pausa', cor: '#b8860b' },
-  presente_sem_tarefa: { texto: 'Presente, sem tarefa', cor: '#13678d' },
-  ausente: { texto: 'Ausente', cor: '#8a94a0' },
+  sem_tarefa: { texto: 'Sem tarefa ativa', cor: '#13678d' },
 };
