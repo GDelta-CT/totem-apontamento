@@ -12,8 +12,9 @@
 - **Fase 1 (auth da oficina + `oficina_id` no JWT):** ✅ **Concluída e validada no projeto de TESTE** (São Paulo). Detalhes em "O que JÁ está pronto".
 - **Passo 1 (CRUD do Admin):** ✅ **Concluído no TESTE** — telas `/admin/os` e `/admin/funcionarios`, migrations 003/004/005 aplicadas, login admin (`admin@gdelta.com`) com papel `dono`. Testado contra o banco (criar/editar/placa-única-parcial/soft-delete).
 - **Passo 3 (visão operacional ao vivo):** ✅ **Construído** — `/admin/producao` (kanban por etapa + 4 estados do operário, auto-refresh 20s). Lógica validada com cenário real.
-- **Próxima entrega:** revisão humana + commit; depois mover queries para API Routes + PIN do operário no servidor. (Por último: migration que remove as policies abertas do `anon` → isolamento real.)
-- **Bloqueado por:** Nada. ⚠️ Pendente: revisão do fundador + `git push` (não autorizado ainda).
+- **Passo 4 (correção de anomalias):** 🟡 **UI pronta** — `/admin/anomalias` detecta apontamentos-fantasma (>10,5h). A GRAVAÇÃO da correção depende da **Migration 006** (grants em apontamentos), que está **escrita mas NÃO aplicada** — aguarda OK explícito do fundador. Bug de fuso (timestamp sem 'Z') encontrado e corrigido via `parseISOComUTC`.
+- **Próxima entrega:** revisão humana + aprovar Migration 006 + commit; depois Passo 5 (ROI/resumo). (Por último: migration que remove as policies abertas do `anon` → isolamento real.)
+- **Bloqueado por:** Nada. ⚠️ Pendente: revisão do fundador + aprovar Migration 006 + `git push` (não autorizado ainda).
 - **Ambientes:** trabalho no projeto de **teste** `pvrnimckfgdmgjrjueap` (SP). **Produção** `ccpxwnbxvmadcafxnbjs` (Oregon) intocada. ⚠️ Em produção o totem está quebrado para o `anon` (faltam GRANTs nas tabelas-base) — correção só sob ordem explícita.
 
 ---

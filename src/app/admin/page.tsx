@@ -25,9 +25,11 @@ export default function AdminPage() {
 }
 
 const CARDS = [
+  { href: '/admin/prazos', icone: '🎯', titulo: 'Saúde de prazos', sub: 'Holofote do dono · dias × R$' },
+  { href: '/admin/producao', icone: '🏭', titulo: 'Produção ao vivo', sub: 'Kanban + estados da equipe' },
   { href: '/admin/os', icone: '📋', titulo: 'Ordens de Serviço', sub: 'Criar, listar e editar OS' },
   { href: '/admin/funcionarios', icone: '👥', titulo: 'Equipe', sub: 'Funcionários · ativar/desativar' },
-  { href: '/admin/producao', icone: '🏭', titulo: 'Produção ao vivo', sub: 'Kanban + estados da equipe' },
+  { href: '/admin/anomalias', icone: '⚠️', titulo: 'Anomalias', sub: 'Corrigir apontamentos esquecidos' },
 ];
 
 function AdminHome() {

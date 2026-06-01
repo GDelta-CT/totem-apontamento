@@ -54,6 +54,20 @@ A cor do card segue uma **ORDEM DE PRIORIDADE**. O primeiro que bater, vence:
 **Regra de ouro:** bloqueado (1 e 2) **sempre ganha** da cor de estado do operário (3–6). Um
 carro parado esperando peça é mais importante de ver do que quem está mexendo nele.
 
+### Esclarecimentos pro build (revisão do arquiteto — fechados)
+
+1. **Card × pessoa.** Os níveis 1, 2, 3 e o "fantasma" colorem o **card** (estão grudados numa
+   OS). **"Presente sem tarefa" e "ausente" NÃO colorem card** — a pessoa sem tarefa não está
+   em card nenhum; ela aparece só na **faixa "Operários agora"**.
+2. **Card parado sem bloqueio.** Carro numa coluna sem ninguém trabalhando e sem bloqueio
+   (ex.: "aguardando próxima etapa") tem cor própria: **cinza neutro**.
+3. **Vários operários no mesmo card.** **Produzindo ganha de pausado**; se todos os
+   apontamentos do card estão pausados, o card fica na cor de **pausa**.
+4. **Degradação graciosa.** Se o passo "etapa concluída? sim/não" for cortado (é candidato a
+   corte), o card simplesmente cai em "parado sem bloqueio" (cinza) — a tela não quebra.
+5. **Todos os apontamentos visíveis.** A coluna segue o `etapa_atual` gravado, mas o card
+   mostra **todos os apontamentos ativos** do carro, cada um com a etiqueta da sua etapa.
+
 ### Máquina de estados (resumo)
 
 - **OS:** ativa → (em uma das 8 etapas) → pode entrar em "bloqueada" (com motivo) a qualquer
