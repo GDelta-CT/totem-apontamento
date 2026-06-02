@@ -14,13 +14,67 @@
   --gd-paper: #f5f4f2; /* off-white da marca */
   --gd-paper-2: #eceae6;
   --gd-ink: #0b2233; /* texto sobre claro */
-  --gd-muted: #5d7689; /* texto secundário */
+  --gd-muted: #46606f; /* texto secundário — escurecido p/ passar APCA Lc>=75 em 11px sobre branco */
   --gd-line: #d7dde2; /* bordas no claro */
   --gd-white: #ffffff;
   --gd-radius: 18px;
   --gd-shadow: 0 18px 50px rgba(8, 30, 48, 0.18);
 
+  /* ===== Camada PREMIUM /admin — ADITIVO (o totem NAO usa estes tokens) ===== */
+  /* Espacamento (base 4px) */
+  --gd-sp-1: 4px;
+  --gd-sp-2: 8px;
+  --gd-sp-3: 12px;
+  --gd-sp-4: 16px;
+  --gd-sp-5: 24px;
+  --gd-sp-6: 32px;
+  --gd-sp-7: 48px;
+  --gd-sp-8: 64px;
+  /* Raios */
+  --gd-r-control: 10px;
+  --gd-r-card: 14px;
+  --gd-r-panel: 18px;
+  --gd-r-pill: 999px;
+  /* Bordas tonais de marca (substituem cinzas crus) */
+  --gd-border: rgba(11, 56, 87, 0.1);
+  --gd-border-strong: rgba(11, 56, 87, 0.16);
+  --gd-hairline-top: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  /* Elevacao premium (luz fria em camadas, nao sombra cinza) */
+  --gd-elev-0: 0 1px 0 rgba(11, 56, 87, 0.04);
+  --gd-elev-1: 0 1px 2px rgba(11, 56, 87, 0.05), 0 1px 0 rgba(11, 56, 87, 0.03);
+  --gd-elev-2: 0 8px 24px -8px rgba(11, 56, 87, 0.14), 0 2px 6px rgba(11, 56, 87, 0.06);
+  --gd-elev-pop: 0 24px 60px -12px rgba(8, 30, 48, 0.28);
+  /* Fundo do app em camadas (cartoes brancos flutuam sobre ele) */
+  --gd-app-bg: radial-gradient(120% 80% at 50% -10%, #fbfcfd 0%, #f4f6f8 60%);
+  /* Escala tipografica (Inter, minor third) */
+  --gd-fs-micro: 11px;
+  --gd-fs-cap: 12.5px;
+  --gd-fs-body: clamp(13px, 0.8vw, 14px);
+  --gd-fs-h3: clamp(15px, 1vw, 16px);
+  --gd-fs-kpi: clamp(28px, 3.2vw, 40px);
+  --gd-fs-hero: clamp(44px, 6vw, 72px);
+  /* Tokens de estado (uma cor = um significado; sempre com label/icone) */
+  --gd-ok-fill: #e1f5ee;
+  --gd-ok-ink: #0f6e56;
+  --gd-warn-fill: #faeeda;
+  --gd-warn-ink: #8a5a12;
+  --gd-bad-fill: #fcebeb;
+  --gd-bad-ink: #a32d2d;
+  --gd-neutral-fill: #f0f1f0;
+  --gd-neutral-ink: #5f5e5a;
+  --gd-info-fill: #e6f1fb;
+  --gd-info-ink: #0c447c;
+  /* Motion (tech: rapido e preciso) */
+  --gd-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --gd-dur-fast: 120ms;
+  --gd-dur: 180ms;
+  --gd-dur-slow: 240ms;
+  --gd-stagger: 40ms;
+
   /* Core Palette - Industrial Dark */
+  /* ATENCAO: estes tokens (--bg-*, --green-*, --amber-*, --red-*, --blue-*, --text-*, */
+  /* --border-*, --radius-*) sao a CAMADA DO TOTEM (tablet-quiosque). NAO REMOVER: */
+  /* o totem depende deles e remove-los quebra o totem. */
   --bg-primary: #0a0f1c;
   --bg-secondary: #111827;
   --bg-card: #1a2236;
@@ -181,6 +235,51 @@ body {
 
 .animate-spin-slow {
   animation: spin 1.5s linear infinite;
+}
+
+/* ===== Premium /admin — heartbeat do dado AO VIVO + pulso de valor ===== */
+@keyframes gd-heartbeat {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+@keyframes gd-value-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.04);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.gd-live-dot {
+  animation: gd-heartbeat 2s var(--gd-ease) infinite;
+}
+.gd-tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1, 'cv11' 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .gd-live-dot,
+  .animate-pulse-green,
+  .animate-pulse-amber {
+    animation: none;
+  }
+  /* Neutraliza transicoes de hover (translateY/scale) e de width das barras
+     de prazo/benchmark — respeita a preferencia do usuario por menos movimento. */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* ===== Scrollbar (minimal for kiosk) ===== */

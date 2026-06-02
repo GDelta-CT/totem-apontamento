@@ -9,6 +9,12 @@ contra as regras travadas (CLAUDE.md, NOTAS-TECNICAS, Pacote 1/2). Handoff pro C
 ## A. DECISÕES DO FUNDADOR (PARE — não decidir por ele)
 
 ### A1. Ponto removido → o painel perde o estado "presente sem tarefa"
+**DECISÃO (01/06/2026 — fundador delega ao arquiteto): opção (a).** Derivar "presente" SEM
+ponto: operário com **qualquer apontamento hoje** (mesmo finalizado/pausado) = **presente**;
+nenhum apontamento hoje = **ausente**; "presente sem tarefa" = teve apontamento hoje mas
+nenhum **ativo** agora. Não reintroduz ponto/RH. **Code:** ajustar `live-queries.ts` pra
+derivar presença de `apontamentos` do dia, não de `pontos_eletronicos` (tabela morta).
+
 O totem **removeu a camada de ponto** (comentário no próprio `totem/page.tsx:7-8`:
 "camada de ponto removida"). Mas `live-queries.ts:220-240` ainda deriva "presente sem tarefa"
 × "ausente" lendo `pontos_eletronicos` — uma tabela que **ninguém mais escreve**. Efeito:

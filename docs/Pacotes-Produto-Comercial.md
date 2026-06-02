@@ -25,7 +25,7 @@ O painel cruza **DUAS coisas independentes**:
 - **Estado do operário** = o que a **PESSOA** está fazendo (independente da OS):
   - **Produzindo** — cronômetro rodando numa OS.
   - **Em pausa** — parou (almoço, descanso).
-  - **Presente sem tarefa** — bateu ponto, está na oficina, mas sem OS atribuída.
+  - **Presente sem tarefa** — teve apontamento hoje, mas sem tarefa ativa agora (derivado de produtividade, sem ponto/RH).
   - **Ausente** — não está presente / saiu.
 
 ### Como cruzam
