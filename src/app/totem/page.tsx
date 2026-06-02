@@ -54,7 +54,6 @@ type Tela =
   | 'consultar-os'
   | 'resultado-os'
   | 'selecionar-etapa'
-  | 'iniciar-tarefa-confirmar'
   | 'trabalhando'
   | 'selecionar-motivo-pausa'
   | 'tarefa-pausada'
@@ -112,15 +111,20 @@ function TotemApp() {
     }
   };
 
-  const iniciarTarefa = async () => {
-    if (!funcionario || resultadoOS.status !== 'success' || !etapaSelecionada) return;
+  // Adoção: a escolha da etapa É a confirmação — iniciar já leva pra "trabalhando".
+  // A etapa chega POR PARÂMETRO (não pelo estado etapaSelecionada, que o setState
+  // ainda não aplicou no mesmo tick); o estado serve só de fallback.
+  const iniciarTarefa = async (etapa?: EtapaInfo) => {
+    const etapaAlvo = etapa ?? etapaSelecionada;
+    if (!funcionario || resultadoOS.status !== 'success' || !etapaAlvo) return;
+    setEtapaSelecionada(etapaAlvo);
     setCarregandoAcao(true);
     setErroAcao(null);
     const r = await iniciarApontamento({
       ordemServicoId: resultadoOS.data.id,
       nomeFuncionario: funcionario.nome,
       cargoFuncionario: funcionario.cargo || '—',
-      etapa: etapaSelecionada.id,
+      etapa: etapaAlvo.id,
     });
     setCarregandoAcao(false);
     if (r.status === 'success') {
@@ -128,6 +132,7 @@ function TotemApp() {
       setOsDoApontamento(resultadoOS.data);
       setTela('trabalhando');
     } else if (r.status === 'error') {
+      // Erro fica INLINE na própria tela de etapa (com retry), nunca some calado.
       setErroAcao(r.message);
     }
   };
@@ -216,7 +221,16 @@ function TotemApp() {
           <TelaConsultarOS
             onResultado={(r) => {
               setResultadoOS(r);
-              setTela('resultado-os');
+              // Caminho feliz: achou o carro (1 OS ativa) -> direto pra escolher a
+              // etapa, pulando a tela de confirmação do carro. Vazio/erro caem na
+              // tela de resultado (fallback) com a mensagem e o "tentar de novo".
+              if (r.status === 'success') {
+                setErroAcao(null);
+                setEtapaSelecionada(null);
+                setTela('selecionar-etapa');
+              } else {
+                setTela('resultado-os');
+              }
             }}
             onVoltar={voltarInicio}
           />
@@ -241,27 +255,17 @@ function TotemApp() {
         {tela === 'selecionar-etapa' && resultadoOS.status === 'success' && (
           <TelaSelecionarEtapa
             os={resultadoOS.data}
-            onEscolher={(etapa) => {
-              setEtapaSelecionada(etapa);
-              setTela('iniciar-tarefa-confirmar');
+            etapaIniciando={carregandoAcao ? etapaSelecionada : null}
+            carregando={carregandoAcao}
+            erro={erroAcao}
+            onEscolher={(etapa) => iniciarTarefa(etapa)}
+            onVoltar={() => {
+              setResultadoOS({ status: 'idle' });
+              setErroAcao(null);
+              setTela('consultar-os');
             }}
-            onVoltar={() => setTela('resultado-os')}
           />
         )}
-
-        {tela === 'iniciar-tarefa-confirmar' &&
-          resultadoOS.status === 'success' &&
-          etapaSelecionada && (
-            <TelaIniciarTarefaConfirmar
-              os={resultadoOS.data}
-              etapa={etapaSelecionada}
-              carregando={carregandoAcao}
-              erro={erroAcao}
-              onConfirmar={iniciarTarefa}
-              onTrocarEtapa={() => setTela('selecionar-etapa')}
-              onCancelar={() => setTela('resultado-os')}
-            />
-          )}
 
         {tela === 'trabalhando' && apontamentoAtivo && osDoApontamento && (
           <TelaTrabalhando
@@ -384,10 +388,10 @@ function TelaSelecionarFuncionario({ onSelecionar }: { onSelecionar: (f: Funcion
 
   return (
     <div className="tela">
-      <h1 className="tela-titulo">QUEM ESTÁ NO PONTO?</h1>
+      <h1 className="tela-titulo">QUEM VAI TRABALHAR?</h1>
       <p className="tela-sub">Toque no seu nome para começar.</p>
 
-      {state.status === 'loading' && <Carregando texto="Buscando equipe..." />}
+      {state.status === 'loading' && <Carregando texto="Buscando a equipe..." />}
       {state.status === 'error' && <Erro mensagem={state.message} onTentar={recarregar} />}
       {state.status === 'empty' && (
         <Vazio
@@ -438,7 +442,7 @@ function TelaConsultarOS({
 
   return (
     <div className="tela">
-      <h1 className="tela-titulo">PLACA DO VEÍCULO</h1>
+      <h1 className="tela-titulo">QUAL É O CARRO?</h1>
       <p className="tela-sub">Digite a placa e toque em buscar.</p>
 
       <div className="placa-wrap">
@@ -463,7 +467,7 @@ function TelaConsultarOS({
           VOLTAR
         </button>
         <button className="btn-primario" onClick={buscar} disabled={!podeBuscar}>
-          {buscando ? 'BUSCANDO...' : 'BUSCAR OS'}
+          {buscando ? 'PROCURANDO...' : 'BUSCAR CARRO'}
         </button>
       </div>
     </div>
@@ -485,21 +489,21 @@ function TelaResultadoOS({
 }) {
   return (
     <div className="tela">
-      {resultado.status === 'loading' && <Carregando texto="Buscando OS..." />}
+      {resultado.status === 'loading' && <Carregando texto="Procurando o carro..." />}
       {resultado.status === 'error' && (
         <Erro mensagem={resultado.message} onTentar={onNovaConsulta} />
       )}
       {resultado.status === 'empty' && (
         <Vazio
-          titulo="Placa não encontrada"
-          dica="Confira se digitou certo. Se não aparecer, fale com o administrador."
+          titulo="Carro não encontrado"
+          dica="Confira a placa que você digitou. Se não aparecer, fale com o administrador."
           onTentar={onNovaConsulta}
         />
       )}
       {resultado.status === 'success' && (
         <article className="os-card">
           <div className="os-header">
-            <span className="os-tag">ORDEM DE SERVIÇO</span>
+            <span className="os-tag">CARRO</span>
             <span
               className={`os-status status-${(resultado.data.status_geral || 'aberta').toLowerCase().replace(/\s+/g, '-')}`}
             >
@@ -522,7 +526,7 @@ function TelaResultadoOS({
             <span className="btn-iniciar-icone" aria-hidden>
               ▶
             </span>
-            INICIAR TAREFA
+            É ESTE CARRO
           </button>
 
           <div className="acoes-linha">
@@ -530,7 +534,7 @@ function TelaResultadoOS({
               VOLTAR
             </button>
             <button className="btn-secundario" onClick={onNovaConsulta}>
-              NOVA CONSULTA
+              OUTRO CARRO
             </button>
           </div>
         </article>
@@ -543,109 +547,65 @@ function TelaResultadoOS({
 
 function TelaSelecionarEtapa({
   os,
+  etapaIniciando,
+  carregando,
+  erro,
   onEscolher,
   onVoltar,
 }: {
   os: OrdemServico;
+  etapaIniciando: EtapaInfo | null;
+  carregando: boolean;
+  erro: string | null;
   onEscolher: (etapa: EtapaInfo) => void;
   onVoltar: () => void;
 }) {
   return (
     <div className="tela">
-      <h1 className="tela-titulo">QUE ETAPA VAI FAZER?</h1>
-      <p className="tela-sub">
-        Toque na etapa em que vai trabalhar agora no{' '}
-        <span className="destaque">{os.modelo_veiculo}</span> · {formatarPlaca(os.placa)}
-      </p>
+      <h1 className="tela-titulo">O QUE VOCÊ VAI FAZER?</h1>
+      <p className="tela-sub">Toque na etapa e o cronômetro já começa.</p>
 
-      <ul className="grid-etapas">
-        {ETAPAS.map((e) => (
-          <li key={e.id}>
-            <button className="card-etapa" onClick={() => onEscolher(e)} type="button">
-              <span className="card-etapa-num">{e.ordem.toString().padStart(2, '0')}</span>
-              <span className="card-etapa-icone" aria-hidden>
-                {e.icone}
-              </span>
-              <span className="card-etapa-nome">{e.nome}</span>
-              <span className="card-etapa-desc">{e.descricao}</span>
-            </button>
-          </li>
-        ))}
-      </ul>
-
-      <div className="acoes-linha" style={{ marginTop: 24 }}>
-        <button className="btn-secundario" onClick={onVoltar}>
-          VOLTAR
-        </button>
+      {/* Confirma o carro no topo: o operário tem certeza de em qual carro vai bater o tempo. */}
+      <div className="etapa-carro">
+        <span className="etapa-carro-tag">CARRO</span>
+        <span className="etapa-carro-modelo">{os.modelo_veiculo}</span>
+        <span className="etapa-carro-placa">{formatarPlaca(os.placa)}</span>
       </div>
-    </div>
-  );
-}
-
-/* ─────────────── Tela: Confirmar Iniciar Tarefa ─────────────── */
-
-function TelaIniciarTarefaConfirmar({
-  os,
-  etapa,
-  carregando,
-  erro,
-  onConfirmar,
-  onTrocarEtapa,
-  onCancelar,
-}: {
-  os: OrdemServico;
-  etapa: EtapaInfo;
-  carregando: boolean;
-  erro: string | null;
-  onConfirmar: () => void;
-  onTrocarEtapa: () => void;
-  onCancelar: () => void;
-}) {
-  return (
-    <div className="tela">
-      <h1 className="tela-titulo">CONFIRMAR TAREFA</h1>
-      <p className="tela-sub">Confira antes de o cronômetro começar.</p>
-
-      <article className="confirmacao-card">
-        <div className="confirmacao-etapa">
-          <span className="confirmacao-etapa-icone" aria-hidden>
-            {etapa.icone}
-          </span>
-          <div>
-            <div className="confirmacao-etapa-tag">ETAPA</div>
-            <div className="confirmacao-etapa-nome">{etapa.nome}</div>
-          </div>
-          <button className="btn-trocar" onClick={onTrocarEtapa} disabled={carregando}>
-            Trocar
-          </button>
-        </div>
-
-        <div style={{ paddingTop: 20, marginTop: 20, borderTop: '1px solid var(--line)' }}>
-          <h2 className="os-veiculo">{os.modelo_veiculo}</h2>
-          <div className="os-placa-display">{formatarPlaca(os.placa)}</div>
-        </div>
-
-        <p className="confirmacao-aviso">
-          O cronômetro vai começar agora. Você só sai dessa tarefa quando finalizar ou pausar.
-        </p>
-      </article>
 
       {erro && (
-        <div className="erro-inline">
-          <span aria-hidden>⚠</span> {erro}
+        <div className="erro-inline" role="alert" style={{ marginBottom: 16 }}>
+          <span aria-hidden>⚠</span> {erro} Toque na etapa de novo para tentar.
         </div>
       )}
 
-      <div className="acoes-linha">
-        <button className="btn-secundario" onClick={onCancelar} disabled={carregando}>
-          CANCELAR
-        </button>
-        <button
-          className="btn-primario btn-acao-grande"
-          onClick={onConfirmar}
-          disabled={carregando}
-        >
-          {carregando ? 'INICIANDO...' : '▶ COMEÇAR AGORA'}
+      <ul className="grid-etapas" aria-busy={carregando}>
+        {ETAPAS.map((e) => {
+          const iniciandoEsta = !!etapaIniciando && etapaIniciando.id === e.id;
+          return (
+            <li key={e.id}>
+              <button
+                className={`card-etapa ${iniciandoEsta ? 'card-etapa-iniciando' : ''}`}
+                onClick={() => onEscolher(e)}
+                disabled={carregando}
+                type="button"
+              >
+                <span className="card-etapa-num">{e.ordem.toString().padStart(2, '0')}</span>
+                <span className="card-etapa-icone" aria-hidden>
+                  {e.icone}
+                </span>
+                <span className="card-etapa-nome">{e.nome}</span>
+                <span className="card-etapa-desc">
+                  {iniciandoEsta ? 'Começando...' : e.descricao}
+                </span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+
+      <div className="acoes-linha" style={{ marginTop: 24 }}>
+        <button className="btn-secundario" onClick={onVoltar} disabled={carregando}>
+          OUTRO CARRO
         </button>
       </div>
     </div>
@@ -725,7 +685,7 @@ function TelaSelecionarMotivoPausa({
     <div className="tela">
       <h1 className="tela-titulo">POR QUE VAI PAUSAR?</h1>
       <p className="tela-sub">
-        Tarefa: <span className="destaque">{os.modelo_veiculo}</span> · {formatarPlaca(os.placa)}
+        Carro: <span className="destaque">{os.modelo_veiculo}</span> · {formatarPlaca(os.placa)}
       </p>
 
       <div className="aviso-15min">
@@ -750,7 +710,7 @@ function TelaSelecionarMotivoPausa({
               <div className="card-motivo-texto">
                 <div className="card-motivo-nome">{m.nome}</div>
                 <div className="card-motivo-desc">{m.descricao}</div>
-                {m.alerta && <div className="card-motivo-alerta-tag">DISPARA ALERTA</div>}
+                {m.alerta && <div className="card-motivo-alerta-tag">AVISA O ADMIN</div>}
               </div>
             </button>
           </li>
@@ -1054,6 +1014,14 @@ function Estilos() {
         scroll-behavior: smooth;
       }
 
+      /* Acessibilidade: anel de foco visível e claro em tudo que recebe foco
+         (uso de parede/oficina + teclado/leitor). Cobre os casos com outline:none. */
+      :where(button, a, input, [tabindex]):focus-visible {
+        outline: 3px solid var(--warn);
+        outline-offset: 2px;
+        border-radius: 6px;
+      }
+
       .totem-root {
         min-height: 100%;
         background: var(--bg);
@@ -1148,7 +1116,8 @@ function Estilos() {
         background: transparent;
         border: 1px solid var(--line);
         color: var(--ink);
-        padding: 8px 14px;
+        padding: 8px 16px;
+        min-height: 44px;
         border-radius: 4px;
         font-family: inherit;
         font-weight: 700;
@@ -1156,6 +1125,7 @@ function Estilos() {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
+        justify-content: center;
         line-height: 1.1;
         transition: all 120ms ease;
       }
@@ -1167,7 +1137,7 @@ function Estilos() {
         font-size: 13px;
       }
       .op-sair {
-        font-size: 10px;
+        font-size: 11px;
         color: var(--ink-soft);
         letter-spacing: 1px;
       }
@@ -1175,8 +1145,10 @@ function Estilos() {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
+        justify-content: center;
         line-height: 1.1;
-        padding: 8px 14px;
+        padding: 8px 16px;
+        min-height: 44px;
       }
       .op-trabalhando .op-sair {
         color: var(--running);
@@ -1264,12 +1236,17 @@ function Estilos() {
         transition: all 120ms ease;
         text-align: left;
       }
-      .card-func:hover,
+      .card-func:hover {
+        border-color: var(--warn);
+        background: #1d1d1d;
+        transform: translateY(-2px);
+      }
       .card-func:focus-visible {
         border-color: var(--warn);
         background: #1d1d1d;
         transform: translateY(-2px);
-        outline: none;
+        outline: 3px solid var(--warn);
+        outline-offset: 2px;
       }
       .card-func:active {
         transform: translateY(0);
@@ -1293,7 +1270,7 @@ function Estilos() {
         line-height: 1.2;
       }
       .card-func-cargo {
-        font-size: 12px;
+        font-size: 13px;
         color: var(--ink-soft);
         text-transform: uppercase;
         letter-spacing: 1px;
@@ -1648,7 +1625,7 @@ function Estilos() {
         right: 20px;
         bottom: 12px;
         font-family: 'JetBrains Mono', monospace;
-        font-size: 12px;
+        font-size: 13px;
         color: var(--ink-soft);
       }
 
@@ -1900,12 +1877,30 @@ function Estilos() {
         position: relative;
         transition: all 130ms ease;
       }
-      .card-etapa:hover,
+      .card-etapa:hover:not(:disabled) {
+        border-color: var(--warn);
+        background: #1d1d1d;
+        transform: translateY(-3px);
+      }
       .card-etapa:focus-visible {
         border-color: var(--warn);
         background: #1d1d1d;
         transform: translateY(-3px);
-        outline: none;
+        outline: 3px solid var(--warn);
+        outline-offset: 2px;
+      }
+      .card-etapa:disabled {
+        cursor: not-allowed;
+        opacity: 0.45;
+      }
+      .card-etapa-iniciando {
+        opacity: 1;
+        border-color: var(--running);
+        background: rgba(74, 222, 128, 0.1);
+      }
+      .card-etapa-iniciando .card-etapa-desc {
+        color: var(--running);
+        font-weight: 700;
       }
       .card-etapa:active {
         transform: translateY(-1px);
@@ -1934,9 +1929,47 @@ function Estilos() {
         letter-spacing: -0.01em;
       }
       .card-etapa-desc {
-        font-size: 12px;
+        font-size: 13px;
         color: var(--ink-soft);
         line-height: 1.4;
+      }
+
+      /* Carro confirmado no topo da escolha de etapa */
+      .etapa-carro {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        background: var(--bg-2);
+        border: 2px solid var(--warn);
+        border-radius: 10px;
+        padding: 16px 20px;
+        margin-bottom: 20px;
+      }
+      .etapa-carro-tag {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        letter-spacing: 2px;
+        color: var(--warn);
+        font-weight: 700;
+      }
+      .etapa-carro-modelo {
+        font-size: 22px;
+        font-weight: 900;
+        letter-spacing: -0.01em;
+        line-height: 1.1;
+      }
+      .etapa-carro-placa {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        color: var(--warn);
+        padding: 4px 10px;
+        background: #000;
+        border-radius: 4px;
+        border: 1.5px solid var(--warn);
+        margin-left: auto;
       }
 
       /* Confirmação */
@@ -1976,7 +2009,8 @@ function Estilos() {
         background: transparent;
         border: 1px solid var(--line);
         color: var(--ink-soft);
-        padding: 8px 14px;
+        padding: 10px 16px;
+        min-height: 44px;
         border-radius: 4px;
         font-family: inherit;
         font-weight: 700;
@@ -2284,7 +2318,7 @@ function Estilos() {
         line-height: 1.2;
       }
       .card-motivo-desc {
-        font-size: 12px;
+        font-size: 13px;
         color: var(--ink-soft);
         margin-top: 4px;
         line-height: 1.4;
@@ -2292,12 +2326,12 @@ function Estilos() {
       .card-motivo-alerta-tag {
         display: inline-block;
         font-family: 'JetBrains Mono', monospace;
-        font-size: 9px;
+        font-size: 11px;
         font-weight: 900;
         letter-spacing: 1px;
         background: var(--danger);
         color: #fff;
-        padding: 2px 6px;
+        padding: 3px 7px;
         border-radius: 3px;
         margin-top: 6px;
       }
