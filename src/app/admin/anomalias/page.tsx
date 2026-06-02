@@ -14,10 +14,11 @@ import { useCallback, useEffect, useState } from 'react';
 import { AdminAuthGate } from '../AdminAuthGate';
 import type { FetchState } from '@/lib/supabase/queries';
 import {
-  fecharApontamento,
   listarAnomalias,
+  registrarCorrecao,
   TETO_FANTASMA_MS,
   type Anomalia,
+  type MotivoCodigo,
 } from '@/lib/supabase/anomalias-queries';
 
 export default function AdminAnomaliasPage() {
@@ -32,7 +33,10 @@ const tetoHoras = (TETO_FANTASMA_MS / (60 * 60 * 1000)).toFixed(1).replace('.', 
 
 function Anomalias() {
   const [lista, setLista] = useState<FetchState<Anomalia[]>>({ status: 'loading' });
-  const [fechandoId, setFechandoId] = useState<string | null>(null);
+  const [corrigindoId, setCorrigindoId] = useState<string | null>(null);
+  const [motivoTxt, setMotivoTxt] = useState('');
+  const [motivoCod, setMotivoCod] = useState<MotivoCodigo>('esqueceu_parar');
+  const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [okMsg, setOkMsg] = useState<string | null>(null);
 
@@ -53,17 +57,38 @@ function Anomalias() {
     };
   }, []);
 
-  const fechar = async (a: Anomalia) => {
+  const abrirCorrecao = (a: Anomalia) => {
     setErro(null);
     setOkMsg(null);
-    setFechandoId(a.id);
-    const r = await fecharApontamento(a.id);
-    setFechandoId(null);
+    setMotivoTxt('');
+    setMotivoCod('esqueceu_parar');
+    setCorrigindoId(a.id);
+  };
+
+  const cancelarCorrecao = () => {
+    setCorrigindoId(null);
+    setMotivoTxt('');
+  };
+
+  const confirmarCorrecao = async (a: Anomalia) => {
+    if (!motivoTxt.trim()) return;
+    setErro(null);
+    setOkMsg(null);
+    setSalvando(true);
+    const r = await registrarCorrecao({
+      apontamentoId: a.id,
+      acao: 'ajustar_fim',
+      motivo: motivoTxt,
+      motivoCodigo: motivoCod,
+    });
+    setSalvando(false);
     if (r.status === 'error') {
       setErro(r.message);
       return;
     }
-    setOkMsg(`Apontamento de ${a.nome_funcionario} fechado.`);
+    setCorrigindoId(null);
+    setMotivoTxt('');
+    setOkMsg(`Correção registrada para ${a.nome_funcionario}. O tempo original foi preservado.`);
     recarregar();
   };
 
@@ -107,23 +132,69 @@ function Anomalias() {
         {lista.status === 'success' && (
           <div className="tabela">
             {lista.data.map((a) => (
-              <div className="linha" key={a.id}>
-                <div className="info">
-                  <strong>{a.nome_funcionario}</strong>
-                  <span className="sub">
-                    {a.placa ?? '—'} · {a.etapa ?? 'sem etapa'} · {a.status_tarefa}
+              <div className="item" key={a.id}>
+                <div className="linha">
+                  <div className="info">
+                    <strong>{a.nome_funcionario}</strong>
+                    <span className="sub">
+                      {a.placa ?? '—'} · {a.etapa ?? 'sem etapa'} · {a.status_tarefa}
+                    </span>
+                  </div>
+                  <span className="horas" title="Horas em aberto">
+                    {a.horasDecorridas.toFixed(1).replace('.', ',')}h
                   </span>
+                  <button
+                    className="btn btn-fechar"
+                    onClick={() => abrirCorrecao(a)}
+                    disabled={corrigindoId === a.id}
+                  >
+                    Corrigir
+                  </button>
                 </div>
-                <span className="horas" title="Horas em aberto">
-                  {a.horasDecorridas.toFixed(1).replace('.', ',')}h
-                </span>
-                <button
-                  className="btn btn-fechar"
-                  onClick={() => fechar(a)}
-                  disabled={fechandoId === a.id}
-                >
-                  {fechandoId === a.id ? 'Fechando…' : 'Fechar agora'}
-                </button>
+
+                {corrigindoId === a.id && (
+                  <div className="correcao">
+                    <label className="campo">
+                      <span>Motivo (obrigatório)</span>
+                      <textarea
+                        className="motivo-txt"
+                        value={motivoTxt}
+                        onChange={(e) => setMotivoTxt(e.target.value)}
+                        placeholder="Ex.: operário esqueceu de finalizar ao sair."
+                        rows={2}
+                        autoFocus
+                      />
+                    </label>
+                    <label className="campo">
+                      <span>Tipo</span>
+                      <select
+                        className="motivo-cod"
+                        value={motivoCod}
+                        onChange={(e) => setMotivoCod(e.target.value as MotivoCodigo)}
+                      >
+                        <option value="esqueceu_parar">Esqueceu de parar</option>
+                        <option value="saiu_sem_registrar">Saiu sem registrar</option>
+                        <option value="erro_toque">Erro de toque</option>
+                        <option value="outro">Outro</option>
+                      </select>
+                    </label>
+                    <div className="correcao-acoes">
+                      <button
+                        className="btn btn-fechar"
+                        onClick={() => confirmarCorrecao(a)}
+                        disabled={salvando || !motivoTxt.trim()}
+                      >
+                        {salvando ? 'Registrando…' : 'Registrar correção'}
+                      </button>
+                      <button className="btn btn-ghost" onClick={cancelarCorrecao} disabled={salvando}>
+                        Cancelar
+                      </button>
+                    </div>
+                    <p className="correcao-nota">
+                      O tempo original é preservado. Fica registrado quem corrigiu, quando e por quê.
+                    </p>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -273,6 +344,55 @@ function Estilos() {
       .flash.erro {
         background: #fdeaea;
         color: #b42323;
+      }
+      .item {
+        border-bottom: 1px solid var(--gd-line, #d7dde2);
+      }
+      .item:last-child {
+        border-bottom: none;
+      }
+      .item .linha {
+        border-bottom: none;
+      }
+      .correcao {
+        padding: 0 16px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background: #fafbfc;
+      }
+      .campo {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font-size: 13px;
+        color: var(--gd-muted, #5d7689);
+      }
+      .motivo-txt,
+      .motivo-cod {
+        font-family: inherit;
+        font-size: 14px;
+        color: var(--gd-ink, #0b2233);
+        border: 1px solid var(--gd-line, #d7dde2);
+        border-radius: 8px;
+        padding: 8px 10px;
+        background: #fff;
+        resize: vertical;
+      }
+      .correcao-acoes {
+        display: flex;
+        gap: 8px;
+        margin-top: 2px;
+      }
+      .btn-ghost {
+        background: transparent;
+        color: var(--gd-muted, #5d7689);
+        border: 1px solid var(--gd-line, #d7dde2);
+      }
+      .correcao-nota {
+        font-size: 12px;
+        color: var(--gd-muted, #5d7689);
+        margin: 0;
       }
     `}</style>
   );

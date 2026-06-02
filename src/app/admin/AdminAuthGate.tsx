@@ -76,7 +76,7 @@ export function AdminAuthGate({ children }: { children: ReactNode }) {
       <div className="gd-auth gd-auth--light">
         <div className="gd-auth__card">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="gd-auth__logo" src="/gdelta-logo.png" alt="G Delta" />
+          <img className="gd-auth__logo" src="/gdelta-logo.png" alt="GDelta" />
           <p className="gd-auth__sub" style={{ margin: 0 }}>
             Verificando acesso…
           </p>
@@ -92,7 +92,7 @@ export function AdminAuthGate({ children }: { children: ReactNode }) {
       <div className="gd-auth gd-auth--light">
         <div className="gd-auth__card">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="gd-auth__logo" src="/gdelta-logo.png" alt="G Delta" />
+          <img className="gd-auth__logo" src="/gdelta-logo.png" alt="GDelta" />
           <h1 className="gd-auth__title">Sem acesso</h1>
           <p className="gd-auth__sub">
             Esta conta não tem papel de <strong>gerente</strong> ou <strong>dono</strong> nesta
@@ -102,7 +102,7 @@ export function AdminAuthGate({ children }: { children: ReactNode }) {
             Sair
           </button>
           <p className="gd-auth__foot">
-            <strong>G Delta</strong> · Painel
+            <strong>GDelta</strong> · Painel
           </p>
         </div>
       </div>
@@ -114,7 +114,7 @@ export function AdminAuthGate({ children }: { children: ReactNode }) {
     <div className="gd-auth gd-auth--light">
       <div className="gd-auth__card">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="gd-auth__logo" src="/gdelta-logo.png" alt="G Delta" />
+        <img className="gd-auth__logo" src="/gdelta-logo.png" alt="GDelta" />
         <h1 className="gd-auth__title">Painel do gestor</h1>
         <p className="gd-auth__sub">Entre com sua conta de gestor.</p>
         <form onSubmit={entrar} className="gd-auth__form">
@@ -143,7 +143,7 @@ export function AdminAuthGate({ children }: { children: ReactNode }) {
           </button>
         </form>
         <p className="gd-auth__foot">
-          <strong>G Delta</strong> · Painel
+          <strong>GDelta</strong> · Painel
         </p>
       </div>
     </div>

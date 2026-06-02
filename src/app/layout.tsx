@@ -2,10 +2,10 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'G Delta — Totem de Apontamento',
+  title: 'GDelta — Totem de Apontamento',
   description:
     'Sistema de apontamento industrial para oficina automotiva. Interface mobile-first otimizada para tablets e totens.',
-  keywords: ['apontamento', 'oficina', 'automotivo', 'totem', 'produção', 'G Delta'],
+  keywords: ['apontamento', 'oficina', 'automotivo', 'totem', 'produção', 'GDelta'],
   robots: 'noindex, nofollow',
 };
 

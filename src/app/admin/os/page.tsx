@@ -166,6 +166,22 @@ function OSManager() {
       setErroForm('Valor do orçamento inválido. Use só números (ex.: 4500.00).');
       return;
     }
+    if (valor != null && valor < 0) {
+      setSalvando(false);
+      setErroForm('O valor do orçamento não pode ser negativo.');
+      return;
+    }
+
+    // G3: o prazo não pode ser antes da entrada (datas ISO yyyy-mm-dd comparam direto).
+    if (
+      form.data_entrada &&
+      form.data_prometida &&
+      form.data_prometida < form.data_entrada
+    ) {
+      setSalvando(false);
+      setErroForm('A data prometida não pode ser antes da data de entrada.');
+      return;
+    }
 
     const r = form.id
       ? await atualizarOS(form.id, {

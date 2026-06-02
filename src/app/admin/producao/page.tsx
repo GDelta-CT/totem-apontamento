@@ -182,13 +182,15 @@ function FaixaOperarios({ visao }: { visao: VisaoLive }) {
   const ops = [...visao.operarios].sort(
     (a, b) => ordem.indexOf(a.estado) - ordem.indexOf(b.estado)
   );
-  if (ops.length === 0) return null;
   return (
     <section className="faixa">
       <div className="faixa-head">
         <h2 className="sec-titulo">Equipe agora</h2>
         <span className="faixa-hint">todo mundo produzindo?</span>
       </div>
+      {ops.length === 0 ? (
+        <p className="faixa-vazia">Ninguém apontou ainda hoje.</p>
+      ) : (
       <div className="op-grid">
         {ops.map((o, i) => {
           const meta = ESTADO_LABEL[o.estado];
@@ -219,6 +221,7 @@ function FaixaOperarios({ visao }: { visao: VisaoLive }) {
           );
         })}
       </div>
+      )}
     </section>
   );
 }
@@ -545,6 +548,15 @@ function Estilos() {
       }
       .faixa-head .sec-titulo {
         margin: 0;
+      }
+      .faixa-vazia {
+        margin: 0 var(--gd-sp-5) var(--gd-sp-3);
+        padding: var(--gd-sp-5);
+        color: var(--gd-muted);
+        font-size: var(--gd-fs-body);
+        border: 1px dashed var(--gd-border);
+        border-radius: var(--gd-r-card);
+        background: var(--gd-white);
       }
       .faixa-hint {
         font-size: var(--gd-fs-micro);

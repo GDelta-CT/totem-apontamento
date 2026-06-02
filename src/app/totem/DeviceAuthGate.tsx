@@ -56,7 +56,7 @@ export function DeviceAuthGate({ children }: { children: ReactNode }) {
       <div className="gd-auth gd-auth--dark gd-auth--kiosk">
         <div className="gd-auth__card">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="gd-auth__logo" src="/gdelta-logo.png" alt="G Delta" />
+          <img className="gd-auth__logo" src="/gdelta-logo.png" alt="GDelta" />
           <p className="gd-auth__sub" style={{ margin: 0 }}>
             Verificando sessão do totem…
           </p>
@@ -71,7 +71,7 @@ export function DeviceAuthGate({ children }: { children: ReactNode }) {
     <div className="gd-auth gd-auth--dark gd-auth--kiosk">
       <div className="gd-auth__card">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="gd-auth__logo" src="/gdelta-logo.png" alt="G Delta" />
+        <img className="gd-auth__logo" src="/gdelta-logo.png" alt="GDelta" />
         <h1 className="gd-auth__title">Login da oficina</h1>
         <p className="gd-auth__sub">Acesso do totem — faça uma vez neste aparelho.</p>
         <form onSubmit={entrar} className="gd-auth__form">
@@ -100,7 +100,7 @@ export function DeviceAuthGate({ children }: { children: ReactNode }) {
           </button>
         </form>
         <p className="gd-auth__foot">
-          <strong>G Delta</strong> · Apontamento de oficina
+          <strong>GDelta</strong> · Apontamento de oficina
         </p>
       </div>
     </div>

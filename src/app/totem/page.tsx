@@ -50,6 +50,7 @@ export default function TotemPage() {
 type Tela =
   | 'selecionar-funcionario'
   | 'verificar-recovery'
+  | 'recovery-erro'
   | 'consultar-os'
   | 'resultado-os'
   | 'selecionar-etapa'
@@ -84,9 +85,10 @@ function TotemApp() {
 
   const selecionarFuncionario = async (f: Funcionario) => {
     setFuncionario(f);
+    setErroAcao(null);
     setTela('verificar-recovery');
 
-    // Recovery: busca tarefa ativa primeiro
+    // Recovery: confere se já existe tarefa ativa antes de deixar começar do zero.
     const r = await buscarApontamentoAtivo(f.nome);
     if (r.status === 'success') {
       setApontamentoAtivo(r.data);
@@ -96,9 +98,17 @@ function TotemApp() {
       } else {
         setTela('trabalhando');
       }
-    } else {
-      // Sem tarefa ativa: vai direto para a busca de OS (sem ponto, sem menu).
+    } else if (r.status === 'empty') {
+      // Confirmado SEM tarefa ativa: segue para a busca de OS (sem ponto, sem menu).
       setTela('consultar-os');
+    } else {
+      // ERRO (ex.: queda de conexão): NÃO seguimos pro fluxo de começar do zero —
+      // começar agora poderia DUPLICAR um apontamento que talvez esteja ativo.
+      // Mostra erro amigável e deixa tentar de novo (ou SAIR pelo header).
+      setErroAcao(
+        'Não consegui conferir se você tem uma tarefa em andamento. Verifique a conexão e toque para tentar de novo.'
+      );
+      setTela('recovery-erro');
     }
   };
 
@@ -193,6 +203,13 @@ function TotemApp() {
 
         {tela === 'verificar-recovery' && (
           <Carregando texto="Conferindo se você tinha tarefa em andamento..." />
+        )}
+
+        {tela === 'recovery-erro' && (
+          <Erro
+            mensagem={erroAcao ?? 'Não consegui conferir agora. Toque para tentar de novo.'}
+            onTentar={() => funcionario && selecionarFuncionario(funcionario)}
+          />
         )}
 
         {tela === 'consultar-os' && (
@@ -334,7 +351,7 @@ function Header({
     <header className="totem-header">
       <div className="brand">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="brand-mark" src="/gdelta-symbol.png" alt="G Delta" />
+        <img className="brand-mark" src="/gdelta-symbol.png" alt="GDelta" />
         <span className="brand-name">GDelta · Apontamento</span>
         {emTarefa && <span className="status-pill">EM TAREFA</span>}
         {pausada && <span className="status-pill pausado">PAUSADO</span>}
@@ -374,8 +391,8 @@ function TelaSelecionarFuncionario({ onSelecionar }: { onSelecionar: (f: Funcion
       {state.status === 'error' && <Erro mensagem={state.message} onTentar={recarregar} />}
       {state.status === 'empty' && (
         <Vazio
-          titulo="Nenhum funcionário ativo encontrado"
-          dica="Possíveis causas: tabela vazia, coluna 'ativo' diferente, ou política RLS bloqueando."
+          titulo="Ninguém cadastrado ainda"
+          dica="Peça ao administrador para cadastrar a equipe no painel."
           onTentar={recarregar}
         />
       )}
@@ -475,7 +492,7 @@ function TelaResultadoOS({
       {resultado.status === 'empty' && (
         <Vazio
           titulo="Placa não encontrada"
-          dica="Confira se digitou certo. Se a placa existe mas não aparece, pode ser política RLS bloqueando."
+          dica="Confira se digitou certo. Se não aparecer, fale com o administrador."
           onTentar={onNovaConsulta}
         />
       )}

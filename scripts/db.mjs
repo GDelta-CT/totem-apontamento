@@ -43,6 +43,7 @@ if (!url.includes(TESTE)) {
 }
 
 const args = process.argv.slice(2);
+const asJson = args.includes('--json'); // imprime JSON completo (nao trunca DDL longo)
 let sql = '';
 const fi = args.indexOf('--file');
 const si = args.indexOf('--sql');
@@ -53,14 +54,25 @@ else {
   process.exit(2);
 }
 
-const client = new Client({ connectionString: url, ssl: { rejectUnauthorized: true } });
+// SSL: verifica a cadeia do Supabase com a CA baixada (supabase/prod-ca-2021.crt).
+// Verificacao ESTRITA (rejectUnauthorized: true) — NAO afrouxamos TLS.
+let ssl = { rejectUnauthorized: true };
+try {
+  ssl = { ca: readFileSync('supabase/prod-ca-2021.crt', 'utf8'), rejectUnauthorized: true };
+} catch {
+  console.error('AVISO: supabase/prod-ca-2021.crt nao encontrado. Baixe a CA do Supabase (Settings > Database > SSL Configuration > Download certificate) e salve nessa pasta.');
+}
+const client = new Client({ connectionString: url, ssl });
 try {
   await client.connect();
   const res = await client.query(sql);
   const results = Array.isArray(res) ? res : [res];
   for (const r of results) {
     if (r && r.command) console.log(`-> ${r.command}${r.rowCount != null ? ' (' + r.rowCount + ')' : ''}`);
-    if (r && r.rows && r.rows.length) console.table(r.rows);
+    if (r && r.rows && r.rows.length) {
+      if (asJson) console.log(JSON.stringify(r.rows, null, 2));
+      else console.table(r.rows);
+    }
   }
   console.log('OK');
 } catch (e) {

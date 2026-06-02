@@ -171,6 +171,22 @@ export async function iniciarApontamento(params: {
     };
     if (error) return { status: 'error', message: traduzirErro(error.message) };
     if (!data) return { status: 'error', message: 'Falha ao criar apontamento.' };
+
+    // G9: "ultimo que iniciou vence" — alinha a coluna do kanban
+    // (ordens_servico.etapa_atual) com a etapa que o operario acabou de iniciar.
+    // Best-effort: o apontamento (fonte da verdade) ja foi criado; uma falha aqui
+    // NAO quebra o inicio da tarefa.
+    try {
+      await withTimeout(
+        getSupabase()
+          .from('ordens_servico')
+          .update({ etapa_atual: params.etapa })
+          .eq('id', params.ordemServicoId)
+      );
+    } catch {
+      // ignora: etapa_atual e conveniencia do kanban; o apontamento ja vale.
+    }
+
     return { status: 'success', data };
   } catch (e) {
     return {
@@ -335,23 +351,21 @@ export function normalizarPlaca(input: string): string {
 }
 
 function traduzirErro(msg: string): string {
+  // Tela do OPERARIO: nunca expor detalhe tecnico (RLS/SQL/estrutura) — so amigavel.
   const m = msg.toLowerCase();
+  if (
+    m.includes('network') ||
+    m.includes('fetch') ||
+    m.includes('timeout') ||
+    m.includes('demorou')
+  ) {
+    return 'Sem conexão com o servidor. Verifique a internet e tente de novo.';
+  }
   if (m.includes('jwt') || m.includes('invalid api key')) {
-    return 'Chave de acesso inválida. Avise o administrador.';
+    return 'A sessão do aparelho expirou. Avise o administrador.';
   }
-  if (m.includes('relation') && m.includes('does not exist')) {
-    return 'Tabela não encontrada no banco. Avise o administrador.';
-  }
-  if (m.includes('permission') || m.includes('rls') || m.includes('policy')) {
-    return 'Sem permissão para gravar/ler. Aplique as políticas RLS no Supabase.';
-  }
-  if (m.includes('network') || m.includes('fetch')) {
-    return 'Sem conexão com o servidor. Verifique a internet.';
-  }
-  if (m.includes('does not exist')) {
-    return msg;
-  }
-  return msg;
+  // Permissao / estrutura / qualquer outro erro tecnico -> generico e amigavel.
+  return 'Não foi possível concluir agora. Tente de novo ou avise o administrador.';
 }
 
 export function useFocoAutomatico<T extends HTMLElement>() {

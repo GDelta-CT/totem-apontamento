@@ -97,47 +97,124 @@ export async function listarAnomalias(): Promise<FetchState<Anomalia[]>> {
       });
 
     if (anomalias.length === 0) return { status: 'empty' };
-    return { status: 'success', data: anomalias };
+
+    // §4 (PLANO): não ressuscitar fantasmas já corrigidos — exclui apontamentos
+    // com correção encerrante (ajustar_fim/descartar) na trilha.
+    const ids = anomalias.map((a) => a.id);
+    const corr = await withTimeout(
+      getSupabase()
+        .from('apontamento_correcoes')
+        .select('apontamento_id')
+        .in('apontamento_id', ids)
+        .in('acao', ['ajustar_fim', 'descartar'])
+    );
+    const { data: corrRows } = corr as { data: { apontamento_id: string }[] | null };
+    const encerrados = new Set((corrRows ?? []).map((c) => c.apontamento_id));
+    const restantes = anomalias.filter((a) => !encerrados.has(a.id));
+
+    if (restantes.length === 0) return { status: 'empty' };
+    return { status: 'success', data: restantes };
   } catch (e) {
     return { status: 'error', message: e instanceof Error ? e.message : 'Erro desconhecido.' };
   }
 }
 
-/** Traduz erro de gravação para algo legível ao admin. */
+/** Traduz erro de gravação para algo legível ao admin (sem jargão técnico). */
 function traduzirErro(msg: string): string {
   const m = msg.toLowerCase();
-  if (m.includes('permission') || m.includes('denied') || m.includes('row-level')) {
-    return 'Sem permissão para corrigir. (Falta aplicar a Migration 006 de grants no teste.)';
+  if (
+    m.includes('permission') ||
+    m.includes('denied') ||
+    m.includes('row-level') ||
+    m.includes('policy')
+  ) {
+    return 'Sem permissão para corrigir. Confirme que você entrou como gerente/dono desta oficina.';
   }
-  if (m.includes('editado_admin')) {
-    return 'Coluna de marca ausente. (Falta aplicar a Migration 006 no teste.)';
+  if (m.includes('network') || m.includes('fetch') || m.includes('timeout') || m.includes('demorou')) {
+    return 'Sem conexão com o servidor. Verifique a internet e tente de novo.';
   }
-  return msg;
+  return 'Não foi possível registrar a correção agora. Tente de novo.';
 }
 
+export type AcaoCorrecao = 'ajustar_fim' | 'descartar' | 'confirmar';
+export type MotivoCodigo = 'esqueceu_parar' | 'saiu_sem_registrar' | 'erro_toque' | 'outro';
+
 /**
- * Fecha um apontamento fantasma: marca como Finalizado, define hora_fim e a
- * marca "editado pelo admin". Só funciona após a Migration 006.
+ * Correção APPEND-ONLY de um apontamento-fantasma (docs/PLANO-CORRECAO-ANOMALIA).
+ * NÃO sobrescreve o bruto (hora_inicio/hora_fim/status): registra UMA linha em
+ * apontamento_correcoes (antes→depois, motivo OBRIGATÓRIO, quem/quando pelo
+ * servidor) e marca editado_admin=true (só marcador). Os leitores excluem os
+ * apontamentos com correção encerrante (ver listarAnomalias / §4 do plano).
  */
-export async function fecharApontamento(
-  id: string,
-  horaFimISO?: string
-): Promise<FetchState<true>> {
+export async function registrarCorrecao(params: {
+  apontamentoId: string;
+  acao: AcaoCorrecao;
+  motivo: string;
+  motivoCodigo?: MotivoCodigo;
+  horaFimISO?: string;
+}): Promise<FetchState<true>> {
+  const motivo = params.motivo.trim();
+  if (!motivo) return { status: 'error', message: 'Informe o motivo da correção.' };
   try {
-    const result = await withTimeout(
+    // 1) Snapshot do "antes" — o bruto NUNCA é sobrescrito.
+    const atual = await withTimeout(
       getSupabase()
         .from('apontamentos')
-        .update({
-          status_tarefa: 'Finalizado',
-          hora_fim: horaFimISO ?? new Date().toISOString(),
-          editado_admin: true,
+        .select('hora_inicio, hora_fim, status_tarefa, etapa')
+        .eq('id', params.apontamentoId)
+        .single()
+    );
+    const { data: bruto, error: e1 } = atual as {
+      data: {
+        hora_inicio: string;
+        hora_fim: string | null;
+        status_tarefa: string;
+        etapa: string | null;
+      } | null;
+      error: { message: string } | null;
+    };
+    if (e1) return { status: 'error', message: traduzirErro(e1.message) };
+    if (!bruto) return { status: 'error', message: 'Apontamento não encontrado.' };
+
+    // 2) O "depois": ajustar_fim encerra com um fim efetivo; descartar não tem depois.
+    const valorCorrigido =
+      params.acao === 'ajustar_fim'
+        ? { status_tarefa: 'Finalizado', hora_fim: params.horaFimISO ?? new Date().toISOString() }
+        : params.acao === 'confirmar'
+          ? { status_tarefa: bruto.status_tarefa }
+          : null;
+
+    // 3) Acréscimo na trilha (oficina_id pelo trigger; admin_user_id/corrigido_em pelo default).
+    const ins = await withTimeout(
+      getSupabase()
+        .from('apontamento_correcoes')
+        .insert({
+          apontamento_id: params.apontamentoId,
+          acao: params.acao,
+          valor_original: {
+            hora_inicio: bruto.hora_inicio,
+            hora_fim: bruto.hora_fim,
+            status_tarefa: bruto.status_tarefa,
+            etapa: bruto.etapa,
+          },
+          valor_corrigido: valorCorrigido,
+          motivo,
+          motivo_codigo: params.motivoCodigo ?? null,
         })
-        .eq('id', id)
         .select('id')
         .single()
     );
-    const { error } = result as { error: { message: string } | null };
-    if (error) return { status: 'error', message: traduzirErro(error.message) };
+    const { error: e2 } = ins as { error: { message: string } | null };
+    if (e2) return { status: 'error', message: traduzirErro(e2.message) };
+
+    // 4) Marca "editado pelo admin" (apenas marcador; tempos/status do bruto intactos).
+    await withTimeout(
+      getSupabase()
+        .from('apontamentos')
+        .update({ editado_admin: true })
+        .eq('id', params.apontamentoId)
+    );
+
     return { status: 'success', data: true };
   } catch (e) {
     return { status: 'error', message: e instanceof Error ? e.message : 'Erro desconhecido.' };

@@ -1,10 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 @import 'tailwindcss';
 
-/* ===== G Delta — Design System ===== */
+/* ===== GDelta — Design System ===== */
 
 :root {
-  /* --- Marca G Delta (fonte: logo oficial) --- */
+  /* --- Marca GDelta (fonte: logo oficial) --- */
   --gd-navy: #0b3857; /* marinho da marca */
   --gd-navy-deep: #082a42; /* fundo escuro (login do totem) */
   --gd-navy-soft: #0f4467; /* superfície marinho */
@@ -307,7 +307,7 @@ input {
   user-select: text;
 }
 
-/* ===== Telas de autenticação — marca G Delta (login oficina/totem + admin) ===== */
+/* ===== Telas de autenticação — marca GDelta (login oficina/totem + admin) ===== */
 .gd-auth {
   position: fixed;
   inset: 0;
