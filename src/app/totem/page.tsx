@@ -112,19 +112,19 @@ function TotemApp() {
   };
 
   // Adoção: a escolha da etapa É a confirmação — iniciar já leva pra "trabalhando".
-  // A etapa chega POR PARÂMETRO (não pelo estado etapaSelecionada, que o setState
-  // ainda não aplicou no mesmo tick); o estado serve só de fallback.
-  const iniciarTarefa = async (etapa?: EtapaInfo) => {
-    const etapaAlvo = etapa ?? etapaSelecionada;
-    if (!funcionario || resultadoOS.status !== 'success' || !etapaAlvo) return;
-    setEtapaSelecionada(etapaAlvo);
+  // A etapa chega SEMPRE POR PARÂMETRO (não pelo estado etapaSelecionada, que o
+  // setState ainda não aplicou no mesmo tick): todos os chamadores já passam a
+  // etapa, então não há fallback dependente de timing.
+  const iniciarTarefa = async (etapa: EtapaInfo) => {
+    if (!funcionario || resultadoOS.status !== 'success') return;
+    setEtapaSelecionada(etapa);
     setCarregandoAcao(true);
     setErroAcao(null);
     const r = await iniciarApontamento({
       ordemServicoId: resultadoOS.data.id,
       nomeFuncionario: funcionario.nome,
       cargoFuncionario: funcionario.cargo || '—',
-      etapa: etapaAlvo.id,
+      etapa: etapa.id,
     });
     setCarregandoAcao(false);
     if (r.status === 'success') {
@@ -565,12 +565,24 @@ function TelaSelecionarEtapa({
       <h1 className="tela-titulo">O QUE VOCÊ VAI FAZER?</h1>
       <p className="tela-sub">Toque na etapa e o cronômetro já começa.</p>
 
-      {/* Confirma o carro no topo: o operário tem certeza de em qual carro vai bater o tempo. */}
-      <div className="etapa-carro">
+      {/* Confirma o carro no topo: o operário tem certeza de em qual carro vai
+          bater o tempo. É CLICÁVEL — se a placa trouxe o carro errado, um toque
+          aqui volta pra busca (mesma ação do botão "OUTRO CARRO"), antes de
+          iniciar o cronômetro no carro errado. */}
+      <button
+        type="button"
+        className="etapa-carro"
+        onClick={onVoltar}
+        disabled={carregando}
+        aria-label={`Carro ${os.modelo_veiculo}, placa ${formatarPlaca(os.placa)}. Toque para trocar de carro.`}
+      >
         <span className="etapa-carro-tag">CARRO</span>
         <span className="etapa-carro-modelo">{os.modelo_veiculo}</span>
         <span className="etapa-carro-placa">{formatarPlaca(os.placa)}</span>
-      </div>
+        <span className="etapa-carro-trocar" aria-hidden>
+          ↺ trocar carro
+        </span>
+      </button>
 
       {erro && (
         <div className="erro-inline" role="alert" style={{ marginBottom: 16 }}>
@@ -1650,10 +1662,6 @@ function Estilos() {
         transition: all 120ms ease;
         border: 2px solid transparent;
       }
-      .btn-acao-grande {
-        padding: 26px 28px;
-        font-size: 20px;
-      }
       .btn-primario {
         background: var(--warn);
         color: #000;
@@ -1934,8 +1942,10 @@ function Estilos() {
         line-height: 1.4;
       }
 
-      /* Carro confirmado no topo da escolha de etapa */
+      /* Carro confirmado no topo da escolha de etapa — É um BOTÃO: tocar troca
+         o carro (volta pra busca), pra não bater tempo no carro errado. */
       .etapa-carro {
+        width: 100%;
         display: flex;
         align-items: center;
         flex-wrap: wrap;
@@ -1945,6 +1955,19 @@ function Estilos() {
         border-radius: 10px;
         padding: 16px 20px;
         margin-bottom: 20px;
+        color: var(--ink);
+        font-family: inherit;
+        text-align: left;
+        cursor: pointer;
+        transition: all 120ms ease;
+      }
+      .etapa-carro:hover:not(:disabled) {
+        background: #1d1d1d;
+        border-color: #ffc333;
+      }
+      .etapa-carro:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
       }
       .etapa-carro-tag {
         font-family: 'JetBrains Mono', monospace;
@@ -1970,6 +1993,24 @@ function Estilos() {
         border-radius: 4px;
         border: 1.5px solid var(--warn);
         margin-left: auto;
+      }
+      .etapa-carro-trocar {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        padding: 6px 12px;
+      }
+      .etapa-carro:hover:not(:disabled) .etapa-carro-trocar {
+        color: var(--warn);
+        border-color: var(--warn);
       }
 
       /* Confirmação */
@@ -2027,14 +2068,6 @@ function Estilos() {
       .btn-trocar:disabled {
         opacity: 0.4;
         cursor: not-allowed;
-      }
-      .confirmacao-aviso {
-        color: var(--ink-soft);
-        font-size: 14px;
-        margin: 16px 0 0;
-        padding-top: 16px;
-        border-top: 1px solid var(--line);
-        line-height: 1.5;
       }
       .erro-inline {
         background: rgba(255, 77, 46, 0.1);
