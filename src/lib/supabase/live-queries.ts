@@ -179,8 +179,32 @@ export async function carregarVisaoLive(): Promise<FetchState<VisaoLive>> {
     if (erro) return { status: 'error', message: erro.message };
 
     const oss = ((osRes as { data: OSRow[] | null }).data ?? []) as OSRow[];
-    const apont = ((apRes as { data: ApontRow[] | null }).data ?? []) as ApontRow[];
+    const apontBruto = ((apRes as { data: ApontRow[] | null }).data ?? []) as ApontRow[];
     const apHoje = ((apHojeRes as { data: ApontHojeRow[] | null }).data ?? []) as ApontHojeRow[];
+
+    // §4 (correção append-only): o bruto segue 'Em andamento'/'Pausado' de
+    // propósito (imutável). Um apontamento com correção ENCERRANTE
+    // (ajustar_fim/descartar) na trilha já não é ativo — então o LEITOR o exclui.
+    // Sem isso, um fantasma corrigido reapareceria como "produzindo" na faixa e
+    // como apontamento ativo no card do kanban. Mesma regra de listarAnomalias.
+    let apont = apontBruto;
+    if (apontBruto.length > 0) {
+      const ids = apontBruto.map((a) => a.id);
+      const corr = await withTimeout(
+        sb
+          .from('apontamento_correcoes')
+          .select('apontamento_id')
+          .in('apontamento_id', ids)
+          .in('acao', ['ajustar_fim', 'descartar'])
+      );
+      const { data: corrRows, error: corrErr } = corr as {
+        data: { apontamento_id: string }[] | null;
+        error: { message: string } | null;
+      };
+      if (corrErr) return { status: 'error', message: corrErr.message };
+      const encerrados = new Set((corrRows ?? []).map((c) => c.apontamento_id));
+      if (encerrados.size > 0) apont = apontBruto.filter((a) => !encerrados.has(a.id));
+    }
 
     // 1) apontamentos ativos por OS
     const ativosPorOS = new Map<string, ApontamentoAtivo[]>();

@@ -119,6 +119,11 @@ export async function buscarOSPorPlaca(placaInput: string): Promise<FetchState<O
         .from('ordens_servico')
         .select('id, placa, modelo_veiculo, status_geral, data_entrada')
         .ilike('placa', placa)
+        // G7: não deixar apontar numa OS já entregue (placa única-PARCIAL: histórico
+        // preservado, mas só a OS ATIVA é apontável) e, havendo mais de uma, a
+        // mais recente vence.
+        .neq('status_geral', 'Entregue')
+        .order('data_entrada', { ascending: false })
         .limit(1)
         .maybeSingle()
     );
@@ -332,6 +337,26 @@ export async function buscarApontamentoAtivo(
     };
     if (error) return { status: 'error', message: traduzirErro(error.message) };
     if (!data) return { status: 'empty' };
+
+    // §4 (correção append-only): o bruto continua 'Em andamento'/'Pausado' de
+    // propósito (imutável), então é o LEITOR que exclui os corrigidos. Se houver
+    // QUALQUER correção encerrante (ajustar_fim/descartar) na trilha deste
+    // apontamento, ele já não conta como ativo -> totem trata como SEM tarefa.
+    const corr = await withTimeout(
+      getSupabase()
+        .from('apontamento_correcoes')
+        .select('apontamento_id')
+        .eq('apontamento_id', data.id)
+        .in('acao', ['ajustar_fim', 'descartar'])
+        .limit(1)
+    );
+    const { data: corrRows, error: corrErr } = corr as {
+      data: { apontamento_id: string }[] | null;
+      error: { message: string } | null;
+    };
+    if (corrErr) return { status: 'error', message: traduzirErro(corrErr.message) };
+    if (corrRows && corrRows.length > 0) return { status: 'empty' };
+
     return { status: 'success', data };
   } catch (e) {
     return {

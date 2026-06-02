@@ -367,6 +367,71 @@ export async function listarFuncionarios(): Promise<FetchState<FuncionarioAdmin[
 
 export type FuncionarioInput = { nome: string; cargo: string };
 
+/**
+ * Buscar-antes-de-criar (G4 — integridade por UX): procura um funcionário com o
+ * MESMO nome (case-insensitive, ignorando espaços nas pontas). O totem identifica
+ * o operário SÓ pelo nome — dois "Fulano" confundem na hora de achar a tarefa.
+ * Não é trava de banco; é o aviso que deixa o admin confirmar antes de duplicar.
+ * Retorna o nome já cadastrado (como está no banco), ou null se está livre.
+ */
+export async function buscarFuncionarioPorNome(
+  nomeCru: string
+): Promise<FetchState<{ id: string; nome: string; ativo: boolean } | null>> {
+  const nome = nomeCru.trim();
+  if (!nome) return { status: 'error', message: 'Informe o nome do funcionário.' };
+  try {
+    const result = await withTimeout(
+      getSupabase()
+        .from('funcionarios')
+        .select('id, nome, ativo')
+        .ilike('nome', nome) // ilike sem % = igualdade case-insensitive
+        .limit(1)
+        .maybeSingle()
+    );
+    const { data, error } = result as {
+      data: { id: string; nome: string; ativo: boolean } | null;
+      error: { message: string } | null;
+    };
+    if (error) return { status: 'error', message: traduzirErro(error.message) };
+    return { status: 'success', data: data ?? null };
+  } catch (e) {
+    return { status: 'error', message: e instanceof Error ? e.message : 'Erro desconhecido.' };
+  }
+}
+
+/**
+ * Checa se um funcionário tem apontamento ATIVO (G5 — integridade por UX).
+ * "Ativo" = status_tarefa in ('Em andamento','Pausado'), o mesmo critério do
+ * totem (ver buscarApontamentoAtivo em queries.ts). O totem casa apontamento ⇄
+ * operário pelo NOME, então a checagem é por nome. Usado para avisar antes de
+ * desativar — desativar com timer rodando deixaria um apontamento órfão.
+ * Retorna true se há pelo menos um apontamento ativo com esse nome.
+ */
+export async function funcionarioTemApontamentoAtivo(
+  nomeCru: string
+): Promise<FetchState<boolean>> {
+  const nome = nomeCru.trim();
+  if (!nome) return { status: 'success', data: false };
+  try {
+    const result = await withTimeout(
+      getSupabase()
+        .from('apontamentos')
+        .select('id')
+        .eq('nome_funcionario', nome)
+        .in('status_tarefa', ['Em andamento', 'Pausado'])
+        .limit(1)
+    );
+    const { data, error } = result as {
+      data: { id: string }[] | null;
+      error: { message: string } | null;
+    };
+    if (error) return { status: 'error', message: traduzirErro(error.message) };
+    return { status: 'success', data: !!data && data.length > 0 };
+  } catch (e) {
+    return { status: 'error', message: e instanceof Error ? e.message : 'Erro desconhecido.' };
+  }
+}
+
 /** Cria um funcionário (nome + cargo são obrigatórios na tabela). */
 export async function criarFuncionario(
   input: FuncionarioInput

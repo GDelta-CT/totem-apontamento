@@ -93,6 +93,14 @@ function OSManager() {
     };
   }, []);
 
+  // G6: o flash de sucesso some sozinho em ~3s (erros NÃO auto-limpam — o admin
+  // precisa lê-los). Cleanup cancela o timer se a mensagem mudar/desmontar.
+  useEffect(() => {
+    if (!okMsg) return;
+    const t = setTimeout(() => setOkMsg(null), 3000);
+    return () => clearTimeout(t);
+  }, [okMsg]);
+
   const abrirNova = () => {
     setErroForm(null);
     setAvisoPlaca(null);
@@ -255,10 +263,14 @@ function OSManager() {
                 <span className="placa">{os.placa}</span>
                 <span>{os.modelo_veiculo}</span>
                 <span className="cap">{os.tipo_cliente ?? '—'}</span>
-                <span>{os.data_prometida?.slice(0, 10) ?? '—'}</span>
-                <span>{os.valor_orcamento != null ? brl(os.valor_orcamento) : '—'}</span>
+                <span className={'prazo gd-tabular fam-' + familiaPrazo(os.data_prometida)}>
+                  {dataBR(os.data_prometida)}
+                </span>
+                <span className="gd-tabular">
+                  {os.valor_orcamento != null ? brl(os.valor_orcamento) : '—'}
+                </span>
                 <span>
-                  <em className={'pill ' + (os.status_geral === 'Entregue' ? 'pill-done' : 'pill-active')}>
+                  <em className={'pill fam-' + familiaStatus(os.status_geral)}>
                     {os.status_geral ?? '—'}
                   </em>
                 </span>
@@ -401,6 +413,56 @@ function brl(n: number): string {
   return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
+/**
+ * Família de cor semântica (tokens --gd-*) para cada status_geral.
+ * Só apresentação — não muda nenhuma regra de negócio.
+ *  neutral = ainda não entrou em produção / já saiu do quadro
+ *  info    = em andamento
+ *  ok      = fase final positiva (pronto)
+ */
+type Familia = 'ok' | 'warn' | 'bad' | 'neutral' | 'info';
+
+function familiaStatus(status: string | null | undefined): Familia {
+  switch (status) {
+    case 'Em Produção':
+      return 'info';
+    case 'Pronto para Entrega':
+      return 'ok';
+    case 'Aguardando Produção':
+    case 'Entregue':
+      return 'neutral';
+    default:
+      return 'neutral';
+  }
+}
+
+/**
+ * Cor de PRAZO da data prometida, comparando com hoje (só apresentação):
+ *  bad     = já passou (estourado)
+ *  warn    = falta <=3 dias (perto)
+ *  ok      = ainda há folga
+ *  neutral = sem data
+ * Recebe a data já fatiada em 'YYYY-MM-DD'.
+ */
+function familiaPrazo(dataISO: string | null | undefined): Familia {
+  if (!dataISO) return 'neutral';
+  const prazo = new Date(dataISO + 'T00:00:00');
+  if (Number.isNaN(prazo.getTime())) return 'neutral';
+  const hoje = new Date(hojeISO() + 'T00:00:00');
+  const dias = Math.round((prazo.getTime() - hoje.getTime()) / 86400000);
+  if (dias < 0) return 'bad';
+  if (dias <= 3) return 'warn';
+  return 'ok';
+}
+
+/** Data 'YYYY-MM-DD' -> 'DD/MM/AAAA' (pt-BR), sem fuso. Vazio -> traço. */
+function dataBR(dataISO: string | null | undefined): string {
+  if (!dataISO) return '—';
+  const [a, m, d] = dataISO.slice(0, 10).split('-');
+  if (!a || !m || !d) return '—';
+  return `${d}/${m}/${a}`;
+}
+
 function Estilos() {
   return (
     <style jsx global>{`
@@ -469,19 +531,41 @@ function Estilos() {
         text-transform: capitalize;
       }
       .pill {
+        display: inline-block;
         font-style: normal;
         font-size: 12px;
         padding: 3px 9px;
-        border-radius: 999px;
+        border-radius: var(--gd-r-pill, 999px);
         font-weight: 600;
       }
-      .pill-active {
-        background: #e2f0f7;
-        color: var(--gd-teal, #13678d);
+      /* Famílias semânticas de cor (tokens --gd-*): uma cor = um significado. */
+      .fam-ok {
+        background: var(--gd-ok-fill, #e1f5ee);
+        color: var(--gd-ok-ink, #0f6e56);
       }
-      .pill-done {
-        background: #e6e9ec;
-        color: var(--gd-muted, #5d7689);
+      .fam-warn {
+        background: var(--gd-warn-fill, #faeeda);
+        color: var(--gd-warn-ink, #8a5a12);
+      }
+      .fam-bad {
+        background: var(--gd-bad-fill, #fcebeb);
+        color: var(--gd-bad-ink, #a32d2d);
+      }
+      .fam-neutral {
+        background: var(--gd-neutral-fill, #f0f1f0);
+        color: var(--gd-neutral-ink, #5f5e5a);
+      }
+      .fam-info {
+        background: var(--gd-info-fill, #e6f1fb);
+        color: var(--gd-info-ink, #0c447c);
+      }
+      /* Prazo na tabela: data colorida pela proximidade do vencimento. */
+      .prazo {
+        display: inline-block;
+        padding: 3px 9px;
+        border-radius: var(--gd-r-pill, 999px);
+        font-weight: 600;
+        justify-self: start;
       }
       .btn {
         border: none;
@@ -523,16 +607,17 @@ function Estilos() {
         font-size: 14px;
       }
       .flash.ok {
-        background: #e6f6ec;
-        color: #1b7a3d;
+        background: var(--gd-ok-fill, #e1f5ee);
+        color: var(--gd-ok-ink, #0f6e56);
+        transition: opacity var(--gd-dur, 180ms) var(--gd-ease, ease);
       }
       .flash.erro {
-        background: #fdeaea;
-        color: #b42323;
+        background: var(--gd-bad-fill, #fcebeb);
+        color: var(--gd-bad-ink, #a32d2d);
       }
       .flash.aviso {
-        background: #fff5e0;
-        color: #92600c;
+        background: var(--gd-warn-fill, #faeeda);
+        color: var(--gd-warn-ink, #8a5a12);
       }
       .overlay {
         position: fixed;
