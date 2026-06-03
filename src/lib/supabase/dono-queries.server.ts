@@ -23,7 +23,7 @@
 
 import 'server-only';
 
-import { getSessao, getServerClient } from './dal';
+import { getSessao, getServerClient, sessaoGestorOuNull } from './dal';
 import type { FetchState } from './queries';
 import {
   COLS_PAINEL_DONO,
@@ -62,7 +62,7 @@ function withTimeout<T>(promise: PromiseLike<T>, ms = TIMEOUT_MS): Promise<T> {
 export async function carregarPainelDonoServer(): Promise<FetchState<PainelDono>> {
   // Sem sessão verificada → não consulta (evita ler como anon) e deixa o gate
   // client cuidar do login. Não é erro: é o estado "ainda não logado".
-  const sessao = await getSessao();
+  const sessao = await sessaoGestorOuNull();
   if (!sessao) return { status: 'empty' };
 
   try {

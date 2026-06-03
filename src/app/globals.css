@@ -39,9 +39,6 @@
   --gd-r-pill: 999px;
   /* Marca GDelta = navy + teal + off-white. SEM dourado/gold (diretriz do
      fundador) — NAO re-adicionar tokens de ouro nem tema "premium gold". */
-  /* Creme do SELO do logo: fundo claro arredondado que faz o símbolo
-     navy+teal SALTAR no escuro (navy sobre creme: APCA Lc≈91). */
-  --gd-seal-cream: #f4f1ea;
 
   /* Bordas tonais de marca (substituem cinzas crus) */
   --gd-border: rgba(11, 56, 87, 0.1);

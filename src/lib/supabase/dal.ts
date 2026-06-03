@@ -129,6 +129,18 @@ export async function requireGestor(): Promise<SessaoServidor> {
 }
 
 /**
+ * Sessao de GESTOR (dono/gerente) para LEITURAS server-side. Como requireGestor,
+ * mas NAO redireciona/lanca: devolve null se nao houver sessao OU o papel nao for
+ * de gestao — o leitor entao retorna 'empty'. Fecha a leitura do /admin a sessoes
+ * nao-gestoras (ex.: o device do totem), igual a barreira que a ESCRITA ja tem.
+ */
+export async function sessaoGestorOuNull(): Promise<SessaoServidor | null> {
+  const sessao = await getSessao();
+  if (!sessao || !sessao.papel || !PAPEIS_GESTOR.includes(sessao.papel)) return null;
+  return sessao;
+}
+
+/**
  * Exige sessão de DEVICE (totem): qualquer usuário autenticado COM oficina_id
  * no JWT serve — é a sessão da oficina que isola o tenant. Sem sessão → erro
  * (o chamador, tipicamente uma Server Action do totem, responde "não salvou").
