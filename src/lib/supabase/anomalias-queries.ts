@@ -8,11 +8,14 @@
  * SERVER-MOVE (passo 1): a regra de negócio (classificar fantasmas, calcular
  * horas, excluir os já corrigidos) e os tipos saíram daqui para anomalias-shared.ts
  * (módulo PURO, sem Supabase), e a versão server-side da LEITURA vive em
- * anomalias-queries.server.ts (RSC + DAL). Este arquivo continua existindo para a
- * ESCRITA (registrarCorrecao, que segue no cliente neste passo) e para quem AINDA
- * lê do browser — re-exporta tipos/constantes compartilhados para NÃO quebrar
- * nenhum import já existente (a tela de anomalias passou a LER do servidor; a
- * correção segue chamando registrarCorrecao() daqui igual a antes).
+ * anomalias-queries.server.ts (RSC + DAL).
+ *
+ * SERVER-MOVE (passo 3): a ESCRITA (registrarCorrecao) foi MOVIDA para o servidor
+ * em anomalias-actions.ts (Server Action com requireGestor + RLS). A tela de
+ * anomalias passou a chamar a Action. O registrarCorrecao CLIENT abaixo NÃO é mais
+ * chamado pela View; fica aqui preservado para não quebrar o contrato/histórico (a
+ * versão server é a gêmea exata). Este arquivo segue para quem AINDA lê do browser
+ * (listarAnomalias) e RE-EXPORTA tipos/constantes para NÃO quebrar imports.
  *
  * Teto anti-fantasma (CLAUDE.md): apontamento ativo muito acima de ~10,5h é
  * anomalia para o admin corrigir. Tempos ancorados no relógio do servidor.

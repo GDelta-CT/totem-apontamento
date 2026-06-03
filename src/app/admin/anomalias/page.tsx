@@ -10,9 +10,10 @@
  * dark, loading/empty/error, copy, a11y) e re-lê NO SERVIDOR via router.refresh()
  * (botão "Atualizar" e após cada correção bem-sucedida).
  *
- * A ESCRITA (a correção append-only) CONTINUA NO CLIENTE neste passo (Passo 3 do
- * server-move move a escrita): a View chama registrarCorrecao() de
- * anomalias-queries.ts e, no sucesso, dá router.refresh() para o servidor re-ler.
+ * SERVER-MOVE (passo 3): a ESCRITA (a correção append-only) AGORA RODA NO SERVIDOR
+ * via Server Action (anomalias-actions.ts): a View chama registrarCorrecao(), que
+ * faz requireGestor() no servidor e revalidatePath('/admin/anomalias') no sucesso.
+ * A View também dá router.refresh() para o servidor re-ler.
  *
  * Por que a busca fica antes do gate client: a query server só roda se houver
  * SESSÃO no cookie (getSessao); sem sessão devolve `empty` e o gate client

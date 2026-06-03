@@ -34,14 +34,17 @@ import { useRouter } from 'next/navigation';
 import { AdminAuthGate } from '../AdminAuthGate';
 import { AdminShell } from '../_shell/AdminShell';
 import type { FetchState } from '@/lib/supabase/queries';
+// ESCRITA + checagens G4 (nome duplicado) / G5 (apontamento ativo) agora no
+// SERVIDOR (Server Actions, server-move Passo 3). O tipo FuncionarioAdmin segue
+// vindo de admin-queries (que re-exporta de admin-shared).
 import {
   atualizarFuncionario,
-  buscarFuncionarioPorNome,
+  buscarFuncionarioPorNomeAction,
   criarFuncionario,
-  funcionarioTemApontamentoAtivo,
+  funcionarioTemApontamentoAtivoAction,
   setFuncionarioAtivo,
-  type FuncionarioAdmin,
-} from '@/lib/supabase/admin-queries';
+} from '@/lib/supabase/admin-actions';
+import type { FuncionarioAdmin } from '@/lib/supabase/admin-queries';
 
 const CARGO_PADRAO = 'Operário';
 
@@ -153,7 +156,7 @@ function FuncionariosManager({
       return;
     }
     setVerificando(true);
-    const dup = await buscarFuncionarioPorNome(nome);
+    const dup = await buscarFuncionarioPorNomeAction(nome);
     setVerificando(false);
     if (dup.status === 'error') {
       setErro(dup.message);
@@ -203,7 +206,7 @@ function FuncionariosManager({
       return;
     }
     setVerificando(true);
-    const ativo = await funcionarioTemApontamentoAtivo(f.nome);
+    const ativo = await funcionarioTemApontamentoAtivoAction(f.nome);
     setVerificando(false);
     if (ativo.status === 'error') {
       setErro(ativo.message);

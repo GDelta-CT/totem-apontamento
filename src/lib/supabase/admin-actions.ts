@@ -1,71 +1,59 @@
+'use server';
+
 /**
- * Camada de dados do ADMIN — passo 2 da ordem de construção (A.1).
+ * Server Actions do ADMIN — ESCRITA no SERVIDOR (server-move, Passo 3).
  *
- * Espelha os padrões do totem (queries.ts): FetchState + timeout obrigatório +
- * mensagens de erro traduzidas. É um arquivo isolado: não toca no totem, no RLS
- * nem na produção.
+ * Move a ESCRITA de /admin/os e /admin/funcionarios do browser para o servidor.
+ * Antes, a View chamava getSupabase().from(...).insert/update direto no cliente
+ * (anon key no browser). Agora chama estas Server Actions, e a gravação roda no
+ * servidor com a sessão do COOKIE httpOnly.
  *
- * SERVER-MOVE (passo 1): os tipos, constantes de domínio e helpers puros
- * (somarDias, osEstaAtiva, escaparLike, traduzirErro, normalizarPlaca,
- * TIPOS_CLIENTE, MOTIVOS_BLOQUEIO, STATUS_OS, COLS_OS, PapelOficina, …) saíram
- * daqui para admin-shared.ts (módulo PURO, sem Supabase), e a versão server-side
- * da LEITURA das listas vive em admin-queries.server.ts (RSC + DAL).
+ * CADA action é um endpoint PÚBLICO (alcançável por POST direto, não só pela UI —
+ * ver o aviso do guia "Mutating Data" do Next). Por isso TODA action:
+ *   1) chama requireGestor() PRIMEIRO — revalida no servidor que quem chama é
+ *      dono/gerente (não confiar na UI). requireGestor() LANÇA para quem não é
+ *      gestor (GDELTA_FORBIDDEN) ou redireciona se não há sessão; capturamos o
+ *      forbidden e devolvemos erro amigável (a action NUNCA estoura pro cliente);
+ *   2) usa o cliente do DAL (getServerClient) — JÁ autenticado pelo cookie, então
+ *      o RLS isola por oficina_id e o trigger BEFORE INSERT carimba o oficina_id.
+ *      NUNCA mandamos oficina_id do cliente (REGRA DE OURO do DAL);
+ *   3) retorna FetchState<T> (sucesso/erro), preservando as MESMAS mensagens
+ *      amigáveis (traduzirErro) e o MESMO timeout de 8s da versão client;
+ *   4) no sucesso de uma MUTAÇÃO, revalida a rota afetada (revalidatePath) para o
+ *      Server Component re-ler a lista fresh. A View também dá router.refresh()
+ *      (mantido) — os dois somam: a tela atualiza após a ação como antes.
  *
- * SERVER-MOVE (passo 3): a ESCRITA e as buscas "antes-de-criar" foram MOVIDAS para
- * o servidor em admin-actions.ts (Server Actions com requireGestor + RLS). As telas
- * /admin/os e /admin/funcionarios passaram a chamar as Actions. As funções de
- * escrita/busca CLIENT abaixo (criarOS/atualizarOS/buscarOSAtivaPorPlaca, criar/
- * atualizar/setFuncionarioAtivo, buscarFuncionarioPorNome,
- * funcionarioTemApontamentoAtivo) NÃO são mais chamadas pelas Views; ficam aqui
- * preservadas para não quebrar o contrato de imports/histórico (a versão server é a
- * gêmea exata). Este arquivo segue como casa do crachá da sessão / papel
- * (cracheDaSessao, papelDoUsuarioAtual — consumidos pelo AdminShell e pelo
- * AdminAuthGate) e RE-EXPORTA tudo de admin-shared (AdminShell, AdminAuthGate,
- * dal.ts, os testes e as telas seguem importando daqui sem mudança).
+ * As validações G4 (nome duplicado) / G5 (apontamento ativo) e a busca
+ * "antes-de-criar" da OS rodam AQUI, no servidor (mais seguras que no browser),
+ * preservando o comportamento EXATO: continuam sendo CHECAGENS que a UI usa para
+ * pedir confirmação (não viram trava cega). A regra de negócio pura (normalização,
+ * tradução de erro, colunas) segue em admin-shared.ts — sem cópia.
  *
- * SOBRE ESCRITA (criar/editar/desativar): só grava de verdade quando houver
- *   (1) usuário ADMIN logado com conta real (oficina_id no JWT) e
- *   (2) a Migration 004 (grants) aplicada no teste.
- * Até lá, as Actions retornam erro de permissão — é esperado.
- *
- * O oficina_id NÃO é setado aqui nos inserts: o trigger BEFORE INSERT da Fase 1
- * preenche sozinho a partir do JWT, mantendo o isolamento multi-tenant.
+ * SOBRE GRAVAR DE VERDADE: a escrita só persiste quando houver (1) usuário gestor
+ * logado com conta real (oficina_id no JWT) e (2) a Migration de grants aplicada
+ * no teste. Até lá, o RLS recusa e a action devolve a mensagem de permissão — é o
+ * esperado, igual à versão client.
  */
 
-import { getSupabase, type EtapaId } from './client';
-import { normalizarPlaca, type FetchState } from './queries';
+import { revalidatePath } from 'next/cache';
+
+import { getServerClient, requireGestor } from './dal';
+import type { FetchState } from './queries';
+import type { EtapaId } from './client';
 import {
   COLS_OS,
   escaparLike,
+  normalizarPlaca,
   traduzirErro,
   type FuncionarioAdmin,
   type MotivoBloqueio,
   type OrdemServicoAdmin,
-  type PapelOficina,
   type TipoCliente,
-} from './admin-shared';
-
-// Re-export do núcleo compartilhado: preserva o contrato de quem importava estes
-// nomes de './admin-queries' (tipos, constantes de domínio e helpers puros). Os
-// testes (somarDias/osEstaAtiva), o dal.ts (type PapelOficina) e as telas seguem
-// importando daqui sem mudança.
-export {
-  STATUS_OS,
-  TIPOS_CLIENTE,
-  MOTIVOS_BLOQUEIO,
-  somarDias,
-  osEstaAtiva,
-  type TipoCliente,
-  type StatusOS,
-  type MotivoBloqueio,
-  type OrdemServicoAdmin,
-  type FuncionarioAdmin,
-  type PapelOficina,
 } from './admin-shared';
 
 const TIMEOUT_MS = 8000;
 
-/** Mesmo guarda-chuva de timeout do totem: nenhum loading dura para sempre. */
+/** Mesmo guarda-chuva de timeout da versão client: nenhuma escrita é eterna. */
 function withTimeout<T>(promise: PromiseLike<T>, ms = TIMEOUT_MS): Promise<T> {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
@@ -84,68 +72,61 @@ function withTimeout<T>(promise: PromiseLike<T>, ms = TIMEOUT_MS): Promise<T> {
   });
 }
 
-/* ─────────────────── Ordens de Serviço — leitura ─────────────────── */
+/**
+ * Mensagem amigável para a falha de AUTORIZAÇÃO (papel insuficiente). Espelha o
+ * texto de "sem permissão" do traduzirErro, mas para o caso em que a barreira é o
+ * requireGestor (não o RLS). Mantém a UX: o admin entende que precisa entrar como
+ * gerente/dono.
+ */
+const MSG_FORBIDDEN =
+  'Sem permissão para esta ação. Entre como gerente ou dono desta oficina.';
 
 /**
- * Lista as OS da oficina, mais recentes primeiro. VERSÃO CLIENT (lê do browser).
- * A tela /admin/os agora LÊ DO SERVIDOR (listarOSServer); esta versão segue para
- * quem ainda lê do browser e para preservar o contrato.
+ * Roda a barreira de gestor e devolve a sessão; se o papel for insuficiente,
+ * devolve um FetchState de erro (NUNCA deixa o GDELTA_FORBIDDEN estourar pro
+ * cliente). A AUSÊNCIA de sessão não cai aqui: requireGestor() faz redirect('/admin')
+ * — controle de fluxo do Next, tratado pelo framework, não é um erro a capturar.
  */
-export async function listarOS(): Promise<FetchState<OrdemServicoAdmin[]>> {
+async function exigirGestorOuErro(): Promise<{ ok: true } | { ok: false; erro: FetchState<never> }> {
   try {
-    const result = await withTimeout(
-      getSupabase()
-        .from('ordens_servico')
-        .select(COLS_OS)
-        .order('data_entrada', { ascending: false })
-    );
-    const { data, error } = result as {
-      data: OrdemServicoAdmin[] | null;
-      error: { message: string } | null;
-    };
-    if (error) return { status: 'error', message: traduzirErro(error.message) };
-    if (!data || data.length === 0) return { status: 'empty' };
-    return { status: 'success', data };
+    await requireGestor();
+    return { ok: true };
   } catch (e) {
-    return { status: 'error', message: traduzirErro(e instanceof Error ? e.message : null) };
+    // requireGestor lança GDELTA_FORBIDDEN para papel insuficiente. Qualquer outra
+    // exceção (ex.: falha ao ler a sessão) também vira erro amigável, sem vazar.
+    const msg = e instanceof Error ? e.message : '';
+    if (msg.includes('GDELTA_FORBIDDEN')) {
+      return { ok: false, erro: { status: 'error', message: MSG_FORBIDDEN } };
+    }
+    // redirect() do Next lança um erro de controle de fluxo (NEXT_REDIRECT) que NÃO
+    // pode ser engolido — re-lança para o framework concluir o redirect.
+    throw e;
   }
 }
 
-/** Carrega uma OS pelo id (para a tela de edição). */
-export async function buscarOSPorId(id: string): Promise<FetchState<OrdemServicoAdmin>> {
-  try {
-    const result = await withTimeout(
-      getSupabase().from('ordens_servico').select(COLS_OS).eq('id', id).maybeSingle()
-    );
-    const { data, error } = result as {
-      data: OrdemServicoAdmin | null;
-      error: { message: string } | null;
-    };
-    if (error) return { status: 'error', message: traduzirErro(error.message) };
-    if (!data) return { status: 'empty' };
-    return { status: 'success', data };
-  } catch (e) {
-    return { status: 'error', message: traduzirErro(e instanceof Error ? e.message : null) };
-  }
-}
+/* ─────────────────── Ordens de Serviço — busca-antes-de-criar ─────────────────── */
 
 /**
- * Buscar-antes-de-criar: procura uma OS ATIVA (não entregue) com a placa.
- * Usado para avisar o admin antes de criar uma duplicada. Faz parte do fluxo de
- * GRAVAÇÃO (segue no cliente neste passo). A trava real é o índice único parcial
- * do banco (Migration 005); aqui é a camada de UX.
- * Retorna a OS ativa encontrada, ou null se a placa está livre.
+ * Buscar-antes-de-criar (server): procura uma OS ATIVA (não entregue) com a placa.
+ * É a camada de UX que avisa o admin antes de criar uma duplicada (a trava real é o
+ * índice único parcial do banco). Roda no servidor (RLS isola), com a barreira de
+ * gestor. Comportamento idêntico à versão client (buscarOSAtivaPorPlaca):
+ * retorna a OS ativa encontrada, ou null se a placa está livre.
  */
-export async function buscarOSAtivaPorPlaca(
+export async function buscarOSAtivaPorPlacaAction(
   placaCrua: string
 ): Promise<FetchState<OrdemServicoAdmin | null>> {
+  const guard = await exigirGestorOuErro();
+  if (!guard.ok) return guard.erro;
+
   const placa = normalizarPlaca(placaCrua);
   if (placa.length < 7) {
     return { status: 'error', message: 'Placa inválida. Confira os 7 caracteres.' };
   }
   try {
+    const supabase = await getServerClient();
     const result = await withTimeout(
-      getSupabase()
+      supabase
         .from('ordens_servico')
         .select(COLS_OS)
         .eq('placa', placa)
@@ -180,10 +161,13 @@ export type CriarOSInput = {
 };
 
 /**
- * Cria uma OS. Normaliza a placa em maiúsculas. NÃO seta oficina_id
- * (o trigger da Fase 1 preenche a partir do JWT).
+ * Cria uma OS (server). Normaliza a placa em maiúsculas. NÃO seta oficina_id
+ * (o trigger da Fase 1 preenche a partir do JWT). No sucesso, revalida /admin/os.
  */
 export async function criarOS(input: CriarOSInput): Promise<FetchState<OrdemServicoAdmin>> {
+  const guard = await exigirGestorOuErro();
+  if (!guard.ok) return guard.erro;
+
   const placa = normalizarPlaca(input.placa);
   if (placa.length < 7) {
     return { status: 'error', message: 'Placa inválida. Confira os 7 caracteres.' };
@@ -193,8 +177,9 @@ export async function criarOS(input: CriarOSInput): Promise<FetchState<OrdemServ
     return { status: 'error', message: 'Informe o modelo do veículo.' };
   }
   try {
+    const supabase = await getServerClient();
     const result = await withTimeout(
-      getSupabase()
+      supabase
         .from('ordens_servico')
         .insert({
           placa,
@@ -216,6 +201,7 @@ export async function criarOS(input: CriarOSInput): Promise<FetchState<OrdemServ
     };
     if (error) return { status: 'error', message: traduzirErro(error.message) };
     if (!data) return { status: 'error', message: 'Falha ao criar a OS.' };
+    revalidatePath('/admin/os');
     return { status: 'success', data };
   } catch (e) {
     return { status: 'error', message: traduzirErro(e instanceof Error ? e.message : null) };
@@ -235,11 +221,17 @@ export type AtualizarOSInput = {
   motivo_bloqueio?: MotivoBloqueio | null;
 };
 
-/** Edita campos de uma OS. Só envia o que vier definido em `input`. */
+/**
+ * Edita campos de uma OS (server). Só envia o que vier definido em `input`.
+ * No sucesso, revalida /admin/os.
+ */
 export async function atualizarOS(
   id: string,
   input: AtualizarOSInput
 ): Promise<FetchState<OrdemServicoAdmin>> {
+  const guard = await exigirGestorOuErro();
+  if (!guard.ok) return guard.erro;
+
   const patch: Record<string, unknown> = {};
   if (input.modelo_veiculo !== undefined) patch.modelo_veiculo = input.modelo_veiculo.trim();
   if (input.tipo_cliente !== undefined) patch.tipo_cliente = input.tipo_cliente;
@@ -257,8 +249,9 @@ export async function atualizarOS(
   }
 
   try {
+    const supabase = await getServerClient();
     const result = await withTimeout(
-      getSupabase().from('ordens_servico').update(patch).eq('id', id).select(COLS_OS).single()
+      supabase.from('ordens_servico').update(patch).eq('id', id).select(COLS_OS).single()
     );
     const { data, error } = result as {
       data: OrdemServicoAdmin | null;
@@ -266,6 +259,7 @@ export async function atualizarOS(
     };
     if (error) return { status: 'error', message: traduzirErro(error.message) };
     if (!data) return { status: 'error', message: 'Falha ao atualizar a OS.' };
+    revalidatePath('/admin/os');
     return { status: 'success', data };
   } catch (e) {
     return { status: 'error', message: traduzirErro(e instanceof Error ? e.message : null) };
@@ -274,49 +268,27 @@ export async function atualizarOS(
 
 /* ─────────────────────── Funcionários ─────────────────────── */
 
-/**
- * Lista todos os funcionários (ativos e inativos), em ordem alfabética. VERSÃO
- * CLIENT. A tela /admin/funcionarios agora LÊ DO SERVIDOR
- * (listarFuncionariosServer); esta versão segue para o contrato/usos client.
- */
-export async function listarFuncionarios(): Promise<FetchState<FuncionarioAdmin[]>> {
-  try {
-    const result = await withTimeout(
-      getSupabase()
-        .from('funcionarios')
-        .select('id, nome, cargo, ativo')
-        .order('nome', { ascending: true })
-    );
-    const { data, error } = result as {
-      data: FuncionarioAdmin[] | null;
-      error: { message: string } | null;
-    };
-    if (error) return { status: 'error', message: traduzirErro(error.message) };
-    if (!data || data.length === 0) return { status: 'empty' };
-    return { status: 'success', data };
-  } catch (e) {
-    return { status: 'error', message: traduzirErro(e instanceof Error ? e.message : null) };
-  }
-}
-
 export type FuncionarioInput = { nome: string; cargo: string };
 
 /**
- * Buscar-antes-de-criar (G4 — integridade por UX): procura um funcionário com o
- * MESMO nome (case-insensitive, ignorando espaços nas pontas). Faz parte do fluxo
- * de GRAVAÇÃO (segue no cliente neste passo). O totem identifica o operário SÓ
- * pelo nome — dois "Fulano" confundem na hora de achar a tarefa. Não é trava de
- * banco; é o aviso que deixa o admin confirmar antes de duplicar.
- * Retorna o nome já cadastrado (como está no banco), ou null se está livre.
+ * Buscar-antes-de-criar (G4 — server): procura um funcionário com o MESMO nome
+ * (case-insensitive, ignorando espaços nas pontas). O totem identifica o operário
+ * SÓ pelo nome — dois "Fulano" confundem. Roda no servidor com barreira de gestor.
+ * Comportamento idêntico à versão client (buscarFuncionarioPorNome):
+ * retorna o nome já cadastrado (como está no banco), ou null se está livre.
  */
-export async function buscarFuncionarioPorNome(
+export async function buscarFuncionarioPorNomeAction(
   nomeCru: string
 ): Promise<FetchState<{ id: string; nome: string; ativo: boolean } | null>> {
+  const guard = await exigirGestorOuErro();
+  if (!guard.ok) return guard.erro;
+
   const nome = nomeCru.trim();
   if (!nome) return { status: 'error', message: 'Informe o nome do funcionário.' };
   try {
+    const supabase = await getServerClient();
     const result = await withTimeout(
-      getSupabase()
+      supabase
         .from('funcionarios')
         .select('id, nome, ativo')
         // Igualdade case-insensitive: ilike SEM wildcards. Escapamos %/_/\ do
@@ -337,27 +309,25 @@ export async function buscarFuncionarioPorNome(
 }
 
 /**
- * Checa se um funcionário tem apontamento ATIVO (G5 — integridade por UX).
- * "Ativo" = status_tarefa in ('Em andamento','Pausado'), o mesmo critério do
- * totem (ver buscarApontamentoAtivo em queries.ts). Faz parte do fluxo de
- * GRAVAÇÃO (desativar — segue no cliente neste passo). O totem casa apontamento ⇄
- * operário pelo NOME, então a checagem é por nome. Usado para avisar antes de
- * desativar — desativar com timer rodando deixaria um apontamento órfão.
- * Retorna true se há pelo menos um apontamento ativo com esse nome.
- *
- * O CRITÉRIO DE NOME é o MESMO do G4 (buscarFuncionarioPorNome): igualdade
- * case-insensitive ignorando espaços nas pontas (trim + ilike escapado). Se
- * usássemos .eq exato, um funcionário cadastrado com caixa/espaço diferente do
- * apontamento escaparia da checagem e o G5 falharia em silêncio.
+ * Checa se um funcionário tem apontamento ATIVO (G5 — server). "Ativo" =
+ * status_tarefa in ('Em andamento','Pausado'), o mesmo critério do totem. O totem
+ * casa apontamento ⇄ operário pelo NOME, então a checagem é por nome (igualdade
+ * case-insensitive ignorando espaços, igual ao G4). Usado para avisar antes de
+ * desativar — desativar com timer rodando deixaria um apontamento órfão. Roda no
+ * servidor com barreira de gestor. Comportamento idêntico à versão client.
  */
-export async function funcionarioTemApontamentoAtivo(
+export async function funcionarioTemApontamentoAtivoAction(
   nomeCru: string
 ): Promise<FetchState<boolean>> {
+  const guard = await exigirGestorOuErro();
+  if (!guard.ok) return guard.erro;
+
   const nome = nomeCru.trim();
   if (!nome) return { status: 'success', data: false };
   try {
+    const supabase = await getServerClient();
     const result = await withTimeout(
-      getSupabase()
+      supabase
         .from('apontamentos')
         .select('id')
         .ilike('nome_funcionario', escaparLike(nome))
@@ -375,17 +345,24 @@ export async function funcionarioTemApontamentoAtivo(
   }
 }
 
-/** Cria um funcionário (nome + cargo são obrigatórios na tabela). */
+/**
+ * Cria um funcionário (server; nome + cargo são obrigatórios na tabela).
+ * No sucesso, revalida /admin/funcionarios.
+ */
 export async function criarFuncionario(
   input: FuncionarioInput
 ): Promise<FetchState<FuncionarioAdmin>> {
+  const guard = await exigirGestorOuErro();
+  if (!guard.ok) return guard.erro;
+
   const nome = input.nome.trim();
   const cargo = input.cargo.trim();
   if (!nome) return { status: 'error', message: 'Informe o nome do funcionário.' };
   if (!cargo) return { status: 'error', message: 'Informe o cargo do funcionário.' };
   try {
+    const supabase = await getServerClient();
     const result = await withTimeout(
-      getSupabase()
+      supabase
         .from('funcionarios')
         .insert({ nome, cargo })
         .select('id, nome, cargo, ativo')
@@ -397,17 +374,24 @@ export async function criarFuncionario(
     };
     if (error) return { status: 'error', message: traduzirErro(error.message) };
     if (!data) return { status: 'error', message: 'Falha ao criar o funcionário.' };
+    revalidatePath('/admin/funcionarios');
     return { status: 'success', data };
   } catch (e) {
     return { status: 'error', message: traduzirErro(e instanceof Error ? e.message : null) };
   }
 }
 
-/** Edita nome e/ou cargo de um funcionário. */
+/**
+ * Edita nome e/ou cargo de um funcionário (server). No sucesso, revalida
+ * /admin/funcionarios.
+ */
 export async function atualizarFuncionario(
   id: string,
   input: Partial<FuncionarioInput>
 ): Promise<FetchState<FuncionarioAdmin>> {
+  const guard = await exigirGestorOuErro();
+  if (!guard.ok) return guard.erro;
+
   const patch: Record<string, unknown> = {};
   if (input.nome !== undefined) patch.nome = input.nome.trim();
   if (input.cargo !== undefined) patch.cargo = input.cargo.trim();
@@ -415,8 +399,9 @@ export async function atualizarFuncionario(
     return { status: 'error', message: 'Nada para atualizar.' };
   }
   try {
+    const supabase = await getServerClient();
     const result = await withTimeout(
-      getSupabase()
+      supabase
         .from('funcionarios')
         .update(patch)
         .eq('id', id)
@@ -429,6 +414,7 @@ export async function atualizarFuncionario(
     };
     if (error) return { status: 'error', message: traduzirErro(error.message) };
     if (!data) return { status: 'error', message: 'Falha ao atualizar o funcionário.' };
+    revalidatePath('/admin/funcionarios');
     return { status: 'success', data };
   } catch (e) {
     return { status: 'error', message: traduzirErro(e instanceof Error ? e.message : null) };
@@ -436,16 +422,21 @@ export async function atualizarFuncionario(
 }
 
 /**
- * Ativa/desativa um funcionário (soft delete). Nunca apagamos de verdade,
- * para preservar o histórico de apontamentos ligado ao nome.
+ * Ativa/desativa um funcionário (soft delete, server). Nunca apagamos de verdade,
+ * para preservar o histórico de apontamentos ligado ao nome. No sucesso, revalida
+ * /admin/funcionarios.
  */
 export async function setFuncionarioAtivo(
   id: string,
   ativo: boolean
 ): Promise<FetchState<FuncionarioAdmin>> {
+  const guard = await exigirGestorOuErro();
+  if (!guard.ok) return guard.erro;
+
   try {
+    const supabase = await getServerClient();
     const result = await withTimeout(
-      getSupabase()
+      supabase
         .from('funcionarios')
         .update({ ativo })
         .eq('id', id)
@@ -458,62 +449,9 @@ export async function setFuncionarioAtivo(
     };
     if (error) return { status: 'error', message: traduzirErro(error.message) };
     if (!data) return { status: 'error', message: 'Falha ao mudar o status do funcionário.' };
+    revalidatePath('/admin/funcionarios');
     return { status: 'success', data };
   } catch (e) {
     return { status: 'error', message: traduzirErro(e instanceof Error ? e.message : null) };
   }
-}
-
-/* ─────────────────── Sessão / papel do admin (passo 3) ─────────────────── */
-
-/**
- * Lê o papel do usuário logado na PRÓPRIA oficina (tabela user_oficinas).
- * A política "user_ve_proprios_vinculos" garante que só vem a própria linha.
- * Consumida pelo AdminAuthGate e pelo AdminShell (não tocados neste passo).
- */
-export async function papelDoUsuarioAtual(): Promise<
-  FetchState<{ papel: PapelOficina; oficina_id: string }>
-> {
-  try {
-    const result = await withTimeout(
-      getSupabase().from('user_oficinas').select('role, oficina_id').limit(1).maybeSingle()
-    );
-    const { data, error } = result as {
-      data: { role: PapelOficina; oficina_id: string } | null;
-      error: { message: string } | null;
-    };
-    if (error) return { status: 'error', message: traduzirErro(error.message) };
-    if (!data) return { status: 'empty' };
-    return { status: 'success', data: { papel: data.role, oficina_id: data.oficina_id } };
-  } catch (e) {
-    return { status: 'error', message: traduzirErro(e instanceof Error ? e.message : null) };
-  }
-}
-
-/** Lê as claims do JWT (crachá) sem validar assinatura — só para exibir. */
-function lerClaimsJWT(token: string): Record<string, unknown> | null {
-  try {
-    const base = token.split('.')[1];
-    const json = atob(base.replace(/-/g, '+').replace(/_/g, '/'));
-    return JSON.parse(json) as Record<string, unknown>;
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Crachá da sessão atual: e-mail + o oficina_id QUE O SERVIDOR CARIMBOU no JWT.
- * É a prova visível do isolamento (o cliente não escolheu esse valor).
- * Consumida pelo AdminShell (não tocado neste passo).
- */
-export async function cracheDaSessao(): Promise<{
-  email: string | null;
-  oficinaIdNoJWT: string | null;
-} | null> {
-  const { data } = await getSupabase().auth.getSession();
-  const s = data.session;
-  if (!s) return null;
-  const claims = lerClaimsJWT(s.access_token);
-  const oid = claims && typeof claims.oficina_id === 'string' ? claims.oficina_id : null;
-  return { email: s.user.email ?? null, oficinaIdNoJWT: oid };
 }

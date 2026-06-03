@@ -36,10 +36,15 @@ import { AdminShell } from '../_shell/AdminShell';
 import { ETAPAS } from '@/lib/supabase/client';
 import type { EtapaId } from '@/lib/supabase/client';
 import { normalizarPlaca, type FetchState } from '@/lib/supabase/queries';
+// ESCRITA + busca-antes-de-criar agora no SERVIDOR (Server Actions, server-move
+// Passo 3). Tipos/constantes/helpers PUROS seguem vindo de admin-queries (que
+// re-exporta de admin-shared).
 import {
   atualizarOS,
-  buscarOSAtivaPorPlaca,
+  buscarOSAtivaPorPlacaAction,
   criarOS,
+} from '@/lib/supabase/admin-actions';
+import {
   somarDias,
   STATUS_OS,
   TIPOS_CLIENTE,
@@ -180,7 +185,7 @@ function OSManager({ estadoInicial }: { estadoInicial: FetchState<OrdemServicoAd
     if (!form || form.id) return; // só no modo criação
     const placa = normalizarPlaca(form.placa);
     if (placa.length < 7) return;
-    const r = await buscarOSAtivaPorPlaca(placa);
+    const r = await buscarOSAtivaPorPlacaAction(placa);
     if (r.status === 'success' && r.data) {
       setAvisoPlaca(
         `Já existe uma OS ATIVA para ${placa} (${r.data.modelo_veiculo} · ${r.data.status_geral}). ` +

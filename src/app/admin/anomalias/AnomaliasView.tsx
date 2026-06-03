@@ -32,8 +32,11 @@ import { useRouter } from 'next/navigation';
 import { AdminAuthGate } from '../AdminAuthGate';
 import { AdminShell } from '../_shell/AdminShell';
 import type { FetchState } from '@/lib/supabase/queries';
+// CORREÇÃO (escrita append-only) agora no SERVIDOR (Server Action, server-move
+// Passo 3). Constante/tipos PUROS seguem vindo de anomalias-queries (que
+// re-exporta de anomalias-shared).
+import { registrarCorrecao } from '@/lib/supabase/anomalias-actions';
 import {
-  registrarCorrecao,
   TETO_FANTASMA_MS,
   type Anomalia,
   type MotivoCodigo,

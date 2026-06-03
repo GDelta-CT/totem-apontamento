@@ -10,11 +10,12 @@
  * a11y, G4/G5) e re-lê NO SERVIDOR via router.refresh() após cada escrita
  * bem-sucedida.
  *
- * A ESCRITA (criar/editar/ativar funcionário) e as checagens G4 (nome duplicado) /
- * G5 (apontamento ativo) CONTINUAM NO CLIENTE neste passo (Passo 3 do server-move
- * move a escrita): a View chama criarFuncionario/atualizarFuncionario/
- * setFuncionarioAtivo/buscarFuncionarioPorNome/funcionarioTemApontamentoAtivo de
- * admin-queries.ts e, no sucesso, dá router.refresh() para o servidor re-ler.
+ * SERVER-MOVE (passo 3): a ESCRITA (criar/editar/ativar funcionário) e as checagens
+ * G4 (nome duplicado) / G5 (apontamento ativo) AGORA RODAM NO SERVIDOR via Server
+ * Actions (admin-actions.ts): a View chama criarFuncionario/atualizarFuncionario/
+ * setFuncionarioAtivo/buscarFuncionarioPorNomeAction/funcionarioTemApontamentoAtivoAction,
+ * cada uma com requireGestor() no servidor e revalidatePath('/admin/funcionarios')
+ * no sucesso. A View também dá router.refresh() para o servidor re-ler.
  *
  * Por que a busca fica antes do gate client: a query server só roda se houver
  * SESSÃO no cookie (getSessao); sem sessão devolve `empty` e o gate client

@@ -107,6 +107,23 @@ export const COLS_OS =
 /* ─────────────────── Helpers puros ─────────────────── */
 
 /**
+ * Normaliza uma placa: MAIÚSCULAS, só A-Z/0-9, sem espaços nas pontas. PURA.
+ *
+ * É uma cópia MÍNIMA e idêntica de queries.normalizarPlaca (coberta por testes
+ * lá), inlinada aqui pelo MESMO motivo de parseISOComUTC em anomalias-shared.ts:
+ * este módulo roda TAMBÉM no servidor (Server Actions), e queries.ts importa
+ * hooks de React + o cliente do browser — o build do Next proíbe arrastar isso
+ * para um módulo 'use server'. O totem segue usando queries.normalizarPlaca sem
+ * mudança; aqui é o gêmeo puro para a escrita server-side.
+ */
+export function normalizarPlaca(input: string): string {
+  return input
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '')
+    .trim();
+}
+
+/**
  * Soma `dias` a uma data base (YYYY-MM-DD) e devolve YYYY-MM-DD.
  * Usado para sugerir a data prometida a partir do tipo de cliente. Sugestão
  * editável: o admin pode trocar. Base ausente -> usa hoje. PURA.

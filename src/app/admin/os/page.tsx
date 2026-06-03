@@ -9,10 +9,11 @@
  * idêntica (AdminAuthGate, AdminShell, tema dark, loading/empty/error, copy, a11y)
  * e re-lê NO SERVIDOR via router.refresh() após cada escrita bem-sucedida.
  *
- * A ESCRITA (criar/editar OS) e a busca "antes-de-criar" CONTINUAM NO CLIENTE
- * neste passo (Passo 3 do server-move move a escrita): a View chama criarOS/
- * atualizarOS/buscarOSAtivaPorPlaca de admin-queries.ts e, no sucesso, dá
- * router.refresh() para o servidor re-ler a lista.
+ * SERVER-MOVE (passo 3): a ESCRITA (criar/editar OS) e a busca "antes-de-criar"
+ * AGORA RODAM NO SERVIDOR via Server Actions (admin-actions.ts): a View chama
+ * criarOS/atualizarOS/buscarOSAtivaPorPlacaAction, cada uma com requireGestor()
+ * no servidor e revalidatePath('/admin/os') no sucesso. A View também dá
+ * router.refresh() — a tela atualiza após a ação como antes.
  *
  * Por que a busca fica antes do gate client: a query server só roda se houver
  * SESSÃO no cookie (getSessao); sem sessão devolve `empty` e o gate client
