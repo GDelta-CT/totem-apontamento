@@ -1002,18 +1002,30 @@ function Estilos() {
   return (
     <style jsx global>{`
       :root {
-        --bg: #0d0d0d;
-        --bg-2: #161616;
-        --line: #2a2a2a;
-        --ink: #f5f5f0;
-        --ink-soft: #b0b0a8;
-        --warn: #ffb000;
-        --warn-dark: #cc8a00;
-        --danger: #ff4d2e;
-        --ok: #6ce16c;
-        --info: #7dd3fc;
-        --running: #4ade80;
-        --paused: #fbbf24;
+        /* ════ Marca GDelta: cockpit NAVY + acento TEAL + off-white ════
+           Sem âmbar/dourado. Reusa os tokens de marca do globals.css (mesma
+           família do login do totem) para casar com o resto do app. */
+        --bg: var(--gd-navy-deep); /* #082a42 — mesmo fundo do login do totem */
+        --bg-2: #0e3a5a; /* superfície dos cards (navy elevado) */
+        --bg-3: #14496e; /* hover das superfícies */
+        --line: #1d5078; /* hairline navy (separa card do fundo) */
+        --ink: var(--text-primary); /* #f1f5f9 — off-white da marca */
+        --ink-soft: #b8c4d4; /* texto secundário (frio, lê de longe) */
+
+        /* ACENTO único = teal da marca (era âmbar). Tudo que "acende" — avatar,
+           botão primário, placa, foco, bordas ativas — usa --warn, que agora é
+           alias do teal (mantém as ~30 regras sem reescrever cada uma). */
+        --accent: var(--gd-teal-bright); /* teal de ação da marca */
+        --accent-strong: var(--gd-teal-hover); /* hover do acento */
+        --warn: var(--accent); /* alias legado → teal */
+
+        /* SEMÂNTICOS — cada cor = um significado (não competem com o acento) */
+        --caution: #fbbf24; /* AVISO real (regra dos 15 min) — âmbar */
+        --danger: #ff4d2e; /* risco / finalizar — vermelho */
+        --ok: #4ade80; /* sucesso — verde */
+        --info: #8fcce8; /* informativo — ciano calmo (igual /admin) */
+        --running: #4ade80; /* trabalhando / cronômetro — verde */
+        --paused: #fbbf24; /* pausado — âmbar */
       }
 
       @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=JetBrains+Mono:wght@500;700&display=swap');
@@ -1029,7 +1041,7 @@ function Estilos() {
       /* Acessibilidade: anel de foco visível e claro em tudo que recebe foco
          (uso de parede/oficina + teclado/leitor). Cobre os casos com outline:none. */
       :where(button, a, input, [tabindex]):focus-visible {
-        outline: 3px solid var(--warn);
+        outline: 3px solid var(--accent-strong);
         outline-offset: 2px;
         border-radius: 6px;
       }
@@ -1038,13 +1050,13 @@ function Estilos() {
         min-height: 100%;
         background: var(--bg);
         background-image:
-          radial-gradient(circle at 10% 0%, rgba(255, 176, 0, 0.06) 0%, transparent 40%),
+          radial-gradient(circle at 10% 0%, rgba(28, 132, 173, 0.1) 0%, transparent 40%),
           repeating-linear-gradient(
             45deg,
             transparent 0,
             transparent 14px,
-            rgba(255, 255, 255, 0.012) 14px,
-            rgba(255, 255, 255, 0.012) 15px
+            rgba(255, 255, 255, 0.02) 14px,
+            rgba(255, 255, 255, 0.02) 15px
           );
         color: var(--ink);
         font-family: 'Archivo', system-ui, sans-serif;
@@ -1250,12 +1262,12 @@ function Estilos() {
       }
       .card-func:hover {
         border-color: var(--warn);
-        background: #1d1d1d;
+        background: var(--bg-3);
         transform: translateY(-2px);
       }
       .card-func:focus-visible {
         border-color: var(--warn);
-        background: #1d1d1d;
+        background: var(--bg-3);
         transform: translateY(-2px);
         outline: 3px solid var(--warn);
         outline-offset: 2px;
@@ -1268,7 +1280,7 @@ function Estilos() {
         height: 56px;
         border-radius: 50%;
         background: var(--warn);
-        color: #000;
+        color: #fff;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -1626,7 +1638,7 @@ function Estilos() {
       .placa-input:focus {
         outline: none;
         border-color: var(--warn);
-        background: #1a1a1a;
+        background: var(--bg-3);
       }
       .placa-input::placeholder {
         color: #444;
@@ -1664,18 +1676,19 @@ function Estilos() {
       }
       .btn-primario {
         background: var(--warn);
-        color: #000;
+        color: #fff;
       }
       .btn-primario:hover:not(:disabled) {
-        background: #ffc333;
+        background: var(--accent-strong);
         transform: translateY(-2px);
       }
       .btn-primario:active {
         transform: translateY(0);
       }
       .btn-primario:disabled {
-        background: #2a2a2a;
-        color: #666;
+        background: var(--bg-2);
+        color: var(--ink-soft);
+        opacity: 0.5;
         cursor: not-allowed;
       }
       .btn-secundario {
@@ -1779,7 +1792,7 @@ function Estilos() {
         padding: 4px 10px;
         border-radius: 3px;
         background: var(--warn);
-        color: #000;
+        color: #fff;
         letter-spacing: 1px;
       }
       .os-veiculo {
@@ -1887,12 +1900,12 @@ function Estilos() {
       }
       .card-etapa:hover:not(:disabled) {
         border-color: var(--warn);
-        background: #1d1d1d;
+        background: var(--bg-3);
         transform: translateY(-3px);
       }
       .card-etapa:focus-visible {
         border-color: var(--warn);
-        background: #1d1d1d;
+        background: var(--bg-3);
         transform: translateY(-3px);
         outline: 3px solid var(--warn);
         outline-offset: 2px;
@@ -1962,8 +1975,8 @@ function Estilos() {
         transition: all 120ms ease;
       }
       .etapa-carro:hover:not(:disabled) {
-        background: #1d1d1d;
-        border-color: #ffc333;
+        background: var(--bg-3);
+        border-color: var(--accent-strong);
       }
       .etapa-carro:disabled {
         opacity: 0.5;
@@ -2281,8 +2294,8 @@ function Estilos() {
         margin-top: 4px;
       }
       .aviso-15min {
-        background: rgba(255, 176, 0, 0.08);
-        border: 1px solid var(--warn);
+        background: rgba(251, 191, 36, 0.08);
+        border: 1px solid var(--caution);
         border-radius: 8px;
         padding: 16px 20px;
         margin-bottom: 24px;
@@ -2291,7 +2304,7 @@ function Estilos() {
         color: var(--ink);
       }
       .aviso-15min strong {
-        color: var(--warn);
+        color: var(--caution);
       }
       .motivo-categoria {
         font-family: 'JetBrains Mono', monospace;
@@ -2327,7 +2340,7 @@ function Estilos() {
       }
       .card-motivo:hover:not(:disabled) {
         border-color: var(--warn);
-        background: #1d1d1d;
+        background: var(--bg-3);
         transform: translateX(4px);
       }
       .card-motivo:disabled {
