@@ -38,6 +38,31 @@ function withTimeout<T>(promise: PromiseLike<T>, ms = TIMEOUT_MS): Promise<T> {
   });
 }
 
+/** Mensagem amigável padrão (mesma higiene do traduzirErro de admin-queries). */
+const ERRO_GENERICO = 'Não foi possível carregar o painel. Tente de novo em instantes.';
+
+/**
+ * Traduz erros do Postgres/Supabase (ou de catch) para algo legível ao dono.
+ * Painel é LEITURA pura — não há jargão de gravação aqui. Nunca devolve o texto
+ * cru do banco: o que não casar vira ERRO_GENERICO; mensagens nossas já em
+ * PT-BR (timeout do withTimeout) passam intactas.
+ */
+function traduzirErro(msg: string | null | undefined): string {
+  if (!msg) return ERRO_GENERICO;
+  const m = msg.toLowerCase();
+  if (m.includes('conexão demorou') || m.includes('verifique a internet')) return msg;
+  if (m.includes('jwt') || m.includes('invalid api key')) {
+    return 'Sessão inválida. Faça login de novo.';
+  }
+  if (m.includes('permission') || m.includes('rls') || m.includes('policy') || m.includes('denied')) {
+    return 'Sem permissão para ver o painel. Faça login como dono.';
+  }
+  if (m.includes('network') || m.includes('fetch') || m.includes('failed to')) {
+    return 'Sem conexão com o servidor. Verifique a internet.';
+  }
+  return ERRO_GENERICO;
+}
+
 /** Situação de prazo de um carro. */
 export type SaudePrazo = 'no_prazo' | 'perto' | 'estourado' | 'sem_prazo';
 
@@ -100,7 +125,7 @@ export async function carregarPainelDono(): Promise<FetchState<PainelDono>> {
         .order('data_prometida', { ascending: true, nullsFirst: false })
     );
     const { data, error } = result as { data: OSRow[] | null; error: { message: string } | null };
-    if (error) return { status: 'error', message: error.message };
+    if (error) return { status: 'error', message: traduzirErro(error.message) };
 
     const agora = Date.now();
     const carros: CarroPrazo[] = (data ?? []).map((o) => {
@@ -147,7 +172,7 @@ export async function carregarPainelDono(): Promise<FetchState<PainelDono>> {
 
     return { status: 'success', data: { carros, kpis } };
   } catch (e) {
-    return { status: 'error', message: e instanceof Error ? e.message : 'Erro desconhecido.' };
+    return { status: 'error', message: traduzirErro(e instanceof Error ? e.message : null) };
   }
 }
 

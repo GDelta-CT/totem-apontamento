@@ -29,3 +29,9 @@ Thumbs.db
 .aiox-core/local/
 .claude/settings.local.json
 .aiox/install-log.txt
+build-output/
+.agents-guru/
+*.local
+
+# Supabase CLI local state (não versionar — é por máquina)
+supabase/.temp/

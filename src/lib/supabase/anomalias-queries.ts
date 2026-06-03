@@ -17,6 +17,9 @@ const TIMEOUT_MS = 8000;
 /** Teto anti-fantasma: 10,5h em milissegundos. */
 export const TETO_FANTASMA_MS = 10.5 * 60 * 60 * 1000;
 
+// Higiene (#7): a LEITURA nunca expõe erro cru do Postgres (RLS/SQL/estrutura) na UI.
+const MSG_FALHA_LEITURA = 'Não foi possível carregar as anomalias agora. Tente de novo.';
+
 function withTimeout<T>(promise: PromiseLike<T>, ms = TIMEOUT_MS): Promise<T> {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
@@ -74,7 +77,10 @@ export async function listarAnomalias(): Promise<FetchState<Anomalia[]>> {
         .order('hora_inicio', { ascending: true })
     );
     const { data, error } = result as { data: Row[] | null; error: { message: string } | null };
-    if (error) return { status: 'error', message: error.message };
+    if (error) {
+      console.warn('[listarAnomalias] falha na consulta principal:', error.message);
+      return { status: 'error', message: MSG_FALHA_LEITURA };
+    }
 
     const agora = Date.now();
     const anomalias: Anomalia[] = (data ?? [])
@@ -108,7 +114,19 @@ export async function listarAnomalias(): Promise<FetchState<Anomalia[]>> {
         .in('apontamento_id', ids)
         .in('acao', ['ajustar_fim', 'descartar'])
     );
-    const { data: corrRows } = corr as { data: { apontamento_id: string }[] | null };
+    const { data: corrRows, error: corrErr } = corr as {
+      data: { apontamento_id: string }[] | null;
+      error: { message: string } | null;
+    };
+    // ROBUSTEZ: antes o erro era IGNORADO em silêncio (corrRows null) -> a exclusão
+    // não acontecia, mas calada. Agora desestruturamos o erro: se a checagem da
+    // trilha falhar, mantemos a lista de anomalias SEM excluir (conservador) e
+    // avisamos no log. Pior caso: um fantasma já corrigido reaparece como anomalia
+    // (o admin recorrige) — preferível a sumir com anomalias por uma falha auxiliar.
+    if (corrErr) {
+      console.warn('[listarAnomalias] falha ao checar correções (ignorada):', corrErr.message);
+      return { status: 'success', data: anomalias };
+    }
     const encerrados = new Set((corrRows ?? []).map((c) => c.apontamento_id));
     const restantes = anomalias.filter((a) => !encerrados.has(a.id));
 

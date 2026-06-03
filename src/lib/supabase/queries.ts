@@ -354,7 +354,14 @@ export async function buscarApontamentoAtivo(
       data: { apontamento_id: string }[] | null;
       error: { message: string } | null;
     };
-    if (corrErr) return { status: 'error', message: traduzirErro(corrErr.message) };
+    // ROBUSTEZ (linha vermelha do totem): uma FALHA ao checar a trilha de correção
+    // (permissão/tabela ausente/rede) NUNCA pode bloquear o operário de iniciar uma
+    // tarefa. Degradar gracioso -> trata como "sem correção encerrante" e devolve o
+    // apontamento ativo. Só EXCLUI (empty) se a consulta SUCEDER e achar correção.
+    if (corrErr) {
+      console.warn('[buscarApontamentoAtivo] falha ao checar correções (ignorada):', corrErr.message);
+      return { status: 'success', data };
+    }
     if (corrRows && corrRows.length > 0) return { status: 'empty' };
 
     return { status: 'success', data };

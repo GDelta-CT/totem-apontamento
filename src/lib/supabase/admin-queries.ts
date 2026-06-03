@@ -39,9 +39,34 @@ function withTimeout<T>(promise: PromiseLike<T>, ms = TIMEOUT_MS): Promise<T> {
   });
 }
 
-/** Traduz erros do Postgres/Supabase para algo legível ao admin. */
-function traduzirErro(msg: string): string {
+/**
+ * Escapa os caracteres especiais de LIKE/ILIKE (`%`, `_`, `\`) num termo de
+ * busca, para que um nome como "João %" ou "a_b" seja tratado LITERALMENTE e
+ * não como um padrão de wildcard. Sem isso, `.ilike(col, termo)` casaria
+ * qualquer coisa quando o termo tivesse `%`/`_` — quebrando G4/G5 em silêncio.
+ */
+function escaparLike(termo: string): string {
+  return termo.replace(/[\\%_]/g, '\\$&');
+}
+
+/**
+ * Mensagem amigável padrão quando o erro não casa nenhum padrão conhecido.
+ * Evita vazar texto cru do Postgres (jargão técnico) para o admin.
+ */
+const ERRO_GENERICO = 'Não foi possível concluir. Tente de novo em instantes.';
+
+/**
+ * Traduz erros do Postgres/Supabase (ou de catch) para algo legível ao admin.
+ * Nunca devolve o texto cru do banco: o que não casar vira ERRO_GENERICO.
+ * Mensagens já-amigáveis em PT-BR (timeout do withTimeout) passam intactas.
+ */
+function traduzirErro(msg: string | null | undefined): string {
+  if (!msg) return ERRO_GENERICO;
   const m = msg.toLowerCase();
+  // Mensagens nossas (já amigáveis) que devem passar sem reescrita.
+  if (m.includes('conexão demorou') || m.includes('verifique a internet')) {
+    return msg;
+  }
   if (m.includes('duplicate') || m.includes('unique') || m.includes('23505')) {
     return 'Já existe uma OS cadastrada com essa placa. Busque a placa antes de criar.';
   }
@@ -54,10 +79,10 @@ function traduzirErro(msg: string): string {
   if (m.includes('check constraint') || m.includes('violates check')) {
     return 'Valor inválido em um dos campos (tipo de cliente, etapa ou motivo de bloqueio).';
   }
-  if (m.includes('network') || m.includes('fetch')) {
+  if (m.includes('network') || m.includes('fetch') || m.includes('failed to')) {
     return 'Sem conexão com o servidor. Verifique a internet.';
   }
-  return msg;
+  return ERRO_GENERICO;
 }
 
 /* ───────────────────────── Tipos ───────────────────────── */
@@ -178,7 +203,7 @@ export async function listarOS(): Promise<FetchState<OrdemServicoAdmin[]>> {
     if (!data || data.length === 0) return { status: 'empty' };
     return { status: 'success', data };
   } catch (e) {
-    return { status: 'error', message: e instanceof Error ? e.message : 'Erro desconhecido.' };
+    return { status: 'error', message: traduzirErro(e instanceof Error ? e.message : null) };
   }
 }
 
@@ -196,7 +221,7 @@ export async function buscarOSPorId(id: string): Promise<FetchState<OrdemServico
     if (!data) return { status: 'empty' };
     return { status: 'success', data };
   } catch (e) {
-    return { status: 'error', message: e instanceof Error ? e.message : 'Erro desconhecido.' };
+    return { status: 'error', message: traduzirErro(e instanceof Error ? e.message : null) };
   }
 }
 
@@ -231,7 +256,7 @@ export async function buscarOSAtivaPorPlaca(
     if (error) return { status: 'error', message: traduzirErro(error.message) };
     return { status: 'success', data: data ?? null };
   } catch (e) {
-    return { status: 'error', message: e instanceof Error ? e.message : 'Erro desconhecido.' };
+    return { status: 'error', message: traduzirErro(e instanceof Error ? e.message : null) };
   }
 }
 
@@ -288,7 +313,7 @@ export async function criarOS(input: CriarOSInput): Promise<FetchState<OrdemServ
     if (!data) return { status: 'error', message: 'Falha ao criar a OS.' };
     return { status: 'success', data };
   } catch (e) {
-    return { status: 'error', message: e instanceof Error ? e.message : 'Erro desconhecido.' };
+    return { status: 'error', message: traduzirErro(e instanceof Error ? e.message : null) };
   }
 }
 
@@ -338,7 +363,7 @@ export async function atualizarOS(
     if (!data) return { status: 'error', message: 'Falha ao atualizar a OS.' };
     return { status: 'success', data };
   } catch (e) {
-    return { status: 'error', message: e instanceof Error ? e.message : 'Erro desconhecido.' };
+    return { status: 'error', message: traduzirErro(e instanceof Error ? e.message : null) };
   }
 }
 
@@ -361,7 +386,7 @@ export async function listarFuncionarios(): Promise<FetchState<FuncionarioAdmin[
     if (!data || data.length === 0) return { status: 'empty' };
     return { status: 'success', data };
   } catch (e) {
-    return { status: 'error', message: e instanceof Error ? e.message : 'Erro desconhecido.' };
+    return { status: 'error', message: traduzirErro(e instanceof Error ? e.message : null) };
   }
 }
 
@@ -384,7 +409,9 @@ export async function buscarFuncionarioPorNome(
       getSupabase()
         .from('funcionarios')
         .select('id, nome, ativo')
-        .ilike('nome', nome) // ilike sem % = igualdade case-insensitive
+        // Igualdade case-insensitive: ilike SEM wildcards. Escapamos %/_/\ do
+        // termo para que sejam comparados literalmente (senão "a%" casaria tudo).
+        .ilike('nome', escaparLike(nome))
         .limit(1)
         .maybeSingle()
     );
@@ -395,7 +422,7 @@ export async function buscarFuncionarioPorNome(
     if (error) return { status: 'error', message: traduzirErro(error.message) };
     return { status: 'success', data: data ?? null };
   } catch (e) {
-    return { status: 'error', message: e instanceof Error ? e.message : 'Erro desconhecido.' };
+    return { status: 'error', message: traduzirErro(e instanceof Error ? e.message : null) };
   }
 }
 
@@ -406,6 +433,11 @@ export async function buscarFuncionarioPorNome(
  * operário pelo NOME, então a checagem é por nome. Usado para avisar antes de
  * desativar — desativar com timer rodando deixaria um apontamento órfão.
  * Retorna true se há pelo menos um apontamento ativo com esse nome.
+ *
+ * O CRITÉRIO DE NOME é o MESMO do G4 (buscarFuncionarioPorNome): igualdade
+ * case-insensitive ignorando espaços nas pontas (trim + ilike escapado). Se
+ * usássemos .eq exato, um funcionário cadastrado com caixa/espaço diferente do
+ * apontamento escaparia da checagem e o G5 falharia em silêncio.
  */
 export async function funcionarioTemApontamentoAtivo(
   nomeCru: string
@@ -417,7 +449,7 @@ export async function funcionarioTemApontamentoAtivo(
       getSupabase()
         .from('apontamentos')
         .select('id')
-        .eq('nome_funcionario', nome)
+        .ilike('nome_funcionario', escaparLike(nome))
         .in('status_tarefa', ['Em andamento', 'Pausado'])
         .limit(1)
     );
@@ -428,7 +460,7 @@ export async function funcionarioTemApontamentoAtivo(
     if (error) return { status: 'error', message: traduzirErro(error.message) };
     return { status: 'success', data: !!data && data.length > 0 };
   } catch (e) {
-    return { status: 'error', message: e instanceof Error ? e.message : 'Erro desconhecido.' };
+    return { status: 'error', message: traduzirErro(e instanceof Error ? e.message : null) };
   }
 }
 
@@ -456,7 +488,7 @@ export async function criarFuncionario(
     if (!data) return { status: 'error', message: 'Falha ao criar o funcionário.' };
     return { status: 'success', data };
   } catch (e) {
-    return { status: 'error', message: e instanceof Error ? e.message : 'Erro desconhecido.' };
+    return { status: 'error', message: traduzirErro(e instanceof Error ? e.message : null) };
   }
 }
 
@@ -488,7 +520,7 @@ export async function atualizarFuncionario(
     if (!data) return { status: 'error', message: 'Falha ao atualizar o funcionário.' };
     return { status: 'success', data };
   } catch (e) {
-    return { status: 'error', message: e instanceof Error ? e.message : 'Erro desconhecido.' };
+    return { status: 'error', message: traduzirErro(e instanceof Error ? e.message : null) };
   }
 }
 
@@ -517,7 +549,7 @@ export async function setFuncionarioAtivo(
     if (!data) return { status: 'error', message: 'Falha ao mudar o status do funcionário.' };
     return { status: 'success', data };
   } catch (e) {
-    return { status: 'error', message: e instanceof Error ? e.message : 'Erro desconhecido.' };
+    return { status: 'error', message: traduzirErro(e instanceof Error ? e.message : null) };
   }
 }
 
@@ -544,7 +576,7 @@ export async function papelDoUsuarioAtual(): Promise<
     if (!data) return { status: 'empty' };
     return { status: 'success', data: { papel: data.role, oficina_id: data.oficina_id } };
   } catch (e) {
-    return { status: 'error', message: e instanceof Error ? e.message : 'Erro desconhecido.' };
+    return { status: 'error', message: traduzirErro(e instanceof Error ? e.message : null) };
   }
 }
 

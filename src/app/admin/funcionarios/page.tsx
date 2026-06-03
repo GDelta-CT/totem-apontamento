@@ -186,6 +186,9 @@ function FuncionariosManager() {
 
   // G5: reativar é sempre seguro; desativar checa apontamento ativo antes.
   const alternar = async (f: FuncionarioAdmin) => {
+    // Trava de reentrância: um duplo-clique não pode disparar dois fluxos em
+    // paralelo e "pular" a confirmação G5 (a 2ª chamada limparia o modal da 1ª).
+    if (verificando) return;
     setErro(null);
     setConfirmarDesativar(null);
     const vaiDesativar = f.ativo; // está ativo -> a ação é desativar

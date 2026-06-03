@@ -17,6 +17,9 @@ import type { FetchState } from './queries';
 
 const TIMEOUT_MS = 8000;
 
+// Higiene (#7): nunca expor erro cru do Postgres (RLS/SQL/estrutura) na UI do painel.
+const MSG_FALHA_GENERICA = 'Não foi possível carregar a visão ao vivo agora. Tente de novo.';
+
 function withTimeout<T>(promise: PromiseLike<T>, ms = TIMEOUT_MS): Promise<T> {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
@@ -176,7 +179,10 @@ export async function carregarVisaoLive(): Promise<FetchState<VisaoLive>> {
       (osRes as { error: { message: string } | null }).error ||
       (apRes as { error: { message: string } | null }).error ||
       (apHojeRes as { error: { message: string } | null }).error;
-    if (erro) return { status: 'error', message: erro.message };
+    if (erro) {
+      console.warn('[visaoOperacional] falha na carga principal:', erro.message);
+      return { status: 'error', message: MSG_FALHA_GENERICA };
+    }
 
     const oss = ((osRes as { data: OSRow[] | null }).data ?? []) as OSRow[];
     const apontBruto = ((apRes as { data: ApontRow[] | null }).data ?? []) as ApontRow[];
@@ -201,9 +207,16 @@ export async function carregarVisaoLive(): Promise<FetchState<VisaoLive>> {
         data: { apontamento_id: string }[] | null;
         error: { message: string } | null;
       };
-      if (corrErr) return { status: 'error', message: corrErr.message };
-      const encerrados = new Set((corrRows ?? []).map((c) => c.apontamento_id));
-      if (encerrados.size > 0) apont = apontBruto.filter((a) => !encerrados.has(a.id));
+      // ROBUSTEZ: se a checagem de correções falhar, NÃO derrubar a visão inteira
+      // pra 'error' — apenas não exclui ninguém (mostra os ativos como estão). No
+      // pior caso, um fantasma já corrigido reaparece (o admin recorrige), o que é
+      // muito melhor que cegar o painel por uma falha na trilha auxiliar.
+      if (corrErr) {
+        console.warn('[visaoOperacional] falha ao checar correções (ignorada):', corrErr.message);
+      } else {
+        const encerrados = new Set((corrRows ?? []).map((c) => c.apontamento_id));
+        if (encerrados.size > 0) apont = apontBruto.filter((a) => !encerrados.has(a.id));
+      }
     }
 
     // 1) apontamentos ativos por OS
