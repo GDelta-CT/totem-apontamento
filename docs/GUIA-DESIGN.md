@@ -6,7 +6,7 @@ implementa; este doc define o "como tem que parecer".
 
 > **Escopo:** vale para `/admin` (e telas de login, já feitas). O **interior do totem**
 > (preto/âmbar do operário) **fica preservado** — não aplicar este guia lá.
-> **Tema dos painéis:** claro (apropriado ao monitor do escritório), marca G Delta.
+> **Tema dos painéis:** claro (apropriado ao monitor do escritório), marca GDelta.
 
 ---
 
@@ -58,7 +58,7 @@ Números (tempo, %, R$, contagem): **tabular-nums** e alinhados.
 
 ## 4. Layout & espaçamento
 
-- **Cabeçalho** branco com ícone G Delta (`gdelta-symbol.png`) + título à esquerda; status/usuário à direita.
+- **Cabeçalho** branco com ícone GDelta (`gdelta-symbol.png`) + título à esquerda; status/usuário à direita.
 - **Navegação** por abas sob o cabeçalho (aba ativa com underline teal de 2px).
 - **Raio:** cartões 10px; pílulas/inputs 9px; pílula de status 10px (formato cápsula).
 - **Sombra:** evitar; usar **borda 1px** `#e6ebf0` pra separar. Sombra só em modal/overlay.

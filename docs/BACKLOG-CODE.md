@@ -72,12 +72,24 @@ serializada** (um executor por vez — regra anti-colisão). Fale com o Code por
 - **`aria-label`** no refresh de anomalias (as outras telas já têm).
 - Texto secundário do totem (descrições 12px) → 13px (uso de parede).
 
+## P3.7 — Padronização do nome (GDelta) — ref. CLAUDE.md "Padrão de nome"
+
+Marca **GDelta** (uma palavra), produto **GDelta Totem**. No `src` + config (Code):
+- `package.json` `name`: `app-nextjs` → `gdelta-totem`.
+- Trocar **"G Delta"** (com espaço) → **"GDelta"** em strings visíveis e metadados:
+  `layout.tsx` (title/keywords), `globals.css` (comentários), `DeviceAuthGate.tsx` /
+  `AdminAuthGate.tsx` (rodapés + `alt` das imagens). Não tocar nos nomes literais externos
+  (pasta, projeto Supabase). A logo mantém o estilo "G|DELTA".
+
 ## P4 — Segurança (antes de QUALQUER 2ª oficina) — ref. `AUDITORIA-FUNCIONAL.md` D
 
 - Mover leituras do painel pro **servidor** (não browser/anon) **e** aplicar o **lockdown** das
   policies abertas do anon (nessa ordem). Plano + aprovação. **NÃO cadastrar 2ª oficina até lá.**
 
-## Decisões do fundador (destravam itens acima)
+## Decisões do fundador — RESOLVIDAS (01/06/2026)
 
-1. **Aprovar o plano append-only** da anomalia (P0).
-2. **G9**: o totem deve setar `etapa_atual` ao operário dar play? (hoje não move o card no kanban).
+1. **Plano append-only da anomalia: APROVADO.** Code implementa conforme
+   `PLANO-CORRECAO-ANOMALIA.md`, com diff antes de aplicar a migration; 006 desligada até a troca.
+2. **G9: SIM — o totem seta `etapa_atual` ao operário dar play.** É o que o escopo travado já
+   manda ("último que iniciou vence"); corrigir em `iniciarApontamento` (atualizar
+   `ordens_servico.etapa_atual` para a etapa iniciada). Não é mais decisão aberta.

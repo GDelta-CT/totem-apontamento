@@ -99,5 +99,6 @@ A 006 hoje habilita um **UPDATE destrutivo** no apontamento. O plano **substitui
    trilha (quem/quando/motivo/antes→depois) aparece.
 4. Só então ligar a correção no painel.
 
-**Decisão sua:** aprovar o desenho append-only acima como está, ou ajustar algo antes de mandar
-o Code implementar?
+**APROVADO (01/06/2026).** O fundador aprovou o desenho append-only como está. O Code
+implementa, mostrando o diff da migration antes de aplicar; a Migration 006 fica desligada até a
+troca entrar.

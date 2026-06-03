@@ -2,6 +2,11 @@
 
 # GDelta-Totem — Fonte da verdade (escopo + regras de trabalho)
 
+> **Padrão de nome (01/06/2026):** marca = **GDelta** (uma palavra; logo estilizada
+> "G|DELTA"); produto = **GDelta Totem**. Em texto visível ao usuário e metadados, usar
+> **GDelta** — nunca "G Delta" com espaço. Nomes literais externos NÃO mudam (pasta
+> `GDelta-Totem`, projeto Supabase `GDelta-Totem-Teste`).
+
 > Estas regras valem em TODA sessão. Leia antes de qualquer ação. Em conflito com
 > qualquer outra orientação, as regras de **segurança/ambiente** (Ambientes, Disciplina)
 > prevalecem. O **escopo MVP (abaixo) está TRAVADO** — não reabrir decisões fechadas.

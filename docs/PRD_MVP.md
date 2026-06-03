@@ -1,4 +1,4 @@
-# PRD - MVP: Sistema Operacional G Delta (v2.0)
+# PRD - MVP: Sistema Operacional GDelta (v2.0)
 
 ## 1. Visão Geral e Objetivo
 
