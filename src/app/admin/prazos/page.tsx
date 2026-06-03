@@ -12,7 +12,7 @@
  * tela de OS). Esta tela NÃO redeclara chrome — consome o shell e um bloco
  * `adm-prazos-*` para o holofote, as réguas de benchmark, a banda de KPIs e o
  * extrato de risco. Números BRILHAM (gd-tabular, alto contraste); a cor de
- * estado vem dos acentos dark (--red/amber/green/blue-primary com glow); o
+ * estado vem dos acentos dark (--red/amber/green-primary + --adm-info com glow); o
  * holofote calmo é verde que brilha. NENHUMA regra de negócio mudou — só a pele.
  *
  * Lógica PRESERVADA 100% (dono-queries.ts): carregarPainelDono, auto-refresh

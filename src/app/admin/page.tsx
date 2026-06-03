@@ -317,9 +317,9 @@ function EstilosHub() {
         font-size: 11px;
         font-weight: 700;
         letter-spacing: 0.02em;
-        color: var(--blue-primary);
-        background: rgba(59, 130, 246, 0.14);
-        border: 1px solid rgba(59, 130, 246, 0.3);
+        color: var(--adm-info);
+        background: rgba(74, 168, 216, 0.14);
+        border: 1px solid rgba(74, 168, 216, 0.3);
         border-radius: 999px;
       }
       .adm-hub-card__prev::before {
@@ -327,8 +327,8 @@ function EstilosHub() {
         width: 6px;
         height: 6px;
         border-radius: 50%;
-        background: var(--gd-teal-bright);
-        box-shadow: 0 0 8px var(--gd-teal-bright);
+        background: var(--adm-info);
+        box-shadow: 0 0 8px var(--adm-info-glow);
       }
       .adm-hub-card__arrow {
         position: absolute;

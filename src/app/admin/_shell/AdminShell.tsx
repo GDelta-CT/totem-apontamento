@@ -181,6 +181,16 @@ function EstilosShell() {
       /* ════════ Casca: fundo escuro + textura sutil; recria scroll/seleção ════════ */
       .adm-shell {
         --adm-gutter: 28px;
+        /* ── "Info" da CASA (escopado ao /admin) ──
+           A família "info" do painel NÃO usa o azul genérico --blue-primary
+           (#3b82f6, que o TOTEM usa e o fundador aprovou). Aqui ela é um
+           teal-ciano frio derivado da matiz da marca (hue ~200°, mesma família
+           navy/teal): claramente "da casa", forte no escuro (contraste >=5.9:1
+           sobre os fundos do painel) e distinguível do --gd-teal-bright (#1c84ad,
+           que marca ATIVO/FOCO/primário) — o info é mais claro/frio, lê como
+           "secundário/informativo" sem competir com o acento de ação. */
+        --adm-info: #4aa8d8;
+        --adm-info-glow: rgba(74, 168, 216, 0.3);
         min-height: 100dvh;
         overflow-y: auto;
         background: var(--bg-primary);
@@ -546,9 +556,9 @@ function EstilosShell() {
         border-color: rgba(148, 163, 184, 0.2);
       }
       .adm-pill.fam-info {
-        background: rgba(59, 130, 246, 0.14);
-        color: var(--blue-primary);
-        border-color: rgba(59, 130, 246, 0.3);
+        background: rgba(74, 168, 216, 0.14);
+        color: var(--adm-info);
+        border-color: rgba(74, 168, 216, 0.3);
       }
 
       /* ── Tabela: cabeçalho label-style, linhas com hairline escuro ── */

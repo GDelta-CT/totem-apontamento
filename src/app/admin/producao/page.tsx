@@ -444,11 +444,11 @@ function Estilos() {
         text-shadow: 0 0 16px var(--amber-glow);
       }
       .adm-prod-kpi.tone-info {
-        border-top-color: var(--blue-primary);
+        border-top-color: var(--adm-info);
       }
       .adm-prod-kpi.tone-info .adm-prod-kpi-num {
-        color: var(--blue-primary);
-        text-shadow: 0 0 16px var(--blue-glow);
+        color: var(--adm-info);
+        text-shadow: 0 0 16px var(--adm-info-glow);
       }
       .adm-prod-kpi.tone-bad {
         border-top-color: var(--red-primary);
@@ -544,7 +544,7 @@ function Estilos() {
         box-shadow: 0 0 8px var(--amber-glow);
       }
       .adm-prod-op-card.estado-sem_tarefa .adm-prod-op-dot {
-        background: var(--blue-primary);
+        background: var(--adm-info);
         opacity: 0.7;
       }
       .adm-prod-op-info {
@@ -571,7 +571,7 @@ function Estilos() {
         color: var(--amber-primary);
       }
       .adm-prod-op-card.estado-sem_tarefa .adm-prod-op-estado {
-        color: var(--blue-primary);
+        color: var(--adm-info);
       }
       .adm-prod-op-carro {
         font-size: 11px;
