@@ -4,14 +4,30 @@
  * /admin/anomalias — Correção de anomalias do admin (Passo 4 da ordem A.1).
  *
  * Lista apontamentos-fantasma (ativos além do teto de ~10,5h) e deixa o admin
- * fechá-los. A DETECÇÃO já funciona (leitura). A CORREÇÃO só grava após a
- * Migration 006 (grants) ser aplicada no teste — até lá mostra erro amigável.
+ * fechá-los via uma CORREÇÃO APPEND-ONLY: o tempo original é preservado e fica
+ * registrado quem corrigiu, quando e por quê. A DETECÇÃO já funciona (leitura).
+ * A CORREÇÃO só grava após a Migration 006 (grants) ser aplicada no teste — até
+ * lá mostra erro amigável.
  *
- * Padrão visual: tokens --gd-* + styled-jsx. Sem Tailwind no JSX.
+ * Visual (PIVÔ): usa o AdminShell ESCURO/INDUSTRIAL (mesmo idioma do totem),
+ * exatamente como /admin/os. Esta tela NÃO redeclara chrome — consome as classes
+ * do shell (adm-card/adm-flash/adm-empty/adm-btn/adm-field/adm-input/adm-select/
+ * adm-pill) + um bloco curto `adm-anom-*` para a lista de fantasmas e as horas
+ * em estilo "instrumento" (--red que brilha, mono-tabular). Números com
+ * `gd-tabular`. NENHUMA regra de negócio mudou — só a pele.
+ *
+ * Regras de negócio PRESERVADAS (CLAUDE.md), idênticas à versão anterior:
+ *  - Correção é APPEND-ONLY: registrarCorrecao não apaga; preserva o original.
+ *  - Motivo é OBRIGATÓRIO: "Registrar correção" fica desabilitado sem texto.
+ *  - motivo_codigo é lista fixa (esqueceu_parar / saiu_sem_registrar /
+ *    erro_toque / outro), default "esqueceu_parar".
+ *  - O count de anomalias alimenta o badge da aba (anomaliasCount no shell).
+ *  - G6: o flash de sucesso some sozinho em ~3s (erros NÃO auto-limpam).
  */
 
 import { useCallback, useEffect, useState } from 'react';
 import { AdminAuthGate } from '../AdminAuthGate';
+import { AdminShell } from '../_shell/AdminShell';
 import type { FetchState } from '@/lib/supabase/queries';
 import {
   listarAnomalias,
@@ -30,6 +46,36 @@ export default function AdminAnomaliasPage() {
 }
 
 const tetoHoras = (TETO_FANTASMA_MS / (60 * 60 * 1000)).toFixed(1).replace('.', ',');
+
+/** Ícone de atualizar (linha, herda currentColor) — substitui o ↻ textual. */
+function RefreshIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M20 11a8 8 0 1 0-.5 4"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+      <path d="M20 5v6h-6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/** Ícone "tudo certo" calmo (escudo com check) — substitui o emoji ✅. */
+function CheckShieldIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M12 3.5 19 6v5.5c0 4.3-2.9 7.4-7 8.9-4.1-1.5-7-4.6-7-8.9V6l7-2.5Z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path d="m9 12 2.2 2.2L15 10.4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
 
 function Anomalias() {
   const [lista, setLista] = useState<FetchState<Anomalia[]>>({ status: 'loading' });
@@ -56,6 +102,14 @@ function Anomalias() {
       cancelled = true;
     };
   }, []);
+
+  // G6: o flash de sucesso some sozinho em ~3s (erros NÃO auto-limpam — o admin
+  // precisa lê-los). Cleanup cancela o timer se a mensagem mudar/desmontar.
+  useEffect(() => {
+    if (!okMsg) return;
+    const t = setTimeout(() => setOkMsg(null), 3000);
+    return () => clearTimeout(t);
+  }, [okMsg]);
 
   const abrirCorrecao = (a: Anomalia) => {
     setErro(null);
@@ -92,72 +146,95 @@ function Anomalias() {
     recarregar();
   };
 
+  const totalAnomalias = lista.status === 'success' ? lista.data.length : 0;
+
   return (
-    <main className="wrap">
-      <header className="topbar">
-        <a className="voltar" href="/admin">
-          ← Painel
-        </a>
-        <strong>Anomalias de apontamento</strong>
-        <button className="btn-refresh" onClick={recarregar} title="Atualizar">
-          ↻
+    <AdminShell
+      abaAtiva="anomalias"
+      titulo="Anomalias"
+      subtitulo="Apontamentos-fantasma"
+      anomaliasCount={totalAnomalias}
+      acao={
+        <button
+          className="adm-btn adm-btn--ghost adm-anom-refresh"
+          onClick={recarregar}
+          title="Atualizar"
+          aria-label="Atualizar lista de anomalias"
+        >
+          <RefreshIcon />
+          Atualizar
         </button>
-      </header>
+      }
+    >
+      <p className="adm-anom-explica">
+        Apontamentos ativos abertos há mais de{' '}
+        <b className="gd-tabular">{tetoHoras}h</b> — provável esquecimento de fechar
+        (apontamento-fantasma). Feche para corrigir o tempo trabalhado.
+      </p>
 
-      <section className="conteudo">
-        <p className="explica">
-          Apontamentos ativos abertos há mais de <b>{tetoHoras}h</b> — provável esquecimento de
-          fechar (apontamento-fantasma). Feche para corrigir o tempo trabalhado.
-        </p>
+      {okMsg && <div className="adm-flash fam-ok adm-anom-flash">{okMsg}</div>}
+      {erro && <div className="adm-flash fam-bad adm-anom-flash">{erro}</div>}
 
-        {okMsg && <div className="flash ok">{okMsg}</div>}
-        {erro && <div className="flash erro">{erro}</div>}
+      {lista.status === 'loading' && <p className="adm-anom-info">Procurando anomalias…</p>}
 
-        {lista.status === 'loading' && <p className="muted">Procurando anomalias…</p>}
-        {lista.status === 'error' && (
-          <div className="flash erro">
-            {lista.message}{' '}
-            <button className="link" onClick={recarregar}>
-              Tentar de novo
-            </button>
+      {lista.status === 'error' && (
+        <div className="adm-flash fam-bad adm-anom-flash">
+          {lista.message}{' '}
+          <button className="adm-link" onClick={recarregar}>
+            Tentar de novo
+          </button>
+        </div>
+      )}
+
+      {lista.status === 'empty' && (
+        <div className="adm-card">
+          <div className="adm-empty">
+            <span className="adm-empty__ico" aria-hidden="true">
+              <CheckShieldIcon />
+            </span>
+            <span className="adm-empty__tit">Nenhuma anomalia</span>
+            <span className="adm-empty__sub">
+              Todos os apontamentos ativos estão dentro do teto de {tetoHoras}h.
+            </span>
           </div>
-        )}
-        {lista.status === 'empty' && (
-          <div className="vazio">
-            <span className="vazio-ic">✅</span>
-            Nenhuma anomalia. Todos os apontamentos ativos estão dentro do teto.
-          </div>
-        )}
+        </div>
+      )}
 
-        {lista.status === 'success' && (
-          <div className="tabela">
-            {lista.data.map((a) => (
-              <div className="item" key={a.id}>
-                <div className="linha">
-                  <div className="info">
-                    <strong>{a.nome_funcionario}</strong>
-                    <span className="sub">
-                      {a.placa ?? '—'} · {a.etapa ?? 'sem etapa'} · {a.status_tarefa}
+      {lista.status === 'success' && (
+        <div className="adm-anom-lista">
+          {lista.data.map((a) => {
+            const aberto = corrigindoId === a.id;
+            return (
+              <div className={'adm-card adm-anom-item' + (aberto ? ' is-aberto' : '')} key={a.id}>
+                <div className="adm-anom-linha">
+                  <div className="adm-anom-info">
+                    <strong className="adm-anom-nome">{a.nome_funcionario}</strong>
+                    <span className="adm-anom-sub">
+                      <span className="adm-anom-placa gd-tabular">{a.placa ?? '—'}</span>
+                      <span aria-hidden="true">·</span>
+                      <span>{a.etapa ?? 'sem etapa'}</span>
+                      <span aria-hidden="true">·</span>
+                      <span>{a.status_tarefa}</span>
                     </span>
                   </div>
-                  <span className="horas" title="Horas em aberto">
+                  <span className="adm-anom-horas gd-tabular" title="Horas em aberto">
                     {a.horasDecorridas.toFixed(1).replace('.', ',')}h
                   </span>
                   <button
-                    className="btn btn-fechar"
+                    className="adm-btn adm-btn--primary adm-anom-btn"
                     onClick={() => abrirCorrecao(a)}
-                    disabled={corrigindoId === a.id}
+                    disabled={aberto}
                   >
                     Corrigir
                   </button>
                 </div>
 
-                {corrigindoId === a.id && (
-                  <div className="correcao">
-                    <label className="campo">
-                      <span>Motivo (obrigatório)</span>
+                {aberto && (
+                  <div className="adm-anom-correcao">
+                    <label className="adm-field adm-anom-campo">
+                      <span className="adm-field__label">Motivo (obrigatório)</span>
                       <textarea
-                        className="motivo-txt"
+                        className="adm-input adm-anom-motivo"
                         value={motivoTxt}
                         onChange={(e) => setMotivoTxt(e.target.value)}
                         placeholder="Ex.: operário esqueceu de finalizar ao sair."
@@ -165,10 +242,10 @@ function Anomalias() {
                         autoFocus
                       />
                     </label>
-                    <label className="campo">
-                      <span>Tipo</span>
+                    <label className="adm-field adm-anom-campo">
+                      <span className="adm-field__label">Tipo</span>
                       <select
-                        className="motivo-cod"
+                        className="adm-select"
                         value={motivoCod}
                         onChange={(e) => setMotivoCod(e.target.value as MotivoCodigo)}
                       >
@@ -178,221 +255,181 @@ function Anomalias() {
                         <option value="outro">Outro</option>
                       </select>
                     </label>
-                    <div className="correcao-acoes">
+                    <div className="adm-anom-acoes">
                       <button
-                        className="btn btn-fechar"
+                        type="button"
+                        className="adm-btn adm-btn--ghost"
+                        onClick={cancelarCorrecao}
+                        disabled={salvando}
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="button"
+                        className="adm-btn adm-btn--primary"
                         onClick={() => confirmarCorrecao(a)}
                         disabled={salvando || !motivoTxt.trim()}
                       >
                         {salvando ? 'Registrando…' : 'Registrar correção'}
                       </button>
-                      <button className="btn btn-ghost" onClick={cancelarCorrecao} disabled={salvando}>
-                        Cancelar
-                      </button>
                     </div>
-                    <p className="correcao-nota">
+                    <p className="adm-anom-nota">
                       O tempo original é preservado. Fica registrado quem corrigiu, quando e por quê.
                     </p>
                   </div>
                 )}
               </div>
-            ))}
-          </div>
-        )}
-      </section>
+            );
+          })}
+        </div>
+      )}
 
-      <Estilos />
-    </main>
+      <EstilosAnomalias />
+    </AdminShell>
   );
 }
 
-function Estilos() {
+/**
+ * Estilos ESPECÍFICOS da tela de anomalias (namespaced `adm-anom-*`) no idioma
+ * ESCURO do totem: a lista de cartões-fantasma, as HORAS em estilo "instrumento"
+ * (--red que brilha, mono) e o formulário de correção append-only inline. O
+ * chrome e a linguagem de cartão/flash/empty/botão/campo vêm do AdminShell.
+ * Tokens da camada do totem (--bg-*, --text-*, --red-*); números com `gd-tabular`.
+ */
+function EstilosAnomalias() {
   return (
     <style jsx global>{`
-      .wrap {
-        min-height: 100vh;
-        background: var(--gd-paper, #f5f4f2);
-        color: var(--gd-ink, #0b2233);
-        font-family: 'Inter', system-ui, sans-serif;
-      }
-      .topbar {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        padding: 14px 24px;
-        background: var(--gd-navy, #0b3857);
-        color: #fff;
-      }
-      .topbar strong {
-        flex: 1;
-        font-size: 18px;
-      }
-      .voltar {
-        color: #cfe2ee;
-        text-decoration: none;
+      .adm-anom-explica {
+        color: var(--text-secondary);
         font-size: 14px;
+        line-height: 1.5;
+        margin: 0 0 18px;
+        max-width: 70ch;
       }
-      .btn-refresh {
-        background: rgba(255, 255, 255, 0.15);
-        border: none;
-        color: #fff;
-        width: 32px;
-        height: 32px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 16px;
+      .adm-anom-explica b {
+        color: var(--text-primary);
+        font-weight: 700;
       }
-      .conteudo {
-        max-width: 760px;
-        margin: 0 auto;
+      .adm-anom-info {
         padding: 24px;
-      }
-      .explica {
-        color: var(--gd-muted, #5d7689);
+        color: var(--text-secondary);
         font-size: 14px;
+      }
+      .adm-anom-flash {
         margin-bottom: 16px;
       }
-      .muted {
-        color: var(--gd-muted, #5d7689);
-      }
-      .vazio {
-        background: #fff;
-        border: 1px solid var(--gd-line, #d7dde2);
-        border-radius: 12px;
-        padding: 32px;
-        text-align: center;
-        color: var(--gd-muted, #5d7689);
+
+      /* Lista de fantasmas: cartões escuros empilhados */
+      .adm-anom-lista {
         display: flex;
         flex-direction: column;
-        gap: 8px;
-        align-items: center;
+        gap: 12px;
       }
-      .vazio-ic {
-        font-size: 28px;
+      .adm-anom-item.is-aberto {
+        border-color: rgba(28, 132, 173, 0.4);
       }
-      .tabela {
-        background: #fff;
-        border: 1px solid var(--gd-line, #d7dde2);
-        border-radius: 14px;
-        overflow: hidden;
-      }
-      .linha {
+
+      /* Linha-resumo do fantasma */
+      .adm-anom-linha {
         display: flex;
         align-items: center;
-        gap: 14px;
-        padding: 14px 16px;
-        border-bottom: 1px solid var(--gd-line, #d7dde2);
+        gap: 16px;
+        padding: 16px 20px;
       }
-      .linha:last-child {
-        border-bottom: none;
-      }
-      .info {
+      .adm-anom-info {
         flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        min-width: 0;
-      }
-      .info strong {
-        font-size: 15px;
-      }
-      .sub {
-        font-size: 13px;
-        color: var(--gd-muted, #5d7689);
-      }
-      .horas {
-        font-weight: 800;
-        font-size: 16px;
-        color: #b42323;
-      }
-      .btn {
-        border: none;
-        border-radius: 10px;
-        padding: 10px 16px;
-        font-weight: 700;
-        cursor: pointer;
-        font-size: 14px;
-      }
-      .btn-fechar {
-        background: var(--gd-teal-bright, #1c84ad);
-        color: #fff;
-      }
-      .btn-fechar:hover:not(:disabled) {
-        background: var(--gd-teal-hover, #2596c4);
-      }
-      .btn:disabled {
-        opacity: 0.6;
-        cursor: default;
-      }
-      .link {
-        background: none;
-        border: none;
-        color: var(--gd-teal-bright, #1c84ad);
-        cursor: pointer;
-        font-weight: 600;
-      }
-      .flash {
-        padding: 10px 14px;
-        border-radius: 10px;
-        margin-bottom: 14px;
-        font-size: 14px;
-      }
-      .flash.ok {
-        background: #e6f6ec;
-        color: #1b7a3d;
-      }
-      .flash.erro {
-        background: #fdeaea;
-        color: #b42323;
-      }
-      .item {
-        border-bottom: 1px solid var(--gd-line, #d7dde2);
-      }
-      .item:last-child {
-        border-bottom: none;
-      }
-      .item .linha {
-        border-bottom: none;
-      }
-      .correcao {
-        padding: 0 16px 16px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        background: #fafbfc;
-      }
-      .campo {
         display: flex;
         flex-direction: column;
         gap: 4px;
-        font-size: 13px;
-        color: var(--gd-muted, #5d7689);
+        min-width: 0;
       }
-      .motivo-txt,
-      .motivo-cod {
-        font-family: inherit;
-        font-size: 14px;
-        color: var(--gd-ink, #0b2233);
-        border: 1px solid var(--gd-line, #d7dde2);
-        border-radius: 8px;
-        padding: 8px 10px;
-        background: #fff;
-        resize: vertical;
+      .adm-anom-nome {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
       }
-      .correcao-acoes {
+      .adm-anom-sub {
         display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 7px;
+        font-size: 13px;
+        color: var(--text-secondary);
+      }
+      /* Placa = "instrumento" do totem: caixa escura + borda teal + mono */
+      .adm-anom-placa {
+        font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+        font-weight: 700;
+        font-size: 12px;
+        letter-spacing: 0.1em;
+        color: var(--text-primary);
+        background: rgba(3, 7, 15, 0.6);
+        border: 1px solid rgba(28, 132, 173, 0.4);
+        border-radius: 6px;
+        padding: 2px 8px;
+      }
+
+      /* Horas em aberto: número-instrumento vermelho que BRILHA (sinal de risco) */
+      .adm-anom-horas {
+        flex-shrink: 0;
+        font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+        font-weight: 800;
+        font-size: 18px;
+        letter-spacing: 0.02em;
+        color: var(--red-primary);
+        text-shadow: 0 0 14px var(--red-glow);
+      }
+      .adm-anom-btn {
+        flex-shrink: 0;
+      }
+
+      /* Formulário de correção inline (append-only) — superfície prensada mais
+         baixa, separada por hairline do topo */
+      .adm-anom-correcao {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        padding: 18px 20px 20px;
+        border-top: 1px solid var(--border-default);
+        background: rgba(3, 7, 15, 0.35);
+        border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+      }
+      /* Os campos do shell trazem margin-bottom; aqui o gap do flex já cuida. */
+      .adm-anom-campo {
+        margin-bottom: 0;
+      }
+      .adm-anom-motivo {
+        resize: vertical;
+        min-height: 60px;
+        line-height: 1.45;
+      }
+      .adm-anom-acoes {
+        display: flex;
+        justify-content: flex-end;
         gap: 8px;
         margin-top: 2px;
       }
-      .btn-ghost {
-        background: transparent;
-        color: var(--gd-muted, #5d7689);
-        border: 1px solid var(--gd-line, #d7dde2);
-      }
-      .correcao-nota {
+      .adm-anom-nota {
         font-size: 12px;
-        color: var(--gd-muted, #5d7689);
+        color: var(--text-muted);
         margin: 0;
+        line-height: 1.45;
+      }
+
+      @media (max-width: 560px) {
+        .adm-anom-linha {
+          flex-wrap: wrap;
+          gap: 12px;
+        }
+        .adm-anom-info {
+          flex-basis: 100%;
+        }
+        .adm-anom-acoes {
+          flex-direction: column-reverse;
+        }
+        .adm-anom-acoes .adm-btn {
+          width: 100%;
+        }
       }
     `}</style>
   );

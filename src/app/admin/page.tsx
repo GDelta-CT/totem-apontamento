@@ -2,9 +2,13 @@
 
 /**
  * /admin — Painel do Gestor (hub de navegação).
- * Porta de entrada do gestor/dono: cabeçalho de marca + selo do usuário +
- * cartões para as áreas (OS · Equipe · Produção ao vivo). Segue o
- * docs/GUIA-DESIGN.md (tokens --gd-*, Inter, superfícies claras).
+ * Porta de entrada do gestor/dono. Agora fala o MESMO idioma ESCURO/INDUSTRIAL
+ * do totem e da tela de OS: consome o AdminShell (marca + chip de usuário + Sair
+ * + abas vivem no shell — NÃO redeclarados aqui) e usa a linguagem de cartão
+ * `adm-*` do shell sobre os tokens da camada do totem.
+ *
+ * Como home, entra com `abaAtiva={null}` (fora das abas). As abas do shell são a
+ * navegação persistente; os cartões abaixo são a ENTRADA destacada da home.
  *
  * A "prova do isolamento" (e-mail + oficina_id carimbado no JWT + papel) fica
  * numa linha de sessão discreta no rodapé — útil pra conferência, sem cara de
@@ -12,14 +16,16 @@
  */
 
 import { useEffect, useState } from 'react';
-import { getSupabase } from '@/lib/supabase/client';
 import { AdminAuthGate } from './AdminAuthGate';
+import { AdminShell } from './_shell/AdminShell';
 import { cracheDaSessao, papelDoUsuarioAtual } from '@/lib/supabase/admin-queries';
 
 export default function AdminPage() {
   return (
     <AdminAuthGate>
-      <AdminHome />
+      <AdminShell abaAtiva={null} titulo="Painel">
+        <AdminHome />
+      </AdminShell>
     </AdminAuthGate>
   );
 }
@@ -146,419 +152,260 @@ function AdminHome() {
     });
   }, []);
 
-  const sair = async () => {
-    await getSupabase().auth.signOut();
-  };
-
-  const iniciais = (email ?? '?').split('@')[0].slice(0, 2).toUpperCase();
-
   const heroes = CARDS.filter((c) => c.hero);
   const gestao = CARDS.filter((c) => !c.hero);
 
   return (
-    <main className="wrap">
-      <header className="topbar">
-        <div className="brand">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/gdelta-symbol.png" alt="" className="brand-symbol" />
-          <span className="brand-title">Painel do Gestor</span>
-        </div>
-        <div className="user">
-          <span className="avatar" aria-hidden="true">
-            {iniciais}
-          </span>
-          <div className="user-info">
-            <strong>{email ?? '—'}</strong>
-            {papel && <span className="user-papel">{papel}</span>}
-          </div>
-          <button className="btn-sair" onClick={sair}>
-            Sair
-          </button>
-        </div>
+    <div className="adm-hub">
+      <header className="adm-hub-hello">
+        <h1 className="adm-hub-hello__tit">Aqui está sua oficina agora.</h1>
+        <p className="adm-hub-hello__sub">Escolha por onde começar.</p>
       </header>
 
-      <section className="conteudo">
-        <header className="hello">
-          <h1 className="hello-tit">Aqui está sua oficina agora.</h1>
-          <p className="hello-sub">Escolha por onde começar.</p>
-        </header>
-
-        <div className="grid">
-          <div className="col col-hero">
-            {heroes.map((c) => (
-              <a key={c.href} href={c.href} className="card card--hero">
-                <span className="card-ic" aria-hidden="true">
-                  <CardIcon id={c.icone} />
-                </span>
-                <span className="card-body">
-                  <strong className="card-tit">{c.titulo}</strong>
-                  <span className="card-sub">{c.sub}</span>
-                  {c.preview && <span className="card-prev">{c.preview}</span>}
-                </span>
-                <span className="card-arrow" aria-hidden="true">
-                  <ArrowIcon />
-                </span>
-              </a>
-            ))}
-          </div>
-
-          <div className="col col-side">
-            {gestao.map((c) => (
-              <a key={c.href} href={c.href} className="card card--side">
-                <span className="card-ic" aria-hidden="true">
-                  <CardIcon id={c.icone} />
-                </span>
-                <span className="card-body">
-                  <strong className="card-tit">{c.titulo}</strong>
-                  <span className="card-sub">{c.sub}</span>
-                </span>
-                <span className="card-arrow" aria-hidden="true">
-                  <ArrowIcon />
-                </span>
-              </a>
-            ))}
-          </div>
+      <div className="adm-hub-grid">
+        <div className="adm-hub-col">
+          {heroes.map((c) => (
+            <a key={c.href} href={c.href} className="adm-card adm-card--hover adm-hub-card adm-hub-card--hero">
+              <span className="adm-hub-card__ic" aria-hidden="true">
+                <CardIcon id={c.icone} />
+              </span>
+              <span className="adm-hub-card__body">
+                <strong className="adm-hub-card__tit">{c.titulo}</strong>
+                <span className="adm-hub-card__sub">{c.sub}</span>
+                {c.preview && <span className="adm-hub-card__prev">{c.preview}</span>}
+              </span>
+              <span className="adm-hub-card__arrow" aria-hidden="true">
+                <ArrowIcon />
+              </span>
+            </a>
+          ))}
         </div>
 
-        <div className="sessao" title="Prova do isolamento multi-tenant">
-          <span className="sessao-lbl">Sessão</span>
-          <span className="sessao-val">{email ?? '—'}</span>
-          <span className="sessao-sep">·</span>
-          <span className="sessao-papel">{papel ?? '—'}</span>
-          <span className="sessao-sep">·</span>
-          <span className="sessao-oid gd-tabular">
-            oficina {oficinaJWT ? '…' + oficinaJWT.slice(-6) : '—'}
-          </span>
+        <div className="adm-hub-col">
+          {gestao.map((c) => (
+            <a key={c.href} href={c.href} className="adm-card adm-card--hover adm-hub-card adm-hub-card--side">
+              <span className="adm-hub-card__ic" aria-hidden="true">
+                <CardIcon id={c.icone} />
+              </span>
+              <span className="adm-hub-card__body">
+                <strong className="adm-hub-card__tit">{c.titulo}</strong>
+                <span className="adm-hub-card__sub">{c.sub}</span>
+              </span>
+              <span className="adm-hub-card__arrow" aria-hidden="true">
+                <ArrowIcon />
+              </span>
+            </a>
+          ))}
         </div>
-      </section>
+      </div>
 
-      <Estilos />
-    </main>
+      <div className="adm-hub-sessao" title="Prova do isolamento multi-tenant">
+        <span className="adm-hub-sessao__lbl">Sessão</span>
+        <span className="adm-hub-sessao__val">{email ?? '—'}</span>
+        <span className="adm-hub-sessao__sep">·</span>
+        <span className="adm-hub-sessao__papel">{papel ?? '—'}</span>
+        <span className="adm-hub-sessao__sep">·</span>
+        <span className="adm-hub-sessao__oid gd-tabular">
+          oficina {oficinaJWT ? '…' + oficinaJWT.slice(-6) : '—'}
+        </span>
+      </div>
+
+      <EstilosHub />
+    </div>
   );
 }
 
-function Estilos() {
+/**
+ * Estilos ESPECÍFICOS do hub (namespaced `adm-hub-*`), em <style jsx> NÃO-global
+ * para não vazar. A casca, o cartão (`adm-card`/`adm-card--hover`), a marca, o
+ * chip e as abas vêm do AdminShell. Aqui só a grade assimétrica da home, o miolo
+ * do cartão (ícone/título/sub/prévia/seta) no idioma escuro e a linha de sessão
+ * — tudo sobre os tokens da camada do totem (--bg-*, --text-*, --*-primary/-glow,
+ * --border-*, --radius-*, --gd-navy/teal).
+ */
+function EstilosHub() {
   return (
-    <style jsx global>{`
-      .wrap {
-        min-height: 100vh;
-        background: var(--gd-app-bg);
-        color: var(--gd-ink);
-        font-family: 'Inter', system-ui, sans-serif;
+    <style jsx>{`
+      .adm-hub-hello {
+        margin: 0 0 24px;
       }
-
-      /* ── Header navy de comando + filete teal (padroniza as 3 telas) ── */
-      .topbar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: var(--gd-sp-4);
-        padding: var(--gd-sp-3) var(--gd-sp-6);
-        background: var(--gd-navy);
-        border-bottom: 2px solid var(--gd-teal-bright);
-        box-shadow: 0 1px 0 rgba(11, 56, 87, 0.12);
-      }
-      .brand {
-        display: flex;
-        align-items: center;
-        gap: var(--gd-sp-3);
-        min-width: 0;
-      }
-      .brand-symbol {
-        width: 30px;
-        height: 30px;
-        object-fit: contain;
-        user-select: none;
-        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
-      }
-      .brand-title {
-        font-size: var(--gd-fs-h3);
-        font-weight: 700;
-        color: var(--gd-white);
-        letter-spacing: -0.01em;
-        white-space: nowrap;
-      }
-
-      /* ── Chip do usuário sobre o navy ── */
-      .user {
-        display: flex;
-        align-items: center;
-        gap: var(--gd-sp-2);
-        min-width: 0;
-        padding: 5px 5px 5px 6px;
-        background: rgba(255, 255, 255, 0.07);
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        border-radius: var(--gd-r-pill);
-      }
-      .avatar {
-        flex-shrink: 0;
-        width: 34px;
-        height: 34px;
-        border-radius: 50%;
-        background: linear-gradient(160deg, var(--gd-teal-bright), var(--gd-teal));
-        color: var(--gd-white);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: var(--gd-fs-cap);
-        font-weight: 700;
-        letter-spacing: 0.5px;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
-      }
-      .user-info {
-        display: flex;
-        flex-direction: column;
-        line-height: 1.25;
-        min-width: 0;
-        padding: 0 var(--gd-sp-1);
-      }
-      .user-info strong {
-        font-size: var(--gd-fs-cap);
-        font-weight: 600;
-        color: var(--gd-white);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 200px;
-      }
-      .user-papel {
-        font-size: var(--gd-fs-micro);
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.6px;
-        color: rgba(255, 255, 255, 0.62);
-      }
-      .btn-sair {
-        margin-left: 2px;
-        padding: 7px 14px;
-        border-radius: var(--gd-r-pill);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        background: rgba(255, 255, 255, 0.04);
-        color: rgba(255, 255, 255, 0.82);
-        font-weight: 600;
-        font-size: var(--gd-fs-cap);
-        cursor: pointer;
-        transition:
-          background var(--gd-dur-fast) var(--gd-ease),
-          color var(--gd-dur-fast) var(--gd-ease),
-          border-color var(--gd-dur-fast) var(--gd-ease);
-      }
-      .btn-sair:hover {
-        background: rgba(255, 255, 255, 0.14);
-        border-color: rgba(255, 255, 255, 0.32);
-        color: var(--gd-white);
-      }
-
-      /* ── Conteúdo ── */
-      .conteudo {
-        max-width: 1040px;
-        margin: 0 auto;
-        padding: var(--gd-sp-6);
-      }
-      .hello {
-        margin: 0 0 var(--gd-sp-5);
-      }
-      .hello-tit {
+      .adm-hub-hello__tit {
         font-size: clamp(22px, 2.6vw, 30px);
         font-weight: 800;
         letter-spacing: -0.02em;
-        color: var(--gd-navy);
+        color: var(--text-primary);
         margin: 0;
       }
-      .hello-sub {
-        margin: var(--gd-sp-2) 0 0;
-        font-size: var(--gd-fs-body);
-        color: var(--gd-muted);
+      .adm-hub-hello__sub {
+        margin: 8px 0 0;
+        font-size: 14px;
+        color: var(--text-secondary);
       }
 
-      /* ── Grid assimétrico: heróis (2fr) | gestão (1fr) ── */
-      .grid {
+      /* Grid assimétrico: heróis (2fr) | gestão (1fr) */
+      .adm-hub-grid {
         display: grid;
         grid-template-columns: 2fr 1fr;
-        gap: var(--gd-sp-5);
+        gap: 24px;
         align-items: start;
       }
-      .col {
+      .adm-hub-col {
         display: flex;
         flex-direction: column;
-        gap: var(--gd-sp-4);
+        gap: 16px;
         min-width: 0;
       }
 
-      /* ── Assinatura do card premium ── */
-      .card {
+      /* Miolo do cartão (a superfície/hover/sombra vêm de .adm-card / .adm-card--hover) */
+      .adm-hub-card {
         position: relative;
         display: flex;
         align-items: flex-start;
-        gap: var(--gd-sp-4);
-        padding: var(--gd-sp-5);
-        background: var(--gd-white);
-        border: 1px solid var(--gd-border);
-        border-radius: var(--gd-r-card);
+        gap: 16px;
+        padding: 24px;
         text-decoration: none;
-        color: var(--gd-ink);
-        box-shadow:
-          var(--gd-elev-1),
-          var(--gd-hairline-top);
-        transition:
-          transform var(--gd-dur-fast) var(--gd-ease),
-          box-shadow var(--gd-dur-fast) var(--gd-ease),
-          border-color var(--gd-dur-fast) var(--gd-ease);
-      }
-      .card:hover {
-        transform: translateY(-2px);
-        border-color: var(--gd-border-strong);
-        box-shadow:
-          var(--gd-elev-2),
-          var(--gd-hairline-top);
-      }
-      .card:active {
-        transform: translateY(0);
+        color: var(--text-primary);
       }
 
-      .card-ic {
+      .adm-hub-card__ic {
         flex-shrink: 0;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         width: 44px;
         height: 44px;
-        border-radius: var(--gd-r-control);
-        background: rgba(28, 132, 173, 0.1);
-        color: var(--gd-navy);
+        border-radius: var(--radius-lg);
+        background: rgba(28, 132, 173, 0.12);
+        border: 1px solid rgba(28, 132, 173, 0.22);
+        color: var(--gd-teal-bright);
         transition:
-          background var(--gd-dur-fast) var(--gd-ease),
-          color var(--gd-dur-fast) var(--gd-ease);
+          background 180ms cubic-bezier(0.4, 0, 0.2, 1),
+          color 180ms cubic-bezier(0.4, 0, 0.2, 1),
+          box-shadow 180ms cubic-bezier(0.4, 0, 0.2, 1);
       }
-      .card:hover .card-ic {
-        background: rgba(28, 132, 173, 0.16);
-        color: var(--gd-teal);
+      .adm-hub-card:hover .adm-hub-card__ic {
+        background: rgba(28, 132, 173, 0.2);
+        color: var(--gd-teal-hover);
+        box-shadow: 0 0 16px rgba(28, 132, 173, 0.35);
       }
-      .card-body {
+      .adm-hub-card__body {
         display: flex;
         flex-direction: column;
         gap: 3px;
         min-width: 0;
-        padding-right: var(--gd-sp-5);
+        padding-right: 24px;
       }
-      .card-tit {
-        font-size: var(--gd-fs-h3);
-        font-weight: 700;
-        color: var(--gd-navy);
+      .adm-hub-card__tit {
+        font-size: 16px;
+        font-weight: 800;
         letter-spacing: -0.01em;
+        color: var(--text-primary);
       }
-      .card-sub {
-        font-size: var(--gd-fs-cap);
-        color: var(--gd-muted);
+      .adm-hub-card__sub {
+        font-size: 12.5px;
+        color: var(--text-secondary);
         line-height: 1.4;
       }
-      .card-prev {
-        margin-top: var(--gd-sp-2);
+      /* Prévia: pílula de info no idioma escuro (família "info" do shell) */
+      .adm-hub-card__prev {
+        margin-top: 8px;
         display: inline-flex;
         align-items: center;
         gap: 7px;
         align-self: flex-start;
-        padding: 4px 10px 4px 9px;
-        font-size: var(--gd-fs-micro);
-        font-weight: 600;
+        padding: 4px 11px 4px 9px;
+        font-size: 11px;
+        font-weight: 700;
         letter-spacing: 0.02em;
-        color: var(--gd-info-ink);
-        background: var(--gd-info-fill);
-        border-radius: var(--gd-r-pill);
+        color: var(--blue-primary);
+        background: rgba(59, 130, 246, 0.14);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        border-radius: 999px;
       }
-      .card-prev::before {
+      .adm-hub-card__prev::before {
         content: '';
         width: 6px;
         height: 6px;
         border-radius: 50%;
         background: var(--gd-teal-bright);
+        box-shadow: 0 0 8px var(--gd-teal-bright);
       }
-      .card-arrow {
+      .adm-hub-card__arrow {
         position: absolute;
-        top: var(--gd-sp-5);
-        right: var(--gd-sp-4);
+        top: 24px;
+        right: 18px;
         display: inline-flex;
-        color: var(--gd-border-strong);
+        color: var(--text-muted);
         transition:
-          color var(--gd-dur-fast) var(--gd-ease),
-          transform var(--gd-dur-fast) var(--gd-ease);
+          color 180ms cubic-bezier(0.4, 0, 0.2, 1),
+          transform 180ms cubic-bezier(0.4, 0, 0.2, 1);
       }
-      .card:hover .card-arrow {
+      .adm-hub-card:hover .adm-hub-card__arrow {
         color: var(--gd-teal-bright);
         transform: translateX(3px);
       }
 
       /* Heróis: mais presença vertical; gestão: compactos e discretos */
-      .card--hero {
-        padding: var(--gd-sp-6) var(--gd-sp-5);
+      .adm-hub-card--hero {
+        padding: 32px 24px;
       }
-      .card--hero .card-ic {
+      .adm-hub-card--hero .adm-hub-card__ic {
         width: 50px;
         height: 50px;
       }
-      .card--hero .card-tit {
+      .adm-hub-card--hero .adm-hub-card__tit {
         font-size: clamp(17px, 1.4vw, 20px);
       }
-      .card--side {
-        padding: var(--gd-sp-4) var(--gd-sp-5);
-        background: rgba(255, 255, 255, 0.86);
+      .adm-hub-card--side {
+        padding: 18px 24px;
       }
-      .card--side .card-ic {
+      .adm-hub-card--side .adm-hub-card__ic {
         width: 38px;
         height: 38px;
       }
-      .card--side .card-ic svg {
+      .adm-hub-card--side .adm-hub-card__ic :global(svg) {
         width: 19px;
         height: 19px;
       }
-      .card--side .card-arrow {
-        top: var(--gd-sp-4);
+      .adm-hub-card--side .adm-hub-card__arrow {
+        top: 18px;
       }
 
-      /* ── Linha de sessão (rodapé discreto) ── */
-      .sessao {
+      /* Linha de sessão (rodapé discreto) */
+      .adm-hub-sessao {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-        gap: var(--gd-sp-2);
-        margin-top: var(--gd-sp-6);
-        padding-top: var(--gd-sp-4);
-        border-top: 1px solid var(--gd-border);
-        font-size: var(--gd-fs-cap);
-        color: var(--gd-muted);
+        gap: 8px;
+        margin-top: 32px;
+        padding-top: 16px;
+        border-top: 1px solid var(--border-default);
+        font-size: 12.5px;
+        color: var(--text-secondary);
       }
-      .sessao-lbl {
-        font-size: var(--gd-fs-micro);
+      .adm-hub-sessao__lbl {
+        font-size: 11px;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.6px;
-        color: var(--gd-muted);
-        opacity: 0.7;
+        color: var(--text-muted);
       }
-      .sessao-papel {
+      .adm-hub-sessao__papel {
         font-weight: 700;
-        color: var(--gd-teal);
+        color: var(--gd-teal-bright);
         text-transform: capitalize;
       }
-      .sessao-sep {
-        color: var(--gd-border-strong);
+      .adm-hub-sessao__sep {
+        color: var(--text-muted);
+      }
+      .adm-hub-sessao__oid {
+        color: var(--text-secondary);
       }
 
-      /* ── Responsivo: empilha no tablet/mobile ── */
+      /* Responsivo: empilha no tablet/mobile */
       @media (max-width: 860px) {
-        .grid {
+        .adm-hub-grid {
           grid-template-columns: 1fr;
-        }
-      }
-      @media (max-width: 560px) {
-        .conteudo {
-          padding: var(--gd-sp-5) var(--gd-sp-4);
-        }
-        .topbar {
-          padding: var(--gd-sp-3) var(--gd-sp-4);
-        }
-        .user-info {
-          display: none;
         }
       }
     `}</style>

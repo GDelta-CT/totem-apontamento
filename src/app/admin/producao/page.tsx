@@ -7,11 +7,23 @@
  * 3 estados do operário) e "que carro está travado/lento?" (kanban por etapa +
  * marca de bloqueio). Auto-atualiza a cada 20s. Só leitura.
  *
- * Padrão visual: tokens --gd-* + styled-jsx (mesmo do totem). Sem Tailwind no JSX.
+ * Visual (PIVÔ): usa o AdminShell ESCURO/INDUSTRIAL (mesmo idioma do totem).
+ * Esta tela NÃO redeclara chrome — o shell provê barra de comando, abas e a
+ * linguagem de cartão/pílula/botão. O selo AO VIVO vai no `subtitulo` do shell.
+ * Só um bloco curto `adm-prod-*` (namespaced) cobre o que é próprio desta tela:
+ * os KPIs com benchmark, a faixa "Equipe agora" e o KANBAN premium (cards
+ * FLUTUANDO sobre colunas-fantasma = trilhas escuras recuadas com borda
+ * tracejada). Tokens da camada do totem (--bg-*, --text-*, --*-primary/-glow,
+ * --gd-*). Números com `gd-tabular` que brilham; dot vivo com `gd-live-dot`.
+ *
+ * NENHUMA regra de negócio mudou — só a pele. Lógica PRESERVADA 100%:
+ * REFRESH_MS=20000 + setInterval + cleanup, carregarVisaoLive, agrupamento por
+ * etapa, os 3 estados e as keys estáveis (sem flash a cada refresh).
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AdminAuthGate } from '../AdminAuthGate';
+import { AdminShell } from '../_shell/AdminShell';
 import type { FetchState } from '@/lib/supabase/queries';
 import {
   carregarVisaoLive,
@@ -59,36 +71,41 @@ function Producao() {
     };
   }, []);
 
-  return (
-    <main className="wrap">
-      <header className="topbar">
-        <a className="voltar" href="/admin">
-          <IconArrow />
-          Painel
-        </a>
-        <div className="topbar-title">
-          <strong>Produção ao vivo</strong>
-          <span className="selo-live" aria-label="Atualizando ao vivo">
-            <span className="selo-dot gd-live-dot" />
-            <span className="selo-lbl">AO VIVO</span>
-            <span className="selo-sep" />
-            <span className="selo-time gd-tabular">
-              {ultimaAtualizacao
-                ? ultimaAtualizacao.toLocaleTimeString('pt-BR')
-                : '—'}
-            </span>
-          </span>
-        </div>
-        <button className="btn-refresh" onClick={carregar} title="Atualizar agora" aria-label="Atualizar agora">
-          <IconRefresh />
-        </button>
-      </header>
+  // Selo AO VIVO + timestamp do servidor → vai no subtítulo do shell.
+  const selo = (
+    <>
+      <span className="adm-prod-dot gd-live-dot" aria-hidden="true" />
+      AO VIVO
+      <span className="adm-prod-selo-sep" aria-hidden="true" />
+      <span className="adm-prod-selo-time gd-tabular">
+        {ultimaAtualizacao ? ultimaAtualizacao.toLocaleTimeString('pt-BR') : '—'}
+      </span>
+    </>
+  );
 
-      {estado.status === 'loading' && <p className="info">Carregando o pátio…</p>}
+  return (
+    <AdminShell
+      abaAtiva="producao"
+      titulo="Produção ao vivo"
+      subtitulo={selo}
+      acao={
+        <button
+          className="adm-btn adm-btn--ghost"
+          onClick={carregar}
+          title="Atualizar agora"
+          aria-label="Atualizar agora"
+        >
+          <IconRefresh />
+          Atualizar
+        </button>
+      }
+    >
+      {estado.status === 'loading' && <p className="adm-prod-info">Carregando o pátio…</p>}
+
       {estado.status === 'error' && (
-        <div className="info erro">
+        <div className="adm-flash fam-bad adm-prod-flash">
           {estado.message}{' '}
-          <button className="link" onClick={carregar}>
+          <button className="adm-link" onClick={carregar}>
             Tentar de novo
           </button>
         </div>
@@ -103,22 +120,14 @@ function Producao() {
       )}
 
       <Estilos />
-    </main>
+    </AdminShell>
   );
 }
 
 /* ─── Ícones SVG inline (stroke currentColor 1.5px) ─── */
-function IconArrow() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M19 12H5" />
-      <path d="m12 19-7-7 7-7" />
-    </svg>
-  );
-}
 function IconRefresh() {
   return (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
       <path d="M21 3v5h-5" />
       <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
@@ -162,15 +171,15 @@ function ResumoEstados({ visao }: { visao: VisaoLive }) {
     { key: 'bloqueados', label: 'Bloqueados', valor: r.carrosBloqueados, tone: 'bad' },
   ];
   return (
-    <section className="resumo">
+    <section className="adm-prod-resumo">
       {cards.map((c) => (
-        <div className={'kpi tone-' + c.tone} key={c.key}>
-          <span className="kpi-num gd-tabular">
+        <div className={'adm-prod-kpi tone-' + c.tone} key={c.key}>
+          <span className="adm-prod-kpi-num gd-tabular">
             {c.valor}
-            {c.de != null && <span className="kpi-de gd-tabular">/{c.de}</span>}
+            {c.de != null && <span className="adm-prod-kpi-de gd-tabular">/{c.de}</span>}
           </span>
-          <span className="kpi-lbl">{c.label}</span>
-          {c.nota && <span className="kpi-nota">{c.nota}</span>}
+          <span className="adm-prod-kpi-lbl">{c.label}</span>
+          {c.nota && <span className="adm-prod-kpi-nota">{c.nota}</span>}
         </div>
       ))}
     </section>
@@ -183,44 +192,44 @@ function FaixaOperarios({ visao }: { visao: VisaoLive }) {
     (a, b) => ordem.indexOf(a.estado) - ordem.indexOf(b.estado)
   );
   return (
-    <section className="faixa">
-      <div className="faixa-head">
-        <h2 className="sec-titulo">Equipe agora</h2>
-        <span className="faixa-hint">todo mundo produzindo?</span>
+    <section className="adm-prod-faixa">
+      <div className="adm-prod-faixa-head">
+        <h2 className="adm-prod-sec-titulo">Equipe agora</h2>
+        <span className="adm-prod-faixa-hint">todo mundo produzindo?</span>
       </div>
       {ops.length === 0 ? (
-        <p className="faixa-vazia">Ninguém apontou ainda hoje.</p>
+        <p className="adm-prod-faixa-vazia">Ninguém apontou ainda hoje.</p>
       ) : (
-      <div className="op-grid">
-        {ops.map((o, i) => {
-          const meta = ESTADO_LABEL[o.estado];
-          // divisor sutil quando o grupo de estado muda (produzindo → pausa → sem tarefa)
-          const novoGrupo = i > 0 && ops[i - 1].estado !== o.estado;
-          return (
-            <div className="op-cell" key={o.nome}>
-              {novoGrupo && <span className="op-divisor" aria-hidden="true" />}
-              <div className={'op-card estado-' + o.estado}>
-                <span
-                  className={'op-dot' + (o.estado === 'produzindo' ? ' gd-live-dot' : '')}
-                />
-                <div className="op-info">
-                  <strong>{o.nome}</strong>
-                  <span className="op-estado">
-                    {meta.texto}
-                    {o.estado === 'em_pausa' && o.motivoPausa ? ` · ${o.motivoPausa}` : ''}
-                  </span>
-                  {o.placaAtual && (
-                    <span className="op-carro gd-tabular">
-                      {o.placaAtual}
-                      {o.etapaAtual ? ` · ${o.etapaAtual}` : ''}
+        <div className="adm-prod-op-grid">
+          {ops.map((o, i) => {
+            const meta = ESTADO_LABEL[o.estado];
+            // divisor sutil quando o grupo de estado muda (produzindo → pausa → sem tarefa)
+            const novoGrupo = i > 0 && ops[i - 1].estado !== o.estado;
+            return (
+              <div className="adm-prod-op-cell" key={o.nome}>
+                {novoGrupo && <span className="adm-prod-op-divisor" aria-hidden="true" />}
+                <div className={'adm-prod-op-card estado-' + o.estado}>
+                  <span
+                    className={'adm-prod-op-dot' + (o.estado === 'produzindo' ? ' gd-live-dot' : '')}
+                  />
+                  <div className="adm-prod-op-info">
+                    <strong>{o.nome}</strong>
+                    <span className="adm-prod-op-estado">
+                      {meta.texto}
+                      {o.estado === 'em_pausa' && o.motivoPausa ? ` · ${o.motivoPausa}` : ''}
                     </span>
-                  )}
+                    {o.placaAtual && (
+                      <span className="adm-prod-op-carro gd-tabular">
+                        {o.placaAtual}
+                        {o.etapaAtual ? ` · ${o.etapaAtual}` : ''}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
       )}
     </section>
   );
@@ -230,21 +239,21 @@ function Kanban({ visao }: { visao: VisaoLive }) {
   const comCarros = visao.colunas.filter((c) => c.carros.length > 0);
   const semNenhum = visao.carros.length === 0;
   return (
-    <section className="kanban-sec">
-      <h2 className="sec-titulo">Pátio por etapa</h2>
-      {semNenhum && <p className="info">Nenhum carro ativo no pátio.</p>}
-      <div className="kanban">
+    <section className="adm-prod-kanban-sec">
+      <h2 className="adm-prod-sec-titulo">Pátio por etapa</h2>
+      {semNenhum && <p className="adm-prod-info">Nenhum carro ativo no pátio.</p>}
+      <div className="adm-prod-kanban">
         {comCarros.map((col) => (
-          <div className="coluna" key={col.etapa}>
-            <header className="col-head">
-              <span className="col-nome">{col.nome}</span>
-              <span className="col-count gd-tabular">{col.carros.length}</span>
+          <div className="adm-prod-coluna" key={col.etapa}>
+            <header className="adm-prod-col-head">
+              <span className="adm-prod-col-nome">{col.nome}</span>
+              <span className="adm-prod-col-count gd-tabular">{col.carros.length}</span>
             </header>
-            <div className="col-trilha">
+            <div className="adm-prod-col-trilha">
               {col.carros.length > 0 ? (
                 col.carros.map((carro) => <CardCarro key={carro.id} carro={carro} />)
               ) : (
-                <p className="col-vazia">— sem carros nesta etapa</p>
+                <p className="adm-prod-col-vazia">— sem carros nesta etapa</p>
               )}
             </div>
           </div>
@@ -260,11 +269,11 @@ function Kanban({ visao }: { visao: VisaoLive }) {
 function SemEtapa({ carros }: { carros: CarroLive[] }) {
   if (carros.length === 0) return null;
   return (
-    <div className="sem-etapa">
-      <h3 className="sec-titulo">
-        Sem etapa iniciada <span className="col-count gd-tabular">{carros.length}</span>
+    <div className="adm-prod-sem-etapa">
+      <h3 className="adm-prod-sec-titulo">
+        Sem etapa iniciada <span className="adm-prod-col-count gd-tabular">{carros.length}</span>
       </h3>
-      <div className="sem-etapa-grid">
+      <div className="adm-prod-sem-etapa-grid">
         {carros.map((c) => (
           <CardCarro key={c.id} carro={c} />
         ))}
@@ -278,35 +287,33 @@ function CardCarro({ carro }: { carro: CarroLive }) {
   const atrasada =
     carro.data_prometida && new Date(carro.data_prometida) < new Date() ? true : false;
   return (
-    <div className={'card sit-' + carro.situacao}>
-      <div className="card-top">
-        <strong className="card-placa gd-tabular">{carro.placa}</strong>
+    <div className={'adm-prod-card sit-' + carro.situacao}>
+      <div className="adm-prod-card-top">
+        <strong className="adm-prod-card-placa gd-tabular">{carro.placa}</strong>
         {carro.bloqueado && (
-          <span className="tag bloq">
+          <span className="adm-prod-tag bloq">
             <IconLock />
             bloqueado
           </span>
         )}
-        {atrasada && <span className="tag atraso">atrasado</span>}
+        {atrasada && <span className="adm-prod-tag atraso">atrasado</span>}
       </div>
-      <span className="card-modelo">{carro.modelo_veiculo}</span>
+      <span className="adm-prod-card-modelo">{carro.modelo_veiculo}</span>
       {carro.bloqueado && carro.motivo_bloqueio && (
-        <span className="card-motivo">
+        <span className="adm-prod-card-motivo">
           <IconLock />
           {carro.motivo_bloqueio}
         </span>
       )}
       {carro.ativos.length > 0 ? (
-        <div className="card-ativos">
+        <div className="adm-prod-card-ativos">
           {carro.ativos.map((a) => (
             <span
               key={a.id}
-              className={'mini ' + (a.status_tarefa === 'Pausado' ? 'mini-pausa' : 'mini-trab')}
+              className={'adm-prod-mini ' + (a.status_tarefa === 'Pausado' ? 'mini-pausa' : 'mini-trab')}
             >
               <span
-                className={
-                  'mini-dot' + (a.status_tarefa === 'Pausado' ? '' : ' gd-live-dot')
-                }
+                className={'adm-prod-mini-dot' + (a.status_tarefa === 'Pausado' ? '' : ' gd-live-dot')}
               />
               {a.nome_funcionario}
               {a.status_tarefa === 'Pausado' ? ' (pausa)' : ''}
@@ -314,10 +321,10 @@ function CardCarro({ carro }: { carro: CarroLive }) {
           ))}
         </div>
       ) : (
-        <span className="card-vazio">aguardando próxima etapa</span>
+        <span className="adm-prod-card-vazio">aguardando próxima etapa</span>
       )}
       {carro.data_prometida && (
-        <span className={'card-prazo gd-tabular' + (atrasada ? ' atraso' : '')}>
+        <span className={'adm-prod-card-prazo gd-tabular' + (atrasada ? ' atraso' : '')}>
           prazo: {carro.data_prometida.slice(0, 10)}
         </span>
       )}
@@ -325,512 +332,481 @@ function CardCarro({ carro }: { carro: CarroLive }) {
   );
 }
 
+/**
+ * Estilos ESPECÍFICOS da tela de produção ao vivo (namespaced `adm-prod-*`) no
+ * idioma ESCURO do totem: selo AO VIVO (no subtítulo do shell), KPIs com
+ * benchmark, faixa "Equipe agora" e o KANBAN premium — cards --bg-card
+ * flutuando sobre colunas-fantasma (trilhas escuras recuadas + borda tracejada),
+ * borda-esquerda 4px no acento de estado que BRILHA. O chrome e a linguagem de
+ * cartão/pílula/botão vêm do AdminShell. Tokens da camada do totem
+ * (--bg-*, --text-*, --*-primary/-glow, --gd-*); números com `gd-tabular`.
+ */
 function Estilos() {
   return (
     <style jsx global>{`
-      .wrap {
-        min-height: 100vh;
-        background: var(--gd-app-bg);
-        color: var(--gd-ink);
-        font-family: 'Inter', system-ui, sans-serif;
-      }
-
-      /* ─── Header navy + filete teal ─── */
-      .topbar {
-        display: flex;
-        align-items: center;
-        gap: var(--gd-sp-4);
-        padding: var(--gd-sp-3) var(--gd-sp-5);
-        background: var(--gd-navy);
-        color: var(--gd-white);
-        position: sticky;
-        top: 0;
-        z-index: 10;
-        border-bottom: 2px solid var(--gd-teal);
-        box-shadow: var(--gd-elev-2);
-      }
-      .topbar-title {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        gap: var(--gd-sp-4);
-        min-width: 0;
-      }
-      .topbar-title strong {
-        font-size: var(--gd-fs-h3);
-        font-weight: 800;
-        letter-spacing: -0.01em;
-      }
-      .voltar {
-        display: inline-flex;
-        align-items: center;
-        gap: var(--gd-sp-1);
-        color: #cfe2ee;
-        text-decoration: none;
-        font-size: var(--gd-fs-cap);
-        font-weight: 600;
-        padding: var(--gd-sp-1) var(--gd-sp-2);
-        border-radius: var(--gd-r-control);
-        transition: background var(--gd-dur-fast) var(--gd-ease);
-      }
-      .voltar:hover {
-        background: rgba(255, 255, 255, 0.1);
-      }
-
-      /* Selo AO VIVO — "isto respira" */
-      .selo-live {
-        display: inline-flex;
-        align-items: center;
-        gap: var(--gd-sp-2);
-        padding: 4px 10px 4px 8px;
-        border-radius: var(--gd-r-pill);
-        background: rgba(28, 132, 173, 0.18);
-        border: 1px solid rgba(28, 132, 173, 0.4);
-      }
-      .selo-dot {
+      /* ─── Selo AO VIVO no subtítulo do shell (.adm-topbar__sub é flex/uppercase) ─── */
+      .adm-prod-dot {
         width: 8px;
         height: 8px;
         border-radius: 50%;
         background: var(--gd-teal-bright);
-        box-shadow: 0 0 0 3px rgba(28, 132, 173, 0.25);
+        box-shadow: 0 0 0 3px rgba(28, 132, 173, 0.22), 0 0 10px rgba(28, 132, 173, 0.7);
         flex-shrink: 0;
       }
-      .selo-lbl {
-        font-size: var(--gd-fs-micro);
-        font-weight: 800;
-        letter-spacing: 0.12em;
-        color: #d6ecf6;
-      }
-      .selo-sep {
+      .adm-prod-selo-sep {
         width: 1px;
         height: 11px;
-        background: rgba(255, 255, 255, 0.28);
+        background: rgba(148, 163, 184, 0.4);
       }
-      .selo-time {
-        font-size: var(--gd-fs-micro);
+      .adm-prod-selo-time {
+        font-size: 11px;
         font-weight: 600;
-        color: #9fc1d6;
+        color: var(--text-secondary);
         letter-spacing: 0.02em;
+        text-transform: none;
       }
 
-      .btn-refresh {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(255, 255, 255, 0.12);
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        color: var(--gd-white);
-        width: 36px;
-        height: 36px;
-        border-radius: var(--gd-r-control);
-        cursor: pointer;
-        flex-shrink: 0;
-        transition:
-          background var(--gd-dur-fast) var(--gd-ease),
-          transform var(--gd-dur-fast) var(--gd-ease);
+      /* ─── Mensagens utilitárias ─── */
+      .adm-prod-info {
+        padding: 24px;
+        color: var(--text-secondary);
+        font-size: 14px;
       }
-      .btn-refresh:hover {
-        background: rgba(255, 255, 255, 0.22);
-      }
-      .btn-refresh:active {
-        transform: scale(0.94);
+      .adm-prod-flash {
+        margin-bottom: 16px;
       }
 
-      .info {
-        padding: var(--gd-sp-5);
-        color: var(--gd-muted);
-        font-size: var(--gd-fs-body);
-      }
-      .info.erro {
-        color: var(--gd-bad-ink);
-      }
-      .link {
-        background: none;
-        border: none;
-        color: var(--gd-teal-bright);
-        cursor: pointer;
-        font-weight: 700;
-        font-size: inherit;
-      }
-
-      /* ─── KPIs de resumo (benchmark) ─── */
-      .resumo {
+      /* ─── KPIs de resumo (benchmark) — instrumento prensado escuro ─── */
+      .adm-prod-resumo {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: var(--gd-sp-3);
-        padding: var(--gd-sp-5) var(--gd-sp-5) 0;
+        gap: 14px;
+        margin-bottom: 8px;
       }
-      .kpi {
+      .adm-prod-kpi {
         position: relative;
-        background: var(--gd-white);
-        border: 1px solid var(--gd-border);
-        border-top: 3px solid var(--gd-border-strong);
-        border-radius: var(--gd-r-card);
-        padding: var(--gd-sp-4);
+        background: var(--bg-card);
+        border: 1px solid var(--border-default);
+        border-top: 3px solid var(--text-muted);
+        border-radius: var(--radius-lg);
+        padding: 18px 18px 16px;
         display: flex;
         flex-direction: column;
         gap: 3px;
-        box-shadow: var(--gd-elev-1), var(--gd-hairline-top);
+        box-shadow:
+          0 1px 0 rgba(255, 255, 255, 0.04) inset,
+          0 12px 30px -12px rgba(0, 0, 0, 0.6);
       }
-      .kpi-num {
-        font-size: var(--gd-fs-kpi);
+      .adm-prod-kpi-num {
+        font-size: clamp(28px, 3.2vw, 40px);
         font-weight: 800;
         line-height: 1;
         letter-spacing: -0.02em;
         display: inline-flex;
         align-items: baseline;
+        color: var(--text-primary);
       }
-      .kpi-de {
+      .adm-prod-kpi-de {
         font-size: 0.5em;
         font-weight: 700;
-        color: var(--gd-muted);
+        color: var(--text-muted);
         margin-left: 2px;
       }
-      .kpi-lbl {
-        font-size: var(--gd-fs-micro);
-        color: var(--gd-muted);
+      .adm-prod-kpi-lbl {
+        font-size: 11px;
+        color: var(--text-secondary);
         text-transform: uppercase;
         letter-spacing: 0.06em;
-        font-weight: 600;
+        font-weight: 700;
       }
-      .kpi-nota {
-        font-size: var(--gd-fs-micro);
-        color: var(--gd-muted);
+      .adm-prod-kpi-nota {
+        font-size: 11px;
+        color: var(--text-muted);
         margin-top: 1px;
       }
-      .kpi.tone-ok {
-        border-top-color: var(--gd-ok-ink);
+      /* Tom = um acento que brilha no topo + no número (uma cor = um significado) */
+      .adm-prod-kpi.tone-ok {
+        border-top-color: var(--green-primary);
+        box-shadow:
+          0 1px 0 rgba(255, 255, 255, 0.04) inset,
+          0 -1px 0 var(--green-glow),
+          0 12px 30px -12px rgba(0, 0, 0, 0.6);
       }
-      .kpi.tone-ok .kpi-num {
-        color: var(--gd-ok-ink);
+      .adm-prod-kpi.tone-ok .adm-prod-kpi-num {
+        color: var(--green-primary);
+        text-shadow: 0 0 16px var(--green-glow);
       }
-      .kpi.tone-warn {
-        border-top-color: var(--gd-warn-ink);
+      .adm-prod-kpi.tone-warn {
+        border-top-color: var(--amber-primary);
       }
-      .kpi.tone-warn .kpi-num {
-        color: var(--gd-warn-ink);
+      .adm-prod-kpi.tone-warn .adm-prod-kpi-num {
+        color: var(--amber-primary);
+        text-shadow: 0 0 16px var(--amber-glow);
       }
-      .kpi.tone-info {
-        border-top-color: var(--gd-info-ink);
+      .adm-prod-kpi.tone-info {
+        border-top-color: var(--blue-primary);
       }
-      .kpi.tone-info .kpi-num {
-        color: var(--gd-info-ink);
+      .adm-prod-kpi.tone-info .adm-prod-kpi-num {
+        color: var(--blue-primary);
+        text-shadow: 0 0 16px var(--blue-glow);
       }
-      .kpi.tone-bad {
-        border-top-color: var(--gd-bad-ink);
+      .adm-prod-kpi.tone-bad {
+        border-top-color: var(--red-primary);
       }
-      .kpi.tone-bad .kpi-num {
-        color: var(--gd-bad-ink);
+      .adm-prod-kpi.tone-bad .adm-prod-kpi-num {
+        color: var(--red-primary);
+        text-shadow: 0 0 16px var(--red-glow);
       }
-      .kpi.tone-navy {
-        border-top-color: var(--gd-navy);
+      .adm-prod-kpi.tone-navy {
+        border-top-color: var(--gd-teal-bright);
       }
-      .kpi.tone-navy .kpi-num {
-        color: var(--gd-navy);
+      .adm-prod-kpi.tone-navy .adm-prod-kpi-num {
+        color: var(--gd-teal-bright);
+        text-shadow: 0 0 16px rgba(28, 132, 173, 0.5);
       }
 
       /* ─── Títulos de seção ─── */
-      .sec-titulo {
-        font-size: var(--gd-fs-cap);
+      .adm-prod-sec-titulo {
+        font-size: 12.5px;
         text-transform: uppercase;
         letter-spacing: 0.08em;
-        color: var(--gd-muted);
+        color: var(--text-muted);
         font-weight: 700;
-        margin: var(--gd-sp-6) var(--gd-sp-5) var(--gd-sp-3);
+        margin: 32px 0 12px;
       }
 
       /* ─── Faixa "Equipe agora" — instrumento primário ─── */
-      .faixa-head {
+      .adm-prod-faixa-head {
         display: flex;
         align-items: baseline;
-        gap: var(--gd-sp-3);
-        margin: var(--gd-sp-6) var(--gd-sp-5) var(--gd-sp-3);
+        gap: 12px;
+        margin: 32px 0 12px;
       }
-      .faixa-head .sec-titulo {
+      .adm-prod-faixa-head .adm-prod-sec-titulo {
         margin: 0;
       }
-      .faixa-vazia {
-        margin: 0 var(--gd-sp-5) var(--gd-sp-3);
-        padding: var(--gd-sp-5);
-        color: var(--gd-muted);
-        font-size: var(--gd-fs-body);
-        border: 1px dashed var(--gd-border);
-        border-radius: var(--gd-r-card);
-        background: var(--gd-white);
+      .adm-prod-faixa-vazia {
+        margin: 0 0 4px;
+        padding: 24px;
+        color: var(--text-secondary);
+        font-size: 14px;
+        border: 1px dashed var(--border-default);
+        border-radius: var(--radius-lg);
+        background: var(--bg-card);
       }
-      .faixa-hint {
-        font-size: var(--gd-fs-micro);
-        color: var(--gd-muted);
+      .adm-prod-faixa-hint {
+        font-size: 11px;
+        color: var(--text-muted);
         font-style: italic;
       }
-      .op-grid {
+      .adm-prod-op-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: var(--gd-sp-2);
-        padding: 0 var(--gd-sp-5);
+        gap: 8px;
       }
-      .op-cell {
+      .adm-prod-op-cell {
         position: relative;
       }
-      .op-divisor {
+      .adm-prod-op-divisor {
         position: absolute;
-        left: calc(var(--gd-sp-2) * -1 + 0.5px);
+        left: -4.5px;
         top: 6px;
         bottom: 6px;
         width: 1px;
-        background: var(--gd-border-strong);
+        background: var(--border-default);
       }
-      .op-card {
+      .adm-prod-op-card {
         display: flex;
-        gap: var(--gd-sp-2);
+        gap: 10px;
         align-items: flex-start;
-        background: var(--gd-white);
-        border: 1px solid var(--gd-border);
-        border-radius: var(--gd-r-control);
-        padding: var(--gd-sp-3) var(--gd-sp-3);
-        box-shadow: var(--gd-elev-1), var(--gd-hairline-top);
+        background: var(--bg-card);
+        border: 1px solid var(--border-default);
+        border-radius: 10px;
+        padding: 12px;
+        box-shadow:
+          0 1px 0 rgba(255, 255, 255, 0.04) inset,
+          0 10px 24px -14px rgba(0, 0, 0, 0.6);
       }
-      .op-dot {
+      .adm-prod-op-dot {
         width: 10px;
         height: 10px;
         border-radius: 50%;
         margin-top: 4px;
         flex-shrink: 0;
-        background: var(--gd-neutral-ink);
+        background: var(--text-muted);
       }
-      .op-card.estado-produzindo .op-dot {
-        background: var(--gd-ok-ink);
-        box-shadow: 0 0 0 3px var(--gd-ok-fill);
+      .adm-prod-op-card.estado-produzindo .adm-prod-op-dot {
+        background: var(--green-primary);
+        box-shadow: 0 0 0 3px var(--green-glow), 0 0 10px var(--green-glow);
       }
-      .op-card.estado-em_pausa .op-dot {
-        background: var(--gd-warn-ink);
+      .adm-prod-op-card.estado-em_pausa .adm-prod-op-dot {
+        background: var(--amber-primary);
+        box-shadow: 0 0 8px var(--amber-glow);
       }
-      .op-card.estado-sem_tarefa .op-dot {
-        background: var(--gd-info-ink);
+      .adm-prod-op-card.estado-sem_tarefa .adm-prod-op-dot {
+        background: var(--blue-primary);
         opacity: 0.7;
       }
-      .op-info {
+      .adm-prod-op-info {
         display: flex;
         flex-direction: column;
         gap: 1px;
         min-width: 0;
       }
-      .op-info strong {
-        font-size: var(--gd-fs-body);
+      .adm-prod-op-info strong {
+        font-size: 14px;
         font-weight: 700;
+        color: var(--text-primary);
       }
-      .op-estado {
-        font-size: var(--gd-fs-micro);
+      .adm-prod-op-estado {
+        font-size: 11px;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.03em;
       }
-      .op-card.estado-produzindo .op-estado {
-        color: var(--gd-ok-ink);
+      .adm-prod-op-card.estado-produzindo .adm-prod-op-estado {
+        color: var(--green-primary);
       }
-      .op-card.estado-em_pausa .op-estado {
-        color: var(--gd-warn-ink);
+      .adm-prod-op-card.estado-em_pausa .adm-prod-op-estado {
+        color: var(--amber-primary);
       }
-      .op-card.estado-sem_tarefa .op-estado {
-        color: var(--gd-info-ink);
+      .adm-prod-op-card.estado-sem_tarefa .adm-prod-op-estado {
+        color: var(--blue-primary);
       }
-      .op-carro {
-        font-size: var(--gd-fs-micro);
-        color: var(--gd-muted);
+      .adm-prod-op-carro {
+        font-size: 11px;
+        color: var(--text-muted);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
       }
 
-      /* ─── Kanban premium — cards flutuando sobre colunas-fantasma ─── */
-      .kanban-sec {
-        padding-bottom: var(--gd-sp-7);
+      /* ─── Kanban premium — cards FLUTUANDO sobre colunas-fantasma ─── */
+      .adm-prod-kanban-sec {
+        padding-bottom: 16px;
       }
-      .kanban {
+      .adm-prod-kanban {
         display: flex;
-        gap: var(--gd-sp-3);
+        gap: 12px;
         overflow-x: auto;
-        padding: 0 var(--gd-sp-5) var(--gd-sp-2);
+        padding-bottom: 8px;
       }
-      .coluna {
+      .adm-prod-coluna {
         flex: 0 0 248px;
         display: flex;
         flex-direction: column;
         background: transparent;
       }
-      .col-head {
+      .adm-prod-col-head {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: var(--gd-sp-2);
-        padding: var(--gd-sp-2) var(--gd-sp-2) var(--gd-sp-2) 2px;
+        gap: 8px;
+        padding: 8px 8px 8px 2px;
       }
-      .col-nome {
+      .adm-prod-col-nome {
         font-weight: 700;
-        font-size: var(--gd-fs-cap);
-        color: var(--gd-navy);
+        font-size: 12.5px;
+        color: var(--text-primary);
         letter-spacing: 0.01em;
       }
-      .col-count {
-        background: var(--gd-navy);
-        color: var(--gd-white);
-        border-radius: var(--gd-r-pill);
+      /* Contador em cápsula que brilha (teal) */
+      .adm-prod-col-count {
+        background: rgba(28, 132, 173, 0.16);
+        color: var(--gd-teal-bright);
+        border: 1px solid rgba(28, 132, 173, 0.35);
+        border-radius: 999px;
         min-width: 22px;
         text-align: center;
         padding: 2px 8px;
-        font-size: var(--gd-fs-micro);
-        font-weight: 700;
+        font-size: 11px;
+        font-weight: 800;
+        box-shadow: 0 0 10px rgba(28, 132, 173, 0.25);
       }
-      .col-trilha {
+      /* Coluna-fantasma = trilha escura RECUADA com borda tracejada */
+      .adm-prod-col-trilha {
         display: flex;
         flex-direction: column;
-        gap: var(--gd-sp-2);
-        padding: var(--gd-sp-2);
-        border-radius: var(--gd-r-card);
-        border: 1px dashed var(--gd-border-strong);
-        background: rgba(11, 56, 87, 0.012);
+        gap: 8px;
+        padding: 8px;
+        border-radius: var(--radius-lg);
+        border: 1px dashed var(--border-default);
+        background: rgba(3, 7, 15, 0.4);
+        box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.35);
         min-height: 72px;
         flex: 1;
       }
-      .col-vazia {
-        font-size: var(--gd-fs-micro);
-        color: var(--gd-muted);
+      .adm-prod-col-vazia {
+        font-size: 11px;
+        color: var(--text-muted);
         font-style: italic;
-        padding: var(--gd-sp-3) var(--gd-sp-2);
+        padding: 12px 8px;
         text-align: center;
       }
 
-      /* ─── Card de OS — branco flutuante, assinatura de borda-esquerda ─── */
-      .card {
-        background: var(--gd-white);
-        border: 1px solid var(--gd-border);
-        border-left: 4px solid var(--gd-neutral-ink);
-        border-radius: var(--gd-r-control);
-        padding: var(--gd-sp-3) var(--gd-sp-3);
+      /* ─── Card de OS — --bg-card FLUTUANTE com realce + borda-esquerda que brilha ─── */
+      .adm-prod-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-default);
+        border-left: 4px solid var(--text-muted);
+        border-radius: 10px;
+        padding: 12px;
         display: flex;
         flex-direction: column;
-        gap: var(--gd-sp-1);
-        box-shadow: var(--gd-elev-1), var(--gd-hairline-top);
+        gap: 4px;
+        box-shadow:
+          0 1px 0 rgba(255, 255, 255, 0.05) inset,
+          0 14px 30px -14px rgba(0, 0, 0, 0.7);
         transition:
-          transform var(--gd-dur) var(--gd-ease),
-          box-shadow var(--gd-dur) var(--gd-ease);
+          transform 180ms var(--gd-ease),
+          box-shadow 180ms var(--gd-ease),
+          border-color 180ms var(--gd-ease);
       }
-      .card:hover {
+      .adm-prod-card:hover {
         transform: translateY(-2px);
-        box-shadow: var(--gd-elev-2), var(--gd-hairline-top);
+        background: var(--bg-card-hover);
+        box-shadow:
+          0 1px 0 rgba(255, 255, 255, 0.07) inset,
+          0 20px 44px -16px rgba(0, 0, 0, 0.8);
       }
-      .card.sit-trabalhando {
-        border-left-color: var(--gd-ok-ink);
+      /* Borda-esquerda 4px no acento de estado — que BRILHA */
+      .adm-prod-card.sit-trabalhando {
+        border-left-color: var(--green-primary);
+        box-shadow:
+          inset 4px 0 12px -6px var(--green-glow),
+          0 1px 0 rgba(255, 255, 255, 0.05) inset,
+          0 14px 30px -14px rgba(0, 0, 0, 0.7);
       }
-      .card.sit-aguardando {
-        border-left-color: var(--gd-warn-ink);
+      .adm-prod-card.sit-aguardando {
+        border-left-color: var(--amber-primary);
+        box-shadow:
+          inset 4px 0 12px -6px var(--amber-glow),
+          0 1px 0 rgba(255, 255, 255, 0.05) inset,
+          0 14px 30px -14px rgba(0, 0, 0, 0.7);
       }
-      .card.sit-bloqueado {
-        border-left-color: var(--gd-bad-ink);
+      .adm-prod-card.sit-bloqueado {
+        border-left-color: var(--red-primary);
+        box-shadow:
+          inset 4px 0 12px -6px var(--red-glow),
+          0 1px 0 rgba(255, 255, 255, 0.05) inset,
+          0 14px 30px -14px rgba(0, 0, 0, 0.7);
       }
-      .card-top {
+      .adm-prod-card-top {
         display: flex;
         align-items: center;
-        gap: var(--gd-sp-2);
+        gap: 8px;
       }
-      .card-placa {
-        font-weight: 800;
-        letter-spacing: 0.06em;
+      /* Placa = "instrumento": mono que brilha sobre caixa escura */
+      .adm-prod-card-placa {
+        font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+        font-weight: 700;
+        letter-spacing: 0.08em;
         flex: 1;
-        font-size: var(--gd-fs-body);
-        color: var(--gd-ink);
+        font-size: 13.5px;
+        color: var(--text-primary);
       }
-      .tag {
+      .adm-prod-tag {
         display: inline-flex;
         align-items: center;
         gap: 3px;
-        font-size: var(--gd-fs-micro);
-        padding: 2px 7px;
-        border-radius: var(--gd-r-pill);
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 999px;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.02em;
         white-space: nowrap;
+        border: 1px solid transparent;
       }
-      .tag.bloq {
-        background: var(--gd-bad-fill);
-        color: var(--gd-bad-ink);
+      .adm-prod-tag.bloq {
+        background: rgba(239, 68, 68, 0.16);
+        color: var(--red-primary);
+        border-color: rgba(239, 68, 68, 0.35);
+        box-shadow: 0 0 10px var(--red-glow);
       }
-      .tag.atraso {
-        background: var(--gd-warn-fill);
-        color: var(--gd-warn-ink);
+      .adm-prod-tag.atraso {
+        background: rgba(245, 158, 11, 0.16);
+        color: var(--amber-primary);
+        border-color: rgba(245, 158, 11, 0.35);
       }
-      .card-modelo {
-        font-size: var(--gd-fs-cap);
-        color: var(--gd-ink);
+      .adm-prod-card-modelo {
+        font-size: 12.5px;
+        color: var(--text-secondary);
       }
-      .card-motivo {
+      .adm-prod-card-motivo {
         display: inline-flex;
         align-items: center;
         gap: 4px;
-        font-size: var(--gd-fs-micro);
-        color: var(--gd-bad-ink);
+        font-size: 11px;
+        color: var(--red-primary);
         font-weight: 600;
       }
-      .card-ativos {
+      .adm-prod-card-ativos {
         display: flex;
         flex-wrap: wrap;
-        gap: var(--gd-sp-1);
+        gap: 4px;
         margin-top: 2px;
       }
-      .mini {
+      .adm-prod-mini {
         display: inline-flex;
         align-items: center;
         gap: 5px;
-        font-size: var(--gd-fs-micro);
+        font-size: 11px;
         padding: 2px 8px 2px 6px;
-        border-radius: var(--gd-r-pill);
+        border-radius: 999px;
         font-weight: 600;
+        border: 1px solid transparent;
       }
-      .mini-dot {
+      .adm-prod-mini-dot {
         width: 6px;
         height: 6px;
         border-radius: 50%;
         flex-shrink: 0;
         background: currentColor;
+        box-shadow: 0 0 6px currentColor;
       }
-      .mini-trab {
-        background: var(--gd-ok-fill);
-        color: var(--gd-ok-ink);
+      .adm-prod-mini.mini-trab {
+        background: rgba(34, 197, 94, 0.16);
+        color: var(--green-primary);
+        border-color: rgba(34, 197, 94, 0.3);
       }
-      .mini-pausa {
-        background: var(--gd-warn-fill);
-        color: var(--gd-warn-ink);
+      .adm-prod-mini.mini-pausa {
+        background: rgba(245, 158, 11, 0.16);
+        color: var(--amber-primary);
+        border-color: rgba(245, 158, 11, 0.3);
       }
-      .card-vazio {
-        font-size: var(--gd-fs-micro);
-        color: var(--gd-muted);
+      .adm-prod-mini.mini-pausa .adm-prod-mini-dot {
+        box-shadow: none;
+      }
+      .adm-prod-card-vazio {
+        font-size: 11px;
+        color: var(--text-muted);
         font-style: italic;
       }
-      .card-prazo {
-        font-size: var(--gd-fs-micro);
-        color: var(--gd-muted);
+      .adm-prod-card-prazo {
+        font-size: 11px;
+        color: var(--text-muted);
         margin-top: 1px;
       }
-      .card-prazo.atraso {
-        color: var(--gd-bad-ink);
+      .adm-prod-card-prazo.atraso {
+        color: var(--amber-primary);
         font-weight: 700;
       }
 
       /* ─── Sem etapa iniciada ─── */
-      .sem-etapa {
-        padding: var(--gd-sp-2) var(--gd-sp-5) 0;
+      .adm-prod-sem-etapa {
+        padding-top: 4px;
       }
-      .sem-etapa .sec-titulo {
+      .adm-prod-sem-etapa .adm-prod-sec-titulo {
         display: inline-flex;
         align-items: center;
-        gap: var(--gd-sp-2);
-        margin: var(--gd-sp-3) 0 var(--gd-sp-3);
+        gap: 8px;
+        margin: 12px 0;
       }
-      .sem-etapa-grid {
+      .adm-prod-sem-etapa-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: var(--gd-sp-2);
+        gap: 8px;
       }
     `}</style>
   );

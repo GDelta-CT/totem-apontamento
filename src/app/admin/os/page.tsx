@@ -4,20 +4,29 @@
  * /admin/os — Gestão de Ordens de Serviço (Passo 1 da ordem A.1).
  *
  * Demoável e essencial: listar OS, criar (com buscar-antes-de-criar + status
- * controlado) e editar. Padrão visual do app: tokens --gd-* + styled-jsx
- * (mesmo estilo do totem), sem Tailwind utilitário no JSX.
+ * controlado) e editar.
  *
- * Regras de negócio (CLAUDE.md):
- *  - Placa normalizada em MAIÚSCULAS; uma OS ATIVA por placa (aviso aqui + trava
- *    no banco via índice parcial da Migration 005).
+ * Visual (PIVÔ): usa o AdminShell ESCURO/INDUSTRIAL (mesmo idioma do totem).
+ * Esta tela NÃO redeclara chrome — só consome as classes do shell + um bloco
+ * curto `adm-os-*` para a grade da tabela, a placa em estilo "instrumento" e a
+ * cor de prazo na célula (acentos que brilham). Números com `gd-tabular`.
+ * NENHUMA regra de negócio mudou — só a pele.
+ *
+ * Regras de negócio PRESERVADAS (CLAUDE.md), idênticas à versão anterior:
+ *  - Placa normalizada em MAIÚSCULAS; uma OS ATIVA por placa (aviso aqui +
+ *    trava no banco via índice parcial da Migration 005).
+ *  - Buscar-antes-de-criar: ao sair do campo placa (só ao CRIAR).
  *  - Tipo de cliente sugere a data prometida (+30 seguradora/cooperativa, +15
  *    particular) — editável.
+ *  - G3: valor do orçamento >= 0; data prometida não pode ser antes da entrada.
+ *  - G6: o flash de sucesso some sozinho em ~3s (erros não auto-limpam).
  *  - status_geral é lista fixa (4 valores).
  */
 
 import { useCallback, useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { AdminAuthGate } from '../AdminAuthGate';
+import { AdminShell } from '../_shell/AdminShell';
 import { ETAPAS } from '@/lib/supabase/client';
 import type { EtapaId } from '@/lib/supabase/client';
 import { normalizarPlaca, type FetchState } from '@/lib/supabase/queries';
@@ -67,6 +76,31 @@ const formVazio = (): FormState => ({
   etapa_atual: '',
   status_geral: 'Aguardando Produção',
 });
+
+/** Ícone "+" (linha) para a ação primária. */
+function PlusIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/** Ícone de documento vazio (estado "nenhuma OS"). */
+function DocIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M7 3.5h7l4 4V20a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1Z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path d="M13.5 3.5V8H18" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M9 12.5h6M9 16h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
 
 function OSManager() {
   const [lista, setLista] = useState<FetchState<OrdemServicoAdmin[]>>({ status: 'loading' });
@@ -223,76 +257,103 @@ function OSManager() {
   };
 
   return (
-    <main className="wrap">
-      <header className="topbar">
-        <a className="voltar" href="/admin">
-          ← Painel
-        </a>
-        <strong>Ordens de Serviço</strong>
-        <button className="btn btn-primary" onClick={abrirNova}>
-          + Nova OS
+    <AdminShell
+      abaAtiva="os"
+      titulo="Ordens de Serviço"
+      subtitulo="Criar, listar e editar"
+      acao={
+        <button className="adm-btn adm-btn--primary" onClick={abrirNova}>
+          <PlusIcon />
+          Nova OS
         </button>
-      </header>
+      }
+    >
+      {okMsg && <div className="adm-flash fam-ok adm-os-flash">{okMsg}</div>}
 
-      <section className="conteudo">
-        {okMsg && <div className="flash ok">{okMsg}</div>}
+      {lista.status === 'loading' && <p className="adm-os-info">Carregando ordens…</p>}
 
-        {lista.status === 'loading' && <p className="muted">Carregando ordens…</p>}
-        {lista.status === 'error' && (
-          <div className="flash erro">
-            {lista.message} <button className="link" onClick={recarregar}>Tentar de novo</button>
+      {lista.status === 'error' && (
+        <div className="adm-flash fam-bad adm-os-flash">
+          {lista.message}{' '}
+          <button className="adm-link" onClick={recarregar}>
+            Tentar de novo
+          </button>
+        </div>
+      )}
+
+      {lista.status === 'empty' && (
+        <div className="adm-card">
+          <div className="adm-empty">
+            <span className="adm-empty__ico" aria-hidden="true">
+              <DocIcon />
+            </span>
+            <span className="adm-empty__tit">Nenhuma OS ainda</span>
+            <span className="adm-empty__sub">
+              Cadastre a primeira ordem de serviço para começar a acompanhar a produção.
+            </span>
+            <button className="adm-btn adm-btn--primary" onClick={abrirNova}>
+              <PlusIcon />
+              Nova OS
+            </button>
           </div>
-        )}
-        {lista.status === 'empty' && (
-          <p className="muted">Nenhuma OS ainda. Clique em “+ Nova OS”.</p>
-        )}
+        </div>
+      )}
 
-        {lista.status === 'success' && (
-          <div className="tabela">
-            <div className="linha cabec">
+      {lista.status === 'success' && (
+        <div className="adm-card">
+          <div className="adm-table adm-os-table">
+            <div className="adm-table__head adm-os-row" role="row">
               <span>Placa</span>
               <span>Modelo</span>
               <span>Cliente</span>
               <span>Prometida</span>
               <span>Valor</span>
               <span>Status</span>
-              <span></span>
+              <span aria-hidden="true" />
             </div>
             {lista.data.map((os) => (
-              <div className="linha" key={os.id}>
-                <span className="placa">{os.placa}</span>
-                <span>{os.modelo_veiculo}</span>
-                <span className="cap">{os.tipo_cliente ?? '—'}</span>
-                <span className={'prazo gd-tabular fam-' + familiaPrazo(os.data_prometida)}>
+              <div className="adm-table__row adm-os-row" key={os.id} role="row">
+                <span className="adm-os-placa gd-tabular">{os.placa}</span>
+                <span className="adm-os-modelo">{os.modelo_veiculo}</span>
+                <span className="adm-os-cap">{os.tipo_cliente ?? '—'}</span>
+                <span className={'adm-os-prazo gd-tabular fam-' + familiaPrazo(os.data_prometida)}>
                   {dataBR(os.data_prometida)}
                 </span>
                 <span className="gd-tabular">
                   {os.valor_orcamento != null ? brl(os.valor_orcamento) : '—'}
                 </span>
                 <span>
-                  <em className={'pill fam-' + familiaStatus(os.status_geral)}>
+                  <em className={'adm-pill fam-' + familiaStatus(os.status_geral)}>
                     {os.status_geral ?? '—'}
                   </em>
                 </span>
-                <span>
-                  <button className="link" onClick={() => abrirEdicao(os)}>
+                <span className="adm-os-acao-col">
+                  <button className="adm-link" onClick={() => abrirEdicao(os)}>
                     Editar
                   </button>
                 </span>
               </div>
             ))}
           </div>
-        )}
-      </section>
+        </div>
+      )}
 
       {form && (
-        <div className="overlay" onClick={fechar}>
-          <form className="modal" onClick={(e) => e.stopPropagation()} onSubmit={submeter}>
-            <h2>{form.id ? 'Editar OS' : 'Nova OS'}</h2>
+        <div className="adm-modal-overlay" onClick={fechar}>
+          <form
+            className="adm-modal"
+            onClick={(e) => e.stopPropagation()}
+            onSubmit={submeter}
+            role="dialog"
+            aria-modal="true"
+            aria-label={form.id ? 'Editar OS' : 'Nova OS'}
+          >
+            <h2 className="adm-modal__title">{form.id ? 'Editar OS' : 'Nova OS'}</h2>
 
-            <label>
-              Placa
+            <label className="adm-field">
+              <span className="adm-field__label">Placa</span>
               <input
+                className="adm-input"
                 value={form.placa}
                 disabled={!!form.id}
                 onChange={(e) => set('placa', normalizarPlaca(e.target.value))}
@@ -302,11 +363,12 @@ function OSManager() {
                 required
               />
             </label>
-            {avisoPlaca && <div className="flash aviso">{avisoPlaca}</div>}
+            {avisoPlaca && <div className="adm-flash fam-warn adm-os-flash">{avisoPlaca}</div>}
 
-            <label>
-              Modelo
+            <label className="adm-field">
+              <span className="adm-field__label">Modelo</span>
               <input
+                className="adm-input"
                 value={form.modelo_veiculo}
                 onChange={(e) => set('modelo_veiculo', e.target.value)}
                 placeholder="Ex.: Gol 1.0"
@@ -314,10 +376,11 @@ function OSManager() {
               />
             </label>
 
-            <div className="dois">
-              <label>
-                Tipo de cliente
+            <div className="adm-grid-2">
+              <label className="adm-field">
+                <span className="adm-field__label">Tipo de cliente</span>
                 <select
+                  className="adm-select"
                   value={form.tipo_cliente}
                   onChange={(e) => escolherTipo(e.target.value as TipoCliente | '')}
                 >
@@ -329,9 +392,10 @@ function OSManager() {
                   ))}
                 </select>
               </label>
-              <label>
-                Valor do orçamento (R$)
+              <label className="adm-field">
+                <span className="adm-field__label">Valor do orçamento (R$)</span>
                 <input
+                  className="adm-input"
                   inputMode="decimal"
                   value={form.valor_orcamento}
                   onChange={(e) => set('valor_orcamento', e.target.value)}
@@ -340,19 +404,21 @@ function OSManager() {
               </label>
             </div>
 
-            <div className="dois">
-              <label>
-                Data de entrada
+            <div className="adm-grid-2">
+              <label className="adm-field">
+                <span className="adm-field__label">Data de entrada</span>
                 <input
+                  className="adm-input"
                   type="date"
                   value={form.data_entrada}
                   onChange={(e) => set('data_entrada', e.target.value)}
                   required
                 />
               </label>
-              <label>
-                Data prometida
+              <label className="adm-field">
+                <span className="adm-field__label">Data prometida</span>
                 <input
+                  className="adm-input"
                   type="date"
                   value={form.data_prometida}
                   onChange={(e) => set('data_prometida', e.target.value)}
@@ -360,10 +426,11 @@ function OSManager() {
               </label>
             </div>
 
-            <div className="dois">
-              <label>
-                Etapa atual
+            <div className="adm-grid-2">
+              <label className="adm-field">
+                <span className="adm-field__label">Etapa atual</span>
                 <select
+                  className="adm-select"
                   value={form.etapa_atual}
                   onChange={(e) => set('etapa_atual', e.target.value as EtapaId | '')}
                 >
@@ -375,9 +442,10 @@ function OSManager() {
                   ))}
                 </select>
               </label>
-              <label>
-                Status
+              <label className="adm-field">
+                <span className="adm-field__label">Status</span>
                 <select
+                  className="adm-select"
                   value={form.status_geral}
                   onChange={(e) => set('status_geral', e.target.value as StatusOS)}
                 >
@@ -390,13 +458,13 @@ function OSManager() {
               </label>
             </div>
 
-            {erroForm && <div className="flash erro">{erroForm}</div>}
+            {erroForm && <div className="adm-flash fam-bad adm-os-flash">{erroForm}</div>}
 
-            <div className="acoes">
-              <button type="button" className="btn btn-ghost" onClick={fechar} disabled={salvando}>
+            <div className="adm-modal__actions">
+              <button type="button" className="adm-btn adm-btn--ghost" onClick={fechar} disabled={salvando}>
                 Cancelar
               </button>
-              <button type="submit" className="btn btn-primary" disabled={salvando}>
+              <button type="submit" className="adm-btn adm-btn--primary" disabled={salvando}>
                 {salvando ? 'Salvando…' : form.id ? 'Salvar' : 'Criar OS'}
               </button>
             </div>
@@ -404,8 +472,8 @@ function OSManager() {
         </div>
       )}
 
-      <Estilos />
-    </main>
+      <EstilosOS />
+    </AdminShell>
   );
 }
 
@@ -463,234 +531,112 @@ function dataBR(dataISO: string | null | undefined): string {
   return `${d}/${m}/${a}`;
 }
 
-function Estilos() {
+/**
+ * Estilos ESPECÍFICOS da tela de OS (namespaced `adm-os-*`) no idioma ESCURO do
+ * totem: a grade da tabela, a PLACA em estilo "instrumento" (caixa escura +
+ * borda teal que brilha, mono), a cápsula de prazo nos acentos que brilham e os
+ * ajustes responsivos. O chrome e a linguagem de cartão/pílula/botão/modal/
+ * campo vêm do AdminShell. Tokens da camada do totem (--bg-*, --text-*,
+ * --*-primary/-glow); números com `gd-tabular`.
+ */
+function EstilosOS() {
   return (
     <style jsx global>{`
-      .wrap {
-        min-height: 100vh;
-        background: var(--gd-paper, #f5f4f2);
-        color: var(--gd-ink, #0b2233);
-        font-family: 'Inter', system-ui, sans-serif;
-      }
-      .topbar {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        padding: 14px 24px;
-        background: var(--gd-navy, #0b3857);
-        color: #fff;
-      }
-      .topbar strong {
-        flex: 1;
-        font-size: 18px;
-      }
-      .voltar {
-        color: #cfe2ee;
-        text-decoration: none;
-        font-size: 14px;
-      }
-      .conteudo {
-        max-width: 1000px;
-        margin: 0 auto;
+      .adm-os-info {
         padding: 24px;
-      }
-      .muted {
-        color: var(--gd-muted, #5d7689);
-      }
-      .tabela {
-        background: #fff;
-        border: 1px solid var(--gd-line, #d7dde2);
-        border-radius: 14px;
-        overflow: hidden;
-      }
-      .linha {
-        display: grid;
-        grid-template-columns: 90px 1.4fr 1fr 110px 110px 150px 70px;
-        gap: 10px;
-        align-items: center;
-        padding: 12px 16px;
-        border-bottom: 1px solid var(--gd-line, #d7dde2);
+        color: var(--text-secondary);
         font-size: 14px;
       }
-      .linha:last-child {
-        border-bottom: none;
+      .adm-os-flash {
+        margin-bottom: 16px;
       }
-      .linha.cabec {
-        background: var(--gd-paper-2, #eceae6);
-        font-weight: 700;
-        font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        color: var(--gd-muted, #5d7689);
+
+      /* Grade da linha (cabeçalho e linhas usam a MESMA grid → colunas alinhadas) */
+      .adm-os-row {
+        grid-template-columns: 112px 1.4fr 1fr 128px 120px 168px 72px;
       }
-      .placa {
-        font-weight: 800;
-        letter-spacing: 1px;
-      }
-      .cap {
-        text-transform: capitalize;
-      }
-      .pill {
-        display: inline-block;
-        font-style: normal;
-        font-size: 12px;
-        padding: 3px 9px;
-        border-radius: var(--gd-r-pill, 999px);
-        font-weight: 600;
-      }
-      /* Famílias semânticas de cor (tokens --gd-*): uma cor = um significado. */
-      .fam-ok {
-        background: var(--gd-ok-fill, #e1f5ee);
-        color: var(--gd-ok-ink, #0f6e56);
-      }
-      .fam-warn {
-        background: var(--gd-warn-fill, #faeeda);
-        color: var(--gd-warn-ink, #8a5a12);
-      }
-      .fam-bad {
-        background: var(--gd-bad-fill, #fcebeb);
-        color: var(--gd-bad-ink, #a32d2d);
-      }
-      .fam-neutral {
-        background: var(--gd-neutral-fill, #f0f1f0);
-        color: var(--gd-neutral-ink, #5f5e5a);
-      }
-      .fam-info {
-        background: var(--gd-info-fill, #e6f1fb);
-        color: var(--gd-info-ink, #0c447c);
-      }
-      /* Prazo na tabela: data colorida pela proximidade do vencimento. */
-      .prazo {
-        display: inline-block;
-        padding: 3px 9px;
-        border-radius: var(--gd-r-pill, 999px);
-        font-weight: 600;
+      /* Placa = "instrumento" do totem: caixa escura + borda teal + mono que brilha */
+      .adm-os-placa {
         justify-self: start;
-      }
-      .btn {
-        border: none;
-        border-radius: 10px;
-        padding: 10px 16px;
+        font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
         font-weight: 700;
-        cursor: pointer;
-        font-size: 14px;
-      }
-      .btn-primary {
-        background: var(--gd-teal-bright, #1c84ad);
-        color: #fff;
-      }
-      .btn-primary:hover:not(:disabled) {
-        background: var(--gd-teal-hover, #2596c4);
-      }
-      .btn-ghost {
-        background: transparent;
-        border: 1.5px solid var(--gd-line, #d7dde2);
-        color: var(--gd-muted, #5d7689);
-      }
-      .btn:disabled {
-        opacity: 0.6;
-        cursor: default;
-      }
-      .link {
-        background: none;
-        border: none;
-        color: var(--gd-teal-bright, #1c84ad);
-        cursor: pointer;
-        font-weight: 600;
-        font-size: 14px;
-        padding: 0;
-      }
-      .flash {
-        padding: 10px 14px;
-        border-radius: 10px;
-        margin-bottom: 14px;
-        font-size: 14px;
-      }
-      .flash.ok {
-        background: var(--gd-ok-fill, #e1f5ee);
-        color: var(--gd-ok-ink, #0f6e56);
-        transition: opacity var(--gd-dur, 180ms) var(--gd-ease, ease);
-      }
-      .flash.erro {
-        background: var(--gd-bad-fill, #fcebeb);
-        color: var(--gd-bad-ink, #a32d2d);
-      }
-      .flash.aviso {
-        background: var(--gd-warn-fill, #faeeda);
-        color: var(--gd-warn-ink, #8a5a12);
-      }
-      .overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(8, 30, 48, 0.45);
-        display: flex;
-        align-items: flex-start;
-        justify-content: center;
-        padding: 40px 16px;
-        overflow-y: auto;
-        z-index: 50;
-      }
-      .modal {
-        background: #fff;
-        border-radius: 18px;
-        padding: 24px;
-        width: 100%;
-        max-width: 520px;
-        box-shadow: 0 18px 50px rgba(8, 30, 48, 0.25);
-      }
-      .modal h2 {
-        margin: 0 0 16px;
-        font-size: 20px;
-      }
-      .modal label {
-        display: block;
         font-size: 13px;
+        letter-spacing: 0.1em;
+        color: var(--text-primary);
+        background: rgba(3, 7, 15, 0.6);
+        border: 1px solid rgba(28, 132, 173, 0.4);
+        border-radius: 6px;
+        padding: 4px 9px;
+      }
+      .adm-os-modelo {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: var(--text-primary);
         font-weight: 600;
-        color: var(--gd-muted, #5d7689);
-        margin-bottom: 12px;
       }
-      .modal input,
-      .modal select {
-        display: block;
-        width: 100%;
-        margin-top: 5px;
-        padding: 11px 12px;
-        border: 1.5px solid var(--gd-line, #d7dde2);
-        border-radius: 10px;
-        font-size: 15px;
-        color: var(--gd-ink, #0b2233);
-        background: #fff;
+      .adm-os-cap {
+        text-transform: capitalize;
+        color: var(--text-secondary);
       }
-      .modal input:focus,
-      .modal select:focus {
-        outline: none;
-        border-color: var(--gd-teal-bright, #1c84ad);
+      /* Prazo: data colorida pela proximidade do vencimento (cápsula na célula,
+         acentos que brilham — mesma família do totem). */
+      .adm-os-prazo {
+        justify-self: start;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 11px;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 12.5px;
+        border: 1px solid transparent;
       }
-      .modal input:disabled {
-        background: var(--gd-paper-2, #eceae6);
-        color: var(--gd-muted, #5d7689);
+      .adm-os-prazo::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        border-radius: 999px;
+        background: currentColor;
+        box-shadow: 0 0 8px currentColor;
+        flex-shrink: 0;
       }
-      .dois {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
+      .adm-os-prazo.fam-ok {
+        background: rgba(34, 197, 94, 0.14);
+        color: var(--green-primary);
+        border-color: rgba(34, 197, 94, 0.3);
       }
-      .acoes {
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
-        margin-top: 8px;
+      .adm-os-prazo.fam-warn {
+        background: rgba(245, 158, 11, 0.14);
+        color: var(--amber-primary);
+        border-color: rgba(245, 158, 11, 0.3);
       }
-      @media (max-width: 680px) {
-        .linha {
-          grid-template-columns: 80px 1fr 90px 70px;
+      .adm-os-prazo.fam-bad {
+        background: rgba(239, 68, 68, 0.14);
+        color: var(--red-primary);
+        border-color: rgba(239, 68, 68, 0.3);
+      }
+      .adm-os-prazo.fam-neutral {
+        background: rgba(148, 163, 184, 0.12);
+        color: var(--text-secondary);
+        border-color: rgba(148, 163, 184, 0.2);
+      }
+      .adm-os-prazo.fam-neutral::before {
+        box-shadow: none;
+      }
+      .adm-os-acao-col {
+        justify-self: end;
+      }
+
+      @media (max-width: 760px) {
+        /* mantém Placa, Modelo, Status e a ação; oculta Cliente/Prometida/Valor */
+        .adm-os-row {
+          grid-template-columns: 100px 1fr 150px 64px;
         }
-        .linha span:nth-child(4),
-        .linha span:nth-child(5) {
+        .adm-os-row > span:nth-child(3),
+        .adm-os-row > span:nth-child(4),
+        .adm-os-row > span:nth-child(5) {
           display: none;
-        }
-        .dois {
-          grid-template-columns: 1fr;
         }
       }
     `}</style>

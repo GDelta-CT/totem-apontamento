@@ -8,11 +8,20 @@
  * perto → no prazo). É o quadro do Daily Huddle que faz o dono abrir ≥1x/dia.
  * Só leitura. Auto-refresh 30s.
  *
- * Padrão visual: tokens --gd-* + styled-jsx. Sem Tailwind no JSX.
+ * Visual (PIVÔ): usa o AdminShell ESCURO/INDUSTRIAL (mesmo idioma do totem e da
+ * tela de OS). Esta tela NÃO redeclara chrome — consome o shell e um bloco
+ * `adm-prazos-*` para o holofote, as réguas de benchmark, a banda de KPIs e o
+ * extrato de risco. Números BRILHAM (gd-tabular, alto contraste); a cor de
+ * estado vem dos acentos dark (--red/amber/green/blue-primary com glow); o
+ * holofote calmo é verde que brilha. NENHUMA regra de negócio mudou — só a pele.
+ *
+ * Lógica PRESERVADA 100% (dono-queries.ts): carregarPainelDono, auto-refresh
+ * 30s, cálculo dos KPIs e ordenação por urgência (peso estourado→perto→no_prazo).
  */
 
 import { useCallback, useEffect, useState } from 'react';
 import { AdminAuthGate } from '../AdminAuthGate';
+import { AdminShell } from '../_shell/AdminShell';
 import type { FetchState } from '@/lib/supabase/queries';
 import {
   brl,
@@ -34,9 +43,9 @@ export default function AdminPrazosPage() {
 }
 
 /**
- * Mapa de situação → tokens de estado. `fill`/`ink` apontam para as variáveis
- * CSS de estado (uma cor = um significado). `cls` vira o modificador da pílula
- * e do dot na lista. Sem hex hardcoded.
+ * Mapa de situação → família de cor do shock dark. `cls` vira o modificador
+ * (bad/warn/ok/neutral) da pílula, do dot e da mini-barra de prazo. Sem hex
+ * hardcoded — a cor sai dos tokens --red/amber/green-primary (com glow).
  */
 const SAUDE_META: Record<SaudePrazo, { txt: string; cls: string }> = {
   estourado: { txt: 'Estourado', cls: 'bad' },
@@ -92,6 +101,21 @@ function IconCheck() {
   );
 }
 
+/** Ícone de refresh (ação primária na barra de comando). */
+function IconRefresh() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M20 11a8 8 0 1 0-.6 3M20 5v6h-6"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 function Prazos() {
   const [estado, setEstado] = useState<FetchState<PainelDono>>({ status: 'loading' });
 
@@ -114,55 +138,46 @@ function Prazos() {
   }, []);
 
   return (
-    <main className="wrap">
-      <header className="topbar">
-        <a className="voltar" href="/admin">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="m14 6-6 6 6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          Painel
-        </a>
-        <div className="tit">
-          <strong>Saúde de prazos</strong>
-          <span className="sub">
-            <span className="gd-live-dot dot" aria-hidden="true" />O holofote do Daily Huddle · ao vivo
-          </span>
-        </div>
-        <button className="btn-refresh" onClick={carregar} title="Atualizar" aria-label="Atualizar">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path
-              d="M20 11a8 8 0 1 0-.6 3M20 5v6h-6"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+    <AdminShell
+      abaAtiva="prazos"
+      titulo="Saúde de prazos"
+      subtitulo={
+        <span className="adm-prazos-sub">
+          <span className="gd-live-dot adm-prazos-livedot" aria-hidden="true" />
+          ao vivo · Daily Huddle
+        </span>
+      }
+      acao={
+        <button className="adm-btn adm-btn--ghost adm-prazos-refresh" onClick={carregar} aria-label="Atualizar">
+          <IconRefresh />
+          Atualizar
         </button>
-      </header>
+      }
+    >
+      {estado.status === 'loading' && <p className="adm-prazos-info">Carregando prazos…</p>}
 
-      {estado.status === 'loading' && <p className="info">Carregando prazos…</p>}
       {estado.status === 'error' && (
-        <div className="info erro">
+        <div className="adm-flash fam-bad adm-prazos-flash">
           {estado.message}{' '}
-          <button className="link" onClick={carregar}>
+          <button className="adm-link" onClick={carregar}>
             Tentar de novo
           </button>
         </div>
       )}
+
       {(estado.status === 'empty' || (estado.status === 'success' && estado.data.carros.length === 0)) && (
-        <p className="info">Nenhum carro ativo no pátio.</p>
+        <p className="adm-prazos-info">Nenhum carro ativo no pátio.</p>
       )}
 
       {estado.status === 'success' && estado.data.carros.length > 0 && (
-        <div className="board">
+        <div className="adm-prazos-board">
           <KPIs dados={estado.data} />
           <Lista carros={estado.data.carros} />
         </div>
       )}
 
       <Estilos />
-    </main>
+    </AdminShell>
   );
 }
 
@@ -172,70 +187,70 @@ function KPIs({ dados }: { dados: PainelDono }) {
   return (
     <>
       {/* HOLOFOTE — bloco-herói: risco de prazo domina a tela */}
-      <section className="hero" aria-label="Risco de prazo">
-        <article className={`herocard ${calmo ? 'calmo' : 'critico'}`}>
-          <div className="herohead">
-            <span className="heroico" aria-hidden="true">
+      <section className="adm-prazos-hero" aria-label="Risco de prazo">
+        <article className={`adm-prazos-herocard ${calmo ? 'calmo' : 'critico'}`}>
+          <div className="adm-prazos-herohead">
+            <span className="adm-prazos-heroico" aria-hidden="true">
               {calmo ? <IconCheck /> : <IconAlerta />}
             </span>
-            <span className="herolbl">{calmo ? 'Prazos' : 'Estourados'}</span>
+            <span className="adm-prazos-herolbl">{calmo ? 'Prazos' : 'Estourados'}</span>
           </div>
           {calmo ? (
-            <strong className="heromsg">Tudo no prazo.</strong>
+            <strong className="adm-prazos-heromsg">Tudo no prazo.</strong>
           ) : (
-            <span className="heronum gd-tabular">{k.estourado}</span>
+            <span className="adm-prazos-heronum gd-tabular">{k.estourado}</span>
           )}
-          <span className="herofoot">
+          <span className="adm-prazos-herofoot">
             {calmo
               ? `${k.totalAtivos} ${k.totalAtivos === 1 ? 'carro ativo' : 'carros ativos'}, nenhum estourou`
               : `${k.estourado === 1 ? 'carro passou' : 'carros passaram'} do prazo prometido`}
           </span>
         </article>
 
-        <article className={`herocard ${k.perto > 0 ? 'atencao' : 'sereno'} sec`}>
-          <div className="herohead">
-            <span className="heroico" aria-hidden="true">
+        <article className={`adm-prazos-herocard ${k.perto > 0 ? 'atencao' : 'sereno'} sec`}>
+          <div className="adm-prazos-herohead">
+            <span className="adm-prazos-heroico" aria-hidden="true">
               <IconRelogio />
             </span>
-            <span className="herolbl">Perto de estourar</span>
+            <span className="adm-prazos-herolbl">Perto de estourar</span>
           </div>
-          <span className="heronum gd-tabular">{k.perto}</span>
-          <span className="herofoot">faltam ≤ {DIAS_ALERTA_PRAZO} dias para o prazo</span>
+          <span className="adm-prazos-heronum gd-tabular">{k.perto}</span>
+          <span className="adm-prazos-herofoot">faltam ≤ {DIAS_ALERTA_PRAZO} dias para o prazo</span>
         </article>
       </section>
 
       {/* BANDA SECUNDÁRIA — mostradores com régua de benchmark (PPG/AkzoNobel) */}
-      <section className="kpis" aria-label="Indicadores do pátio">
-        <div className="kpi">
-          <span className="kpi-lbl">Tempo de ciclo</span>
-          <span className="kpi-num gd-tabular">
+      <section className="adm-prazos-kpis" aria-label="Indicadores do pátio">
+        <div className="adm-prazos-kpi">
+          <span className="adm-prazos-kpi-lbl">Tempo de ciclo</span>
+          <span className="adm-prazos-kpi-num gd-tabular">
             {k.cicloMedioDias}
             <em className="un">dias</em>
           </span>
-          <span className="kpi-bench">
-            <span className="bench-bar" data-state={k.cicloMedioDias <= 7 ? 'ok' : 'warn'} aria-hidden="true">
+          <span className="adm-prazos-kpi-bench">
+            <span className="adm-prazos-bench-bar" data-state={k.cicloMedioDias <= 7 ? 'ok' : 'warn'} aria-hidden="true">
               <i style={{ width: `${Math.min(100, (k.cicloMedioDias / 14) * 100)}%` }} />
             </span>
             meta · até 7 dias
           </span>
         </div>
-        <div className="kpi">
-          <span className="kpi-lbl">Ticket médio</span>
-          <span className="kpi-num gd-tabular">{k.ticketMedio != null ? brl(k.ticketMedio) : '—'}</span>
-          <span className="kpi-bench">média por carro com orçamento</span>
+        <div className="adm-prazos-kpi">
+          <span className="adm-prazos-kpi-lbl">Ticket médio</span>
+          <span className="adm-prazos-kpi-num gd-tabular">{k.ticketMedio != null ? brl(k.ticketMedio) : '—'}</span>
+          <span className="adm-prazos-kpi-bench">média por carro com orçamento</span>
         </div>
-        <div className="kpi">
-          <span className="kpi-lbl">Valor em produção</span>
-          <span className="kpi-num gd-tabular">{brl(k.valorEmProducao)}</span>
-          <span className="kpi-bench">soma dos orçamentos no pátio</span>
+        <div className="adm-prazos-kpi">
+          <span className="adm-prazos-kpi-lbl">Valor em produção</span>
+          <span className="adm-prazos-kpi-num gd-tabular">{brl(k.valorEmProducao)}</span>
+          <span className="adm-prazos-kpi-bench">soma dos orçamentos no pátio</span>
         </div>
-        <div className="kpi">
-          <span className="kpi-lbl">Ocupação do pátio</span>
-          <span className="kpi-num gd-tabular">
+        <div className="adm-prazos-kpi">
+          <span className="adm-prazos-kpi-lbl">Ocupação do pátio</span>
+          <span className="adm-prazos-kpi-num gd-tabular">
             {k.totalAtivos}
             <em className="un">{k.totalAtivos === 1 ? 'carro' : 'carros'}</em>
           </span>
-          <span className="kpi-bench">ativos agora · meta 70–85%</span>
+          <span className="adm-prazos-kpi-bench">ativos agora · meta 70–85%</span>
         </div>
       </section>
     </>
@@ -250,12 +265,12 @@ function diaMes(iso: string): string {
 
 function Lista({ carros }: { carros: CarroPrazo[] }) {
   return (
-    <section className="lista" aria-label="Extrato de risco — carros por urgência">
-      <div className="lista-cab">
-        <span className="lh-tit">Extrato de risco</span>
-        <span className="lh-sub">ordenado por urgência de prazo</span>
+    <section className="adm-prazos-lista adm-card" aria-label="Extrato de risco — carros por urgência">
+      <div className="adm-prazos-lista-cab">
+        <span className="adm-prazos-lh-tit">Extrato de risco</span>
+        <span className="adm-prazos-lh-sub">ordenado por urgência de prazo</span>
       </div>
-      <div className="linha cabec" role="row">
+      <div className="adm-prazos-linha cabec" role="row">
         <span>Placa</span>
         <span>Modelo</span>
         <span>Dias aqui</span>
@@ -267,20 +282,20 @@ function Lista({ carros }: { carros: CarroPrazo[] }) {
         const meta = SAUDE_META[c.saude];
         const prog = progressoPrazo(c);
         return (
-          <div className="linha" key={c.id} role="row">
-            <span className="placa gd-tabular">{c.placa}</span>
-            <span className="modelo">{c.modelo}</span>
-            <span className="dias gd-tabular">
+          <div className="adm-prazos-linha" key={c.id} role="row">
+            <span className="adm-prazos-placa gd-tabular">{c.placa}</span>
+            <span className="adm-prazos-modelo">{c.modelo}</span>
+            <span className="adm-prazos-dias gd-tabular">
               {c.diasNaOficina}
               <em className="un">d</em>
             </span>
-            <span className={`prazo s-${meta.cls}`}>
+            <span className={`adm-prazos-prazo s-${meta.cls}`}>
               {prog != null ? (
                 <>
-                  <span className="barra" aria-hidden="true">
+                  <span className="adm-prazos-barra" aria-hidden="true">
                     <i style={{ width: `${Math.round(prog * 100)}%` }} />
                   </span>
-                  <span className="prazo-txt gd-tabular">
+                  <span className="adm-prazos-prazo-txt gd-tabular">
                     {c.data_prometida ? diaMes(c.data_prometida) : '—'}
                     {c.diasAtePrazo != null && (
                       <em className="ate">
@@ -290,7 +305,7 @@ function Lista({ carros }: { carros: CarroPrazo[] }) {
                   </span>
                 </>
               ) : (
-                <span className="prazo-txt gd-tabular">
+                <span className="adm-prazos-prazo-txt gd-tabular">
                   {c.data_prometida ? c.data_prometida.slice(0, 10) : '—'}
                   {c.diasAtePrazo != null && (
                     <em className="ate">
@@ -300,10 +315,10 @@ function Lista({ carros }: { carros: CarroPrazo[] }) {
                 </span>
               )}
             </span>
-            <span className="valor gd-tabular">{c.valor_orcamento != null ? brl(c.valor_orcamento) : '—'}</span>
+            <span className="adm-prazos-valor gd-tabular">{c.valor_orcamento != null ? brl(c.valor_orcamento) : '—'}</span>
             <span>
-              <em className={`pill s-${meta.cls}`}>
-                <span className="pdot" aria-hidden="true" />
+              <em className={`adm-prazos-pill s-${meta.cls}`}>
+                <span className="adm-prazos-pdot" aria-hidden="true" />
                 {meta.txt}
               </em>
             </span>
@@ -314,159 +329,91 @@ function Lista({ carros }: { carros: CarroPrazo[] }) {
   );
 }
 
+/**
+ * Estilos ESPECÍFICOS da tela de prazos (namespaced `adm-prazos-*`) no idioma
+ * ESCURO do totem. O chrome (barra de comando, abas, foco teal, cartão/pílula/
+ * botão/flash base) vem do AdminShell. Aqui ficam o HOLOFOTE (cartão-herói com
+ * borda de estado que brilha; calmo = verde que brilha), as réguas de benchmark,
+ * a banda de KPIs e o extrato de risco (mini-barra de prazo). Tokens da camada do
+ * totem (--bg-*, --text-*, --*-primary/-glow, --border-*, --radius-*); números
+ * com `gd-tabular` e alto contraste.
+ */
 function Estilos() {
   return (
     <style jsx global>{`
-      .wrap {
-        min-height: 100vh;
-        background: var(--gd-app-bg, var(--gd-paper));
-        color: var(--gd-ink);
-        font-family: 'Inter', system-ui, sans-serif;
-      }
-
-      /* ===== Header: barra navy + filete teal (padrão das 3 telas) ===== */
-      .topbar {
-        display: flex;
+      /* Subtítulo "ao vivo" na barra de comando: dot teal que pulsa */
+      .adm-prazos-sub {
+        display: inline-flex;
         align-items: center;
-        gap: var(--gd-sp-4);
-        padding: var(--gd-sp-4) var(--gd-sp-6);
-        background: var(--gd-navy);
-        color: var(--gd-white);
-        position: sticky;
-        top: 0;
-        z-index: 10;
-        border-bottom: 2px solid var(--gd-teal);
+        gap: 8px;
       }
-      .tit {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        min-width: 0;
-      }
-      .tit strong {
-        font-size: var(--gd-fs-h3);
-        font-weight: 800;
-        letter-spacing: -0.01em;
-      }
-      .tit .sub {
-        display: flex;
-        align-items: center;
-        gap: var(--gd-sp-2);
-        font-size: var(--gd-fs-micro);
-        color: #bcd3e2;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-      }
-      .tit .dot {
+      .adm-prazos-livedot {
         width: 7px;
         height: 7px;
-        border-radius: var(--gd-r-pill);
+        border-radius: 999px;
         background: var(--gd-teal-bright);
-        box-shadow: 0 0 0 3px rgba(28, 132, 173, 0.25);
+        box-shadow: 0 0 8px var(--gd-teal-bright);
       }
-      .voltar {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        color: #cfe2ee;
-        text-decoration: none;
-        font-size: var(--gd-fs-cap);
-        font-weight: 600;
-        padding: 6px 4px;
-        border-radius: var(--gd-r-control);
-        transition: color var(--gd-dur-fast) var(--gd-ease);
-      }
-      .voltar svg {
-        width: 16px;
-        height: 16px;
-      }
-      .voltar:hover {
-        color: var(--gd-white);
-      }
-      .btn-refresh {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(255, 255, 255, 0.12);
-        border: 1px solid rgba(255, 255, 255, 0.16);
-        color: var(--gd-white);
-        width: 38px;
-        height: 38px;
-        border-radius: var(--gd-r-control);
-        cursor: pointer;
-        transition:
-          background var(--gd-dur-fast) var(--gd-ease),
-          transform var(--gd-dur-fast) var(--gd-ease);
-      }
-      .btn-refresh svg {
-        width: 18px;
-        height: 18px;
-      }
-      .btn-refresh:hover {
-        background: rgba(255, 255, 255, 0.22);
-      }
-      .btn-refresh:active {
+      /* Ação primária = atualizar (gira a seta no clique, gesto do totem) */
+      .adm-prazos-refresh:active:not(:disabled) svg {
         transform: rotate(-30deg);
       }
-
-      .info {
-        padding: var(--gd-sp-6);
-        color: var(--gd-muted);
-        font-size: var(--gd-fs-body);
-      }
-      .info.erro {
-        color: var(--gd-bad-ink);
-      }
-      .link {
-        background: none;
-        border: none;
-        color: var(--gd-teal-bright);
-        cursor: pointer;
-        font-weight: 700;
-        font-size: inherit;
+      .adm-prazos-refresh svg {
+        transition: transform 120ms ease;
       }
 
-      .board {
-        max-width: 1180px;
-        margin: 0 auto;
-        padding: var(--gd-sp-6);
+      .adm-prazos-info {
+        padding: 24px;
+        color: var(--text-secondary);
+        font-size: 14px;
+      }
+      .adm-prazos-flash {
+        margin-bottom: 16px;
+      }
+
+      .adm-prazos-board {
         display: flex;
         flex-direction: column;
-        gap: var(--gd-sp-5);
+        gap: 20px;
       }
 
-      /* ===== HOLOFOTE — bloco-herói ===== */
-      .hero {
+      /* ════════ HOLOFOTE — bloco-herói (risco de prazo domina a tela) ════════
+         Cartão "instrumento prensado" escuro (mesma profundidade do shell:
+         borda fina + realce de topo 1px + sombra escura). A cor de estado é uma
+         faixa vertical que BRILHA à esquerda + tinge número/ícone/rótulo. */
+      .adm-prazos-hero {
         display: grid;
         grid-template-columns: 1.6fr 1fr;
-        gap: var(--gd-sp-4);
+        gap: 16px;
       }
-      .herocard {
-        background: var(--gd-white);
-        border: 1px solid var(--gd-border);
-        border-radius: var(--gd-r-panel);
-        box-shadow:
-          var(--gd-elev-1),
-          var(--gd-hairline-top);
-        padding: var(--gd-sp-6);
-        display: flex;
-        flex-direction: column;
-        gap: var(--gd-sp-2);
+      .adm-prazos-herocard {
         position: relative;
         overflow: hidden;
-        transition:
-          transform var(--gd-dur) var(--gd-ease),
-          box-shadow var(--gd-dur) var(--gd-ease);
-      }
-      .herocard:hover {
-        transform: translateY(-2px);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 26px;
+        background: var(--bg-card);
+        border: 1px solid var(--border-default);
+        border-radius: var(--radius-lg);
         box-shadow:
-          var(--gd-elev-2),
-          var(--gd-hairline-top);
+          0 1px 0 rgba(255, 255, 255, 0.04) inset,
+          0 12px 30px -12px rgba(0, 0, 0, 0.6);
+        transition:
+          transform 180ms cubic-bezier(0.4, 0, 0.2, 1),
+          box-shadow 180ms cubic-bezier(0.4, 0, 0.2, 1),
+          border-color 180ms cubic-bezier(0.4, 0, 0.2, 1);
       }
-      /* Faixa de cor de estado fina à esquerda — foco vem do tamanho/posição, não de borda berrante */
-      .herocard::before {
+      .adm-prazos-herocard:hover {
+        transform: translateY(-2px);
+        border-color: var(--accent-border, rgba(28, 132, 173, 0.4));
+        box-shadow:
+          0 1px 0 rgba(255, 255, 255, 0.06) inset,
+          0 18px 40px -14px rgba(0, 0, 0, 0.7);
+      }
+      /* Faixa de cor de estado fina à esquerda — foco vem do tamanho/posição +
+         GLOW (não de borda berrante). */
+      .adm-prazos-herocard::before {
         content: '';
         position: absolute;
         left: 0;
@@ -474,312 +421,354 @@ function Estilos() {
         bottom: 0;
         width: 4px;
         background: var(--accent, transparent);
-        opacity: 0.85;
+        box-shadow: 0 0 16px var(--accent-glow, transparent);
       }
-      .herocard.critico {
-        --accent: var(--gd-bad-ink);
+      .adm-prazos-herocard.critico {
+        --accent: var(--red-primary);
+        --accent-glow: var(--red-glow);
+        --accent-border: rgba(239, 68, 68, 0.45);
       }
-      .herocard.calmo {
-        --accent: var(--gd-ok-ink);
-        background: linear-gradient(180deg, var(--gd-ok-fill) 0%, var(--gd-white) 46%);
+      /* Holofote calmo = verde que brilha: leve wash verde + faixa/ícone glow */
+      .adm-prazos-herocard.calmo {
+        --accent: var(--green-primary);
+        --accent-glow: var(--green-glow);
+        --accent-border: rgba(34, 197, 94, 0.4);
+        background:
+          radial-gradient(120% 90% at 0% 0%, rgba(34, 197, 94, 0.12) 0%, transparent 55%),
+          var(--bg-card);
       }
-      .herocard.atencao {
-        --accent: var(--gd-warn-ink);
+      .adm-prazos-herocard.atencao {
+        --accent: var(--amber-primary);
+        --accent-glow: var(--amber-glow);
+        --accent-border: rgba(245, 158, 11, 0.45);
       }
-      .herocard.sereno {
-        --accent: var(--gd-neutral-ink);
+      .adm-prazos-herocard.sereno {
+        --accent: var(--text-muted);
+        --accent-glow: transparent;
       }
-      .herohead {
+      .adm-prazos-herohead {
         display: flex;
         align-items: center;
-        gap: var(--gd-sp-2);
-        color: var(--accent, var(--gd-muted));
+        gap: 8px;
+        color: var(--accent, var(--text-secondary));
       }
-      .heroico {
+      .adm-prazos-heroico {
         display: inline-flex;
+        filter: drop-shadow(0 0 8px var(--accent-glow, transparent));
       }
-      .heroico .ico {
+      .adm-prazos-heroico .ico {
         width: 22px;
         height: 22px;
       }
-      .herolbl {
-        font-size: var(--gd-fs-cap);
+      .adm-prazos-herolbl {
+        font-size: 12px;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.08em;
       }
-      .heronum {
-        font-size: var(--gd-fs-hero);
+      /* Número-holofote: enorme, alto contraste, BRILHANDO na cor do estado */
+      .adm-prazos-heronum {
+        font-size: clamp(56px, 8vw, 88px);
         font-weight: 900;
         line-height: 0.95;
         letter-spacing: -0.03em;
-        color: var(--accent, var(--gd-navy));
+        color: var(--accent, var(--text-primary));
+        text-shadow: 0 0 28px var(--accent-glow, transparent);
       }
-      .herocard.sereno .heronum {
-        color: var(--gd-navy);
+      .adm-prazos-herocard.sereno .adm-prazos-heronum {
+        color: var(--text-primary);
+        text-shadow: none;
       }
-      .heromsg {
-        font-size: var(--gd-fs-kpi);
+      /* Mensagem do estado calmo = verde que brilha */
+      .adm-prazos-heromsg {
+        font-size: clamp(30px, 4vw, 40px);
         font-weight: 800;
         line-height: 1;
         letter-spacing: -0.02em;
-        color: var(--gd-ok-ink);
+        color: var(--green-primary);
+        text-shadow: 0 0 24px var(--green-glow);
       }
-      .herofoot {
-        font-size: var(--gd-fs-cap);
-        color: var(--gd-muted);
+      .adm-prazos-herofoot {
+        font-size: 12.5px;
+        color: var(--text-secondary);
         line-height: 1.4;
       }
-      .herocard.sec {
+      .adm-prazos-herocard.sec {
         justify-content: space-between;
       }
 
-      /* ===== BANDA SECUNDÁRIA — mostradores + régua de benchmark ===== */
-      .kpis {
+      /* ════════ BANDA SECUNDÁRIA — mostradores + régua de benchmark ════════ */
+      .adm-prazos-kpis {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: var(--gd-sp-4);
+        gap: 16px;
       }
-      .kpi {
-        background: var(--gd-white);
-        border: 1px solid var(--gd-border);
-        border-radius: var(--gd-r-card);
-        box-shadow:
-          var(--gd-elev-1),
-          var(--gd-hairline-top);
-        padding: var(--gd-sp-5);
+      .adm-prazos-kpi {
         display: flex;
         flex-direction: column;
-        gap: var(--gd-sp-2);
-        transition:
-          transform var(--gd-dur) var(--gd-ease),
-          box-shadow var(--gd-dur) var(--gd-ease);
-      }
-      .kpi:hover {
-        transform: translateY(-2px);
+        gap: 8px;
+        padding: 20px;
+        background: var(--bg-card);
+        border: 1px solid var(--border-default);
+        border-radius: var(--radius-lg);
         box-shadow:
-          var(--gd-elev-2),
-          var(--gd-hairline-top);
+          0 1px 0 rgba(255, 255, 255, 0.04) inset,
+          0 12px 30px -12px rgba(0, 0, 0, 0.6);
+        transition:
+          transform 180ms cubic-bezier(0.4, 0, 0.2, 1),
+          box-shadow 180ms cubic-bezier(0.4, 0, 0.2, 1),
+          border-color 180ms cubic-bezier(0.4, 0, 0.2, 1);
       }
-      .kpi-lbl {
-        font-size: var(--gd-fs-micro);
-        color: var(--gd-muted);
+      .adm-prazos-kpi:hover {
+        transform: translateY(-2px);
+        border-color: rgba(28, 132, 173, 0.4);
+        box-shadow:
+          0 1px 0 rgba(255, 255, 255, 0.06) inset,
+          0 18px 40px -14px rgba(0, 0, 0, 0.7);
+      }
+      .adm-prazos-kpi-lbl {
+        font-size: 11px;
+        color: var(--text-muted);
         text-transform: uppercase;
         letter-spacing: 0.07em;
-        font-weight: 600;
+        font-weight: 700;
       }
-      .kpi-num {
-        font-size: var(--gd-fs-kpi);
-        font-weight: 800;
-        line-height: 1;
-        letter-spacing: -0.02em;
-        color: var(--gd-navy);
+      /* Número de KPI: brilha discretamente (mono-tabular, alto contraste) */
+      .adm-prazos-kpi-num {
         display: flex;
         align-items: baseline;
         gap: 6px;
+        font-size: 30px;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -0.02em;
+        color: var(--text-primary);
+        text-shadow: 0 0 18px rgba(28, 132, 173, 0.18);
       }
-      .kpi-num .un {
-        font-size: var(--gd-fs-cap);
+      .adm-prazos-kpi-num .un {
+        font-size: 12.5px;
         font-weight: 600;
         font-style: normal;
-        color: var(--gd-muted);
+        color: var(--text-muted);
         letter-spacing: 0;
+        text-shadow: none;
       }
-      .kpi-bench {
+      .adm-prazos-kpi-bench {
         display: flex;
         flex-direction: column;
         gap: 5px;
-        font-size: var(--gd-fs-micro);
-        color: var(--gd-muted);
+        font-size: 11px;
+        color: var(--text-muted);
       }
-      .bench-bar {
+      /* Régua de benchmark: trilho escuro + preenchimento que brilha (ok/warn) */
+      .adm-prazos-bench-bar {
         position: relative;
         height: 4px;
-        border-radius: var(--gd-r-pill);
-        background: var(--gd-neutral-fill);
+        border-radius: 999px;
+        background: rgba(148, 163, 184, 0.16);
         overflow: hidden;
       }
-      .bench-bar i {
+      .adm-prazos-bench-bar i {
         position: absolute;
         inset: 0 auto 0 0;
-        border-radius: var(--gd-r-pill);
-        background: var(--gd-ok-ink);
-        transition: width var(--gd-dur-slow) var(--gd-ease);
+        border-radius: 999px;
+        background: var(--green-primary);
+        box-shadow: 0 0 8px var(--green-glow);
+        transition: width 480ms cubic-bezier(0.4, 0, 0.2, 1);
       }
-      .bench-bar[data-state='warn'] i {
-        background: var(--gd-warn-ink);
+      .adm-prazos-bench-bar[data-state='warn'] i {
+        background: var(--amber-primary);
+        box-shadow: 0 0 8px var(--amber-glow);
       }
 
-      /* ===== EXTRATO DE RISCO ===== */
-      .lista {
-        background: var(--gd-white);
-        border: 1px solid var(--gd-border);
-        border-radius: var(--gd-r-panel);
-        box-shadow:
-          var(--gd-elev-1),
-          var(--gd-hairline-top);
+      /* ════════ EXTRATO DE RISCO ════════ (cartão do shell .adm-card) */
+      .adm-prazos-lista {
         overflow: hidden;
       }
-      .lista-cab {
+      .adm-prazos-lista-cab {
         display: flex;
         align-items: baseline;
-        gap: var(--gd-sp-3);
-        padding: var(--gd-sp-5) var(--gd-sp-5) var(--gd-sp-3);
+        gap: 12px;
+        padding: 22px 24px 12px;
       }
-      .lh-tit {
-        font-size: var(--gd-fs-h3);
+      .adm-prazos-lh-tit {
+        font-size: 16px;
         font-weight: 800;
-        color: var(--gd-ink);
+        color: var(--text-primary);
         letter-spacing: -0.01em;
       }
-      .lh-sub {
-        font-size: var(--gd-fs-cap);
-        color: var(--gd-muted);
+      .adm-prazos-lh-sub {
+        font-size: 12.5px;
+        color: var(--text-secondary);
       }
-      .linha {
+      .adm-prazos-linha {
         display: grid;
         grid-template-columns: 96px 1.2fr 78px 1.5fr 118px 116px;
-        gap: var(--gd-sp-3);
+        gap: 12px;
         align-items: center;
-        padding: var(--gd-sp-3) var(--gd-sp-5);
-        border-top: 1px solid var(--gd-border);
-        font-size: var(--gd-fs-body);
+        padding: 13px 24px;
+        border-top: 1px solid var(--border-default);
+        font-size: 14px;
+        color: var(--text-primary);
       }
-      .linha.cabec {
+      .adm-prazos-linha.cabec {
         border-top: none;
         background: transparent;
         font-weight: 700;
-        font-size: var(--gd-fs-micro);
+        font-size: 11px;
         text-transform: uppercase;
         letter-spacing: 0.07em;
-        color: var(--gd-muted);
+        color: var(--text-muted);
         padding-top: 0;
-        padding-bottom: var(--gd-sp-2);
+        padding-bottom: 10px;
       }
-      .linha:not(.cabec):hover {
-        background: rgba(11, 56, 87, 0.025);
+      .adm-prazos-linha:not(.cabec):hover {
+        background: rgba(28, 132, 173, 0.06);
       }
-      .placa {
+      /* Placa = "instrumento" do totem: caixa escura + borda teal + mono brilho */
+      .adm-prazos-placa {
+        justify-self: start;
+        font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
         font-weight: 700;
-        letter-spacing: 0.06em;
-        color: var(--gd-ink);
+        font-size: 13px;
+        letter-spacing: 0.1em;
+        color: var(--text-primary);
+        background: rgba(3, 7, 15, 0.6);
+        border: 1px solid rgba(28, 132, 173, 0.4);
+        border-radius: 6px;
+        padding: 4px 9px;
       }
-      .modelo {
-        color: var(--gd-ink);
+      .adm-prazos-modelo {
+        color: var(--text-primary);
+        font-weight: 600;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
       }
-      .dias .un,
-      .kpi-num .un {
+      .adm-prazos-dias {
+        color: var(--text-primary);
+        font-weight: 700;
+      }
+      .adm-prazos-dias .un {
         margin-left: 1px;
-      }
-      .dias {
-        color: var(--gd-ink);
-      }
-      .dias .un {
-        font-size: var(--gd-fs-micro);
+        font-size: 11px;
         font-style: normal;
-        color: var(--gd-muted);
+        color: var(--text-muted);
       }
-      .valor {
-        color: var(--gd-ink);
+      .adm-prazos-valor {
+        color: var(--text-primary);
         font-weight: 600;
       }
 
-      /* mini-barra de prazo */
-      .prazo {
+      /* mini-barra de prazo — cor de estado que brilha (acentos dark) */
+      .adm-prazos-prazo {
         display: flex;
         flex-direction: column;
         gap: 5px;
-        --accent: var(--gd-neutral-ink);
-        --accent-fill: var(--gd-neutral-fill);
+        --accent: var(--text-muted);
+        --accent-fill: rgba(148, 163, 184, 0.16);
+        --accent-glow: transparent;
       }
-      .prazo.s-bad {
-        --accent: var(--gd-bad-ink);
-        --accent-fill: var(--gd-bad-fill);
+      .adm-prazos-prazo.s-bad {
+        --accent: var(--red-primary);
+        --accent-fill: rgba(239, 68, 68, 0.16);
+        --accent-glow: var(--red-glow);
       }
-      .prazo.s-warn {
-        --accent: var(--gd-warn-ink);
-        --accent-fill: var(--gd-warn-fill);
+      .adm-prazos-prazo.s-warn {
+        --accent: var(--amber-primary);
+        --accent-fill: rgba(245, 158, 11, 0.16);
+        --accent-glow: var(--amber-glow);
       }
-      .prazo.s-ok {
-        --accent: var(--gd-ok-ink);
-        --accent-fill: var(--gd-ok-fill);
+      .adm-prazos-prazo.s-ok {
+        --accent: var(--green-primary);
+        --accent-fill: rgba(34, 197, 94, 0.16);
+        --accent-glow: var(--green-glow);
       }
-      .prazo .barra {
+      .adm-prazos-barra {
         position: relative;
         height: 6px;
-        border-radius: var(--gd-r-pill);
+        border-radius: 999px;
         background: var(--accent-fill);
         overflow: hidden;
       }
-      .prazo .barra i {
+      .adm-prazos-barra i {
         position: absolute;
         inset: 0 auto 0 0;
-        border-radius: var(--gd-r-pill);
+        border-radius: 999px;
         background: var(--accent);
-        transition: width var(--gd-dur-slow) var(--gd-ease);
+        box-shadow: 0 0 8px var(--accent-glow);
+        transition: width 480ms cubic-bezier(0.4, 0, 0.2, 1);
       }
-      .prazo-txt {
-        font-size: var(--gd-fs-cap);
-        color: var(--gd-muted);
+      .adm-prazos-prazo-txt {
+        font-size: 12.5px;
+        color: var(--text-secondary);
       }
-      .ate {
+      .adm-prazos-prazo-txt .ate {
         font-style: normal;
         font-weight: 700;
         color: var(--accent);
         margin-left: 6px;
       }
 
-      /* pílula-cápsula com dot */
-      .pill {
+      /* pílula-cápsula com dot que brilha (uma cor = um significado) */
+      .adm-prazos-pill {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
+        gap: 7px;
         font-style: normal;
-        font-size: var(--gd-fs-cap);
-        padding: 4px 11px 4px 9px;
-        border-radius: var(--gd-r-pill);
+        font-size: 12.5px;
+        padding: 4px 12px 4px 10px;
+        border-radius: 999px;
         font-weight: 700;
-        background: var(--p-fill, var(--gd-neutral-fill));
-        color: var(--p-ink, var(--gd-neutral-ink));
+        border: 1px solid var(--p-border, rgba(148, 163, 184, 0.2));
+        background: var(--p-fill, rgba(148, 163, 184, 0.12));
+        color: var(--p-ink, var(--text-secondary));
+        white-space: nowrap;
       }
-      .pill .pdot {
+      .adm-prazos-pdot {
         width: 7px;
         height: 7px;
-        border-radius: var(--gd-r-pill);
+        border-radius: 999px;
         background: currentColor;
+        box-shadow: 0 0 8px currentColor;
+        flex-shrink: 0;
       }
-      .pill.s-bad {
-        --p-fill: var(--gd-bad-fill);
-        --p-ink: var(--gd-bad-ink);
+      .adm-prazos-pill.s-bad {
+        --p-fill: rgba(239, 68, 68, 0.14);
+        --p-ink: var(--red-primary);
+        --p-border: rgba(239, 68, 68, 0.3);
       }
-      .pill.s-warn {
-        --p-fill: var(--gd-warn-fill);
-        --p-ink: var(--gd-warn-ink);
+      .adm-prazos-pill.s-warn {
+        --p-fill: rgba(245, 158, 11, 0.14);
+        --p-ink: var(--amber-primary);
+        --p-border: rgba(245, 158, 11, 0.3);
       }
-      .pill.s-ok {
-        --p-fill: var(--gd-ok-fill);
-        --p-ink: var(--gd-ok-ink);
+      .adm-prazos-pill.s-ok {
+        --p-fill: rgba(34, 197, 94, 0.14);
+        --p-ink: var(--green-primary);
+        --p-border: rgba(34, 197, 94, 0.3);
       }
-      .pill.s-neutral {
-        --p-fill: var(--gd-neutral-fill);
-        --p-ink: var(--gd-neutral-ink);
+      .adm-prazos-pill.s-neutral {
+        --p-fill: rgba(148, 163, 184, 0.12);
+        --p-ink: var(--text-secondary);
+        --p-border: rgba(148, 163, 184, 0.2);
+      }
+      .adm-prazos-pill.s-neutral .adm-prazos-pdot {
+        box-shadow: none;
       }
 
       @media (max-width: 760px) {
-        .hero {
+        .adm-prazos-hero {
           grid-template-columns: 1fr;
         }
-        .linha {
+        .adm-prazos-linha {
           grid-template-columns: 84px 1fr auto;
-          gap: var(--gd-sp-2);
+          gap: 8px;
         }
         /* mantém Placa, Modelo e Situação; oculta Dias/Prazo/Valor */
-        .linha span:nth-child(3),
-        .linha span:nth-child(4),
-        .linha span:nth-child(5) {
+        .adm-prazos-linha span:nth-child(3),
+        .adm-prazos-linha span:nth-child(4),
+        .adm-prazos-linha span:nth-child(5) {
           display: none;
         }
       }
