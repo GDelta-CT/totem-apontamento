@@ -131,11 +131,23 @@ function Prazos({ estadoInicial }: { estadoInicial: FetchState<PainelDono> }) {
   };
 
   // Auto-refresh: mesma cadência (30s) do original, mas re-buscando NO SERVIDOR.
+  // ECONOMIA (Daily Huddle, painel aberto o dia todo): com a aba em segundo plano
+  // o ciclo NÃO dispara (evita re-rodar o Server Component + Auth à toa, poupando
+  // bateria/conexão do tablet); ao voltar a ficar visível, faz UM refresh imediato
+  // para "ressincronizar". Mesma cadência quando visível; um só timer; listener limpo.
   useEffect(() => {
-    const id = setInterval(() => {
-      router.refresh();
-    }, REFRESH_MS);
-    return () => clearInterval(id);
+    const tick = () => {
+      if (!document.hidden) router.refresh();
+    };
+    const id = setInterval(tick, REFRESH_MS);
+    const onVisibility = () => {
+      if (!document.hidden) router.refresh();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
   }, [router]);
 
   const estado = estadoInicial;

@@ -86,11 +86,23 @@ function Producao({ estadoInicial }: { estadoInicial: FetchState<VisaoLive> }) {
   // Auto-refresh: MESMA cadência (20s) do original, mas re-buscando NO SERVIDOR.
   // router.refresh() re-executa o Server Component → re-busca no servidor e
   // mescla o novo payload RSC sem perder estado de cliente (sensação "ao vivo").
+  // ECONOMIA (Daily Huddle, painel aberto o dia todo): com a aba em segundo plano
+  // o ciclo NÃO dispara (evita re-rodar o Server Component + Auth à toa, poupando
+  // bateria/conexão do tablet); ao voltar a ficar visível, faz UM refresh imediato
+  // para "ressincronizar". Mesma cadência quando visível; um só timer; listener limpo.
   useEffect(() => {
-    const id = setInterval(() => {
-      router.refresh();
-    }, REFRESH_MS);
-    return () => clearInterval(id);
+    const tick = () => {
+      if (!document.hidden) router.refresh();
+    };
+    const id = setInterval(tick, REFRESH_MS);
+    const onVisibility = () => {
+      if (!document.hidden) router.refresh();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
   }, [router]);
 
   // Selo AO VIVO + timestamp do servidor → vai no subtítulo do shell.
