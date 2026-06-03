@@ -1,9 +1,17 @@
 /**
- * Painel do DONO — saúde de prazos (Passo 3.5 da ordem A.1).
+ * Painel do DONO — leitura no BROWSER (versão client).
  *
  * O "holofote" do dono (CLAUDE.md, camada 1): carros dentro do prazo / perto de
  * estourar / estourados, + ticket "dias na oficina × R$ do orçamento". Leitura
  * pura — não escreve nada, não toca no totem nem no RLS.
+ *
+ * SERVER-MOVE (passo 1): a regra de negócio (cálculo de KPIs, saúde de prazo,
+ * ordenação) saiu daqui para dono-shared.ts (módulo PURO, sem Supabase), e a
+ * versão server-side vive em dono-queries.server.ts (RSC + DAL). Este arquivo
+ * continua existindo para quem AINDA lê do browser — re-exporta os tipos/utils
+ * compartilhados para NÃO quebrar nenhum import já existente. A tela de prazos
+ * passou a usar a versão server; outras telas/usos client seguem chamando
+ * carregarPainelDono() daqui igual a antes.
  *
  * Vocabulário de KPI da pesquisa de domínio (credibilidade com donos):
  *   - Tempo de Ciclo (key-to-key) = "dias na oficina" (data_entrada → hoje).
@@ -13,12 +21,27 @@
  */
 
 import { getSupabase } from './client';
-import { parseISOComUTC, type FetchState } from './queries';
+import type { FetchState } from './queries';
+import {
+  COLS_PAINEL_DONO,
+  montarPainelDono,
+  traduzirErroDono,
+  type OSRow,
+  type PainelDono,
+} from './dono-shared';
+
+// Re-export do núcleo compartilhado: preserva o contrato de quem importava
+// estes nomes de './dono-queries' (brl, DIAS_ALERTA_PRAZO, traduzirErroDono, tipos).
+export {
+  brl,
+  DIAS_ALERTA_PRAZO,
+  traduzirErroDono,
+  type CarroPrazo,
+  type PainelDono,
+  type SaudePrazo,
+} from './dono-shared';
 
 const TIMEOUT_MS = 8000;
-/** Janela de "perto de estourar": faltam ≤ N dias para o prazo. */
-export const DIAS_ALERTA_PRAZO = 3;
-const MS_DIA = 24 * 60 * 60 * 1000;
 
 function withTimeout<T>(promise: PromiseLike<T>, ms = TIMEOUT_MS): Promise<T> {
   return new Promise((resolve, reject) => {
@@ -38,144 +61,21 @@ function withTimeout<T>(promise: PromiseLike<T>, ms = TIMEOUT_MS): Promise<T> {
   });
 }
 
-/** Mensagem amigável padrão (mesma higiene do traduzirErro de admin-queries). */
-const ERRO_GENERICO = 'Não foi possível carregar o painel. Tente de novo em instantes.';
-
-/**
- * Traduz erros do Postgres/Supabase (ou de catch) para algo legível ao dono.
- * Painel é LEITURA pura — não há jargão de gravação aqui. Nunca devolve o texto
- * cru do banco: o que não casar vira ERRO_GENERICO; mensagens nossas já em
- * PT-BR (timeout do withTimeout) passam intactas.
- */
-function traduzirErro(msg: string | null | undefined): string {
-  if (!msg) return ERRO_GENERICO;
-  const m = msg.toLowerCase();
-  if (m.includes('conexão demorou') || m.includes('verifique a internet')) return msg;
-  if (m.includes('jwt') || m.includes('invalid api key')) {
-    return 'Sessão inválida. Faça login de novo.';
-  }
-  if (m.includes('permission') || m.includes('rls') || m.includes('policy') || m.includes('denied')) {
-    return 'Sem permissão para ver o painel. Faça login como dono.';
-  }
-  if (m.includes('network') || m.includes('fetch') || m.includes('failed to')) {
-    return 'Sem conexão com o servidor. Verifique a internet.';
-  }
-  return ERRO_GENERICO;
-}
-
-/** Situação de prazo de um carro. */
-export type SaudePrazo = 'no_prazo' | 'perto' | 'estourado' | 'sem_prazo';
-
-export type CarroPrazo = {
-  id: string;
-  placa: string;
-  modelo: string;
-  tipo_cliente: string | null;
-  valor_orcamento: number | null;
-  data_entrada: string | null;
-  data_prometida: string | null;
-  /** Dias na oficina (tempo de ciclo, key-to-key). */
-  diasNaOficina: number;
-  /** Dias até o prazo (negativo = estourado). null se sem prazo. */
-  diasAtePrazo: number | null;
-  saude: SaudePrazo;
-};
-
-export type PainelDono = {
-  carros: CarroPrazo[];
-  kpis: {
-    totalAtivos: number;
-    noPrazo: number;
-    perto: number;
-    estourado: number;
-    semPrazo: number;
-    /** Média de dias na oficina (tempo de ciclo). */
-    cicloMedioDias: number;
-    /** Ticket médio (média de valor_orcamento dos que têm valor). */
-    ticketMedio: number | null;
-    /** Soma do valor em produção (carros ativos com orçamento). */
-    valorEmProducao: number;
-  };
-};
-
-type OSRow = {
-  id: string;
-  placa: string;
-  modelo_veiculo: string;
-  tipo_cliente: string | null;
-  valor_orcamento: number | null;
-  data_entrada: string | null;
-  data_prometida: string | null;
-};
-
-function diffDias(deISO: string, ateMs: number): number {
-  return Math.floor((ateMs - parseISOComUTC(deISO)) / MS_DIA);
-}
-
-/** Monta o painel do dono a partir das OS ativas (não entregues). */
+/** Monta o painel do dono a partir das OS ativas (não entregues). VERSÃO CLIENT. */
 export async function carregarPainelDono(): Promise<FetchState<PainelDono>> {
   try {
     const result = await withTimeout(
       getSupabase()
         .from('ordens_servico')
-        .select(
-          'id, placa, modelo_veiculo, tipo_cliente, valor_orcamento, data_entrada, data_prometida'
-        )
+        .select(COLS_PAINEL_DONO)
         .neq('status_geral', 'Entregue')
         .order('data_prometida', { ascending: true, nullsFirst: false })
     );
     const { data, error } = result as { data: OSRow[] | null; error: { message: string } | null };
-    if (error) return { status: 'error', message: traduzirErro(error.message) };
+    if (error) return { status: 'error', message: traduzirErroDono(error.message) };
 
-    const agora = Date.now();
-    const carros: CarroPrazo[] = (data ?? []).map((o) => {
-      const diasNaOficina = o.data_entrada ? Math.max(0, diffDias(o.data_entrada, agora)) : 0;
-      let diasAtePrazo: number | null = null;
-      let saude: SaudePrazo = 'sem_prazo';
-      if (o.data_prometida) {
-        diasAtePrazo = -diffDias(o.data_prometida, agora); // >0 = ainda há prazo
-        saude =
-          diasAtePrazo < 0 ? 'estourado' : diasAtePrazo <= DIAS_ALERTA_PRAZO ? 'perto' : 'no_prazo';
-      }
-      return {
-        id: o.id,
-        placa: o.placa,
-        modelo: o.modelo_veiculo,
-        tipo_cliente: o.tipo_cliente,
-        valor_orcamento: o.valor_orcamento,
-        data_entrada: o.data_entrada,
-        data_prometida: o.data_prometida,
-        diasNaOficina,
-        diasAtePrazo,
-        saude,
-      };
-    });
-
-    const comValor = carros.filter((c) => c.valor_orcamento != null);
-    const somaValor = comValor.reduce((acc, c) => acc + (c.valor_orcamento ?? 0), 0);
-    const somaCiclo = carros.reduce((acc, c) => acc + c.diasNaOficina, 0);
-
-    const kpis: PainelDono['kpis'] = {
-      totalAtivos: carros.length,
-      noPrazo: carros.filter((c) => c.saude === 'no_prazo').length,
-      perto: carros.filter((c) => c.saude === 'perto').length,
-      estourado: carros.filter((c) => c.saude === 'estourado').length,
-      semPrazo: carros.filter((c) => c.saude === 'sem_prazo').length,
-      cicloMedioDias: carros.length ? Math.round(somaCiclo / carros.length) : 0,
-      ticketMedio: comValor.length ? Math.round(somaValor / comValor.length) : null,
-      valorEmProducao: somaValor,
-    };
-
-    // ordena por urgência: estourado → perto → no_prazo → sem_prazo
-    const peso: Record<SaudePrazo, number> = { estourado: 0, perto: 1, no_prazo: 2, sem_prazo: 3 };
-    carros.sort((a, b) => peso[a.saude] - peso[b.saude] || (a.diasAtePrazo ?? 999) - (b.diasAtePrazo ?? 999));
-
-    return { status: 'success', data: { carros, kpis } };
+    return { status: 'success', data: montarPainelDono(data) };
   } catch (e) {
-    return { status: 'error', message: traduzirErro(e instanceof Error ? e.message : null) };
+    return { status: 'error', message: traduzirErroDono(e instanceof Error ? e.message : null) };
   }
-}
-
-export function brl(n: number): string {
-  return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
