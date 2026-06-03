@@ -37,20 +37,18 @@ export async function proxy(request: NextRequest) {
       getAll() {
         return request.cookies.getAll();
       },
-      setAll(cookiesToSet, headers) {
+      setAll(cookiesToSet) {
         // (a) reflete nos cookies do request (leituras posteriores no mesmo ciclo)
         for (const { name, value } of cookiesToSet) {
           request.cookies.set(name, value);
         }
-        // (b) recria a resposta a partir do request atualizado...
+        // (b) recria a resposta a partir do request atualizado e grava os
+        //     cookies renovados na resposta que vai ao browser. (Padrão canônico
+        //     do @supabase/ssr: o callback setAll recebe SÓ cookiesToSet — não
+        //     existe 2º parâmetro de headers.)
         response = NextResponse.next({ request });
-        // ...e grava os cookies renovados na resposta que vai ao browser.
         for (const { name, value, options } of cookiesToSet) {
           response.cookies.set(name, value, options);
-        }
-        // (c) headers anti-cache que a lib pede ao setar auth cookies.
-        for (const [key, value] of Object.entries(headers)) {
-          response.headers.set(key, value);
         }
       },
     },
