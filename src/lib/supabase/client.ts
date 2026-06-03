@@ -5,9 +5,21 @@
  * - Singleton: evita criar um client novo a cada render.
  * - Trocar de chave (anon -> service_role) em um único lugar no futuro.
  * - Permite injetar logging/telemetria sem espalhar pelo app.
+ *
+ * SESSÃO EM COOKIE (Passo 0 do server-move): usamos `createBrowserClient` do
+ * `@supabase/ssr`. A sessão sai do localStorage e passa a viver em COOKIE — é
+ * o que permite o SERVIDOR (RSC/Server Actions/proxy) ler a mesma sessão e
+ * autenticar como o usuário, mantendo o RLS isolando por oficina_id SEM código
+ * extra. A API PÚBLICA daqui (getSupabase + tipos/constantes) NÃO muda: os
+ * queries e gates continuam chamando getSupabase().auth.* e .from(...) igual.
+ *
+ * Sem custom cookie store: no browser, o `@supabase/ssr` lê/grava via
+ * `document.cookie` automaticamente quando `cookies` não é passado. Por isso os
+ * usuários re-logam uma vez (a sessão antiga vivia no localStorage) — esperado.
  */
 
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { createBrowserClient } from '@supabase/ssr';
+import { type SupabaseClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -22,11 +34,15 @@ let _client: SupabaseClient | null = null;
 
 export function getSupabase(): SupabaseClient {
   if (_client) return _client;
-  _client = createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!, {
+  // createBrowserClient já é singleton por padrão (isSingleton), mas mantemos o
+  // nosso cache em módulo para preservar exatamente o contrato anterior.
+  // persistSession/autoRefreshToken seguem ligados: a sessão do device (oficina)
+  // persiste no kiosk e se renova sozinha — é ela que carrega o oficina_id no
+  // JWT (Fase 1), usado pelo RLS e pelos triggers de oficina_id nas escritas.
+  // A diferença é o armazenamento: agora COOKIE (via document.cookie), não
+  // localStorage — para o servidor poder ler a mesma sessão.
+  _client = createBrowserClient(SUPABASE_URL!, SUPABASE_ANON_KEY!, {
     auth: {
-      // Sessão do device (oficina) persiste no kiosk e se renova sozinha.
-      // É essa sessão autenticada que carrega o oficina_id no JWT (Fase 1),
-      // usado pelo RLS e pelos triggers que preenchem oficina_id nas escritas.
       persistSession: true,
       autoRefreshToken: true,
     },
