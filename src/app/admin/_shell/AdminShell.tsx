@@ -188,25 +188,31 @@ function EstilosShell() {
            - ACENTO único (ação/ativo/foco/placa/links/contadores) = --adm-accent.
            - INFORMATIVO (recua, NÃO compete) = --adm-info, chroma MENOR. */
 
-        /* Acento da casa — alias do teal da marca (OKLCH na fonte; ver globals).
-           Tudo no /admin que "acende" (foco, primário, placa, link, contador)
-           passa a referenciar --adm-accent, para um ÚNICO ponto de verdade. */
-        --adm-accent: var(--gd-teal-bright); /* oklch(0.62 0.115 220deg) ≈ #1c84ad */
-        --adm-accent-strong: var(--gd-teal-hover); /* hover do acento */
-        --adm-accent-glow: rgba(28, 132, 173, 0.45);
-        --adm-accent-ring: rgba(28, 132, 173, 0.22);
+        /* Acento da casa — teal disciplinado da marca, DENTRO do gamut sRGB.
+           O alias antigo (--gd-teal-bright = oklch(0.62 0.115 220deg)) caía FORA
+           do gamut: o browser cortava o chroma e renderizava ~#0095b6, abaixando
+           o branco-sobre-botão. Aqui (escopo do /admin; o totem segue com
+           --gd-teal-bright intacto no seu login) o acento desce L/chroma p/ caber
+           no gamut — fica em #1089a8, e o branco-sobre-botão-teal sobe p/ APCA
+           Lc≈73 (era ~67 no valor cortado). Tudo no /admin que "acende" (foco,
+           primário, placa, link, contador) referencia --adm-accent = 1 verdade. */
+        --adm-accent: oklch(0.585 0.105 222deg); /* ≈ #1089a8 — em gamut */
+        --adm-accent-strong: var(--gd-teal-hover); /* hover do acento (mais claro) */
+        --adm-accent-glow: rgba(16, 137, 168, 0.45);
+        --adm-accent-ring: rgba(16, 137, 168, 0.22);
 
-        /* ── "Info" da CASA (escopado ao /admin) — chroma MENOR p/ NÃO competir ──
+        /* ── "Info" da CASA (escopado ao /admin) — UM valor = UM significado ──
            NÃO usa o azul genérico --blue-primary (#3b82f6). É um ciano calmo da
-           família navy/teal (hue ~210°), com chroma reduzido (oklch C≈0.075) em
-           relação ao acento de ação (C≈0.115): lê como "secundário/informativo"
-           (só "sem tarefa"/neutro) sem brigar com o acento teal. Contraste alto
-           sobre os fundos do painel; fallback hex para navegadores sem OKLCH. */
-        --adm-info: #5aa6cc;
-        --adm-info: oklch(0.74 0.075 210deg);
-        --adm-info-glow: rgba(90, 166, 204, 0.26);
-        --adm-info-fill: rgba(90, 166, 204, 0.13);
-        --adm-info-line: rgba(90, 166, 204, 0.28);
+           família navy/teal (chroma menor que o acento de ação, p/ recuar e NÃO
+           competir): lê como "secundário/informativo" (só "sem tarefa"/neutro).
+           UNIFICADO em #8fcce8: o valor mais claro que JÁ era usado nos overrides
+           locais (ProducaoView/FuncionariosView) — agora promovido ao token e os
+           overrides removidos. APCA Lc≈68 sobre o card escuro (o antigo
+           oklch(0.74 0.075 210) dava só Lc≈55 e o texto da pílula ficava fraco). */
+        --adm-info: #8fcce8;
+        --adm-info-glow: rgba(143, 204, 232, 0.26);
+        --adm-info-fill: rgba(143, 204, 232, 0.13);
+        --adm-info-line: rgba(143, 204, 232, 0.32);
 
         /* ── Anti-vazamento do AZUL genérico (queixa do fundador) ──
            O foco GLOBAL (globals.css ~300) usa --border-focus/--blue-* = #3b82f6
@@ -218,10 +224,22 @@ function EstilosShell() {
         --blue-primary: var(--adm-accent);
         --blue-glow: var(--adm-accent-glow);
 
-        /* Contraste APCA: o --text-muted (#64748b) global falha em rótulos 11px
-           sobre os fundos navy do painel. Aqui sobe para ~#7d8aa0 (mais claro,
-           continua "mudo"). Escopado: o totem segue com o token original. */
-        --text-muted: #7d8aa0;
+        /* ── Contraste APCA (o painel LÊ DE LONGE numa TV — é critério de existência) ──
+           Escopado ao /admin: o totem segue com os tokens originais (#94a3b8/#64748b).
+           - --text-secondary: #94a3b8 dava só Lc≈49 sobre o card #1a2236. Sobe p/
+             #b8c4d4 → Lc≈68 (rótulos de KPI/card__sub/herofoot/sub legíveis de longe).
+           - --text-muted: #64748b (global) dava Lc≈26; o antigo #7d8aa0 só Lc≈37 —
+             ambos somem em rótulos 11px/unidades/notas. Sobe p/ #acb9cc → Lc≈61. */
+        --text-secondary: #b8c4d4;
+        --text-muted: #acb9cc;
+
+        /* ── Vermelho de risco para TEXTO/ÍCONE PEQUENO sobre fill translúcido ──
+           O --red-primary (#ef4444) dá só Lc≈33 como texto de pílula/tag/número
+           pequeno de anomalia (some). Este vermelho mais claro (em gamut,
+           oklch 0.72 0.16 28deg ≈ #f9786a) sobe p/ Lc≈47 sobre o fill .14. SÓ no
+           texto/ícone das pílulas/tags pequenas: o fill translúcido e os
+           números-herói grandes (massa + glow) seguem no --red-primary. */
+        --adm-bad-bright: oklch(0.72 0.16 28deg); /* ≈ #f9786a */
 
         min-height: 100dvh;
         overflow-y: auto;
@@ -560,13 +578,15 @@ function EstilosShell() {
         border: 1px solid rgba(148, 163, 184, 0.2);
         white-space: nowrap;
       }
+      /* Dot da pílula = estático (NÃO brilha): glow fica reservado aos
+         mostradores-herói e ao dot vivo "produzindo". (Conter o glow: quando
+         tudo brilha, nada salta.) */
       .adm-pill::before {
         content: '';
         width: 7px;
         height: 7px;
         border-radius: 999px;
         background: currentColor;
-        box-shadow: 0 0 8px currentColor;
         flex-shrink: 0;
       }
       .adm-pill.fam-ok {
@@ -581,7 +601,7 @@ function EstilosShell() {
       }
       .adm-pill.fam-bad {
         background: rgba(239, 68, 68, 0.14);
-        color: var(--red-primary);
+        color: var(--adm-bad-bright);
         border-color: rgba(239, 68, 68, 0.3);
       }
       .adm-pill.fam-neutral {
@@ -679,7 +699,7 @@ function EstilosShell() {
       }
       .adm-btn--danger {
         background: rgba(239, 68, 68, 0.14);
-        color: var(--red-primary);
+        color: var(--adm-bad-bright);
         border-color: rgba(239, 68, 68, 0.35);
       }
       .adm-btn--danger:hover:not(:disabled) {
@@ -735,7 +755,7 @@ function EstilosShell() {
       }
       .adm-flash.fam-bad {
         background: rgba(239, 68, 68, 0.12);
-        color: var(--red-primary);
+        color: var(--adm-bad-bright);
         border-color: rgba(239, 68, 68, 0.3);
       }
       .adm-flash.fam-warn {

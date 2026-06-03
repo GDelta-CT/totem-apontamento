@@ -367,12 +367,13 @@ function Estilos() {
         align-items: center;
         gap: 8px;
       }
+      /* Dot "ao vivo" = dot VIVO (exceção que mantém glow). Acento em gamut. */
       .adm-prazos-livedot {
         width: 7px;
         height: 7px;
         border-radius: 999px;
         background: var(--adm-accent);
-        box-shadow: 0 0 8px var(--adm-accent);
+        box-shadow: 0 0 8px var(--adm-accent-glow);
       }
       /* Ação primária = atualizar (gira a seta no clique, gesto do totem) */
       .adm-prazos-refresh:active:not(:disabled) svg {
@@ -555,7 +556,8 @@ function Estilos() {
         letter-spacing: 0.07em;
         font-weight: 700;
       }
-      /* Número de KPI = mostrador: mono-tabular, alto contraste, brilho discreto.
+      /* Número de KPI da BANDA secundária = mono-tabular, alto contraste, SEM glow
+         (glow reservado ao mostrador-herói — o número grande do prazo).
          Unidade ao lado: menor / 600 / muted (recua, não compete). */
       .adm-prazos-kpi-num {
         display: flex;
@@ -567,7 +569,6 @@ function Estilos() {
         line-height: 1;
         letter-spacing: -0.01em;
         color: var(--text-primary);
-        text-shadow: 0 0 18px rgba(28, 132, 173, 0.18);
       }
       .adm-prazos-kpi-num .un {
         font-family: 'Inter', system-ui, sans-serif;
@@ -593,17 +594,17 @@ function Estilos() {
         background: rgba(148, 163, 184, 0.16);
         overflow: hidden;
       }
+      /* Preenchimento da régua de benchmark — SEM glow (barra estática; o glow
+         fica reservado aos mostradores-herói e ao dot vivo). A cor carrega o sinal. */
       .adm-prazos-bench-bar i {
         position: absolute;
         inset: 0 auto 0 0;
         border-radius: 999px;
         background: var(--green-primary);
-        box-shadow: 0 0 8px var(--green-glow);
         transition: width 480ms cubic-bezier(0.4, 0, 0.2, 1);
       }
       .adm-prazos-bench-bar[data-state='warn'] i {
         background: var(--amber-primary);
-        box-shadow: 0 0 8px var(--amber-glow);
       }
 
       /* ════════ EXTRATO DE RISCO ════════ (cartão do shell .adm-card) */
@@ -698,7 +699,9 @@ function Estilos() {
         --accent-glow: transparent;
       }
       .adm-prazos-prazo.s-bad {
-        --accent: var(--red-primary);
+        /* texto pequeno "Nd atrás" no vermelho mais claro (legível de longe);
+           a barra de prazo acompanha a mesma cor (sem glow). */
+        --accent: var(--adm-bad-bright);
         --accent-fill: rgba(239, 68, 68, 0.16);
         --accent-glow: var(--red-glow);
       }
@@ -719,12 +722,13 @@ function Estilos() {
         background: var(--accent-fill);
         overflow: hidden;
       }
+      /* Barra de prazo do extrato — SEM glow (barra estática). A cor de estado
+         (--accent) carrega o sinal; glow reservado a heróis + dot vivo. */
       .adm-prazos-barra i {
         position: absolute;
         inset: 0 auto 0 0;
         border-radius: 999px;
         background: var(--accent);
-        box-shadow: 0 0 8px var(--accent-glow);
         transition: width 480ms cubic-bezier(0.4, 0, 0.2, 1);
       }
       .adm-prazos-prazo-txt {
@@ -753,17 +757,17 @@ function Estilos() {
         color: var(--p-ink, var(--text-secondary));
         white-space: nowrap;
       }
+      /* Dot da pílula = estático, SEM glow (glow reservado a heróis + dot vivo). */
       .adm-prazos-pdot {
         width: 7px;
         height: 7px;
         border-radius: 999px;
         background: currentColor;
-        box-shadow: 0 0 8px currentColor;
         flex-shrink: 0;
       }
       .adm-prazos-pill.s-bad {
         --p-fill: rgba(239, 68, 68, 0.14);
-        --p-ink: var(--red-primary);
+        --p-ink: var(--adm-bad-bright);
         --p-border: rgba(239, 68, 68, 0.3);
       }
       .adm-prazos-pill.s-warn {

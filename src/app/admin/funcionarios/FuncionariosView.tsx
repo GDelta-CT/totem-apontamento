@@ -545,15 +545,9 @@ function EstilosEquipe() {
         font-size: 11px;
         letter-spacing: 0.04em;
       }
-      /* Legibilidade APCA das pílulas INFO (cargo + situação "ativo"): o texto
-         info-ciano da casa (--adm-info ≈ #5aa6cc) dá só Lc~44 sobre o fundo da
-         pílula — abaixo do alvo. Aqui (escopo da tabela de equipe, sem tocar o
-         token global nem o shell) o texto sobe para um ciano mais claro que passa
-         APCA Lc≈65 em 11px/700. Dot acompanha (currentColor); borda fica no
-         --adm-info-line. Uma cor = um significado: continua o hue informativo. */
-      .adm-eq-row .adm-pill.fam-info {
-        color: #8fcce8;
-      }
+      /* Pílulas INFO (cargo + situação "ativo"): o override local (#8fcce8) que
+         garantia a legibilidade APCA virou o próprio token --adm-info (unificado).
+         O .adm-pill.fam-info do shell já usa o token — sem override local aqui. */
       .adm-eq-situacao {
         justify-self: start;
       }
@@ -590,7 +584,7 @@ function EstilosEquipe() {
       .adm-eq-toggle input {
         width: 18px;
         height: 18px;
-        accent-color: var(--gd-teal-bright);
+        accent-color: var(--adm-accent);
         cursor: pointer;
       }
       .adm-eq-toggle input:disabled {

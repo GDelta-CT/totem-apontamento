@@ -227,7 +227,7 @@ function AdminHome({ estadoInicial }: { estadoInicial: FetchState<SessaoAdminVie
  */
 function EstilosHub() {
   return (
-    <style jsx>{`
+    <style jsx global>{`
       .adm-hub-hello {
         margin: 0 0 24px;
       }
@@ -324,13 +324,14 @@ function EstilosHub() {
         border: 1px solid var(--adm-info-line);
         border-radius: 999px;
       }
+      /* Dot da pílula-prévia = estático, SEM glow (glow reservado a
+         mostradores-herói + dot vivo "produzindo"). */
       .adm-hub-card__prev::before {
         content: '';
         width: 6px;
         height: 6px;
         border-radius: 50%;
         background: var(--adm-info);
-        box-shadow: 0 0 8px var(--adm-info-glow);
       }
       .adm-hub-card__arrow {
         position: absolute;

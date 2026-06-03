@@ -390,15 +390,16 @@ function EstilosAnomalias() {
         padding: 2px 8px;
       }
 
-      /* Horas em aberto: número-instrumento vermelho que BRILHA (sinal de risco) */
+      /* Horas em aberto: número-instrumento vermelho (sinal de risco). Vermelho
+         mais claro p/ ler de longe; SEM glow (glow reservado ao mostrador-herói
+         do prazo + dot vivo "produzindo" — não a cada linha de anomalia). */
       .adm-anom-horas {
         flex-shrink: 0;
         font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
         font-weight: 800;
         font-size: 18px;
         letter-spacing: 0.02em;
-        color: var(--red-primary);
-        text-shadow: 0 0 14px var(--red-glow);
+        color: var(--adm-bad-bright);
       }
       .adm-anom-btn {
         flex-shrink: 0;

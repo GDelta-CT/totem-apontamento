@@ -603,13 +603,14 @@ function EstilosOS() {
         font-size: 12.5px;
         border: 1px solid transparent;
       }
+      /* Dot da cápsula de prazo = estático, SEM glow (glow reservado a
+         mostradores-herói + dot vivo). A cor da família carrega o sinal. */
       .adm-os-prazo::before {
         content: '';
         width: 6px;
         height: 6px;
         border-radius: 999px;
         background: currentColor;
-        box-shadow: 0 0 8px currentColor;
         flex-shrink: 0;
       }
       .adm-os-prazo.fam-ok {
@@ -624,7 +625,7 @@ function EstilosOS() {
       }
       .adm-os-prazo.fam-bad {
         background: rgba(239, 68, 68, 0.14);
-        color: var(--red-primary);
+        color: var(--adm-bad-bright);
         border-color: rgba(239, 68, 68, 0.3);
       }
       .adm-os-prazo.fam-neutral {

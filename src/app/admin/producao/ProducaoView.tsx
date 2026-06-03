@@ -463,12 +463,13 @@ function Estilos() {
   return (
     <style jsx global>{`
       /* ─── Selo AO VIVO no subtítulo do shell (.adm-topbar__sub é flex/uppercase) ─── */
+      /* Dot do selo AO VIVO = dot VIVO (exceção que mantém glow). Acento em gamut. */
       .adm-prod-dot {
         width: 8px;
         height: 8px;
         border-radius: 50%;
-        background: var(--gd-teal-bright);
-        box-shadow: 0 0 0 3px rgba(28, 132, 173, 0.22), 0 0 10px rgba(28, 132, 173, 0.7);
+        background: var(--adm-accent);
+        box-shadow: 0 0 0 3px rgba(16, 137, 168, 0.22), 0 0 10px rgba(16, 137, 168, 0.7);
         flex-shrink: 0;
       }
       .adm-prod-selo-sep {
@@ -657,11 +658,13 @@ function Estilos() {
         text-shadow: 0 0 16px var(--red-glow);
       }
       .adm-prod-kpi.tone-navy {
-        border-top-color: var(--gd-teal-bright);
+        border-top-color: var(--adm-accent);
       }
+      /* KPI-herói (mostrador): mantém o glow no número grande (glow reservado a
+         heróis + dot "produzindo"). Cor no acento teal EM GAMUT da casa. */
       .adm-prod-kpi.tone-navy .adm-prod-kpi-num {
-        color: var(--gd-teal-bright);
-        text-shadow: 0 0 16px rgba(28, 132, 173, 0.5);
+        color: var(--adm-accent);
+        text-shadow: 0 0 16px rgba(16, 137, 168, 0.5);
       }
 
       /* ─── Títulos de seção ─── */
@@ -738,15 +741,14 @@ function Estilos() {
         background: var(--green-primary);
         box-shadow: 0 0 0 3px var(--green-glow), 0 0 10px var(--green-glow);
       }
+      /* Em pausa = dot estático SEM glow (glow reservado ao "produzindo"/heróis). */
       .adm-prod-op-card.estado-em_pausa .adm-prod-op-dot {
         background: var(--amber-primary);
-        box-shadow: 0 0 8px var(--amber-glow);
       }
       /* "Sem tarefa" = INFORMATIVO (não alarme): info-ciano cheio, NUNCA cinza
-         nem âmbar. Dot estático (só "produzindo" pulsa) com glow ciano discreto. */
+         nem âmbar. Dot estático SEM glow (só "produzindo" brilha). */
       .adm-prod-op-card.estado-sem_tarefa .adm-prod-op-dot {
         background: var(--adm-info);
-        box-shadow: 0 0 8px var(--adm-info-glow);
       }
       .adm-prod-op-info {
         display: flex;
@@ -771,12 +773,11 @@ function Estilos() {
       .adm-prod-op-card.estado-em_pausa .adm-prod-op-estado {
         color: var(--amber-primary);
       }
-      /* "Sem tarefa ativa": rótulo de estado pequeno (11px/700). O --adm-info
-         puro dá só Lc~47 sobre o card; sobe para um ciano mais claro (APCA Lc≈68)
-         para leitura confortável, mantendo o hue informativo (não vira alarme,
-         não compete com o teal de ação). Escopo desta tela; token global intacto. */
+      /* "Sem tarefa ativa": rótulo de estado pequeno (11px/700) no info-ciano da
+         casa. O override local (#8fcce8) virou o próprio token --adm-info
+         (unificado, APCA Lc≈68 sobre o card) — aqui só referenciamos o token. */
       .adm-prod-op-card.estado-sem_tarefa .adm-prod-op-estado {
-        color: #8fcce8;
+        color: var(--adm-info);
       }
       .adm-prod-op-carro {
         font-size: 11px;
@@ -815,18 +816,18 @@ function Estilos() {
         color: var(--text-primary);
         letter-spacing: 0.01em;
       }
-      /* Contador em cápsula que brilha (teal) */
+      /* Contador em cápsula teal — estático, SEM glow (glow reservado aos
+         mostradores-herói e ao dot vivo "produzindo"). */
       .adm-prod-col-count {
-        background: rgba(28, 132, 173, 0.16);
-        color: var(--gd-teal-bright);
-        border: 1px solid rgba(28, 132, 173, 0.35);
+        background: rgba(16, 137, 168, 0.16);
+        color: var(--adm-accent);
+        border: 1px solid rgba(16, 137, 168, 0.4);
         border-radius: 999px;
         min-width: 22px;
         text-align: center;
         padding: 2px 8px;
         font-size: 11px;
         font-weight: 800;
-        box-shadow: 0 0 10px rgba(28, 132, 173, 0.25);
       }
       /* Coluna-fantasma = trilha escura RECUADA com borda tracejada */
       .adm-prod-col-trilha {
@@ -874,38 +875,24 @@ function Estilos() {
           0 1px 0 rgba(255, 255, 255, 0.07) inset,
           0 20px 44px -16px rgba(0, 0, 0, 0.8);
       }
-      /* Borda-esquerda 4px no acento de estado — que BRILHA */
+      /* Borda-esquerda 4px na cor de estado (a COR encoda o estado). O glow de
+         filete foi removido — quando todo card brilha, nada salta; o glow fica
+         reservado aos mostradores-herói e ao dot vivo "produzindo". */
       .adm-prod-card.sit-trabalhando {
         border-left-color: var(--green-primary);
-        box-shadow:
-          inset 4px 0 12px -6px var(--green-glow),
-          0 1px 0 rgba(255, 255, 255, 0.05) inset,
-          0 14px 30px -14px rgba(0, 0, 0, 0.7);
       }
       .adm-prod-card.sit-aguardando {
         border-left-color: var(--amber-primary);
-        box-shadow:
-          inset 4px 0 12px -6px var(--amber-glow),
-          0 1px 0 rgba(255, 255, 255, 0.05) inset,
-          0 14px 30px -14px rgba(0, 0, 0, 0.7);
       }
       /* Bloqueio-PROBLEMA (peça/aprovação) = VERMELHO (risco). É o default de
          qualquer carro bloqueado sem variante de fluxo. */
       .adm-prod-card.sit-bloqueado {
         border-left-color: var(--red-primary);
-        box-shadow:
-          inset 4px 0 12px -6px var(--red-glow),
-          0 1px 0 rgba(255, 255, 255, 0.05) inset,
-          0 14px 30px -14px rgba(0, 0, 0, 0.7);
       }
       /* Bloqueio-FLUXO (outro setor/cura) = ÂMBAR (espera prevista, não alarme).
          Mesmo dado, só a cor/ícone muda. */
       .adm-prod-card.sit-bloqueado.bloq-fluxo {
         border-left-color: var(--amber-primary);
-        box-shadow:
-          inset 4px 0 12px -6px var(--amber-glow),
-          0 1px 0 rgba(255, 255, 255, 0.05) inset,
-          0 14px 30px -14px rgba(0, 0, 0, 0.7);
       }
       .adm-prod-card-top {
         display: flex;
@@ -934,12 +921,13 @@ function Estilos() {
         white-space: nowrap;
         border: 1px solid transparent;
       }
-      /* Tag de bloqueio — PROBLEMA (vermelho que brilha) × FLUXO (âmbar calmo) */
+      /* Tag de bloqueio — PROBLEMA (vermelho claro p/ ler de longe, SEM glow:
+         tag estática) × FLUXO (âmbar calmo). Texto/ícone no vermelho mais claro;
+         o fill translúcido segue na família --red. */
       .adm-prod-tag.bloq-problema {
         background: rgba(239, 68, 68, 0.16);
-        color: var(--red-primary);
+        color: var(--adm-bad-bright);
         border-color: rgba(239, 68, 68, 0.35);
-        box-shadow: 0 0 10px var(--red-glow);
       }
       .adm-prod-tag.bloq-fluxo {
         background: rgba(245, 158, 11, 0.16);
@@ -969,9 +957,10 @@ function Estilos() {
       .adm-prod-card-motivo svg {
         flex-shrink: 0;
       }
-      /* Motivo segue a categoria do bloqueio (mesma escada de cor da tag/borda) */
+      /* Motivo segue a categoria do bloqueio (mesma escada de cor da tag/borda).
+         Texto pequeno → vermelho mais claro (legível de longe). */
       .adm-prod-card-motivo.bloq-problema {
-        color: var(--red-primary);
+        color: var(--adm-bad-bright);
       }
       .adm-prod-card-motivo.bloq-fluxo {
         color: var(--amber-primary);
