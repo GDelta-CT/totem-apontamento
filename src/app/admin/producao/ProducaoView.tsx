@@ -135,7 +135,7 @@ function Producao({ estadoInicial }: { estadoInicial: FetchState<VisaoLive> }) {
         </button>
       }
     >
-      {estado.status === 'loading' && <p className="adm-prod-info">Carregando o pátio…</p>}
+      {estado.status === 'loading' && <SkeletonPatio />}
 
       {estado.status === 'error' && (
         <div className="adm-flash fam-bad adm-prod-flash">
@@ -176,12 +176,81 @@ function IconRefresh() {
     </svg>
   );
 }
+/** Cadeado (bloqueio-PROBLEMA: peça/aprovação — risco, vermelho). */
 function IconLock() {
   return (
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <rect width="18" height="11" x="3" y="11" rx="2" />
       <path d="M7 11V7a5 5 0 0 1 10 0v4" />
     </svg>
+  );
+}
+/** Relógio/seta (bloqueio-FLUXO: outro setor/cura — espera prevista, âmbar). */
+function IconFlow() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7.5V12l3 2" />
+    </svg>
+  );
+}
+
+/**
+ * Apresentação do MOTIVO de bloqueio (CLAUDE.md — "divisão visual, mesmo modelo
+ * de dados, cor/ícone diferente"). Espelha os valores de MOTIVOS_BLOQUEIO
+ * (admin-shared): PROBLEMA {peça, aprovação} = VERMELHO + cadeado; FLUXO {outro
+ * setor, cura} = ÂMBAR + relógio. Só presentation — não muda nenhum dado/regra:
+ * o `motivo_bloqueio` segue sendo o mesmo código vindo da OS. Códigos
+ * desconhecidos (ou texto livre antigo) caem em PROBLEMA (vermelho), o mais
+ * cauteloso. Devolve também o rótulo legível (o código cru não vai mais à tela).
+ */
+type CategoriaBloqueio = 'problema' | 'fluxo';
+const BLOQUEIO_META: Record<string, { nome: string; categoria: CategoriaBloqueio }> = {
+  aguardando_peca: { nome: 'Aguardando peça', categoria: 'problema' },
+  aguardando_aprovacao: { nome: 'Aguardando aprovação', categoria: 'problema' },
+  em_outro_setor: { nome: 'Em outro setor', categoria: 'fluxo' },
+  aguardando_cura: { nome: 'Aguardando cura', categoria: 'fluxo' },
+};
+function lerBloqueio(motivo: string | null | undefined): {
+  nome: string;
+  categoria: CategoriaBloqueio;
+} {
+  if (motivo && BLOQUEIO_META[motivo]) return BLOQUEIO_META[motivo];
+  // Sem motivo explícito ou código não mapeado → trata como PROBLEMA (cauteloso).
+  return { nome: motivo ?? 'Bloqueado', categoria: 'problema' };
+}
+
+/**
+ * Skeleton "prensado" do pátio (loading): caixas --bg-card com shimmer (keyframe
+ * `shimmer` do globals). Mantém o ritmo da tela carregada — banda de KPIs + faixa
+ * + trilhas do kanban — para a transição não "saltar". aria-hidden (decorativo);
+ * o aria-busy do conteúdo cobre o leitor de tela. Sem mexer em dado.
+ */
+function SkeletonPatio() {
+  return (
+    <div className="adm-prod-skel" aria-hidden="true">
+      <div className="adm-prod-skel-resumo">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div className="adm-prod-skel-kpi adm-prod-skel-box" key={i} />
+        ))}
+      </div>
+      <div className="adm-prod-skel-faixa">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div className="adm-prod-skel-op adm-prod-skel-box" key={i} />
+        ))}
+      </div>
+      <div className="adm-prod-skel-kanban">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div className="adm-prod-skel-col" key={i}>
+            <div className="adm-prod-skel-colhead adm-prod-skel-box" />
+            <div className="adm-prod-skel-trilha">
+              <div className="adm-prod-skel-card adm-prod-skel-box" />
+              <div className="adm-prod-skel-card adm-prod-skel-box" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -327,23 +396,31 @@ function CardCarro({ carro }: { carro: CarroLive }) {
   // Assinatura: borda-esquerda 4px na cor de estado do carro (via token, sem hex cru).
   const atrasada =
     carro.data_prometida && new Date(carro.data_prometida) < new Date() ? true : false;
+  // Bloqueio: PROBLEMA (vermelho/cadeado) × FLUXO (âmbar/relógio), derivado do
+  // motivo. A classe do card vira sit-bloqueado + bloq-{categoria} (cor da
+  // borda-esquerda que brilha + tag + motivo seguem a categoria).
+  const bloq = carro.bloqueado ? lerBloqueio(carro.motivo_bloqueio) : null;
+  const classeSit =
+    carro.situacao === 'bloqueado' && bloq
+      ? `sit-bloqueado bloq-${bloq.categoria}`
+      : 'sit-' + carro.situacao;
   return (
-    <div className={'adm-prod-card sit-' + carro.situacao}>
+    <div className={'adm-prod-card ' + classeSit}>
       <div className="adm-prod-card-top">
         <strong className="adm-prod-card-placa gd-tabular">{carro.placa}</strong>
-        {carro.bloqueado && (
-          <span className="adm-prod-tag bloq">
-            <IconLock />
+        {bloq && (
+          <span className={'adm-prod-tag bloq-' + bloq.categoria}>
+            {bloq.categoria === 'problema' ? <IconLock /> : <IconFlow />}
             bloqueado
           </span>
         )}
         {atrasada && <span className="adm-prod-tag atraso">atrasado</span>}
       </div>
       <span className="adm-prod-card-modelo">{carro.modelo_veiculo}</span>
-      {carro.bloqueado && carro.motivo_bloqueio && (
-        <span className="adm-prod-card-motivo">
-          <IconLock />
-          {carro.motivo_bloqueio}
+      {bloq && (
+        <span className={'adm-prod-card-motivo bloq-' + bloq.categoria}>
+          {bloq.categoria === 'problema' ? <IconLock /> : <IconFlow />}
+          {bloq.nome}
         </span>
       )}
       {carro.ativos.length > 0 ? (
@@ -415,6 +492,87 @@ function Estilos() {
       }
       .adm-prod-flash {
         margin-bottom: 16px;
+      }
+
+      /* ─── Skeleton "prensado" do pátio (loading) — caixas --bg-card + shimmer ─── */
+      .adm-prod-skel {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      /* Caixa-base: superfície prensada escura + faixa de luz que VARRE (keyframe
+         shimmer do globals.css). O gradiente é o que se move (background-position). */
+      .adm-prod-skel-box {
+        background:
+          linear-gradient(
+            100deg,
+            rgba(255, 255, 255, 0.02) 0%,
+            rgba(255, 255, 255, 0.02) 36%,
+            rgba(28, 132, 173, 0.1) 50%,
+            rgba(255, 255, 255, 0.02) 64%,
+            rgba(255, 255, 255, 0.02) 100%
+          ),
+          var(--bg-card);
+        background-size:
+          200% 100%,
+          auto;
+        border: 1px solid var(--border-default);
+        border-radius: var(--radius-lg);
+        box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+        animation: shimmer 1.4s linear infinite;
+      }
+      .adm-prod-skel-resumo {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 14px;
+      }
+      .adm-prod-skel-kpi {
+        height: 92px;
+      }
+      .adm-prod-skel-faixa {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 8px;
+        margin-top: 24px;
+      }
+      .adm-prod-skel-op {
+        height: 64px;
+        border-radius: 10px;
+      }
+      .adm-prod-skel-kanban {
+        display: flex;
+        gap: 12px;
+        overflow: hidden;
+        margin-top: 24px;
+      }
+      .adm-prod-skel-col {
+        flex: 0 0 248px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .adm-prod-skel-colhead {
+        height: 22px;
+        width: 60%;
+        border-radius: 999px;
+      }
+      .adm-prod-skel-trilha {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 8px;
+        border-radius: var(--radius-lg);
+        border: 1px dashed var(--border-default);
+        background: rgba(3, 7, 15, 0.4);
+      }
+      .adm-prod-skel-card {
+        height: 78px;
+        border-radius: 10px;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .adm-prod-skel-box {
+          animation: none;
+        }
       }
 
       /* ─── KPIs de resumo (benchmark) — instrumento prensado escuro ─── */
@@ -584,9 +742,11 @@ function Estilos() {
         background: var(--amber-primary);
         box-shadow: 0 0 8px var(--amber-glow);
       }
+      /* "Sem tarefa" = INFORMATIVO (não alarme): info-ciano cheio, NUNCA cinza
+         nem âmbar. Dot estático (só "produzindo" pulsa) com glow ciano discreto. */
       .adm-prod-op-card.estado-sem_tarefa .adm-prod-op-dot {
         background: var(--adm-info);
-        opacity: 0.7;
+        box-shadow: 0 0 8px var(--adm-info-glow);
       }
       .adm-prod-op-info {
         display: flex;
@@ -611,8 +771,12 @@ function Estilos() {
       .adm-prod-op-card.estado-em_pausa .adm-prod-op-estado {
         color: var(--amber-primary);
       }
+      /* "Sem tarefa ativa": rótulo de estado pequeno (11px/700). O --adm-info
+         puro dá só Lc~47 sobre o card; sobe para um ciano mais claro (APCA Lc≈68)
+         para leitura confortável, mantendo o hue informativo (não vira alarme,
+         não compete com o teal de ação). Escopo desta tela; token global intacto. */
       .adm-prod-op-card.estado-sem_tarefa .adm-prod-op-estado {
-        color: var(--adm-info);
+        color: #8fcce8;
       }
       .adm-prod-op-carro {
         font-size: 11px;
@@ -725,10 +889,21 @@ function Estilos() {
           0 1px 0 rgba(255, 255, 255, 0.05) inset,
           0 14px 30px -14px rgba(0, 0, 0, 0.7);
       }
+      /* Bloqueio-PROBLEMA (peça/aprovação) = VERMELHO (risco). É o default de
+         qualquer carro bloqueado sem variante de fluxo. */
       .adm-prod-card.sit-bloqueado {
         border-left-color: var(--red-primary);
         box-shadow:
           inset 4px 0 12px -6px var(--red-glow),
+          0 1px 0 rgba(255, 255, 255, 0.05) inset,
+          0 14px 30px -14px rgba(0, 0, 0, 0.7);
+      }
+      /* Bloqueio-FLUXO (outro setor/cura) = ÂMBAR (espera prevista, não alarme).
+         Mesmo dado, só a cor/ícone muda. */
+      .adm-prod-card.sit-bloqueado.bloq-fluxo {
+        border-left-color: var(--amber-primary);
+        box-shadow:
+          inset 4px 0 12px -6px var(--amber-glow),
           0 1px 0 rgba(255, 255, 255, 0.05) inset,
           0 14px 30px -14px rgba(0, 0, 0, 0.7);
       }
@@ -759,11 +934,20 @@ function Estilos() {
         white-space: nowrap;
         border: 1px solid transparent;
       }
-      .adm-prod-tag.bloq {
+      /* Tag de bloqueio — PROBLEMA (vermelho que brilha) × FLUXO (âmbar calmo) */
+      .adm-prod-tag.bloq-problema {
         background: rgba(239, 68, 68, 0.16);
         color: var(--red-primary);
         border-color: rgba(239, 68, 68, 0.35);
         box-shadow: 0 0 10px var(--red-glow);
+      }
+      .adm-prod-tag.bloq-fluxo {
+        background: rgba(245, 158, 11, 0.16);
+        color: var(--amber-primary);
+        border-color: rgba(245, 158, 11, 0.35);
+      }
+      .adm-prod-tag svg {
+        flex-shrink: 0;
       }
       .adm-prod-tag.atraso {
         background: rgba(245, 158, 11, 0.16);
@@ -779,8 +963,18 @@ function Estilos() {
         align-items: center;
         gap: 4px;
         font-size: 11px;
-        color: var(--red-primary);
         font-weight: 600;
+        color: var(--text-secondary);
+      }
+      .adm-prod-card-motivo svg {
+        flex-shrink: 0;
+      }
+      /* Motivo segue a categoria do bloqueio (mesma escada de cor da tag/borda) */
+      .adm-prod-card-motivo.bloq-problema {
+        color: var(--red-primary);
+      }
+      .adm-prod-card-motivo.bloq-fluxo {
+        color: var(--amber-primary);
       }
       .adm-prod-card-ativos {
         display: flex;

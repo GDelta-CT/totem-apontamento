@@ -213,8 +213,9 @@ function Anomalias({ estadoInicial }: { estadoInicial: FetchState<Anomalia[]> })
                       <span className="adm-anom-placa gd-tabular">{a.placa ?? '—'}</span>
                       <span aria-hidden="true">·</span>
                       <span>{a.etapa ?? 'sem etapa'}</span>
-                      <span aria-hidden="true">·</span>
-                      <span>{a.status_tarefa}</span>
+                      <em className={'adm-pill adm-anom-statuspill fam-' + familiaStatusTarefa(a.status_tarefa)}>
+                        {a.status_tarefa}
+                      </em>
                     </span>
                   </div>
                   <span className="adm-anom-horas gd-tabular" title="Horas em aberto">
@@ -290,6 +291,17 @@ function Anomalias({ estadoInicial }: { estadoInicial: FetchState<Anomalia[]> })
 }
 
 /**
+ * Família semântica do status do apontamento (só apresentação): "Em andamento"
+ * = ok (verde), "Pausado" = warn (âmbar). Vira a pílula-com-dot do shell. Não
+ * muda nenhum dado — o status segue vindo do apontamento.
+ */
+function familiaStatusTarefa(status: string): 'ok' | 'warn' | 'neutral' {
+  if (status === 'Em andamento') return 'ok';
+  if (status === 'Pausado') return 'warn';
+  return 'neutral';
+}
+
+/**
  * Estilos ESPECÍFICOS da tela de anomalias (namespaced `adm-anom-*`) no idioma
  * ESCURO do totem: a lista de cartões-fantasma, as HORAS em estilo "instrumento"
  * (--red que brilha, mono) e o formulário de correção append-only inline. O
@@ -355,6 +367,15 @@ function EstilosAnomalias() {
         gap: 7px;
         font-size: 13px;
         color: var(--text-secondary);
+      }
+      /* Status do apontamento como pílula-com-dot (uma cor = um significado):
+         compacta levemente para assentar na sub-linha do fantasma. */
+      .adm-anom-statuspill {
+        font-size: 11px;
+        padding: 2px 9px 2px 8px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
       }
       /* Placa = "instrumento" do totem: caixa escura + borda teal + mono */
       .adm-anom-placa {
