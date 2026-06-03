@@ -218,8 +218,10 @@ function AdminHome({ estadoInicial }: { estadoInicial: FetchState<SessaoAdminVie
 }
 
 /**
- * Estilos ESPECÍFICOS do hub (namespaced `adm-hub-*`), em <style jsx> NÃO-global
- * para não vazar. A casca, o cartão (`adm-card`/`adm-card--hover`), a marca, o
+ * Estilos ESPECÍFICOS do hub (namespaced `adm-hub-*`), em <style jsx global>
+ * (igual às demais telas — o styled-jsx scoped quebrava a Home no SSR). A
+ * colisão é evitada pelo prefixo `adm-hub-`, não pelo scoping. A casca, o
+ * cartão (`adm-card`/`adm-card--hover`), a marca, o
  * chip e as abas vêm do AdminShell. Aqui só a grade assimétrica da home, o miolo
  * do cartão (ícone/título/sub/prévia/seta) no idioma escuro e a linha de sessão
  * — tudo sobre os tokens da camada do totem (--bg-*, --text-*, --*-primary/-glow,

@@ -55,8 +55,13 @@ export function DeviceAuthGate({ children }: { children: ReactNode }) {
     return (
       <div className="gd-auth gd-auth--dark gd-auth--kiosk">
         <div className="gd-auth__card">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="gd-auth__logo" src="/gdelta-logo.png" alt="GDelta" />
+          <span className="gd-auth__seal">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img className="gd-auth__seal-img" src="/gdelta-totem-symbol.png" alt="GDelta Totem" />
+          </span>
+          <div className="gd-auth__wordmark" aria-label="GDelta">
+            G<span className="gd-auth__bar">|</span>DELTA
+          </div>
           <p className="gd-auth__sub" style={{ margin: 0 }}>
             Verificando sessão do totem…
           </p>
@@ -70,8 +75,13 @@ export function DeviceAuthGate({ children }: { children: ReactNode }) {
   return (
     <div className="gd-auth gd-auth--dark gd-auth--kiosk">
       <div className="gd-auth__card">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="gd-auth__logo" src="/gdelta-logo.png" alt="GDelta" />
+        <span className="gd-auth__seal">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="gd-auth__seal-img" src="/gdelta-totem-symbol.png" alt="GDelta Totem" />
+        </span>
+        <div className="gd-auth__wordmark" aria-label="GDelta">
+          G<span className="gd-auth__bar">|</span>DELTA
+        </div>
         <h1 className="gd-auth__title">Login da oficina</h1>
         <p className="gd-auth__sub">Acesso do totem — faça uma vez neste aparelho.</p>
         <form onSubmit={entrar} className="gd-auth__form">

@@ -2,6 +2,21 @@
 
 # GDelta-Totem — Fonte da verdade (escopo + regras de trabalho)
 
+> ⛔ **DECISÕES APROVADAS PELO FUNDADOR — NÃO REVERTER (autoridade máxima).**
+> As decisões abaixo foram **aprovadas explicitamente pelo fundador (Eliel)** e são **lei**.
+> NENHUM agente, Code ou workflow pode revertê-las, "melhorá-las" ou ignorá-las por conta
+> própria. Discordou? **Sinaliza ao fundador e PARA — nunca reverte.** Reverter decisão
+> aprovada do fundador é **violação de governança** e está proibido.
+>
+> 1. **Marca SEM dourado.** GDelta = **marinho `#0b3857` + teal `#13678d` + off-white
+>    `#f5f4f2`**. **NÃO existe gold/dourado, "escudo dourado" nem tema "premium gold".**
+>    Remover todo token `--gd-gold*`, todo anel/selo/chip/realce dourado e o
+>    `public/gdelta-shield.png`. Logos oficiais (NÃO regenerar):
+>    `public/gdelta-logo-full.png` e `public/gdelta-totem-symbol.png`.
+> 2. **Padrão de nome:** marca **GDelta** (uma palavra), produto **GDelta Totem** (ver abaixo).
+> 3. **AIOX ativo** sob os checks de segurança (ver Processo).
+> 4. **agents-guru integrado (caminho A)** — não desfazer.
+
 > **Padrão de nome (01/06/2026):** marca = **GDelta** (uma palavra; logo estilizada
 > "G|DELTA"); produto = **GDelta Totem**. Em texto visível ao usuário e metadados, usar
 > **GDelta** — nunca "G Delta" com espaço. Nomes literais externos NÃO mudam (pasta

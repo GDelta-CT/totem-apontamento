@@ -75,8 +75,13 @@ export function AdminAuthGate({ children }: { children: ReactNode }) {
     return (
       <div className="gd-auth gd-auth--dark">
         <div className="gd-auth__card">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="gd-auth__logo" src="/gdelta-logo.png" alt="GDelta" />
+          <span className="gd-auth__seal">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img className="gd-auth__seal-img" src="/gdelta-totem-symbol.png" alt="GDelta" />
+          </span>
+          <div className="gd-auth__wordmark" aria-label="GDelta">
+            G<span className="gd-auth__bar">|</span>DELTA
+          </div>
           <p className="gd-auth__sub" style={{ margin: 0 }}>
             Verificando acesso…
           </p>
@@ -91,8 +96,13 @@ export function AdminAuthGate({ children }: { children: ReactNode }) {
     return (
       <div className="gd-auth gd-auth--dark">
         <div className="gd-auth__card">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="gd-auth__logo" src="/gdelta-logo.png" alt="GDelta" />
+          <span className="gd-auth__seal">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img className="gd-auth__seal-img" src="/gdelta-totem-symbol.png" alt="GDelta" />
+          </span>
+          <div className="gd-auth__wordmark" aria-label="GDelta">
+            G<span className="gd-auth__bar">|</span>DELTA
+          </div>
           <h1 className="gd-auth__title">Sem acesso</h1>
           <p className="gd-auth__sub">
             Esta conta não tem papel de <strong>gerente</strong> ou <strong>dono</strong> nesta
@@ -116,8 +126,13 @@ export function AdminAuthGate({ children }: { children: ReactNode }) {
   return (
     <div className="gd-auth gd-auth--dark">
       <div className="gd-auth__card">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="gd-auth__logo" src="/gdelta-logo.png" alt="GDelta" />
+        <span className="gd-auth__seal">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="gd-auth__seal-img" src="/gdelta-totem-symbol.png" alt="GDelta" />
+        </span>
+        <div className="gd-auth__wordmark" aria-label="GDelta">
+          G<span className="gd-auth__bar">|</span>DELTA
+        </div>
         <h1 className="gd-auth__title">Painel do gestor</h1>
         <p className="gd-auth__sub">Entre com sua conta de gestor.</p>
         <form onSubmit={entrar} className="gd-auth__form">

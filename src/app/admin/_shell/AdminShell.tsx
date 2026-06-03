@@ -106,8 +106,12 @@ export function AdminShell({
             <VoltarIcon />
           </a>
           <a className="adm-brand" href="/admin">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/gdelta-symbol.png" alt="" className="adm-brand__symbol" />
+            {/* Selo CREME (hairline teal): o símbolo oficial navy+teal SALTA no
+                navy escuro da barra (antes sumia, navy-sobre-navy). */}
+            <span className="adm-brand__seal" aria-hidden="true">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/gdelta-totem-symbol.png" alt="" className="adm-brand__symbol" />
+            </span>
             <span className="adm-brand__word" aria-label="GDelta">
               G<span className="adm-brand__bar">|</span>DELTA
             </span>
@@ -127,7 +131,9 @@ export function AdminShell({
             </span>
             <span className="adm-user__info">
               <strong className="adm-user__email">{email ?? (carregando ? 'carregando…' : '—')}</strong>
-              {papel && <span className="adm-user__papel">{papel}</span>}
+              {papel && (
+                <span className={'adm-user__papel' + (papel === 'dono' ? ' is-dono' : '')}>{papel}</span>
+              )}
             </span>
           </div>
           <button className="adm-btn adm-btn--phantom" onClick={sair}>
@@ -201,6 +207,18 @@ function EstilosShell() {
         --adm-accent-glow: rgba(16, 137, 168, 0.45);
         --adm-accent-ring: rgba(16, 137, 168, 0.22);
 
+        /* (tokens de dourado removidos: marca = navy + teal + off-white) */
+
+        /* ── Mais SEPARAÇÃO card↔fundo (queixa "chapado/samey") ──
+           A borda padrão (--border-default = #1e293b) quase some sobre o card
+           #1a2236 (Lc≈5). Escopado ao /admin, a borda dos cards sobe p/ um
+           hairline mais presente (#2d3a52, Lc≈14 sobre o card) e a superfície do
+           card ganha um teto levemente mais claro — eleva sem berrar. NÃO toca
+           no totem (fora de .adm-shell). */
+        --border-default: #2d3a52;
+        --bg-card: #1c2540;
+        --bg-card-hover: #222d4d;
+
         /* ── "Info" da CASA (escopado ao /admin) — UM valor = UM significado ──
            NÃO usa o azul genérico --blue-primary (#3b82f6). É um ciano calmo da
            família navy/teal (chroma menor que o acento de ação, p/ recuar e NÃO
@@ -241,7 +259,7 @@ function EstilosShell() {
            números-herói grandes (massa + glow) seguem no --red-primary. */
         --adm-bad-bright: oklch(0.72 0.16 28deg); /* ≈ #f9786a */
 
-        min-height: 100dvh;
+        height: 100dvh;
         overflow-y: auto;
         background: var(--bg-primary);
         /* Acabamento do totem: glow frio no topo + grade diagonal discretíssima */
@@ -319,13 +337,30 @@ function EstilosShell() {
         text-decoration: none;
         min-width: 0;
       }
+      /* Selo da marca: disco CREME + hairline teal fino. O símbolo navy+teal
+         oficial fica nítido (navy sobre creme: APCA Lc≈91) e premium — não
+         some mais no navy da barra. */
+      .adm-brand__seal {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        background: #ffffff;
+        border: 1px solid rgba(28, 132, 173, 0.35);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.8),
+          0 0 0 1px rgba(0, 0, 0, 0.3),
+          0 4px 12px -4px rgba(0, 0, 0, 0.6);
+        flex-shrink: 0;
+      }
       .adm-brand__symbol {
-        width: 30px;
-        height: 30px;
+        width: 26px;
+        height: 26px;
         object-fit: contain;
         user-select: none;
         -webkit-user-drag: none;
-        filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
       }
       .adm-brand__word {
         font-size: 17px;
@@ -334,11 +369,11 @@ function EstilosShell() {
         color: var(--text-primary);
         white-space: nowrap;
       }
+      /* Traço "|" do wordmark em TEAL. */
       .adm-brand__bar {
         color: var(--adm-accent);
         margin: 0 2px;
         font-weight: 800;
-        text-shadow: 0 0 10px var(--adm-accent-glow);
       }
 
       .adm-topbar__center {
@@ -438,6 +473,17 @@ function EstilosShell() {
         letter-spacing: 0.6px;
         color: var(--text-muted);
       }
+      /* Papel "DONO" = chip neutro discreto (sem dourado). */
+      .adm-user__papel.is-dono {
+        align-self: flex-start;
+        margin-top: 2px;
+        padding: 1px 8px;
+        border-radius: 999px;
+        color: var(--text-secondary);
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        letter-spacing: 0.8px;
+      }
 
       /* ════════ Barra de abas (sticky, vidro ESCURO translúcido) ════════ */
       .adm-tabs {
@@ -526,12 +572,14 @@ function EstilosShell() {
          superfície --bg-card, borda sutil, sombra escura + realce de topo 1px
          (highlight branco BAIXO) = profundidade do totem. */
       .adm-card {
-        background: var(--bg-card);
+        /* Separação mais marcada do fundo (queixa "chapado"): superfície com
+           teto sutil + borda hairline mais presente + sombra funda. */
+        background: linear-gradient(180deg, #20294700 0%, transparent 40%), var(--bg-card);
         border: 1px solid var(--border-default);
         border-radius: var(--radius-lg);
         box-shadow:
-          0 1px 0 rgba(255, 255, 255, 0.04) inset,
-          0 12px 30px -12px rgba(0, 0, 0, 0.6);
+          0 1px 0 rgba(255, 255, 255, 0.06) inset,
+          0 14px 34px -12px rgba(0, 0, 0, 0.7);
         transition:
           transform 180ms cubic-bezier(0.4, 0, 0.2, 1),
           box-shadow 180ms cubic-bezier(0.4, 0, 0.2, 1),

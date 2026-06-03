@@ -37,6 +37,12 @@
   --gd-r-card: 14px;
   --gd-r-panel: 18px;
   --gd-r-pill: 999px;
+  /* Marca GDelta = navy + teal + off-white. SEM dourado/gold (diretriz do
+     fundador) — NAO re-adicionar tokens de ouro nem tema "premium gold". */
+  /* Creme do SELO do logo: fundo claro arredondado que faz o símbolo
+     navy+teal SALTAR no escuro (navy sobre creme: APCA Lc≈91). */
+  --gd-seal-cream: #f4f1ea;
+
   /* Bordas tonais de marca (substituem cinzas crus) */
   --gd-border: rgba(11, 56, 87, 0.1);
   --gd-border-strong: rgba(11, 56, 87, 0.16);
@@ -375,14 +381,46 @@ input {
   box-shadow: 0 0 12px rgba(28, 132, 173, 0.7);
   border-radius: 1px;
 }
-.gd-auth__logo {
-  width: 138px;
-  height: auto;
-  margin-bottom: 10px;
+/* SELO da marca: o símbolo oficial (navy+teal) num disco CREME com hairline teal,
+   pra SALTAR no fundo escuro do login (navy sobre creme: APCA Lc≈91). Mesma
+   lógica do selo da barra de comando do AdminShell — consistência da marca. */
+.gd-auth__seal {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 92px;
+  height: 92px;
+  margin-bottom: 16px;
+  border-radius: 26px;
+  background: #ffffff;
+  /* Hairline teal sutil + elevação sobre o escuro (sem dourado). */
+  border: 1px solid rgba(28, 132, 173, 0.35);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    0 0 0 1px rgba(0, 0, 0, 0.25),
+    0 16px 36px -14px rgba(0, 0, 0, 0.7);
+}
+.gd-auth__seal-img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
   -webkit-user-drag: none;
   user-select: none;
-  /* Assenta o logo dourado sobre o escuro com leve elevação. */
-  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.55));
+}
+/* Wordmark "G|DELTA" sob o selo, claro, com o traço "|" em TEAL. */
+.gd-auth__wordmark {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+  line-height: 1;
+}
+.gd-auth__wordmark .gd-auth__bar {
+  color: var(--gd-teal-bright);
+  font-weight: 800;
+  margin: 0 3px;
 }
 .gd-auth__title {
   font-size: 22px;
@@ -501,8 +539,17 @@ input {
   width: min(468px, 100%);
   padding: 46px 38px 32px;
 }
-.gd-auth--kiosk .gd-auth__logo {
-  width: 156px;
+.gd-auth--kiosk .gd-auth__seal {
+  width: 108px;
+  height: 108px;
+  border-radius: 30px;
+}
+.gd-auth--kiosk .gd-auth__seal-img {
+  width: 72px;
+  height: 72px;
+}
+.gd-auth--kiosk .gd-auth__wordmark {
+  font-size: 23px;
 }
 .gd-auth--kiosk .gd-auth__title {
   font-size: 25px;

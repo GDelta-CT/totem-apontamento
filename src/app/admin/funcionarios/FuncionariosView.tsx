@@ -48,6 +48,9 @@ import type { FuncionarioAdmin } from '@/lib/supabase/admin-queries';
 
 const CARGO_PADRAO = 'Operário';
 
+/** Sugestoes de cargo (datalist): texto livre + cargos comuns de funilaria/pintura. */
+const CARGOS_SUGERIDOS = ['Funileiro', 'Pintor', 'Preparador', 'Polidor', 'Montador', 'Auxiliar', 'Operário'];
+
 export function FuncionariosView({
   estadoInicial,
 }: {
@@ -101,10 +104,12 @@ function FuncionariosManager({
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [novoNome, setNovoNome] = useState('');
+  const [novoCargo, setNovoCargo] = useState('');
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [editId, setEditId] = useState<string | null>(null);
   const [editNome, setEditNome] = useState('');
+  const [editCargo, setEditCargo] = useState('');
 
   // G4: nome igual encontrado ao tentar criar -> confirmação inline.
   const [confirmarNome, setConfirmarNome] = useState<string | null>(null);
@@ -133,13 +138,14 @@ function FuncionariosManager({
   /** Cria de fato (chamado direto ou após o admin confirmar o nome duplicado). */
   const criarDeVez = async (nome: string) => {
     setSalvando(true);
-    const r = await criarFuncionario({ nome, cargo: CARGO_PADRAO });
+    const r = await criarFuncionario({ nome, cargo: novoCargo.trim() || CARGO_PADRAO });
     setSalvando(false);
     if (r.status === 'error') {
       setErro(r.message);
       return;
     }
     setNovoNome('');
+    setNovoCargo('');
     setConfirmarNome(null);
     // ESCRITA no cliente OK → re-lê NO SERVIDOR (router.refresh), sem getSupabase.
     recarregar();
@@ -173,7 +179,7 @@ function FuncionariosManager({
   const salvarEdicao = async (id: string) => {
     const nome = editNome.trim();
     if (!nome) return;
-    const r = await atualizarFuncionario(id, { nome });
+    const r = await atualizarFuncionario(id, { nome, cargo: editCargo.trim() || CARGO_PADRAO });
     if (r.status === 'error') {
       setErro(r.message);
       return;
@@ -271,10 +277,26 @@ function FuncionariosManager({
               aria-label="Nome do operário"
             />
           </label>
+          <label className="adm-eq-novo-field">
+            <span className="adm-field__label">Cargo / função</span>
+            <input
+              className="adm-input"
+              value={novoCargo}
+              onChange={(e) => setNovoCargo(e.target.value)}
+              placeholder="Ex.: Funileiro, Pintor"
+              list="gd-cargos"
+              aria-label="Cargo ou função"
+            />
+          </label>
           <button className="adm-btn adm-btn--primary" type="submit" disabled={salvando || verificando}>
             <PlusIcon />
             {salvando ? 'Salvando…' : verificando ? 'Verificando…' : 'Adicionar'}
           </button>
+          <datalist id="gd-cargos">
+            {CARGOS_SUGERIDOS.map((c) => (
+              <option key={c} value={c} />
+            ))}
+          </datalist>
         </form>
 
         {/* G4 — confirmação amigável de nome duplicado (aviso inline, não erro) */}
@@ -350,17 +372,31 @@ function FuncionariosManager({
                 role="row"
               >
                 {editId === f.id ? (
-                  <input
-                    className="adm-input adm-eq-edit-input"
-                    value={editNome}
-                    autoFocus
-                    aria-label="Editar nome"
-                    onChange={(e) => setEditNome(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') salvarEdicao(f.id);
-                      if (e.key === 'Escape') setEditId(null);
-                    }}
-                  />
+                  <span className="adm-eq-edit">
+                    <input
+                      className="adm-input adm-eq-edit-input"
+                      value={editNome}
+                      autoFocus
+                      aria-label="Editar nome"
+                      onChange={(e) => setEditNome(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') salvarEdicao(f.id);
+                        if (e.key === 'Escape') setEditId(null);
+                      }}
+                    />
+                    <input
+                      className="adm-input adm-eq-edit-input"
+                      value={editCargo}
+                      aria-label="Editar cargo"
+                      list="gd-cargos"
+                      placeholder="Cargo"
+                      onChange={(e) => setEditCargo(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') salvarEdicao(f.id);
+                        if (e.key === 'Escape') setEditId(null);
+                      }}
+                    />
+                  </span>
                 ) : (
                   <span className="adm-eq-nome">
                     <span className="adm-eq-nome-txt">{f.nome}</span>
@@ -398,6 +434,7 @@ function FuncionariosManager({
                         onClick={() => {
                           setEditId(f.id);
                           setEditNome(f.nome);
+                          setEditCargo(f.cargo);
                         }}
                       >
                         Editar
@@ -495,6 +532,11 @@ function EstilosEquipe() {
         flex: 1;
         min-width: 0;
         margin: 0;
+      }
+      .adm-eq-edit {
+        display: flex;
+        gap: 8px;
+        min-width: 0;
       }
       .adm-eq-confirma {
         margin-top: 16px;
