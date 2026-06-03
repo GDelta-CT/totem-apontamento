@@ -176,3 +176,29 @@ export function montarPainelDono(rows: OSRow[] | null | undefined): PainelDono {
 export function brl(n: number): string {
   return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
+
+/* ─────────────────── Identidade da sessão (hub /admin) ─────────────────── */
+
+/**
+ * View-model PURO da linha de "Sessão" do hub /admin (e-mail + papel + os 6
+ * últimos dígitos do oficina_id carimbado no JWT). É a "prova do isolamento"
+ * que o hub mostra no rodapé. Server-move: esses dados saem do BROWSER (onde
+ * vinham de cracheDaSessao/papelDoUsuarioAtual lendo getSession sem verificar) e
+ * passam a vir do SERVIDOR (DAL getSessao, que VERIFICA o token via getUser e a
+ * claim via getClaims). Só formatação aqui — zero I/O.
+ */
+export type SessaoAdminView = {
+  email: string | null;
+  papel: string | null;
+  /** oficina_id COMPLETO (server-side). A UI mostra só os 6 últimos. */
+  oficinaId: string | null;
+};
+
+/**
+ * Trecho final do oficina_id para exibição ("…ABC123"). PURA — mesma saída para
+ * a mesma entrada. Preserva EXATAMENTE o que o hub já mostrava: '…' + 6 últimos,
+ * ou '—' quando não há oficina_id.
+ */
+export function oficinaCurta(oficinaId: string | null | undefined): string {
+  return oficinaId ? '…' + oficinaId.slice(-6) : '—';
+}

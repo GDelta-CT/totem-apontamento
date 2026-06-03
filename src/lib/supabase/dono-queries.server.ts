@@ -31,6 +31,7 @@ import {
   traduzirErroDono,
   type OSRow,
   type PainelDono,
+  type SessaoAdminView,
 } from './dono-shared';
 
 const TIMEOUT_MS = 8000;
@@ -77,6 +78,33 @@ export async function carregarPainelDonoServer(): Promise<FetchState<PainelDono>
     if (error) return { status: 'error', message: traduzirErroDono(error.message) };
 
     return { status: 'success', data: montarPainelDono(data) };
+  } catch (e) {
+    return { status: 'error', message: traduzirErroDono(e instanceof Error ? e.message : null) };
+  }
+}
+
+/**
+ * Identidade da sessão para a linha de "Sessão" do hub /admin (e-mail + papel +
+ * oficina_id do JWT) — LIDA NO SERVIDOR. Server-move passo 1: substitui o par
+ * cracheDaSessao()/papelDoUsuarioAtual() que o hub lia no BROWSER (via getSession,
+ * que NÃO verifica). Aqui tudo vem do DAL getSessao(), que valida a identidade
+ * (getUser) e a claim oficina_id (getClaims) contra o Auth server.
+ *
+ * Sem sessão (cookie ausente/expirado — ex.: 1º render antes do login) NÃO é erro:
+ * devolve `empty` e o AdminAuthGate (client) mostra a tela de login. A sessão
+ * nunca é lida como anon — getSessao() já retorna null sem cookie válido.
+ *
+ * Não usa withTimeout: o getSessao() do DAL já é a única ida verificada ao Auth
+ * server (memoizada por request), sem query de negócio adicional para travar.
+ */
+export async function carregarSessaoAdminServer(): Promise<FetchState<SessaoAdminView>> {
+  try {
+    const sessao = await getSessao();
+    if (!sessao) return { status: 'empty' };
+    return {
+      status: 'success',
+      data: { email: sessao.email, papel: sessao.papel, oficinaId: sessao.oficinaId },
+    };
   } catch (e) {
     return { status: 'error', message: traduzirErroDono(e instanceof Error ? e.message : null) };
   }
