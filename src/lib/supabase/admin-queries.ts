@@ -2,14 +2,26 @@
  * Camada de dados do ADMIN — passo 2 da ordem de construção (A.1).
  *
  * Espelha os padrões do totem (queries.ts): FetchState + timeout obrigatório +
- * mensagens de erro traduzidas. É um arquivo NOVO e isolado: não toca no totem,
- * no client.ts, no RLS nem na produção. Desfazer = apagar este arquivo.
+ * mensagens de erro traduzidas. É um arquivo isolado: não toca no totem, no RLS
+ * nem na produção.
+ *
+ * SERVER-MOVE (passo 1): os tipos, constantes de domínio e helpers puros
+ * (somarDias, osEstaAtiva, escaparLike, traduzirErro, TIPOS_CLIENTE,
+ * MOTIVOS_BLOQUEIO, STATUS_OS, COLS_OS, PapelOficina, …) saíram daqui para
+ * admin-shared.ts (módulo PURO, sem Supabase), e a versão server-side da LEITURA
+ * das listas vive em admin-queries.server.ts (RSC + DAL). Este arquivo continua
+ * existindo para a ESCRITA (criar/editar/ativar — segue no cliente neste passo),
+ * para as buscas "antes-de-criar" (parte do fluxo de gravação) e para o crachá da
+ * sessão / papel (consumidos pelo AdminShell e pelo AdminAuthGate). Ele
+ * RE-EXPORTA tudo que movemos para admin-shared, para NÃO quebrar nenhum import já
+ * existente (AdminShell, AdminAuthGate, dal.ts, os testes e as duas telas seguem
+ * importando daqui sem mudança). As telas /admin/os e /admin/funcionarios passaram
+ * a LER do servidor; a escrita segue chamando estas funções igual a antes.
  *
  * SOBRE ESCRITA (criar/editar/desativar): só grava de verdade quando houver
  *   (1) usuário ADMIN logado com conta real (oficina_id no JWT) e
  *   (2) a Migration 004 (grants) aplicada no teste.
  * Até lá, as funções de escrita retornam erro de permissão — é esperado.
- * As funções de LEITURA já funcionam hoje (o anon lê OS/funcionários).
  *
  * O oficina_id NÃO é setado aqui nos inserts: o trigger BEFORE INSERT da Fase 1
  * preenche sozinho a partir do JWT, mantendo o isolamento multi-tenant.
@@ -17,6 +29,34 @@
 
 import { getSupabase, type EtapaId } from './client';
 import { normalizarPlaca, type FetchState } from './queries';
+import {
+  COLS_OS,
+  escaparLike,
+  traduzirErro,
+  type FuncionarioAdmin,
+  type MotivoBloqueio,
+  type OrdemServicoAdmin,
+  type PapelOficina,
+  type TipoCliente,
+} from './admin-shared';
+
+// Re-export do núcleo compartilhado: preserva o contrato de quem importava estes
+// nomes de './admin-queries' (tipos, constantes de domínio e helpers puros). Os
+// testes (somarDias/osEstaAtiva), o dal.ts (type PapelOficina) e as telas seguem
+// importando daqui sem mudança.
+export {
+  STATUS_OS,
+  TIPOS_CLIENTE,
+  MOTIVOS_BLOQUEIO,
+  somarDias,
+  osEstaAtiva,
+  type TipoCliente,
+  type StatusOS,
+  type MotivoBloqueio,
+  type OrdemServicoAdmin,
+  type FuncionarioAdmin,
+  type PapelOficina,
+} from './admin-shared';
 
 const TIMEOUT_MS = 8000;
 
@@ -39,153 +79,12 @@ function withTimeout<T>(promise: PromiseLike<T>, ms = TIMEOUT_MS): Promise<T> {
   });
 }
 
-/**
- * Escapa os caracteres especiais de LIKE/ILIKE (`%`, `_`, `\`) num termo de
- * busca, para que um nome como "João %" ou "a_b" seja tratado LITERALMENTE e
- * não como um padrão de wildcard. Sem isso, `.ilike(col, termo)` casaria
- * qualquer coisa quando o termo tivesse `%`/`_` — quebrando G4/G5 em silêncio.
- */
-function escaparLike(termo: string): string {
-  return termo.replace(/[\\%_]/g, '\\$&');
-}
-
-/**
- * Mensagem amigável padrão quando o erro não casa nenhum padrão conhecido.
- * Evita vazar texto cru do Postgres (jargão técnico) para o admin.
- */
-const ERRO_GENERICO = 'Não foi possível concluir. Tente de novo em instantes.';
-
-/**
- * Traduz erros do Postgres/Supabase (ou de catch) para algo legível ao admin.
- * Nunca devolve o texto cru do banco: o que não casar vira ERRO_GENERICO.
- * Mensagens já-amigáveis em PT-BR (timeout do withTimeout) passam intactas.
- */
-function traduzirErro(msg: string | null | undefined): string {
-  if (!msg) return ERRO_GENERICO;
-  const m = msg.toLowerCase();
-  // Mensagens nossas (já amigáveis) que devem passar sem reescrita.
-  if (m.includes('conexão demorou') || m.includes('verifique a internet')) {
-    return msg;
-  }
-  if (m.includes('duplicate') || m.includes('unique') || m.includes('23505')) {
-    return 'Já existe uma OS cadastrada com essa placa. Busque a placa antes de criar.';
-  }
-  if (m.includes('jwt') || m.includes('invalid api key')) {
-    return 'Sessão inválida. Faça login de novo.';
-  }
-  if (m.includes('permission') || m.includes('rls') || m.includes('policy') || m.includes('denied')) {
-    return 'Sem permissão para gravar. (Falta aplicar a Migration 004 ou fazer login como admin.)';
-  }
-  if (m.includes('check constraint') || m.includes('violates check')) {
-    return 'Valor inválido em um dos campos (tipo de cliente, etapa ou motivo de bloqueio).';
-  }
-  if (m.includes('network') || m.includes('fetch') || m.includes('failed to')) {
-    return 'Sem conexão com o servidor. Verifique a internet.';
-  }
-  return ERRO_GENERICO;
-}
-
-/* ───────────────────────── Tipos ───────────────────────── */
-
-export type TipoCliente = 'seguradora' | 'cooperativa' | 'particular';
-
-/** Ciclo de vida da OS (status_geral). Lista FIXA — trava do banco na 005. */
-export type StatusOS =
-  | 'Aguardando Produção'
-  | 'Em Produção'
-  | 'Pronto para Entrega'
-  | 'Entregue';
-
-/** OS é "ativa" enquanto não foi entregue (regra da placa única-parcial). */
-export const STATUS_OS: StatusOS[] = [
-  'Aguardando Produção',
-  'Em Produção',
-  'Pronto para Entrega',
-  'Entregue',
-];
-
-/** Um carro entregue sai do quadro ativo; o resto conta como ativo. */
-export function osEstaAtiva(status: string | null | undefined): boolean {
-  return status !== 'Entregue';
-}
-
-export type MotivoBloqueio =
-  | 'aguardando_peca'
-  | 'em_outro_setor'
-  | 'aguardando_aprovacao'
-  | 'aguardando_cura';
-
-/** OS completa, com todos os campos finais da OS (vide CLAUDE.md). */
-export type OrdemServicoAdmin = {
-  id: string;
-  placa: string;
-  modelo_veiculo: string;
-  status_geral: string | null;
-  data_entrada: string | null;
-  data_prometida: string | null;
-  tipo_cliente: TipoCliente | null;
-  valor_orcamento: number | null;
-  ref_externa: string | null;
-  etapa_atual: EtapaId | null;
-  bloqueado: boolean;
-  motivo_bloqueio: MotivoBloqueio | null;
-};
-
-/** Funcionário como o admin vê (inclui inativos). */
-export type FuncionarioAdmin = {
-  id: string;
-  nome: string;
-  cargo: string;
-  ativo: boolean;
-};
-
-/* ─────────────────── Constantes de domínio ─────────────────── */
-
-/**
- * Tipos de cliente + prazo sugerido (em dias) para pré-preencher a data
- * prometida no formulário (passo 4). São SUGESTÕES editáveis, não regra fixa.
- */
-export const TIPOS_CLIENTE: { id: TipoCliente; nome: string; prazoSugeridoDias: number }[] = [
-  { id: 'seguradora', nome: 'Seguradora', prazoSugeridoDias: 30 },
-  { id: 'cooperativa', nome: 'Cooperativa', prazoSugeridoDias: 30 },
-  { id: 'particular', nome: 'Particular', prazoSugeridoDias: 15 },
-];
-
-/**
- * Soma `dias` a uma data base (YYYY-MM-DD) e devolve YYYY-MM-DD.
- * Usado para sugerir a data prometida a partir do tipo de cliente. Sugestão
- * editável: o admin pode trocar. Base ausente -> usa hoje.
- */
-export function somarDias(baseISO: string | null | undefined, dias: number): string {
-  const base = baseISO ? new Date(baseISO + 'T00:00:00') : new Date();
-  base.setDate(base.getDate() + dias);
-  return base.toISOString().slice(0, 10);
-}
-
-/**
- * Motivos de bloqueio com a divisão visual do escopo:
- * PROBLEMA (peça, aprovação) × FLUXO (outro setor, cura).
- */
-export const MOTIVOS_BLOQUEIO: {
-  id: MotivoBloqueio;
-  nome: string;
-  categoria: 'problema' | 'fluxo';
-}[] = [
-  { id: 'aguardando_peca', nome: 'Aguardando peça', categoria: 'problema' },
-  { id: 'aguardando_aprovacao', nome: 'Aguardando aprovação', categoria: 'problema' },
-  { id: 'em_outro_setor', nome: 'Em outro setor', categoria: 'fluxo' },
-  { id: 'aguardando_cura', nome: 'Aguardando cura', categoria: 'fluxo' },
-];
-
-const COLS_OS =
-  'id, placa, modelo_veiculo, status_geral, data_entrada, data_prometida, tipo_cliente, valor_orcamento, ref_externa, etapa_atual, bloqueado, motivo_bloqueio';
-
 /* ─────────────────── Ordens de Serviço — leitura ─────────────────── */
 
 /**
- * Lista as OS da oficina, mais recentes primeiro.
- * (O filtro "esconder entregues/arquivadas" entra junto com o fluxo de
- *  "marcar entregue", num passo futuro — aqui ainda lista todas.)
+ * Lista as OS da oficina, mais recentes primeiro. VERSÃO CLIENT (lê do browser).
+ * A tela /admin/os agora LÊ DO SERVIDOR (listarOSServer); esta versão segue para
+ * quem ainda lê do browser e para preservar o contrato.
  */
 export async function listarOS(): Promise<FetchState<OrdemServicoAdmin[]>> {
   try {
@@ -227,8 +126,9 @@ export async function buscarOSPorId(id: string): Promise<FetchState<OrdemServico
 
 /**
  * Buscar-antes-de-criar: procura uma OS ATIVA (não entregue) com a placa.
- * Usado para avisar o admin antes de criar uma duplicada. A trava real é o
- * índice único parcial do banco (Migration 005); aqui é a camada de UX.
+ * Usado para avisar o admin antes de criar uma duplicada. Faz parte do fluxo de
+ * GRAVAÇÃO (segue no cliente neste passo). A trava real é o índice único parcial
+ * do banco (Migration 005); aqui é a camada de UX.
  * Retorna a OS ativa encontrada, ou null se a placa está livre.
  */
 export async function buscarOSAtivaPorPlaca(
@@ -369,7 +269,11 @@ export async function atualizarOS(
 
 /* ─────────────────────── Funcionários ─────────────────────── */
 
-/** Lista todos os funcionários (ativos e inativos), em ordem alfabética. */
+/**
+ * Lista todos os funcionários (ativos e inativos), em ordem alfabética. VERSÃO
+ * CLIENT. A tela /admin/funcionarios agora LÊ DO SERVIDOR
+ * (listarFuncionariosServer); esta versão segue para o contrato/usos client.
+ */
 export async function listarFuncionarios(): Promise<FetchState<FuncionarioAdmin[]>> {
   try {
     const result = await withTimeout(
@@ -394,9 +298,10 @@ export type FuncionarioInput = { nome: string; cargo: string };
 
 /**
  * Buscar-antes-de-criar (G4 — integridade por UX): procura um funcionário com o
- * MESMO nome (case-insensitive, ignorando espaços nas pontas). O totem identifica
- * o operário SÓ pelo nome — dois "Fulano" confundem na hora de achar a tarefa.
- * Não é trava de banco; é o aviso que deixa o admin confirmar antes de duplicar.
+ * MESMO nome (case-insensitive, ignorando espaços nas pontas). Faz parte do fluxo
+ * de GRAVAÇÃO (segue no cliente neste passo). O totem identifica o operário SÓ
+ * pelo nome — dois "Fulano" confundem na hora de achar a tarefa. Não é trava de
+ * banco; é o aviso que deixa o admin confirmar antes de duplicar.
  * Retorna o nome já cadastrado (como está no banco), ou null se está livre.
  */
 export async function buscarFuncionarioPorNome(
@@ -429,7 +334,8 @@ export async function buscarFuncionarioPorNome(
 /**
  * Checa se um funcionário tem apontamento ATIVO (G5 — integridade por UX).
  * "Ativo" = status_tarefa in ('Em andamento','Pausado'), o mesmo critério do
- * totem (ver buscarApontamentoAtivo em queries.ts). O totem casa apontamento ⇄
+ * totem (ver buscarApontamentoAtivo em queries.ts). Faz parte do fluxo de
+ * GRAVAÇÃO (desativar — segue no cliente neste passo). O totem casa apontamento ⇄
  * operário pelo NOME, então a checagem é por nome. Usado para avisar antes de
  * desativar — desativar com timer rodando deixaria um apontamento órfão.
  * Retorna true se há pelo menos um apontamento ativo com esse nome.
@@ -555,11 +461,10 @@ export async function setFuncionarioAtivo(
 
 /* ─────────────────── Sessão / papel do admin (passo 3) ─────────────────── */
 
-export type PapelOficina = 'dono' | 'gerente' | 'operario' | 'contador';
-
 /**
  * Lê o papel do usuário logado na PRÓPRIA oficina (tabela user_oficinas).
  * A política "user_ve_proprios_vinculos" garante que só vem a própria linha.
+ * Consumida pelo AdminAuthGate e pelo AdminShell (não tocados neste passo).
  */
 export async function papelDoUsuarioAtual(): Promise<
   FetchState<{ papel: PapelOficina; oficina_id: string }>
@@ -594,6 +499,7 @@ function lerClaimsJWT(token: string): Record<string, unknown> | null {
 /**
  * Crachá da sessão atual: e-mail + o oficina_id QUE O SERVIDOR CARIMBOU no JWT.
  * É a prova visível do isolamento (o cliente não escolheu esse valor).
+ * Consumida pelo AdminShell (não tocado neste passo).
  */
 export async function cracheDaSessao(): Promise<{
   email: string | null;

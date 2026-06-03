@@ -1,24 +1,47 @@
 /**
  * Detecção e correção de ANOMALIAS de apontamento (Passo 4 da ordem A.1).
  *
- * A DETECÇÃO é leitura pura (funciona já). A CORREÇÃO (editar tempo / fechar
- * fantasma) só grava de verdade após a Migration 006 (grants de UPDATE em
- * apontamentos) ser aplicada no teste — até lá, retorna erro de permissão,
- * tratado de forma amigável na UI.
+ * A DETECÇÃO é leitura pura. A CORREÇÃO (editar tempo / fechar fantasma) só grava
+ * de verdade após a Migration 006 (grants de UPDATE em apontamentos) ser aplicada
+ * no teste — até lá, retorna erro de permissão, tratado de forma amigável na UI.
+ *
+ * SERVER-MOVE (passo 1): a regra de negócio (classificar fantasmas, calcular
+ * horas, excluir os já corrigidos) e os tipos saíram daqui para anomalias-shared.ts
+ * (módulo PURO, sem Supabase), e a versão server-side da LEITURA vive em
+ * anomalias-queries.server.ts (RSC + DAL). Este arquivo continua existindo para a
+ * ESCRITA (registrarCorrecao, que segue no cliente neste passo) e para quem AINDA
+ * lê do browser — re-exporta tipos/constantes compartilhados para NÃO quebrar
+ * nenhum import já existente (a tela de anomalias passou a LER do servidor; a
+ * correção segue chamando registrarCorrecao() daqui igual a antes).
  *
  * Teto anti-fantasma (CLAUDE.md): apontamento ativo muito acima de ~10,5h é
  * anomalia para o admin corrigir. Tempos ancorados no relógio do servidor.
  */
 
 import { getSupabase } from './client';
-import { parseISOComUTC, type FetchState } from './queries';
+import type { FetchState } from './queries';
+import {
+  ACOES_ENCERRANTES,
+  COLS_ANOMALIAS,
+  MSG_FALHA_LEITURA,
+  STATUS_ATIVOS,
+  filtrarCorrigidas,
+  montarAnomalias,
+  traduzirErroAnomalia,
+  type RowAnomalia,
+} from './anomalias-shared';
+
+// Re-export do núcleo compartilhado: preserva o contrato de quem importava estes
+// nomes de './anomalias-queries' (TETO_FANTASMA_MS, tipos Anomalia/AcaoCorrecao/
+// MotivoCodigo). Os testes e a UI seguem importando daqui sem mudança.
+export {
+  TETO_FANTASMA_MS,
+  type Anomalia,
+  type AcaoCorrecao,
+  type MotivoCodigo,
+} from './anomalias-shared';
 
 const TIMEOUT_MS = 8000;
-/** Teto anti-fantasma: 10,5h em milissegundos. */
-export const TETO_FANTASMA_MS = 10.5 * 60 * 60 * 1000;
-
-// Higiene (#7): a LEITURA nunca expõe erro cru do Postgres (RLS/SQL/estrutura) na UI.
-const MSG_FALHA_LEITURA = 'Não foi possível carregar as anomalias agora. Tente de novo.';
 
 function withTimeout<T>(promise: PromiseLike<T>, ms = TIMEOUT_MS): Promise<T> {
   return new Promise((resolve, reject) => {
@@ -38,70 +61,27 @@ function withTimeout<T>(promise: PromiseLike<T>, ms = TIMEOUT_MS): Promise<T> {
   });
 }
 
-export type Anomalia = {
-  id: string;
-  nome_funcionario: string;
-  cargo_funcionario: string | null;
-  etapa: string | null;
-  status_tarefa: string;
-  hora_inicio: string;
-  /** Horas decorridas desde o início (relógio do servidor no momento da leitura). */
-  horasDecorridas: number;
-  placa: string | null;
-  modelo: string | null;
-};
-
-type Row = {
-  id: string;
-  nome_funcionario: string;
-  cargo_funcionario: string | null;
-  etapa: string | null;
-  status_tarefa: string;
-  hora_inicio: string;
-  ordem_servico: { placa: string; modelo_veiculo: string } | { placa: string; modelo_veiculo: string }[] | null;
-};
-
 /**
  * Lista apontamentos ATIVOS (Em andamento/Pausado) abertos há mais que o teto
- * anti-fantasma. São candidatos a correção do admin (fechar/ajustar).
+ * anti-fantasma. VERSÃO CLIENT (lê do browser). Reusa a regra pura de
+ * anomalias-shared.ts — sem cópia da versão server.
  */
-export async function listarAnomalias(): Promise<FetchState<Anomalia[]>> {
+export async function listarAnomalias(): Promise<FetchState<import('./anomalias-shared').Anomalia[]>> {
   try {
     const result = await withTimeout(
       getSupabase()
         .from('apontamentos')
-        .select(
-          'id, nome_funcionario, cargo_funcionario, etapa, status_tarefa, hora_inicio, ordem_servico:ordens_servico(placa, modelo_veiculo)'
-        )
-        .in('status_tarefa', ['Em andamento', 'Pausado'])
+        .select(COLS_ANOMALIAS)
+        .in('status_tarefa', [...STATUS_ATIVOS])
         .order('hora_inicio', { ascending: true })
     );
-    const { data, error } = result as { data: Row[] | null; error: { message: string } | null };
+    const { data, error } = result as { data: RowAnomalia[] | null; error: { message: string } | null };
     if (error) {
       console.warn('[listarAnomalias] falha na consulta principal:', error.message);
       return { status: 'error', message: MSG_FALHA_LEITURA };
     }
 
-    const agora = Date.now();
-    const anomalias: Anomalia[] = (data ?? [])
-      // só os que passaram do teto anti-fantasma (datas do banco são UTC sem 'Z')
-      .filter((r) => agora - parseISOComUTC(r.hora_inicio) > TETO_FANTASMA_MS)
-      .map((r) => {
-        const decorridoMs = agora - parseISOComUTC(r.hora_inicio);
-        const os = Array.isArray(r.ordem_servico) ? r.ordem_servico[0] : r.ordem_servico;
-        return {
-          id: r.id,
-          nome_funcionario: r.nome_funcionario,
-          cargo_funcionario: r.cargo_funcionario,
-          etapa: r.etapa,
-          status_tarefa: r.status_tarefa,
-          hora_inicio: r.hora_inicio,
-          horasDecorridas: decorridoMs / (60 * 60 * 1000),
-          placa: os?.placa ?? null,
-          modelo: os?.modelo_veiculo ?? null,
-        };
-      });
-
+    const anomalias = montarAnomalias(data, Date.now());
     if (anomalias.length === 0) return { status: 'empty' };
 
     // §4 (PLANO): não ressuscitar fantasmas já corrigidos — exclui apontamentos
@@ -112,23 +92,21 @@ export async function listarAnomalias(): Promise<FetchState<Anomalia[]>> {
         .from('apontamento_correcoes')
         .select('apontamento_id')
         .in('apontamento_id', ids)
-        .in('acao', ['ajustar_fim', 'descartar'])
+        .in('acao', [...ACOES_ENCERRANTES])
     );
     const { data: corrRows, error: corrErr } = corr as {
       data: { apontamento_id: string }[] | null;
       error: { message: string } | null;
     };
-    // ROBUSTEZ: antes o erro era IGNORADO em silêncio (corrRows null) -> a exclusão
-    // não acontecia, mas calada. Agora desestruturamos o erro: se a checagem da
-    // trilha falhar, mantemos a lista de anomalias SEM excluir (conservador) e
-    // avisamos no log. Pior caso: um fantasma já corrigido reaparece como anomalia
-    // (o admin recorrige) — preferível a sumir com anomalias por uma falha auxiliar.
+    // ROBUSTEZ: se a checagem da trilha falhar, mantemos a lista SEM excluir
+    // (conservador) e avisamos no log. Pior caso: um fantasma já corrigido
+    // reaparece como anomalia (o admin recorrige) — preferível a sumir com
+    // anomalias por uma falha auxiliar.
     if (corrErr) {
       console.warn('[listarAnomalias] falha ao checar correções (ignorada):', corrErr.message);
       return { status: 'success', data: anomalias };
     }
-    const encerrados = new Set((corrRows ?? []).map((c) => c.apontamento_id));
-    const restantes = anomalias.filter((a) => !encerrados.has(a.id));
+    const restantes = filtrarCorrigidas(anomalias, corrRows);
 
     if (restantes.length === 0) return { status: 'empty' };
     return { status: 'success', data: restantes };
@@ -137,38 +115,20 @@ export async function listarAnomalias(): Promise<FetchState<Anomalia[]>> {
   }
 }
 
-/** Traduz erro de gravação para algo legível ao admin (sem jargão técnico). */
-function traduzirErro(msg: string): string {
-  const m = msg.toLowerCase();
-  if (
-    m.includes('permission') ||
-    m.includes('denied') ||
-    m.includes('row-level') ||
-    m.includes('policy')
-  ) {
-    return 'Sem permissão para corrigir. Confirme que você entrou como gerente/dono desta oficina.';
-  }
-  if (m.includes('network') || m.includes('fetch') || m.includes('timeout') || m.includes('demorou')) {
-    return 'Sem conexão com o servidor. Verifique a internet e tente de novo.';
-  }
-  return 'Não foi possível registrar a correção agora. Tente de novo.';
-}
-
-export type AcaoCorrecao = 'ajustar_fim' | 'descartar' | 'confirmar';
-export type MotivoCodigo = 'esqueceu_parar' | 'saiu_sem_registrar' | 'erro_toque' | 'outro';
-
 /**
  * Correção APPEND-ONLY de um apontamento-fantasma (docs/PLANO-CORRECAO-ANOMALIA).
  * NÃO sobrescreve o bruto (hora_inicio/hora_fim/status): registra UMA linha em
  * apontamento_correcoes (antes→depois, motivo OBRIGATÓRIO, quem/quando pelo
  * servidor) e marca editado_admin=true (só marcador). Os leitores excluem os
  * apontamentos com correção encerrante (ver listarAnomalias / §4 do plano).
+ *
+ * ESCRITA — segue no cliente neste passo (Passo 3 do server-move move escrita).
  */
 export async function registrarCorrecao(params: {
   apontamentoId: string;
-  acao: AcaoCorrecao;
+  acao: import('./anomalias-shared').AcaoCorrecao;
   motivo: string;
-  motivoCodigo?: MotivoCodigo;
+  motivoCodigo?: import('./anomalias-shared').MotivoCodigo;
   horaFimISO?: string;
 }): Promise<FetchState<true>> {
   const motivo = params.motivo.trim();
@@ -191,7 +151,7 @@ export async function registrarCorrecao(params: {
       } | null;
       error: { message: string } | null;
     };
-    if (e1) return { status: 'error', message: traduzirErro(e1.message) };
+    if (e1) return { status: 'error', message: traduzirErroAnomalia(e1.message) };
     if (!bruto) return { status: 'error', message: 'Apontamento não encontrado.' };
 
     // 2) O "depois": ajustar_fim encerra com um fim efetivo; descartar não tem depois.
@@ -223,7 +183,7 @@ export async function registrarCorrecao(params: {
         .single()
     );
     const { error: e2 } = ins as { error: { message: string } | null };
-    if (e2) return { status: 'error', message: traduzirErro(e2.message) };
+    if (e2) return { status: 'error', message: traduzirErroAnomalia(e2.message) };
 
     // 4) Marca "editado pelo admin" (apenas marcador; tempos/status do bruto intactos).
     await withTimeout(
