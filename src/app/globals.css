@@ -307,7 +307,14 @@ input {
   user-select: text;
 }
 
-/* ===== Telas de autenticação — marca GDelta (login oficina/totem + admin) ===== */
+/* ===== Telas de autenticação — marca GDelta (login oficina/totem + admin) =====
+   IDIOMA ÚNICO ESCURO/INDUSTRIAL: o app inteiro (totem + /admin) é escuro, então
+   as duas telas de login convergem para o MESMO tratamento do AdminShell — cartão
+   --bg-card "prensado" (borda fina + realce de topo 1px inset + sombra escura funda),
+   fundo escuro com glow frio sutil, inputs --bg-input com anel de foco teal que brilha.
+   Layout PRESERVADO (cartão central: logo · título · campos · botão · rodapé).
+   --dark é a base; --light é mantido como ALIAS do escuro (nenhuma tela usa fundo
+   claro hoje), para que trocar a classe no admin seja seguro e reversível. */
 .gd-auth {
   position: fixed;
   inset: 0;
@@ -316,23 +323,37 @@ input {
   justify-content: center;
   padding: 24px;
   overflow: auto;
+  /* Casa com o fundo do AdminShell: navy profundo + glow teal frio no topo +
+     grade diagonal discretíssima (textura industrial). */
+  background-color: var(--bg-primary);
+  background-image:
+    radial-gradient(120% 72% at 50% -12%, rgba(28, 132, 173, 0.16) 0%, transparent 58%),
+    repeating-linear-gradient(
+      45deg,
+      transparent 0,
+      transparent 14px,
+      rgba(255, 255, 255, 0.012) 14px,
+      rgba(255, 255, 255, 0.012) 15px
+    );
+  color: var(--text-primary);
 }
-.gd-auth--dark {
-  background:
-    radial-gradient(circle at 50% -8%, rgba(28, 132, 173, 0.28), transparent 55%),
-    linear-gradient(180deg, var(--gd-navy-deep) 0%, #061a29 100%);
-}
+/* --light é alias do escuro (app 100% dark). Mantido p/ compat sem fundo claro. */
+.gd-auth--dark,
 .gd-auth--light {
-  background:
-    radial-gradient(circle at 50% -8%, rgba(19, 103, 141, 0.12), transparent 55%),
-    linear-gradient(180deg, #e4ebf0 0%, #f0f3f5 100%);
+  /* herda o fundo escuro de .gd-auth; sem override claro. */
 }
 .gd-auth__card {
+  position: relative;
   width: min(420px, 100%);
-  background: var(--gd-paper);
-  border: 1px solid rgba(11, 56, 87, 0.08);
-  border-radius: var(--gd-radius);
-  box-shadow: var(--gd-shadow);
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  /* Profundidade do totem: realce de topo 1px (highlight branco baixo) + sombra
+     escura funda + halo teal sutil = superfície "instrumento prensado". */
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.05) inset,
+    0 30px 80px -24px rgba(0, 0, 0, 0.8),
+    0 0 60px rgba(28, 132, 173, 0.1);
   padding: 40px 34px 30px;
   display: flex;
   flex-direction: column;
@@ -340,23 +361,37 @@ input {
   text-align: center;
   animation: fade-in-up 0.4s ease-out forwards;
 }
+/* Filete teal que brilha no topo do cartão — a mesma assinatura da barra de comando. */
+.gd-auth__card::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 18%;
+  right: 18%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gd-teal-bright), transparent);
+  box-shadow: 0 0 12px rgba(28, 132, 173, 0.7);
+  border-radius: 1px;
+}
 .gd-auth__logo {
   width: 138px;
   height: auto;
   margin-bottom: 10px;
   -webkit-user-drag: none;
   user-select: none;
+  /* Assenta o logo dourado sobre o escuro com leve elevação. */
+  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.55));
 }
 .gd-auth__title {
   font-size: 22px;
   font-weight: 800;
-  color: var(--gd-ink);
+  color: var(--text-primary);
   letter-spacing: -0.01em;
   margin: 4px 0 4px;
 }
 .gd-auth__sub {
   font-size: 15px;
-  color: var(--gd-muted);
+  color: var(--text-secondary);
   line-height: 1.45;
   margin: 0 0 22px;
 }
@@ -368,26 +403,29 @@ input {
 }
 .gd-auth__input {
   width: 100%;
+  min-height: 48px;
   padding: 14px 16px;
   font-size: 16px;
   border-radius: 12px;
-  border: 1.5px solid var(--gd-line);
-  background: var(--gd-white);
-  color: var(--gd-ink);
+  border: 1.5px solid var(--border-default);
+  background: var(--bg-input);
+  color: var(--text-primary);
   transition:
     border-color 120ms ease,
     box-shadow 120ms ease;
 }
 .gd-auth__input::placeholder {
-  color: #93a4b1;
+  color: var(--text-muted);
 }
 .gd-auth__input:focus {
   outline: none;
   border-color: var(--gd-teal-bright);
-  box-shadow: 0 0 0 4px rgba(28, 132, 173, 0.16);
+  /* Anel de foco teal que brilha — idêntico aos inputs do shell. */
+  box-shadow: 0 0 0 4px rgba(28, 132, 173, 0.22);
 }
 .gd-auth__btn {
   width: 100%;
+  min-height: 48px;
   padding: 15px;
   font-size: 16px;
   font-weight: 700;
@@ -397,12 +435,15 @@ input {
   color: #fff;
   cursor: pointer;
   margin-top: 4px;
+  box-shadow: 0 0 0 0 rgba(28, 132, 173, 0);
   transition:
     background 120ms ease,
+    box-shadow 120ms ease,
     transform 80ms ease;
 }
 .gd-auth__btn:hover:not(:disabled) {
   background: var(--gd-teal-hover);
+  box-shadow: 0 8px 24px -8px rgba(28, 132, 173, 0.7);
 }
 .gd-auth__btn:active:not(:disabled) {
   transform: translateY(1px);
@@ -412,37 +453,48 @@ input {
   cursor: default;
 }
 .gd-auth__btn--ghost {
-  background: transparent;
-  color: var(--gd-muted);
-  border: 1.5px solid var(--gd-line);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-secondary);
+  border: 1.5px solid var(--border-default);
+  box-shadow: none;
 }
 .gd-auth__btn--ghost:hover:not(:disabled) {
-  background: var(--gd-paper-2);
-  color: var(--gd-ink);
+  background: var(--bg-card-hover);
+  border-color: rgba(148, 163, 184, 0.4);
+  color: var(--text-primary);
 }
 .gd-auth__error {
   width: 100%;
   box-sizing: border-box;
-  background: #fdecec;
-  color: #b42318;
-  border: 1px solid #f5c2c0;
+  /* Erro legível no escuro: vermelho da família, fundo translúcido + borda. */
+  background: rgba(239, 68, 68, 0.14);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.4);
   border-radius: 10px;
-  padding: 10px 12px;
+  padding: 11px 14px;
   font-size: 14px;
+  font-weight: 600;
   margin: 0;
 }
 .gd-auth__foot {
   margin-top: 22px;
   font-size: 12px;
-  letter-spacing: 0.06em;
-  color: var(--gd-muted);
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
   text-transform: uppercase;
 }
+/* Palavra-marca no rodapé: "G|DELTA" com o | em teal que brilha (igual ao shell). */
 .gd-auth__foot strong {
-  color: var(--gd-teal);
+  color: var(--text-secondary);
   font-weight: 800;
 }
-/* Variante kiosk (totem) — alvos de toque maiores */
+.gd-auth__foot .gd-auth__bar {
+  color: var(--gd-teal-bright);
+  font-weight: 800;
+  margin: 0 1px;
+  text-shadow: 0 0 10px rgba(28, 132, 173, 0.7);
+}
+/* Variante kiosk (totem) — alvos de toque maiores (kiosk é tátil). */
 .gd-auth--kiosk .gd-auth__card {
   width: min(468px, 100%);
   padding: 46px 38px 32px;
@@ -458,9 +510,11 @@ input {
 }
 .gd-auth--kiosk .gd-auth__input {
   font-size: 18px;
+  min-height: 56px;
   padding: 16px 18px;
 }
 .gd-auth--kiosk .gd-auth__btn {
   font-size: 18px;
+  min-height: 56px;
   padding: 17px;
 }

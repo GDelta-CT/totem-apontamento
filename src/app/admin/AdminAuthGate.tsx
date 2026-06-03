@@ -73,7 +73,7 @@ export function AdminAuthGate({ children }: { children: ReactNode }) {
 
   if (estado === 'carregando') {
     return (
-      <div className="gd-auth gd-auth--light">
+      <div className="gd-auth gd-auth--dark">
         <div className="gd-auth__card">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="gd-auth__logo" src="/gdelta-logo.png" alt="GDelta" />
@@ -89,7 +89,7 @@ export function AdminAuthGate({ children }: { children: ReactNode }) {
 
   if (estado === 'sem-permissao') {
     return (
-      <div className="gd-auth gd-auth--light">
+      <div className="gd-auth gd-auth--dark">
         <div className="gd-auth__card">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="gd-auth__logo" src="/gdelta-logo.png" alt="GDelta" />
@@ -102,7 +102,10 @@ export function AdminAuthGate({ children }: { children: ReactNode }) {
             Sair
           </button>
           <p className="gd-auth__foot">
-            <strong>GDelta</strong> · Painel
+            <strong aria-label="GDelta">
+              G<span className="gd-auth__bar">|</span>DELTA
+            </strong>{' '}
+            · Painel
           </p>
         </div>
       </div>
@@ -111,7 +114,7 @@ export function AdminAuthGate({ children }: { children: ReactNode }) {
 
   // deslogado
   return (
-    <div className="gd-auth gd-auth--light">
+    <div className="gd-auth gd-auth--dark">
       <div className="gd-auth__card">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img className="gd-auth__logo" src="/gdelta-logo.png" alt="GDelta" />

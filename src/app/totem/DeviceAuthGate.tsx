@@ -100,7 +100,10 @@ export function DeviceAuthGate({ children }: { children: ReactNode }) {
           </button>
         </form>
         <p className="gd-auth__foot">
-          <strong>GDelta</strong> · Apontamento de oficina
+          <strong aria-label="GDelta">
+            G<span className="gd-auth__bar">|</span>DELTA
+          </strong>{' '}
+          · Apontamento de oficina
         </p>
       </div>
     </div>
