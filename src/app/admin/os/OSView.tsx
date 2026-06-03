@@ -324,7 +324,7 @@ function OSManager({ estadoInicial }: { estadoInicial: FetchState<OrdemServicoAd
                 <span className={'adm-os-prazo gd-tabular fam-' + familiaPrazo(os.data_prometida)}>
                   {dataBR(os.data_prometida)}
                 </span>
-                <span className="gd-tabular">
+                <span className="adm-os-valor gd-tabular">
                   {os.valor_orcamento != null ? brl(os.valor_orcamento) : '—'}
                 </span>
                 <span>
@@ -583,6 +583,12 @@ function EstilosOS() {
       .adm-os-cap {
         text-transform: capitalize;
         color: var(--text-secondary);
+      }
+      /* Valor = mostrador: mono-tabular (mesma família da placa-instrumento). */
+      .adm-os-valor {
+        font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+        color: var(--text-primary);
+        font-weight: 600;
       }
       /* Prazo: data colorida pela proximidade do vencimento (cápsula na célula,
          acentos que brilham — mesma família do totem). */

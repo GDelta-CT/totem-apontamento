@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700;800;900&display=swap');
 @import 'tailwindcss';
 
 /* ===== GDelta — Design System ===== */
@@ -6,11 +6,13 @@
 :root {
   /* --- Marca GDelta (fonte: logo oficial) --- */
   --gd-navy: #0b3857; /* marinho da marca */
-  --gd-navy-deep: #082a42; /* fundo escuro (login do totem) */
-  --gd-navy-soft: #0f4467; /* superfície marinho */
+  --gd-navy-deep: #082a42; /* fundo escuro (login do totem) — ESTRUTURA navy profundo */
+  --gd-navy-soft: #0f4467; /* superfície marinho — ESTRUTURA navy soft */
   --gd-teal: #13678d; /* teal/petróleo da seta */
-  --gd-teal-bright: #1c84ad; /* destaque / botão */
-  --gd-teal-hover: #2596c4;
+  /* ACENTO ÚNICO da "Escada Teal": teal disciplinado, UM hue da família navy.
+     OKLCH (fonte da verdade) com fallback hex que o totem já aprovou (#1c84ad). */
+  --gd-teal-bright: oklch(0.62 0.115 220deg); /* = ~#1c84ad — ação/ativo/foco/placa/links */
+  --gd-teal-hover: oklch(0.68 0.12 218deg); /* = ~#2596c4 — hover do acento */
   --gd-paper: #f5f4f2; /* off-white da marca */
   --gd-paper-2: #eceae6;
   --gd-ink: #0b2233; /* texto sobre claro */

@@ -279,7 +279,7 @@ function EstilosHub() {
         border-radius: var(--radius-lg);
         background: rgba(28, 132, 173, 0.12);
         border: 1px solid rgba(28, 132, 173, 0.22);
-        color: var(--gd-teal-bright);
+        color: var(--adm-accent);
         transition:
           background 180ms cubic-bezier(0.4, 0, 0.2, 1),
           color 180ms cubic-bezier(0.4, 0, 0.2, 1),
@@ -287,7 +287,7 @@ function EstilosHub() {
       }
       .adm-hub-card:hover .adm-hub-card__ic {
         background: rgba(28, 132, 173, 0.2);
-        color: var(--gd-teal-hover);
+        color: var(--adm-accent-strong);
         box-shadow: 0 0 16px rgba(28, 132, 173, 0.35);
       }
       .adm-hub-card__body {
@@ -320,8 +320,8 @@ function EstilosHub() {
         font-weight: 700;
         letter-spacing: 0.02em;
         color: var(--adm-info);
-        background: rgba(74, 168, 216, 0.14);
-        border: 1px solid rgba(74, 168, 216, 0.3);
+        background: var(--adm-info-fill);
+        border: 1px solid var(--adm-info-line);
         border-radius: 999px;
       }
       .adm-hub-card__prev::before {
@@ -343,7 +343,7 @@ function EstilosHub() {
           transform 180ms cubic-bezier(0.4, 0, 0.2, 1);
       }
       .adm-hub-card:hover .adm-hub-card__arrow {
-        color: var(--gd-teal-bright);
+        color: var(--adm-accent);
         transform: translateX(3px);
       }
 
@@ -394,13 +394,14 @@ function EstilosHub() {
       }
       .adm-hub-sessao__papel {
         font-weight: 700;
-        color: var(--gd-teal-bright);
+        color: var(--adm-accent);
         text-transform: capitalize;
       }
       .adm-hub-sessao__sep {
         color: var(--text-muted);
       }
       .adm-hub-sessao__oid {
+        font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
         color: var(--text-secondary);
       }
 

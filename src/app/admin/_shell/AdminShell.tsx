@@ -181,16 +181,48 @@ function EstilosShell() {
       /* ════════ Casca: fundo escuro + textura sutil; recria scroll/seleção ════════ */
       .adm-shell {
         --adm-gutter: 28px;
-        /* ── "Info" da CASA (escopado ao /admin) ──
-           A família "info" do painel NÃO usa o azul genérico --blue-primary
-           (#3b82f6, que o TOTEM usa e o fundador aprovou). Aqui ela é um
-           teal-ciano frio derivado da matiz da marca (hue ~200°, mesma família
-           navy/teal): claramente "da casa", forte no escuro (contraste >=5.9:1
-           sobre os fundos do painel) e distinguível do --gd-teal-bright (#1c84ad,
-           que marca ATIVO/FOCO/primário) — o info é mais claro/frio, lê como
-           "secundário/informativo" sem competir com o acento de ação. */
-        --adm-info: #4aa8d8;
-        --adm-info-glow: rgba(74, 168, 216, 0.3);
+
+        /* ════════ ESCADA TEAL sobre cockpit navy (direção de design) ════════
+           UMA cor = um significado. UM hue (~205–220°) em escada:
+           - ESTRUTURA = navy profundo (--gd-navy-deep / --gd-navy-soft).
+           - ACENTO único (ação/ativo/foco/placa/links/contadores) = --adm-accent.
+           - INFORMATIVO (recua, NÃO compete) = --adm-info, chroma MENOR. */
+
+        /* Acento da casa — alias do teal da marca (OKLCH na fonte; ver globals).
+           Tudo no /admin que "acende" (foco, primário, placa, link, contador)
+           passa a referenciar --adm-accent, para um ÚNICO ponto de verdade. */
+        --adm-accent: var(--gd-teal-bright); /* oklch(0.62 0.115 220deg) ≈ #1c84ad */
+        --adm-accent-strong: var(--gd-teal-hover); /* hover do acento */
+        --adm-accent-glow: rgba(28, 132, 173, 0.45);
+        --adm-accent-ring: rgba(28, 132, 173, 0.22);
+
+        /* ── "Info" da CASA (escopado ao /admin) — chroma MENOR p/ NÃO competir ──
+           NÃO usa o azul genérico --blue-primary (#3b82f6). É um ciano calmo da
+           família navy/teal (hue ~210°), com chroma reduzido (oklch C≈0.075) em
+           relação ao acento de ação (C≈0.115): lê como "secundário/informativo"
+           (só "sem tarefa"/neutro) sem brigar com o acento teal. Contraste alto
+           sobre os fundos do painel; fallback hex para navegadores sem OKLCH. */
+        --adm-info: #5aa6cc;
+        --adm-info: oklch(0.74 0.075 210deg);
+        --adm-info-glow: rgba(90, 166, 204, 0.26);
+        --adm-info-fill: rgba(90, 166, 204, 0.13);
+        --adm-info-line: rgba(90, 166, 204, 0.28);
+
+        /* ── Anti-vazamento do AZUL genérico (queixa do fundador) ──
+           O foco GLOBAL (globals.css ~300) usa --border-focus/--blue-* = #3b82f6
+           e PODE vazar para o /admin. Aqui, no escopo da casca, neutralizamos
+           essas variáveis para o TEAL do acento — qualquer estilo que herde
+           --border-focus/--blue-primary dentro do /admin acende em teal, nunca
+           no azul cru. (NÃO afeta o totem, que está fora de .adm-shell.) */
+        --border-focus: var(--adm-accent);
+        --blue-primary: var(--adm-accent);
+        --blue-glow: var(--adm-accent-glow);
+
+        /* Contraste APCA: o --text-muted (#64748b) global falha em rótulos 11px
+           sobre os fundos navy do painel. Aqui sobe para ~#7d8aa0 (mais claro,
+           continua "mudo"). Escopado: o totem segue com o token original. */
+        --text-muted: #7d8aa0;
+
         min-height: 100dvh;
         overflow-y: auto;
         background: var(--bg-primary);
@@ -211,11 +243,12 @@ function EstilosShell() {
         user-select: text;
       }
 
-      /* Foco visível teal que brilha (acessibilidade — uso diário c/ teclado) */
-      .adm-shell :where(button, a, input, select, [tabindex]):focus-visible {
-        outline: 2px solid var(--gd-teal-bright);
+      /* Foco visível TEAL (nunca o azul genérico) — acessibilidade, uso diário
+         com teclado. Inclui textarea; o anel usa o acento da casa. */
+      .adm-shell :where(button, a, input, select, textarea, [tabindex]):focus-visible {
+        outline: 2px solid var(--adm-accent);
         outline-offset: 2px;
-        box-shadow: 0 0 0 4px rgba(28, 132, 173, 0.25);
+        box-shadow: 0 0 0 4px var(--adm-accent-ring);
         border-radius: 8px;
       }
 
@@ -231,11 +264,12 @@ function EstilosShell() {
         /* Superfície escura mais alta: gradiente sobre navy profundo */
         background:
           linear-gradient(180deg, var(--gd-navy-soft) 0%, var(--gd-navy-deep) 100%);
-        border-bottom: 1px solid var(--gd-teal-bright);
+        /* COMANDO CALMO: só o filete teal de 1px no fundo + sombra ESCURA sutil.
+           (Removido o glow teal de 24px que "borrava" a barra inteira.) */
+        border-bottom: 1px solid var(--adm-accent);
         box-shadow:
-          0 1px 0 rgba(28, 132, 173, 0.4),
-          0 0 24px rgba(28, 132, 173, 0.18),
-          0 10px 30px rgba(0, 0, 0, 0.45);
+          0 1px 0 rgba(28, 132, 173, 0.3),
+          0 8px 24px rgba(0, 0, 0, 0.4);
       }
       .adm-topbar__left {
         display: flex;
@@ -283,10 +317,10 @@ function EstilosShell() {
         white-space: nowrap;
       }
       .adm-brand__bar {
-        color: var(--gd-teal-bright);
+        color: var(--adm-accent);
         margin: 0 2px;
         font-weight: 800;
-        text-shadow: 0 0 10px rgba(28, 132, 173, 0.7);
+        text-shadow: 0 0 10px var(--adm-accent-glow);
       }
 
       .adm-topbar__center {
@@ -345,7 +379,7 @@ function EstilosShell() {
         width: 34px;
         height: 34px;
         border-radius: 50%;
-        background: linear-gradient(160deg, var(--gd-teal-bright), var(--gd-teal));
+        background: linear-gradient(160deg, var(--adm-accent), var(--gd-teal));
         color: #fff;
         display: flex;
         align-items: center;
@@ -431,8 +465,8 @@ function EstilosShell() {
       .adm-tab.is-active {
         color: var(--text-primary);
         font-weight: 700;
-        border-bottom-color: var(--gd-teal-bright);
-        box-shadow: 0 2px 12px -2px rgba(28, 132, 173, 0.55);
+        border-bottom-color: var(--adm-accent);
+        box-shadow: 0 2px 10px -3px var(--adm-accent-glow);
       }
       /* Badge de anomalias: vermelho que brilha */
       .adm-tab__badge {
@@ -556,9 +590,9 @@ function EstilosShell() {
         border-color: rgba(148, 163, 184, 0.2);
       }
       .adm-pill.fam-info {
-        background: rgba(74, 168, 216, 0.14);
+        background: var(--adm-info-fill);
         color: var(--adm-info);
-        border-color: rgba(74, 168, 216, 0.3);
+        border-color: var(--adm-info-line);
       }
 
       /* ── Tabela: cabeçalho label-style, linhas com hairline escuro ── */
@@ -625,13 +659,13 @@ function EstilosShell() {
         height: 16px;
       }
       .adm-btn--primary {
-        background: var(--gd-teal-bright);
+        background: var(--adm-accent);
         color: #fff;
         box-shadow: 0 0 0 0 rgba(28, 132, 173, 0);
       }
       .adm-btn--primary:hover:not(:disabled) {
-        background: var(--gd-teal-hover);
-        box-shadow: 0 6px 20px -6px rgba(28, 132, 173, 0.7);
+        background: var(--adm-accent-strong);
+        box-shadow: 0 6px 20px -6px var(--adm-accent-glow);
       }
       .adm-btn--ghost {
         background: rgba(255, 255, 255, 0.03);
@@ -673,7 +707,7 @@ function EstilosShell() {
       .adm-link {
         background: none;
         border: none;
-        color: var(--gd-teal-bright);
+        color: var(--adm-accent);
         cursor: pointer;
         font-weight: 700;
         font-size: inherit;
@@ -681,7 +715,7 @@ function EstilosShell() {
         padding: 0;
       }
       .adm-link:hover {
-        color: var(--gd-teal-hover);
+        color: var(--adm-accent-strong);
         text-decoration: underline;
       }
 
@@ -822,8 +856,8 @@ function EstilosShell() {
       .adm-input:focus,
       .adm-select:focus {
         outline: none;
-        border-color: var(--gd-teal-bright);
-        box-shadow: 0 0 0 4px rgba(28, 132, 173, 0.22);
+        border-color: var(--adm-accent);
+        box-shadow: 0 0 0 4px var(--adm-accent-ring);
       }
       .adm-input:disabled,
       .adm-select:disabled {

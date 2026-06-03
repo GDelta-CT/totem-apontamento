@@ -371,8 +371,8 @@ function Estilos() {
         width: 7px;
         height: 7px;
         border-radius: 999px;
-        background: var(--gd-teal-bright);
-        box-shadow: 0 0 8px var(--gd-teal-bright);
+        background: var(--adm-accent);
+        box-shadow: 0 0 8px var(--adm-accent);
       }
       /* Ação primária = atualizar (gira a seta no clique, gesto do totem) */
       .adm-prazos-refresh:active:not(:disabled) svg {
@@ -486,12 +486,14 @@ function Estilos() {
         text-transform: uppercase;
         letter-spacing: 0.08em;
       }
-      /* Número-holofote: enorme, alto contraste, BRILHANDO na cor do estado */
+      /* Número-herói = MOSTRADOR: JetBrains Mono 900, enorme, alto contraste,
+         BRILHANDO na cor do estado (o número que "acende como um instrumento"). */
       .adm-prazos-heronum {
+        font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
         font-size: clamp(56px, 8vw, 88px);
         font-weight: 900;
         line-height: 0.95;
-        letter-spacing: -0.03em;
+        letter-spacing: -0.02em;
         color: var(--accent, var(--text-primary));
         text-shadow: 0 0 28px var(--accent-glow, transparent);
       }
@@ -553,19 +555,22 @@ function Estilos() {
         letter-spacing: 0.07em;
         font-weight: 700;
       }
-      /* Número de KPI: brilha discretamente (mono-tabular, alto contraste) */
+      /* Número de KPI = mostrador: mono-tabular, alto contraste, brilho discreto.
+         Unidade ao lado: menor / 600 / muted (recua, não compete). */
       .adm-prazos-kpi-num {
         display: flex;
         align-items: baseline;
         gap: 6px;
+        font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
         font-size: 30px;
         font-weight: 800;
         line-height: 1;
-        letter-spacing: -0.02em;
+        letter-spacing: -0.01em;
         color: var(--text-primary);
         text-shadow: 0 0 18px rgba(28, 132, 173, 0.18);
       }
       .adm-prazos-kpi-num .un {
+        font-family: 'Inter', system-ui, sans-serif;
         font-size: 12.5px;
         font-weight: 600;
         font-style: normal;
@@ -666,16 +671,19 @@ function Estilos() {
         white-space: nowrap;
       }
       .adm-prazos-dias {
+        font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
         color: var(--text-primary);
         font-weight: 700;
       }
       .adm-prazos-dias .un {
         margin-left: 1px;
+        font-family: 'Inter', system-ui, sans-serif;
         font-size: 11px;
         font-style: normal;
         color: var(--text-muted);
       }
       .adm-prazos-valor {
+        font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
         color: var(--text-primary);
         font-weight: 600;
       }
