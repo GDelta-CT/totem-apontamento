@@ -125,7 +125,7 @@ correções/ajustes ligada ao apontamento, nunca um UPDATE que apaga o valor ant
 
 ---
 
-## Pacote 3 — Roteiro de Onboarding: o "Dia 1" na Auto Risco
+## Pacote 3 — Roteiro de Onboarding: o "Dia 1" na oficina piloto
 
 5–10 min, pra você falar com os funileiros e pintores no dia de pendurar o totem.
 Tom: **justiça e organização — nunca vigilância.** Adapte às suas palavras.
@@ -163,7 +163,7 @@ Qualquer dúvida no aparelho, me chama que a gente resolve junto."
 
 ## Pacote 4 — Estruturação Comercial (Setup + Mensalidade)
 
-Estrutura de venda pro pós-piloto, usando a Auto Risco como prova. Os números são **SEUS** —
+Estrutura de venda pro pós-piloto, usando o piloto como prova. Os números são **SEUS** —
 abaixo está a lógica e como ancorar; preencha com seu custo real de hardware e com os
 resultados do piloto.
 
@@ -200,17 +200,17 @@ alavancas:
 
 **Como montar o número (com dado real do piloto, não chute):**
 
-- Pegue do piloto da Auto Risco: quantas horas/semana de ociosidade ou fantasma o painel
+- Pegue do piloto: quantas horas/semana de ociosidade ou fantasma o painel
   revelou; quantos retrabalhos viraram visíveis; o quanto o prazo médio caiu.
 - Traduza UMA dessas em dinheiro pro dono (ex.: "X horas/mês recuperadas × o valor da hora da
   equipe = R$ Y").
 - A mensalidade tem que ser uma **FRAÇÃO confortável** desse Y. Se o sistema devolve R$ Y e
   custa uma fração disso, a conta se vende sozinha.
 
-**Narrativa de venda (pós-piloto):** "Na Auto Risco, em [período], o painel mostrou [resultado
+**Narrativa de venda (pós-piloto):** "Na oficina piloto, em [período], o painel mostrou [resultado
 real]. Você paga [mensalidade] e recupera [múltiplo disso] em tempo e prazo. O setup garante a
 entrada certa; a mensalidade se paga no primeiro mês."
 
 **Lembrete honesto:** eu não inventei valores aqui de propósito — setup, mensalidade e ROI
-saem do seu custo de hardware e dos dados reais que o piloto da Auto Risco gerar. Quando o
+saem do seu custo de hardware e dos dados reais que o piloto gerar. Quando o
 piloto fechar, me traz os números que a gente fecha a tabela e o discurso em cima deles.

@@ -8,7 +8,7 @@ repete o que já está em `DIAGNOSTICO.md` / `AUDITORIA-FUNCIONAL.md`. Handoff p
 
 ---
 
-## A. Gaps de prontidão do piloto (Auto Risco, 1 oficina, teste)
+## A. Gaps de prontidão do piloto (1 oficina, teste)
 
 ### Críticos pra DEMO DE HOJE (aparecem no caminho feliz)
 

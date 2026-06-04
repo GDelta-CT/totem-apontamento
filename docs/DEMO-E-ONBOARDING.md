@@ -8,7 +8,7 @@ Dois entregáveis de campo. Sem código, sem SQL. Argumento de ROI ancorado no
 
 ---
 
-# 1) Roteiro de Demo — primeiro encontro na Auto Risco
+# 1) Roteiro de Demo — primeiro encontro na oficina piloto
 
 ## Abertura (2 frases pra um dono de oficina)
 

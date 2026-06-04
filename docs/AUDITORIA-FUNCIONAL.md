@@ -79,7 +79,7 @@ motivo NOT NULL + admin + timestamp + valor antes/depois). → **A2 (plano de sc
   existe) — contraria a NOTA-TÉCNICA item 1.
 - **Lockdown não existe** nas migrations atuais (001–006). Ainda dependemos das policies abertas
   pro totem/painel funcionarem com anon.
-- **Veredito:** com **UMA** oficina (piloto Auto Risco) está **OK** — não há outro tenant de
+- **Veredito:** com **UMA** oficina (a piloto) está **OK** — não há outro tenant de
   quem vazar. **NÃO cadastrar a 2ª oficina** até: (1) mover leitura pro servidor e (2) aplicar o
   lockdown das policies abertas — nessa ordem (senão o totem anon quebra). Ambos = **plano +
   aprovação** (A3).
@@ -102,7 +102,7 @@ motivo NOT NULL + admin + timestamp + valor antes/depois). → **A2 (plano de sc
 ## Prioridade pro PILOTO DE HOJE (1 oficina, ambiente de teste)
 
 1. **Não bloqueia hoje:** isolamento multi-tenant (só morde com 2ª oficina) — apenas **não
-   cadastre** uma segunda. Demo com Auto Risco roda.
+   cadastre** uma segunda. A demo com 1 oficina roda.
 2. **Decisão sua agora:** A1 (3 estados vs reintroduzir presença leve) — define se o painel
    mostra "presente sem tarefa".
 3. **Antes de ligar a correção de anomalia:** redesenhar append-only + motivo (A2) — está

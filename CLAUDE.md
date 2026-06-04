@@ -45,7 +45,7 @@ operário passou nele e se a equipe está dentro do benchmark."_
 fiscal, cobrança Asaas. O banco tem colunas financeiras + Asaas **dormentes** na tabela
 `oficinas` (resíduo de escopo antigo): **não dropar, não construir em cima**.
 
-**Piloto:** oficina "Auto Risco" (full-service, mas o piloto rastreia só funilaria/pintura).
+**Piloto:** _a definir_ — ainda não há oficina piloto. Quando houver (mesmo full-service), o piloto rastreia só funilaria/pintura.
 **Critério de sucesso (TRAVADO):** _o dono abre o painel sozinho, ≥1x/dia, por 2 semanas
 seguidas, e afirma que pagaria por isso._
 
@@ -187,8 +187,8 @@ admin (os defaults 85/28 são placeholders que enganariam); nunca fabricar um "a
 enquadrar toda ociosidade como puro prejuízo. O ticket "dias × R$" (acima) **não** é ROI de
 hora-homem e **fica no MVP**.
 
-**Papéis no piloto:** dona da Auto Risco = dono; Eliel + uma pessoa da Auto Risco =
-admin/gerente, mas a pessoa da Auto Risco opera desde cedo e **Eliel tira a mão da operação
+**Papéis no piloto:** a dona da oficina piloto = dono; Eliel + uma pessoa da oficina =
+admin/gerente, mas a pessoa da oficina opera desde cedo e **Eliel tira a mão da operação
 diária na semana 2** (entra no critério de sucesso, para a adoção não ser mascarada).
 
 ## Refinamentos do painel (pesquisa de domínio — incorporar)
@@ -202,7 +202,7 @@ diária na semana 2** (entra no critério de sucesso, para a adoção não ser m
 2. **O painel é o quadro digital do "Daily Huddle"** (reunião matinal de pé, 10–15 min:
    quais carros estão atrasados, quais faturam hoje, o que travou). Esse ritual é o que faz
    o dono abrir o painel ≥1x/dia — exatamente o critério de sucesso. Valida a camada de prazo.
-3. **Ordem das colunas A CONFIRMAR com a Auto Risco:** a pesquisa põe Montagem **antes** de
+3. **Ordem das colunas A CONFIRMAR com a oficina piloto:** a pesquisa põe Montagem **antes** de
    Polimento; o código tem Polimento antes. Oficinas variam — confirmar e setar a ordem (custa nada).
 
 ## Estado atual e ordem de construção

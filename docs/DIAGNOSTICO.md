@@ -9,8 +9,8 @@ Estado real do produto, consolidando o progresso do build + a auditoria de 5 age
 ## Veredito
 
 O build está **mais avançado do que o esperado** — todas as telas do dono/admin já foram
-esboçadas e o banco chegou na migration 006. **Uma demo no ambiente de teste, com a Auto Risco
-(1 oficina), é viável hoje.** Porém, antes de rodar "de verdade" na parede com dado confiável,
+esboçadas e o banco chegou na migration 006. **Uma demo no ambiente de teste, com 1 oficina
+(o piloto), é viável hoje.** Porém, antes de rodar "de verdade" na parede com dado confiável,
 há **3 correções estruturais** e **1 decisão de produto** pendentes. Nenhuma delas trava a demo
 de hoje; todas travam o "rodar pra valer".
 

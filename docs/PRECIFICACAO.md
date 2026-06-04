@@ -1,7 +1,7 @@
 # GDelta Totem — Modelo de Precificação (planilha pra preencher)
 
 Estrutura, não tabela final. Os números são **seus** — entram quando você cotar o hardware e
-quando o piloto da Auto Risco gerar resultado. **Nada inventado aqui de propósito.**
+quando o piloto gerar resultado. **Nada inventado aqui de propósito.**
 (Isto é estrutura de negócio, não consultoria financeira — você valida os valores.)
 
 ---

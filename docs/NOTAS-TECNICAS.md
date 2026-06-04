@@ -38,4 +38,4 @@
 
 **Fora deste arquivo (decisão de domínio, não técnica):** a **ordem das colunas Montagem ×
 Polimento** continua em aberto — a pesquisa põe Montagem antes; o código tem Polimento antes.
-Confirmar com a Auto Risco. Lugar sugerido: `CLAUDE.md` ou o doc de produto, não aqui.
+Confirmar com a oficina piloto. Lugar sugerido: `CLAUDE.md` ou o doc de produto, não aqui.
