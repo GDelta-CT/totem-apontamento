@@ -45,9 +45,11 @@ import {
   criarOS,
 } from '@/lib/supabase/admin-actions';
 import {
+  MOTIVOS_BLOQUEIO,
   somarDias,
   STATUS_OS,
   TIPOS_CLIENTE,
+  type MotivoBloqueio,
   type OrdemServicoAdmin,
   type StatusOS,
   type TipoCliente,
@@ -73,6 +75,7 @@ type FormState = {
   valor_orcamento: string; // string no input; converte no submit
   etapa_atual: EtapaId | '';
   status_geral: StatusOS;
+  motivo_bloqueio: MotivoBloqueio | ''; // '' = sem bloqueio (deriva o bloqueado)
 };
 
 const formVazio = (): FormState => ({
@@ -85,6 +88,7 @@ const formVazio = (): FormState => ({
   valor_orcamento: '',
   etapa_atual: '',
   status_geral: 'Aguardando Produção',
+  motivo_bloqueio: '',
 });
 
 /** Ícone "+" (linha) para a ação primária. */
@@ -156,6 +160,7 @@ function OSManager({ estadoInicial }: { estadoInicial: FetchState<OrdemServicoAd
       valor_orcamento: os.valor_orcamento != null ? String(os.valor_orcamento) : '',
       etapa_atual: os.etapa_atual ?? '',
       status_geral: (os.status_geral as StatusOS) ?? 'Aguardando Produção',
+      motivo_bloqueio: os.motivo_bloqueio ?? '',
     });
   };
 
@@ -236,6 +241,8 @@ function OSManager({ estadoInicial }: { estadoInicial: FetchState<OrdemServicoAd
           valor_orcamento: valor,
           etapa_atual: form.etapa_atual || null,
           status_geral: form.status_geral,
+          bloqueado: form.motivo_bloqueio !== '',
+          motivo_bloqueio: form.motivo_bloqueio || null,
         })
       : await criarOS({
           placa: form.placa,
@@ -462,6 +469,33 @@ function OSManager({ estadoInicial }: { estadoInicial: FetchState<OrdemServicoAd
                 </select>
               </label>
             </div>
+
+            {form.id && (
+              <label className="adm-field">
+                <span className="adm-field__label">Bloqueio</span>
+                <select
+                  className="adm-select"
+                  value={form.motivo_bloqueio}
+                  onChange={(e) => set('motivo_bloqueio', e.target.value as MotivoBloqueio | '')}
+                >
+                  <option value="">Sem bloqueio</option>
+                  <optgroup label="Problema (trava o serviço)">
+                    {MOTIVOS_BLOQUEIO.filter((m) => m.categoria === 'problema').map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.nome}
+                      </option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="Fluxo (esperando processo)">
+                    {MOTIVOS_BLOQUEIO.filter((m) => m.categoria === 'fluxo').map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.nome}
+                      </option>
+                    ))}
+                  </optgroup>
+                </select>
+              </label>
+            )}
 
             {erroForm && <div className="adm-flash fam-bad adm-os-flash">{erroForm}</div>}
 
