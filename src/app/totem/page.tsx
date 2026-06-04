@@ -1089,12 +1089,12 @@ function Estilos() {
            real, derivado da marca (--gd-navy/--gd-navy-deep), e as superfícies
            sobem de luminância em degraus nítidos para os cards SALTAREM de
            relance. Premium por contraste e refinamento, não por efeito pesado. */
-        --bg: #0c2438; /* base navy de oficina — mais clara/contrastada que o /admin */
-        --bg-2: #123250; /* card — degrau claro o bastante pra "saltar" do fundo */
-        --bg-3: #173a5c; /* hover — próximo degrau */
-        --bg-inset: #08192a; /* "prensado": placa/displays afundados no navy */
-        --line: #244a6e; /* hairline nítida com leve tom teal */
-        --line-strong: #2f5a82; /* divisória mais visível */
+        --bg: #0a0f1c; /* MESMO dark do /admin (--bg-primary) — navy quase-preto */
+        --bg-2: #1c2540; /* card — igual ao /admin (--bg-card), salta do fundo */
+        --bg-3: #222d4d; /* hover — igual ao /admin (--bg-card-hover) */
+        --bg-inset: #060a14; /* "prensado": placa/displays afundados (mais escuro) */
+        --line: #2d3a52; /* hairline — igual ao /admin (--border-default) */
+        --line-strong: #3a4a66; /* divisória mais visível */
         --ink: var(--text-primary); /* #f1f5f9 — off-white */
         --ink-soft: #cdd9e9; /* texto secundário — APCA Lc>=75 sobre --bg e --bg-2 */
 
