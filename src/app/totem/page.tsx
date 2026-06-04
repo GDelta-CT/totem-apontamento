@@ -191,11 +191,11 @@ function TotemApp() {
     }
   };
 
-  const finalizarTarefa = async () => {
+  const finalizarTarefa = async (etapaConcluida: boolean) => {
     if (!apontamentoAtivo) return;
     setCarregandoAcao(true);
     setErroAcao(null);
-    const r = await finalizarApontamento(apontamentoAtivo);
+    const r = await finalizarApontamento(apontamentoAtivo, etapaConcluida);
     setCarregandoAcao(false);
     if (r.status === 'success') {
       setApontamentoAtivo(null);
@@ -948,7 +948,7 @@ function TelaFinalizarConfirmar({
   os: OrdemServico;
   carregando: boolean;
   erro: string | null;
-  onConfirmar: () => void;
+  onConfirmar: (etapaConcluida: boolean) => void;
   onCancelar: () => void;
 }) {
   const { formatado } = useCronometro(
@@ -999,12 +999,40 @@ function TelaFinalizarConfirmar({
         </div>
       )}
 
+      <p
+        style={{
+          textAlign: 'center',
+          fontSize: 18,
+          fontWeight: 700,
+          color: 'var(--ink)',
+          margin: '4px 0 16px',
+        }}
+      >
+        {etapa ? (
+          <>
+            A etapa <strong style={{ color: 'var(--accent)' }}>{etapa.nome}</strong> foi concluída?
+          </>
+        ) : (
+          'A etapa foi concluída?'
+        )}
+      </p>
+
       <div className="acoes-linha">
+        <button
+          className="btn-secundario"
+          onClick={() => onConfirmar(false)}
+          disabled={carregando}
+        >
+          Ainda falta
+        </button>
+        <button className="btn-primario" onClick={() => onConfirmar(true)} disabled={carregando}>
+          {carregando ? 'SALVANDO...' : '✓ Sim, concluí'}
+        </button>
+      </div>
+
+      <div className="acoes-linha" style={{ marginTop: 12 }}>
         <button className="btn-secundario" onClick={onCancelar} disabled={carregando}>
           {apontamento.status_tarefa === 'Pausado' ? 'VOLTAR' : 'CONTINUAR TRABALHANDO'}
-        </button>
-        <button className="btn-perigo" onClick={onConfirmar} disabled={carregando}>
-          {carregando ? 'SALVANDO...' : '✓ FINALIZAR'}
         </button>
       </div>
     </div>

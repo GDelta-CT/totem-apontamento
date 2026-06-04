@@ -287,7 +287,8 @@ export async function retomarApontamento(
 }
 
 export async function finalizarApontamento(
-  apontamento: Apontamento
+  apontamento: Apontamento,
+  etapaConcluida: boolean
 ): Promise<FetchState<Apontamento>> {
   try {
     let tempoPausadoTotal = apontamento.tempo_pausado_seg ?? 0;
@@ -305,6 +306,7 @@ export async function finalizarApontamento(
           status_tarefa: 'Finalizado',
           pausado_em: null,
           tempo_pausado_seg: tempoPausadoTotal,
+          etapa_concluida: etapaConcluida,
         })
         .eq('id', apontamento.id)
         .select()

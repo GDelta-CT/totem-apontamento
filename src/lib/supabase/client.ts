@@ -87,6 +87,7 @@ export type Apontamento = {
   tempo_pausado_seg?: number | null;
   retrabalho?: boolean | null;
   complexidade?: ComplexidadeId | string | null;
+  etapa_concluida?: boolean | null;
 };
 
 export type ApontamentoComOS = Apontamento & {
