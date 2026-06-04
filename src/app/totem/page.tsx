@@ -8,10 +8,9 @@
  * produto de produtividade, não de presença (camada de ponto removida).
  */
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   buscarApontamentoAtivo,
-  buscarOSPorPlaca,
   finalizarApontamento,
   formatarHora,
   iniciarApontamento,
@@ -21,6 +20,7 @@ import {
   useCronometro,
   useFocoAutomatico,
   useFuncionariosAtivos,
+  useOSAtivas,
   useTempoPausado,
   type FetchState,
 } from '@/lib/supabase/queries';
@@ -461,48 +461,81 @@ function TelaConsultarOS({
   onResultado: (r: FetchState<OrdemServico>) => void;
   onVoltar: () => void;
 }) {
+  const { state, recarregar } = useOSAtivas();
   const inputRef = useFocoAutomatico<HTMLInputElement>();
-  const [placa, setPlaca] = useState('');
-  const [buscando, setBuscando] = useState(false);
-  const placaNormalizada = useMemo(() => normalizarPlaca(placa), [placa]);
-  const podeBuscar = placaNormalizada.length >= 6 && !buscando;
+  const [filtro, setFiltro] = useState('');
 
-  const buscar = async () => {
-    if (!podeBuscar) return;
-    setBuscando(true);
-    const r = await buscarOSPorPlaca(placaNormalizada);
-    setBuscando(false);
-    onResultado(r);
-  };
+  // Filtra a lista por placa (normalizada A-Z0-9) OU modelo (texto). Tocar é o
+  // caminho principal; digitar só NARROW a lista — não há mais "buscar" separado.
+  const carros = state.status === 'success' ? state.data : [];
+  const fPlaca = normalizarPlaca(filtro);
+  const fTxt = filtro.trim().toUpperCase();
+  const filtrados = filtro.trim()
+    ? carros.filter(
+        (c) =>
+          (!!fPlaca && c.placa.toUpperCase().includes(fPlaca)) ||
+          (c.modelo_veiculo ?? '').toUpperCase().includes(fTxt)
+      )
+    : carros;
 
   return (
     <div className="tela">
       <h1 className="tela-titulo">QUAL É O CARRO?</h1>
-      <p className="tela-sub">Digite a placa e toque em buscar.</p>
+      <p className="tela-sub">Toque no carro — ou digite a placa pra filtrar.</p>
 
-      <div className="placa-wrap">
-        <input
-          ref={inputRef}
-          className="placa-input"
-          inputMode="text"
-          autoComplete="off"
-          autoCapitalize="characters"
-          spellCheck={false}
-          maxLength={8}
-          placeholder="ABC1D23"
-          value={placa}
-          onChange={(e) => setPlaca(e.target.value.toUpperCase())}
-          onKeyDown={(e) => e.key === 'Enter' && buscar()}
+      {state.status === 'loading' && <Carregando texto="Buscando os carros..." />}
+      {state.status === 'error' && <Erro mensagem={state.message} onTentar={recarregar} />}
+      {state.status === 'empty' && (
+        <Vazio
+          titulo="Nenhum carro na oficina"
+          dica="Não há OS aberta agora. O administrador cadastra a OS do carro no painel."
+          onTentar={recarregar}
         />
-        <div className="placa-counter">{placaNormalizada.length}/7</div>
-      </div>
+      )}
 
-      <div className="acoes-linha">
-        <button className="btn-secundario" onClick={onVoltar} disabled={buscando}>
+      {state.status === 'success' && (
+        <>
+          <input
+            ref={inputRef}
+            className="filtro-input"
+            inputMode="text"
+            autoComplete="off"
+            autoCapitalize="characters"
+            spellCheck={false}
+            maxLength={8}
+            placeholder="Filtrar por placa ou modelo…"
+            value={filtro}
+            onChange={(e) => setFiltro(e.target.value.toUpperCase())}
+          />
+
+          {filtrados.length === 0 ? (
+            <div className="estado estado-vazio">
+              <div className="estado-icone">∅</div>
+              <h2>Nada com “{filtro}”</h2>
+              <p>Confira a placa/modelo, ou limpe o filtro.</p>
+            </div>
+          ) : (
+            <ul className="grid-carros" aria-label="Carros ativos">
+              {filtrados.map((c) => (
+                <li key={c.id}>
+                  <button
+                    type="button"
+                    className="card-carro"
+                    onClick={() => onResultado({ status: 'success', data: c })}
+                  >
+                    <span className="card-carro-placa">{formatarPlaca(c.placa)}</span>
+                    <span className="card-carro-modelo">{c.modelo_veiculo}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
+      )}
+
+      <div className="acoes-linha" style={{ marginTop: 20 }}>
+        <button className="btn-secundario" onClick={onVoltar}>
           VOLTAR
-        </button>
-        <button className="btn-primario" onClick={buscar} disabled={!podeBuscar}>
-          {buscando ? 'PROCURANDO...' : 'BUSCAR CARRO'}
         </button>
       </div>
     </div>
@@ -1450,6 +1483,86 @@ function Estilos() {
         color: var(--ink-soft);
         text-transform: uppercase;
         letter-spacing: 1px;
+      }
+
+      /* Lista buscável de carros ativos (tocar é o caminho; digitar só filtra) */
+      .filtro-input {
+        width: 100%;
+        background: var(--bg-2);
+        border: 2px solid var(--line);
+        border-radius: 12px;
+        padding: 16px 20px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        color: var(--ink);
+        text-transform: uppercase;
+        margin-bottom: 20px;
+        box-shadow: var(--shadow-card);
+      }
+      .filtro-input:focus {
+        outline: none;
+        border-color: var(--accent);
+        background: var(--bg-3);
+      }
+      .filtro-input::placeholder {
+        color: #5b7fa0;
+        text-transform: none;
+        letter-spacing: normal;
+        font-family: 'Archivo', system-ui, sans-serif;
+        font-weight: 500;
+      }
+      .grid-carros {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 14px;
+      }
+      .card-carro {
+        width: 100%;
+        background: var(--bg-2);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 20px;
+        color: var(--ink);
+        font-family: inherit;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        box-shadow: var(--shadow-card);
+        transition:
+          transform 180ms cubic-bezier(0.4, 0, 0.2, 1),
+          box-shadow 180ms cubic-bezier(0.4, 0, 0.2, 1),
+          border-color 180ms cubic-bezier(0.4, 0, 0.2, 1),
+          background 180ms ease;
+        text-align: left;
+      }
+      .card-carro:hover {
+        border-color: rgba(16, 137, 168, 0.4);
+        background: var(--bg-3);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-card-hover);
+      }
+      .card-carro:active {
+        transform: translateY(0);
+      }
+      .card-carro-placa {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        color: var(--accent);
+        line-height: 1;
+      }
+      .card-carro-modelo {
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 1.2;
       }
 
       /* Placa input */

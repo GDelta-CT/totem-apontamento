@@ -153,6 +153,65 @@ export async function buscarOSPorPlaca(placaInput: string): Promise<FetchState<O
   }
 }
 
+/**
+ * Lista os carros ATIVOS (OS não entregue) da oficina, mais recentes primeiro,
+ * para o operário ESCOLHER TOCANDO em vez de digitar a placa com a mão suja
+ * (escopo: "lista buscável de carros ativos por placa, mais recentes primeiro").
+ * Lê via cliente sob a sessão do device → o RLS isola por oficina_id. Mesmo
+ * contrato/padrão do useFuncionariosAtivos.
+ */
+export function useOSAtivas() {
+  const [state, setState] = useState<FetchState<OrdemServico[]>>({ status: 'loading' });
+  const [reloadKey, setReloadKey] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    setState({ status: 'loading' });
+
+    const run = async () => {
+      try {
+        const sb = getSupabase();
+        const result = await withTimeout(
+          sb
+            .from('ordens_servico')
+            .select('id, placa, modelo_veiculo, status_geral, data_entrada')
+            .neq('status_geral', 'Entregue')
+            .order('data_entrada', { ascending: false })
+        );
+        const { data, error } = result as {
+          data: OrdemServico[] | null;
+          error: { message: string } | null;
+        };
+
+        if (cancelled) return;
+        if (error) {
+          setState({ status: 'error', message: traduzirErro(error.message) });
+          return;
+        }
+        if (!data || data.length === 0) {
+          setState({ status: 'empty' });
+          return;
+        }
+        setState({ status: 'success', data });
+      } catch (e) {
+        if (cancelled) return;
+        setState({
+          status: 'error',
+          message: e instanceof Error ? e.message : 'Erro desconhecido.',
+        });
+      }
+    };
+
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [reloadKey]);
+
+  const recarregar = useCallback(() => setReloadKey((k) => k + 1), []);
+  return { state, recarregar };
+}
+
 /* ────────────────────── APONTAMENTOS ────────────────────── */
 
 export async function iniciarApontamento(params: {
