@@ -441,13 +441,25 @@ export function useCronometro(
   const [, setTick] = useState(0);
 
   useEffect(() => {
-    if (!horaInicioISO) return;
-    if (pausadoEmISO) return;
-    setTick((n) => n + 1);
-    const id = setInterval(() => {
-      setTick((n) => n + 1);
-    }, 1000);
-    return () => clearInterval(id);
+    // Pausado ou sem início: relógio parado, valor estático (não liga o rAF).
+    if (!horaInicioISO || pausadoEmISO) return;
+
+    // Em vez de setInterval(1000) — que DERIVA (dispara a 1001ms+, e em aba de
+    // fundo o navegador segura e solta vários ticks juntos → segundos pulando) —
+    // usamos requestAnimationFrame ancorado em Date.now(): re-renderiza SÓ quando
+    // o segundo de relógio realmente vira. Sem drift, sem salto ao voltar de fundo.
+    let raf = 0;
+    let ultimoSegundo = -1;
+    const loop = () => {
+      const segAtual = Math.floor(Date.now() / 1000);
+      if (segAtual !== ultimoSegundo) {
+        ultimoSegundo = segAtual;
+        setTick((n) => n + 1);
+      }
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
   }, [horaInicioISO, pausadoEmISO]);
 
   if (!horaInicioISO) {
