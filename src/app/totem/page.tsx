@@ -1184,8 +1184,6 @@ function Estilos() {
           0 10px 26px -12px rgba(0, 0, 0, 0.6);
       }
 
-      @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=JetBrains+Mono:wght@500;700&display=swap');
-
       html,
       body {
         height: 100%;
@@ -1226,7 +1224,7 @@ function Estilos() {
         );
         background-attachment: fixed;
         color: var(--ink);
-        font-family: 'Archivo', system-ui, sans-serif;
+        font-family: var(--font-archivo), system-ui, sans-serif;
         display: flex;
         flex-direction: column;
       }
@@ -1282,7 +1280,7 @@ function Estilos() {
       .status-pill {
         background: var(--running);
         color: #000;
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-jetbrains-mono), monospace;
         font-size: 11px;
         font-weight: 900;
         letter-spacing: 1.5px;
@@ -1319,7 +1317,7 @@ function Estilos() {
         gap: 24px;
       }
       .hora {
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-jetbrains-mono), monospace;
         font-size: 18px;
         color: var(--ink);
         font-weight: 700;
@@ -1469,7 +1467,7 @@ function Estilos() {
         justify-content: center;
         font-weight: 900;
         font-size: 23px;
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-jetbrains-mono), monospace;
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
         flex-shrink: 0;
       }
@@ -1492,7 +1490,7 @@ function Estilos() {
         border: 2px solid var(--line);
         border-radius: 12px;
         padding: 16px 20px;
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-jetbrains-mono), monospace;
         font-size: 22px;
         font-weight: 700;
         letter-spacing: 0.08em;
@@ -1510,7 +1508,7 @@ function Estilos() {
         color: #5b7fa0;
         text-transform: none;
         letter-spacing: normal;
-        font-family: 'Archivo', system-ui, sans-serif;
+        font-family: var(--font-archivo), system-ui, sans-serif;
         font-weight: 500;
       }
       .grid-carros {
@@ -1552,7 +1550,7 @@ function Estilos() {
         transform: translateY(0);
       }
       .card-carro-placa {
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-jetbrains-mono), monospace;
         font-size: 24px;
         font-weight: 700;
         letter-spacing: 0.06em;
@@ -1577,7 +1575,7 @@ function Estilos() {
         border-radius: 12px;
         padding: 26px 28px;
         font-size: clamp(40px, 6vw, 66px);
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-jetbrains-mono), monospace;
         font-weight: 700;
         letter-spacing: 0.16em;
         color: var(--ink);
@@ -1603,7 +1601,7 @@ function Estilos() {
         position: absolute;
         right: 20px;
         bottom: 12px;
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-jetbrains-mono), monospace;
         font-size: 13px;
         color: var(--ink-soft);
       }
@@ -1745,14 +1743,14 @@ function Estilos() {
         margin-bottom: 16px;
       }
       .os-tag {
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-jetbrains-mono), monospace;
         font-size: 11px;
         letter-spacing: 2px;
         color: var(--ink-soft);
         font-weight: 700;
       }
       .os-status {
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-jetbrains-mono), monospace;
         font-size: 12px;
         font-weight: 700;
         padding: 6px 14px;
@@ -1769,7 +1767,7 @@ function Estilos() {
         letter-spacing: -0.02em;
       }
       .os-placa-display {
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-jetbrains-mono), monospace;
         font-size: 28px;
         font-weight: 700;
         letter-spacing: 0.1em;
@@ -1789,7 +1787,7 @@ function Estilos() {
         margin: 0 0 28px;
       }
       .os-grid dt {
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-jetbrains-mono), monospace;
         font-size: 11px;
         letter-spacing: 1.5px;
         color: var(--ink-soft);
@@ -1906,7 +1904,7 @@ function Estilos() {
         position: absolute;
         top: 14px;
         right: 14px;
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-jetbrains-mono), monospace;
         font-size: 11px;
         font-weight: 700;
         color: var(--ink-soft);
@@ -1997,7 +1995,7 @@ function Estilos() {
         margin-left: auto;
       }
       .complex-label {
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-jetbrains-mono), monospace;
         font-size: 11px;
         letter-spacing: 2px;
         text-transform: uppercase;
@@ -2070,7 +2068,7 @@ function Estilos() {
         cursor: not-allowed;
       }
       .etapa-carro-tag {
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-jetbrains-mono), monospace;
         font-size: 11px;
         letter-spacing: 2px;
         color: var(--ink-soft);
@@ -2083,7 +2081,7 @@ function Estilos() {
         line-height: 1.1;
       }
       .etapa-carro-placa {
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-jetbrains-mono), monospace;
         font-size: 18px;
         font-weight: 700;
         letter-spacing: 0.1em;
@@ -2133,7 +2131,7 @@ function Estilos() {
         flex-shrink: 0;
       }
       .confirmacao-etapa-tag {
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-jetbrains-mono), monospace;
         font-size: 11px;
         letter-spacing: 2px;
         color: var(--ink-soft);
@@ -2174,7 +2172,7 @@ function Estilos() {
       }
       .trabalhando-tag {
         display: inline-block;
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-jetbrains-mono), monospace;
         font-size: 12px;
         letter-spacing: 2px;
         color: var(--running);
@@ -2209,7 +2207,7 @@ function Estilos() {
         letter-spacing: -0.02em;
       }
       .trabalhando-placa {
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-jetbrains-mono), monospace;
         font-size: 22px;
         font-weight: 700;
         letter-spacing: 0.1em;
@@ -2241,7 +2239,7 @@ function Estilos() {
           0 0 0 1px rgba(251, 191, 36, 0.25);
       }
       .cronometro-label {
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-jetbrains-mono), monospace;
         font-size: 12px;
         letter-spacing: 3px;
         color: var(--ink-soft);
@@ -2249,7 +2247,7 @@ function Estilos() {
         margin-bottom: 12px;
       }
       .cronometro-display {
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-jetbrains-mono), monospace;
         font-size: clamp(60px, 12vw, 120px);
         font-weight: 700;
         color: var(--running);
@@ -2351,7 +2349,7 @@ function Estilos() {
         line-height: 1;
       }
       .pausada-banner-tag {
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-jetbrains-mono), monospace;
         font-size: 11px;
         letter-spacing: 2px;
         color: var(--paused);
@@ -2382,7 +2380,7 @@ function Estilos() {
         color: var(--caution);
       }
       .motivo-categoria {
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-jetbrains-mono), monospace;
         font-size: 13px;
         letter-spacing: 2px;
         color: var(--ink-soft);
@@ -2453,7 +2451,7 @@ function Estilos() {
       }
       .card-motivo-alerta-tag {
         display: inline-block;
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-jetbrains-mono), monospace;
         font-size: 11px;
         font-weight: 900;
         letter-spacing: 1px;
@@ -2473,14 +2471,14 @@ function Estilos() {
         border-top: 1px solid var(--line);
       }
       .cronometro-resumo-label {
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-jetbrains-mono), monospace;
         font-size: 11px;
         letter-spacing: 2px;
         color: var(--ink-soft);
         font-weight: 700;
       }
       .cronometro-resumo-valor {
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--font-jetbrains-mono), monospace;
         font-size: 48px;
         font-weight: 700;
         color: var(--running);

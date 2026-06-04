@@ -379,7 +379,7 @@ function EstilosAnomalias() {
       }
       /* Placa = "instrumento" do totem: caixa escura + borda teal + mono */
       .adm-anom-placa {
-        font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+        font-family: var(--font-jetbrains-mono), ui-monospace, 'SFMono-Regular', monospace;
         font-weight: 700;
         font-size: 12px;
         letter-spacing: 0.1em;
@@ -395,7 +395,7 @@ function EstilosAnomalias() {
          do prazo + dot vivo "produzindo" — não a cada linha de anomalia). */
       .adm-anom-horas {
         flex-shrink: 0;
-        font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+        font-family: var(--font-jetbrains-mono), ui-monospace, 'SFMono-Regular', monospace;
         font-weight: 800;
         font-size: 18px;
         letter-spacing: 0.02em;

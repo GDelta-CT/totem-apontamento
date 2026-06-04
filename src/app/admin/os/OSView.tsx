@@ -597,7 +597,7 @@ function EstilosOS() {
       /* Placa = "instrumento" do totem: caixa escura + borda teal + mono que brilha */
       .adm-os-placa {
         justify-self: start;
-        font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+        font-family: var(--font-jetbrains-mono), ui-monospace, 'SFMono-Regular', monospace;
         font-weight: 700;
         font-size: 13px;
         letter-spacing: 0.1em;
@@ -620,7 +620,7 @@ function EstilosOS() {
       }
       /* Valor = mostrador: mono-tabular (mesma família da placa-instrumento). */
       .adm-os-valor {
-        font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+        font-family: var(--font-jetbrains-mono), ui-monospace, 'SFMono-Regular', monospace;
         color: var(--text-primary);
         font-weight: 600;
       }

@@ -274,7 +274,7 @@ function EstilosShell() {
           );
         background-attachment: fixed;
         color: var(--text-primary);
-        font-family: 'Inter', system-ui, sans-serif;
+        font-family: var(--font-inter), system-ui, sans-serif;
         -webkit-user-select: text;
         user-select: text;
       }

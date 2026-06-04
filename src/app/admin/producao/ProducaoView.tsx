@@ -901,7 +901,7 @@ function Estilos() {
       }
       /* Placa = "instrumento": mono que brilha sobre caixa escura */
       .adm-prod-card-placa {
-        font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+        font-family: var(--font-jetbrains-mono), ui-monospace, 'SFMono-Regular', monospace;
         font-weight: 700;
         letter-spacing: 0.08em;
         flex: 1;

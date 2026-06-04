@@ -490,7 +490,7 @@ function Estilos() {
       /* Número-herói = MOSTRADOR: JetBrains Mono 900, enorme, alto contraste,
          BRILHANDO na cor do estado (o número que "acende como um instrumento"). */
       .adm-prazos-heronum {
-        font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+        font-family: var(--font-jetbrains-mono), ui-monospace, 'SFMono-Regular', monospace;
         font-size: clamp(56px, 8vw, 88px);
         font-weight: 900;
         line-height: 0.95;
@@ -564,7 +564,7 @@ function Estilos() {
         display: flex;
         align-items: baseline;
         gap: 6px;
-        font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+        font-family: var(--font-jetbrains-mono), ui-monospace, 'SFMono-Regular', monospace;
         font-size: 30px;
         font-weight: 800;
         line-height: 1;
@@ -572,7 +572,7 @@ function Estilos() {
         color: var(--text-primary);
       }
       .adm-prazos-kpi-num .un {
-        font-family: 'Inter', system-ui, sans-serif;
+        font-family: var(--font-inter), system-ui, sans-serif;
         font-size: 12.5px;
         font-weight: 600;
         font-style: normal;
@@ -655,7 +655,7 @@ function Estilos() {
       /* Placa = "instrumento" do totem: caixa escura + borda teal + mono brilho */
       .adm-prazos-placa {
         justify-self: start;
-        font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+        font-family: var(--font-jetbrains-mono), ui-monospace, 'SFMono-Regular', monospace;
         font-weight: 700;
         font-size: 13px;
         letter-spacing: 0.1em;
@@ -673,19 +673,19 @@ function Estilos() {
         white-space: nowrap;
       }
       .adm-prazos-dias {
-        font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+        font-family: var(--font-jetbrains-mono), ui-monospace, 'SFMono-Regular', monospace;
         color: var(--text-primary);
         font-weight: 700;
       }
       .adm-prazos-dias .un {
         margin-left: 1px;
-        font-family: 'Inter', system-ui, sans-serif;
+        font-family: var(--font-inter), system-ui, sans-serif;
         font-size: 11px;
         font-style: normal;
         color: var(--text-muted);
       }
       .adm-prazos-valor {
-        font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+        font-family: var(--font-jetbrains-mono), ui-monospace, 'SFMono-Regular', monospace;
         color: var(--text-primary);
         font-weight: 600;
       }

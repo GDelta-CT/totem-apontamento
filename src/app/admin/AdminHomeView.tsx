@@ -404,7 +404,7 @@ function EstilosHub() {
         color: var(--text-muted);
       }
       .adm-hub-sessao__oid {
-        font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+        font-family: var(--font-jetbrains-mono), ui-monospace, 'SFMono-Regular', monospace;
         color: var(--text-secondary);
       }
 
