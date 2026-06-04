@@ -1002,20 +1002,21 @@ function Estilos() {
   return (
     <style jsx global>{`
       :root {
-        /* ════ Marca GDelta: cockpit NAVY + acento TEAL + off-white ════
-           Sem âmbar/dourado. Reusa os tokens de marca do globals.css (mesma
-           família do login do totem) para casar com o resto do app. */
-        --bg: var(--gd-navy-deep); /* #082a42 — mesmo fundo do login do totem */
-        --bg-2: #0e3a5a; /* superfície dos cards (navy elevado) */
-        --bg-3: #14496e; /* hover das superfícies */
-        --line: #1d5078; /* hairline navy (separa card do fundo) */
-        --ink: var(--text-primary); /* #f1f5f9 — off-white da marca */
-        --ink-soft: #b8c4d4; /* texto secundário (frio, lê de longe) */
+        /* ════ MESMO dark do /admin em TODAS as telas (decisão do fundador) ════
+           O totem usa exatamente a paleta do painel: navy quase-preto + teal +
+           off-white. Mais escuro/contrastado = "mais compreensível" no escuro.
+           (Os valores espelham os tokens do .adm-shell para as telas casarem.) */
+        --bg: var(--bg-primary); /* #0a0f1c — mesmo fundo do /admin */
+        --bg-2: #1c2540; /* card — igual ao /admin (--bg-card) */
+        --bg-3: #222d4d; /* hover — igual ao /admin (--bg-card-hover) */
+        --line: #2d3a52; /* hairline — igual ao /admin (--border-default) */
+        --ink: var(--text-primary); /* #f1f5f9 — off-white */
+        --ink-soft: #b8c4d4; /* texto secundário (= /admin) */
 
-        /* ACENTO único = teal da marca (era âmbar). Tudo que "acende" — avatar,
-           botão primário, placa, foco, bordas ativas — usa --warn, que agora é
-           alias do teal (mantém as ~30 regras sem reescrever cada uma). */
-        --accent: var(--gd-teal-bright); /* teal de ação da marca */
+        /* ACENTO único = teal do painel (≈ --adm-accent). Tudo que "acende" —
+           avatar, botão, placa, foco, bordas — usa --warn, alias do teal
+           (mantém as ~30 regras sem reescrever cada uma). */
+        --accent: #1089a8; /* teal — idêntico ao --adm-accent do /admin */
         --accent-strong: var(--gd-teal-hover); /* hover do acento */
         --warn: var(--accent); /* alias legado → teal */
 
@@ -1023,9 +1024,17 @@ function Estilos() {
         --caution: #fbbf24; /* AVISO real (regra dos 15 min) — âmbar */
         --danger: #ff4d2e; /* risco / finalizar — vermelho */
         --ok: #4ade80; /* sucesso — verde */
-        --info: #8fcce8; /* informativo — ciano calmo (igual /admin) */
+        --info: #8fcce8; /* informativo — ciano calmo (= /admin) */
         --running: #4ade80; /* trabalhando / cronômetro — verde */
         --paused: #fbbf24; /* pausado — âmbar */
+
+        /* POLIMENTO (= /admin): anel de foco, glow do acento e sombra de card */
+        --accent-ring: rgba(16, 137, 168, 0.22);
+        --accent-glow: rgba(16, 137, 168, 0.45);
+        --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.06) inset,
+          0 14px 34px -12px rgba(0, 0, 0, 0.7);
+        --shadow-card-hover: 0 1px 0 rgba(255, 255, 255, 0.06) inset,
+          0 18px 40px -14px rgba(0, 0, 0, 0.7);
       }
 
       @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=JetBrains+Mono:wght@500;700&display=swap');
@@ -1041,16 +1050,17 @@ function Estilos() {
       /* Acessibilidade: anel de foco visível e claro em tudo que recebe foco
          (uso de parede/oficina + teclado/leitor). Cobre os casos com outline:none. */
       :where(button, a, input, [tabindex]):focus-visible {
-        outline: 3px solid var(--accent-strong);
+        outline: 2px solid var(--accent);
         outline-offset: 2px;
-        border-radius: 6px;
+        box-shadow: 0 0 0 4px var(--accent-ring);
+        border-radius: 8px;
       }
 
       .totem-root {
         min-height: 100%;
         background: var(--bg);
         background-image:
-          radial-gradient(circle at 10% 0%, rgba(28, 132, 173, 0.1) 0%, transparent 40%),
+          radial-gradient(120% 70% at 50% -10%, rgba(28, 132, 173, 0.1) 0%, transparent 55%),
           repeating-linear-gradient(
             45deg,
             transparent 0,
@@ -1069,8 +1079,11 @@ function Estilos() {
         align-items: center;
         justify-content: space-between;
         padding: 18px 32px;
-        border-bottom: 1px solid var(--line);
-        background: var(--bg-2);
+        border-bottom: 1px solid var(--accent);
+        background: linear-gradient(180deg, var(--gd-navy-soft) 0%, var(--gd-navy-deep) 100%);
+        box-shadow:
+          0 1px 0 rgba(16, 137, 168, 0.3),
+          0 8px 24px rgba(0, 0, 0, 0.4);
       }
       .brand {
         display: flex;
@@ -1098,8 +1111,8 @@ function Estilos() {
         font-size: 11px;
         font-weight: 900;
         letter-spacing: 1.5px;
-        padding: 4px 10px;
-        border-radius: 3px;
+        padding: 5px 12px;
+        border-radius: 999px;
         animation: pulseGreen 2s ease-in-out infinite;
       }
       .status-pill.pausado {
@@ -1247,8 +1260,8 @@ function Estilos() {
       .card-func {
         width: 100%;
         background: var(--bg-2);
-        border: 2px solid var(--line);
-        border-radius: 8px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
         padding: 24px 20px;
         color: var(--ink);
         font-family: inherit;
@@ -1257,13 +1270,19 @@ function Estilos() {
         flex-direction: column;
         align-items: flex-start;
         gap: 12px;
-        transition: all 120ms ease;
+        box-shadow: var(--shadow-card);
+        transition:
+          transform 180ms cubic-bezier(0.4, 0, 0.2, 1),
+          box-shadow 180ms cubic-bezier(0.4, 0, 0.2, 1),
+          border-color 180ms cubic-bezier(0.4, 0, 0.2, 1),
+          background 180ms ease;
         text-align: left;
       }
       .card-func:hover {
-        border-color: var(--warn);
+        border-color: rgba(16, 137, 168, 0.4);
         background: var(--bg-3);
         transform: translateY(-2px);
+        box-shadow: var(--shadow-card-hover);
       }
       .card-func:focus-visible {
         border-color: var(--warn);
@@ -1279,7 +1298,7 @@ function Estilos() {
         width: 56px;
         height: 56px;
         border-radius: 50%;
-        background: var(--warn);
+        background: linear-gradient(160deg, var(--accent), var(--gd-teal));
         color: #fff;
         display: flex;
         align-items: center;
@@ -1287,6 +1306,9 @@ function Estilos() {
         font-weight: 900;
         font-size: 22px;
         font-family: 'JetBrains Mono', monospace;
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.3),
+          0 0 14px rgba(16, 137, 168, 0.4);
       }
       .card-func-nome {
         font-size: 18px;
@@ -1681,6 +1703,7 @@ function Estilos() {
       .btn-primario:hover:not(:disabled) {
         background: var(--accent-strong);
         transform: translateY(-2px);
+        box-shadow: 0 6px 20px -6px var(--accent-glow);
       }
       .btn-primario:active {
         transform: translateY(0);
@@ -1767,10 +1790,11 @@ function Estilos() {
 
       /* OS Card */
       .os-card {
-        background: var(--bg-2);
-        border: 2px solid var(--warn);
-        border-radius: 10px;
+        background: linear-gradient(180deg, rgba(16, 137, 168, 0.06) 0%, transparent 40%), var(--bg-2);
+        border: 1px solid rgba(16, 137, 168, 0.4);
+        border-radius: 16px;
         padding: 32px;
+        box-shadow: var(--shadow-card);
       }
       .os-header {
         display: flex;
@@ -1789,8 +1813,8 @@ function Estilos() {
         font-family: 'JetBrains Mono', monospace;
         font-size: 12px;
         font-weight: 700;
-        padding: 4px 10px;
-        border-radius: 3px;
+        padding: 5px 12px;
+        border-radius: 999px;
         background: var(--warn);
         color: #fff;
         letter-spacing: 1px;
@@ -1806,13 +1830,14 @@ function Estilos() {
         font-size: 28px;
         font-weight: 700;
         letter-spacing: 0.1em;
-        color: var(--warn);
+        color: var(--accent);
         margin-bottom: 28px;
         padding: 8px 14px;
-        background: #000;
+        background: #060d18;
         display: inline-block;
-        border-radius: 4px;
-        border: 2px solid var(--warn);
+        border-radius: 8px;
+        border: 1px solid rgba(16, 137, 168, 0.5);
+        box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
       }
       .os-grid {
         display: grid;
@@ -1856,6 +1881,7 @@ function Estilos() {
       .btn-iniciar:hover {
         background: #6ee585;
         transform: translateY(-2px);
+        box-shadow: 0 8px 24px -8px rgba(74, 222, 128, 0.5);
       }
       .btn-iniciar:active {
         transform: translateY(0);
@@ -1884,8 +1910,8 @@ function Estilos() {
       .card-etapa {
         width: 100%;
         background: var(--bg-2);
-        border: 2px solid var(--line);
-        border-radius: 10px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
         padding: 22px 18px;
         color: var(--ink);
         font-family: inherit;
@@ -1896,12 +1922,18 @@ function Estilos() {
         gap: 8px;
         text-align: left;
         position: relative;
-        transition: all 130ms ease;
+        box-shadow: var(--shadow-card);
+        transition:
+          transform 180ms cubic-bezier(0.4, 0, 0.2, 1),
+          box-shadow 180ms cubic-bezier(0.4, 0, 0.2, 1),
+          border-color 180ms cubic-bezier(0.4, 0, 0.2, 1),
+          background 180ms ease;
       }
       .card-etapa:hover:not(:disabled) {
-        border-color: var(--warn);
+        border-color: rgba(16, 137, 168, 0.4);
         background: var(--bg-3);
         transform: translateY(-3px);
+        box-shadow: var(--shadow-card-hover);
       }
       .card-etapa:focus-visible {
         border-color: var(--warn);
@@ -2028,11 +2060,12 @@ function Estilos() {
 
       /* Confirmação */
       .confirmacao-card {
-        background: var(--bg-2);
-        border: 2px solid var(--warn);
-        border-radius: 10px;
+        background: linear-gradient(180deg, rgba(16, 137, 168, 0.06) 0%, transparent 40%), var(--bg-2);
+        border: 1px solid rgba(16, 137, 168, 0.4);
+        border-radius: 16px;
         padding: 32px;
         margin-bottom: 24px;
+        box-shadow: var(--shadow-card);
       }
       .confirmacao-etapa {
         display: flex;
@@ -2149,12 +2182,13 @@ function Estilos() {
         font-size: 22px;
         font-weight: 700;
         letter-spacing: 0.1em;
-        color: var(--warn);
-        padding: 6px 12px;
-        background: #000;
+        color: var(--accent);
+        padding: 6px 14px;
+        background: #060d18;
         display: inline-block;
-        border-radius: 4px;
-        border: 2px solid var(--warn);
+        border-radius: 8px;
+        border: 1px solid rgba(16, 137, 168, 0.5);
+        box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
       }
       .cronometro-wrap {
         text-align: center;
@@ -2326,8 +2360,8 @@ function Estilos() {
       .card-motivo {
         width: 100%;
         background: var(--bg-2);
-        border: 2px solid var(--line);
-        border-radius: 10px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
         padding: 18px;
         color: var(--ink);
         font-family: inherit;
@@ -2336,12 +2370,18 @@ function Estilos() {
         align-items: center;
         gap: 14px;
         text-align: left;
-        transition: all 120ms ease;
+        box-shadow: var(--shadow-card);
+        transition:
+          transform 160ms cubic-bezier(0.4, 0, 0.2, 1),
+          box-shadow 160ms cubic-bezier(0.4, 0, 0.2, 1),
+          border-color 160ms cubic-bezier(0.4, 0, 0.2, 1),
+          background 160ms ease;
       }
       .card-motivo:hover:not(:disabled) {
-        border-color: var(--warn);
+        border-color: rgba(16, 137, 168, 0.4);
         background: var(--bg-3);
         transform: translateX(4px);
+        box-shadow: var(--shadow-card-hover);
       }
       .card-motivo:disabled {
         opacity: 0.5;
