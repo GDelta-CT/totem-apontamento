@@ -119,7 +119,12 @@ export async function buscarOSPorPlaca(placaInput: string): Promise<FetchState<O
       getSupabase()
         .from('ordens_servico')
         .select('id, placa, modelo_veiculo, status_geral, data_entrada')
-        .ilike('placa', placa)
+        // A placa SEMPRE chega normalizada em MAIÚSCULAS/[A-Z0-9] (normalizarPlaca na
+        // entrada e na própria função; toda escrita de placa também normaliza), sem
+        // wildcards — então .eq é equivalente funcional a .ilike AQUI e, ao contrário do
+        // ILIKE, USA o índice (oficina_id, placa) WHERE status_geral <> 'Entregue'
+        // (migration 005). Mesmo padrão já usado no admin (buscar-antes-de-criar).
+        .eq('placa', placa)
         // G7: não deixar apontar numa OS já entregue (placa única-PARCIAL: histórico
         // preservado, mas só a OS ATIVA é apontável) e, havendo mais de uma, a
         // mais recente vence.

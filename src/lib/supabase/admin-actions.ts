@@ -50,6 +50,7 @@ import {
   type OrdemServicoAdmin,
   type TipoCliente,
 } from './admin-shared';
+import { STATUS_ATIVOS } from './anomalias-shared';
 
 const TIMEOUT_MS = 8000;
 
@@ -101,6 +102,100 @@ async function exigirGestorOuErro(): Promise<{ ok: true } | { ok: false; erro: F
     // redirect() do Next lança um erro de controle de fluxo (NEXT_REDIRECT) que NÃO
     // pode ser engolido — re-lança para o framework concluir o redirect.
     throw e;
+  }
+}
+
+/**
+ * Converte um timestamp do banco em epoch ms tratando-o como UTC. Cópia MÍNIMA e
+ * idêntica de queries.parseISOComUTC (coberta por testes lá), inlinada aqui pelo
+ * MESMO motivo de admin-shared.normalizarPlaca: este módulo é 'use server' e
+ * queries.ts importa hooks de React + o cliente do browser — o build do Next
+ * proíbe arrastar isso para um Server Action. O Postgres grava `timestamp` SEM
+ * 'Z'; sem isso o JS interpretaria como hora local e erraria pelo offset do fuso.
+ */
+function parseISOComUTC(iso: string): number {
+  const isoComUTC =
+    iso.endsWith('Z') || /[+-]\d{2}:?\d{2}$/.test(iso) ? iso : iso.replace(' ', 'T') + 'Z';
+  return new Date(isoComUTC).getTime();
+}
+
+/** Forma mínima de um apontamento aberto que precisamos para encerrá-lo. */
+type ApontamentoAberto = {
+  id: string;
+  status_tarefa: string;
+  pausado_em: string | null;
+  tempo_pausado_seg: number | null;
+};
+
+/**
+ * Encerra TODOS os apontamentos ainda abertos de uma OS (escopo travado:
+ * "Entregue → OS sai do quadro ativo + FECHA APONTAMENTOS ABERTOS"). Sem isto,
+ * um timer deixado rodando vira órfão (a OS some do quadro pela `.neq('Entregue')`
+ * e o operário não acha mais o carro pra finalizar), inflando o tempo trabalhado
+ * e a contagem "produzindo" até o teto de 10,5h jogá-lo nas anomalias.
+ *
+ * Reusa EXATAMENTE a matemática de queries.finalizarApontamento: hora_fim no
+ * relógio do SERVIDOR (nunca do tablet) e, para os que estão 'Pausado',
+ * acumula em tempo_pausado_seg o intervalo desde `pausado_em`. Roda server-side,
+ * sob a sessão do cookie (o RLS isola por oficina_id) e depois da barreira de
+ * gestor já feita pelo chamador.
+ *
+ * BEST-EFFORT por desenho: a entrega da OS (UPDATE de status) é a ação principal
+ * e já sucedeu quando isto roda; uma falha aqui NÃO desfaz a entrega nem estoura
+ * pro cliente — o pior caso degrada para o comportamento de hoje (o apontamento
+ * vira fantasma e cai em /admin/anomalias para correção manual). Devolve o nº de
+ * apontamentos que conseguiu encerrar (0 quando não havia nenhum aberto).
+ *
+ * Dependência (sinalizada, não resolvida aqui): o UPDATE em `apontamentos` pelo
+ * gestor depende dos grants de escrita admin (Migration 004/006). Antes deles o
+ * RLS recusa silenciosamente — o mesmo grant que registrarCorrecao já consome.
+ */
+async function encerrarApontamentosDaOS(
+  supabase: Awaited<ReturnType<typeof getServerClient>>,
+  ordemServicoId: string
+): Promise<number> {
+  try {
+    const result = await withTimeout(
+      supabase
+        .from('apontamentos')
+        .select('id, status_tarefa, pausado_em, tempo_pausado_seg')
+        .eq('ordem_servico_id', ordemServicoId)
+        .in('status_tarefa', [...STATUS_ATIVOS])
+    );
+    const { data, error } = result as {
+      data: ApontamentoAberto[] | null;
+      error: { message: string } | null;
+    };
+    if (error || !data || data.length === 0) return 0;
+
+    const agora = Date.now();
+    let encerrados = 0;
+    for (const ap of data) {
+      // Mesma regra do totem (finalizarApontamento): se estava 'Pausado', soma o
+      // intervalo desde pausado_em ao tempo_pausado_seg antes de fechar.
+      let tempoPausadoTotal = ap.tempo_pausado_seg ?? 0;
+      if (ap.status_tarefa === 'Pausado' && ap.pausado_em) {
+        const segundosPausados = Math.max(0, Math.floor((agora - parseISOComUTC(ap.pausado_em)) / 1000));
+        tempoPausadoTotal += segundosPausados;
+      }
+      const upd = await withTimeout(
+        supabase
+          .from('apontamentos')
+          .update({
+            hora_fim: new Date(agora).toISOString(),
+            status_tarefa: 'Finalizado',
+            pausado_em: null,
+            tempo_pausado_seg: tempoPausadoTotal,
+          })
+          .eq('id', ap.id)
+      );
+      const { error: updErr } = upd as { error: { message: string } | null };
+      if (!updErr) encerrados += 1;
+    }
+    return encerrados;
+  } catch {
+    // Best-effort: nunca derruba a entrega da OS por falha ao fechar timers.
+    return 0;
   }
 }
 
@@ -259,6 +354,14 @@ export async function atualizarOS(
     };
     if (error) return { status: 'error', message: traduzirErro(error.message) };
     if (!data) return { status: 'error', message: 'Falha ao atualizar a OS.' };
+
+    // Escopo travado: ao marcar "Entregue", a OS sai do quadro ativo E os
+    // apontamentos abertos são FECHADOS (senão viram órfãos/fantasmas). É
+    // best-effort: a entrega (acima) já valeu; fechar os timers não pode desfazê-la.
+    if (patch.status_geral === 'Entregue') {
+      await encerrarApontamentosDaOS(supabase, id);
+    }
+
     revalidatePath('/admin/os');
     return { status: 'success', data };
   } catch (e) {
