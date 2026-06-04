@@ -564,3 +564,20 @@ input {
   min-height: 56px;
   padding: 17px;
 }
+/* Contraste APCA do login do TOTEM (uso de parede, luz forte): os tokens do
+   /admin (--text-secondary/--text-muted) ficam escuros demais sobre o cartão.
+   Escopo SÓ ao kiosk — o /admin permanece intocado. Valores medidos sobre
+   --bg-card #1a2236 / --bg-input #0f172a: corpo Lc>=75. */
+.gd-auth--kiosk .gd-auth__sub {
+  color: #cdd9e9; /* Lc 80.3 sobre o cartão */
+}
+.gd-auth--kiosk .gd-auth__foot,
+.gd-auth--kiosk .gd-auth__foot strong {
+  color: #cdd9e9; /* Lc 80.3 sobre o cartão */
+}
+.gd-auth--kiosk .gd-auth__input::placeholder {
+  color: #cdd9e9; /* Lc 81.7 sobre o input */
+}
+.gd-auth--kiosk .gd-auth__error {
+  color: #fecaca; /* vermelho claro da mesma família — Lc 79.5 sobre o cartão */
+}

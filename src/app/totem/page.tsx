@@ -8,7 +8,7 @@
  * produto de produtividade, não de presença (camada de ponto removida).
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   buscarApontamentoAtivo,
   buscarOSPorPlaca,
@@ -77,8 +77,21 @@ function TotemApp() {
   // Extras do apontamento (escopo travado): começam no padrão = zero toque extra.
   const [retrabalho, setRetrabalho] = useState(false);
   const [complexidade, setComplexidade] = useState<ComplexidadeId>(COMPLEXIDADE_PADRAO);
+  // Timer do auto-reset pós-finalização: guardado pra poder cancelar se o
+  // operário tocar "CONCLUIR" (ou outro fluxo voltar ao início) antes dos 3s,
+  // evitando um 2º reset disparado em cima de uma nova sessão.
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const limparResetTimer = () => {
+    if (resetTimer.current) {
+      clearTimeout(resetTimer.current);
+      resetTimer.current = null;
+    }
+  };
+  // Cancela qualquer auto-reset pendente ao desmontar o totem.
+  useEffect(() => () => limparResetTimer(), []);
 
   const voltarInicio = () => {
+    limparResetTimer();
     setFuncionario(null);
     setResultadoOS({ status: 'idle' });
     setEtapaSelecionada(null);
@@ -188,7 +201,9 @@ function TotemApp() {
       setApontamentoAtivo(null);
       setEtapaSelecionada(null);
       setTela('tarefa-finalizada');
-      setTimeout(() => {
+      limparResetTimer();
+      resetTimer.current = setTimeout(() => {
+        resetTimer.current = null;
         setOsDoApontamento(null);
         voltarInicio();
       }, 3000);
@@ -634,17 +649,20 @@ function TelaSelecionarEtapa({
           Retrabalho
         </button>
 
-        <div className="complex-group" role="group" aria-label="Complexidade da tarefa">
-          <span className="complex-label">Complexidade</span>
-          <div className="complex-seg">
+        <div className="complex-group">
+          <span className="complex-label" id="complex-label">
+            Complexidade
+          </span>
+          <div className="complex-seg" role="radiogroup" aria-labelledby="complex-label">
             {COMPLEXIDADES.map((c) => (
               <button
                 key={c.id}
                 type="button"
+                role="radio"
                 className={`complex-btn ${complexidade === c.id ? 'complex-btn-on' : ''}`}
                 onClick={() => onComplexidade(c.id)}
                 disabled={carregando}
-                aria-pressed={complexidade === c.id}
+                aria-checked={complexidade === c.id}
               >
                 {c.nome}
               </button>
@@ -1078,7 +1096,7 @@ function Estilos() {
         --line: #244a6e; /* hairline nítida com leve tom teal */
         --line-strong: #2f5a82; /* divisória mais visível */
         --ink: var(--text-primary); /* #f1f5f9 — off-white */
-        --ink-soft: #aebfd2; /* texto secundário — alto contraste sobre navy */
+        --ink-soft: #cdd9e9; /* texto secundário — APCA Lc>=75 sobre --bg e --bg-2 */
 
         /* ACENTO único = TEAL da marca. Tudo que "acende" — avatar, botão, placa,
            foco, bordas ativas — usa --warn, alias do teal (mantém as regras sem
@@ -1242,7 +1260,7 @@ function Estilos() {
       .hora {
         font-family: 'JetBrains Mono', monospace;
         font-size: 18px;
-        color: var(--warn);
+        color: var(--ink);
         font-weight: 700;
       }
       .btn-ghost {
@@ -1437,7 +1455,7 @@ function Estilos() {
           0 0 0 4px var(--accent-ring);
       }
       .placa-input::placeholder {
-        color: #3a5e80;
+        color: #5b7fa0; /* dica do formato — APCA Lc~31 sobre --bg-inset, subdued vs texto digitado */
         letter-spacing: 0.16em;
       }
       .placa-counter {
@@ -1589,7 +1607,7 @@ function Estilos() {
         font-family: 'JetBrains Mono', monospace;
         font-size: 11px;
         letter-spacing: 2px;
-        color: var(--warn);
+        color: var(--ink-soft);
         font-weight: 700;
       }
       .os-status {
@@ -1750,7 +1768,7 @@ function Estilos() {
         font-family: 'JetBrains Mono', monospace;
         font-size: 11px;
         font-weight: 700;
-        color: var(--accent);
+        color: var(--ink-soft);
         background: var(--bg-inset);
         border: 1px solid var(--line);
         padding: 3px 7px;
@@ -1914,7 +1932,7 @@ function Estilos() {
         font-family: 'JetBrains Mono', monospace;
         font-size: 11px;
         letter-spacing: 2px;
-        color: var(--warn);
+        color: var(--ink-soft);
         font-weight: 700;
       }
       .etapa-carro-modelo {
@@ -1977,7 +1995,7 @@ function Estilos() {
         font-family: 'JetBrains Mono', monospace;
         font-size: 11px;
         letter-spacing: 2px;
-        color: var(--warn);
+        color: var(--ink-soft);
         font-weight: 700;
         margin-bottom: 4px;
       }
