@@ -85,11 +85,32 @@ export type Apontamento = {
   motivo_pausa?: string | null;
   pausado_em?: string | null;
   tempo_pausado_seg?: number | null;
+  retrabalho?: boolean | null;
+  complexidade?: ComplexidadeId | string | null;
 };
 
 export type ApontamentoComOS = Apontamento & {
   ordem_servico: OrdemServico | null;
 };
+
+// ---------- Complexidade da tarefa (escopo TRAVADO do MVP) ----------
+// Escala unica de 3 niveis em TODO apontamento; 'simples' pre-selecionado
+// (zero toque extra). Guardada em ASCII ('medio'); a UI exibe "Médio".
+export type ComplexidadeId = 'simples' | 'medio' | 'complexo';
+
+export type ComplexidadeInfo = {
+  id: ComplexidadeId;
+  nome: string;
+  icone: string;
+};
+
+export const COMPLEXIDADE_PADRAO: ComplexidadeId = 'simples';
+
+export const COMPLEXIDADES: ComplexidadeInfo[] = [
+  { id: 'simples', nome: 'Simples', icone: '○' },
+  { id: 'medio', nome: 'Médio', icone: '◐' },
+  { id: 'complexo', nome: 'Complexo', icone: '●' },
+];
 
 // ---------- Etapas operacionais (Fase 2) ----------
 

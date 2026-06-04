@@ -9,6 +9,7 @@ import {
   getSupabase,
   type Apontamento,
   type ApontamentoComOS,
+  type ComplexidadeId,
   type EtapaId,
   type Funcionario,
   type MotivoPausaId,
@@ -154,6 +155,8 @@ export async function iniciarApontamento(params: {
   nomeFuncionario: string;
   cargoFuncionario: string;
   etapa: EtapaId;
+  retrabalho: boolean;
+  complexidade: ComplexidadeId;
 }): Promise<FetchState<Apontamento>> {
   try {
     const result = await withTimeout(
@@ -165,6 +168,8 @@ export async function iniciarApontamento(params: {
           cargo_funcionario: params.cargoFuncionario,
           status_tarefa: 'Em andamento',
           etapa: params.etapa,
+          retrabalho: params.retrabalho,
+          complexidade: params.complexidade,
           tempo_pausado_seg: 0,
         })
         .select()

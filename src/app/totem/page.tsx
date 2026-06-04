@@ -25,11 +25,14 @@ import {
   type FetchState,
 } from '@/lib/supabase/queries';
 import {
+  COMPLEXIDADES,
+  COMPLEXIDADE_PADRAO,
   ETAPAS,
   MOTIVOS_PAUSA,
   buscarEtapa,
   buscarMotivoPausa,
   type Apontamento,
+  type ComplexidadeId,
   type EtapaInfo,
   type Funcionario,
   type MotivoPausaId,
@@ -71,6 +74,9 @@ function TotemApp() {
   const [osDoApontamento, setOsDoApontamento] = useState<OrdemServico | null>(null);
   const [erroAcao, setErroAcao] = useState<string | null>(null);
   const [carregandoAcao, setCarregandoAcao] = useState(false);
+  // Extras do apontamento (escopo travado): começam no padrão = zero toque extra.
+  const [retrabalho, setRetrabalho] = useState(false);
+  const [complexidade, setComplexidade] = useState<ComplexidadeId>(COMPLEXIDADE_PADRAO);
 
   const voltarInicio = () => {
     setFuncionario(null);
@@ -79,6 +85,8 @@ function TotemApp() {
     setApontamentoAtivo(null);
     setOsDoApontamento(null);
     setErroAcao(null);
+    setRetrabalho(false);
+    setComplexidade(COMPLEXIDADE_PADRAO);
     setTela('selecionar-funcionario');
   };
 
@@ -125,6 +133,8 @@ function TotemApp() {
       nomeFuncionario: funcionario.nome,
       cargoFuncionario: funcionario.cargo || '—',
       etapa: etapa.id,
+      retrabalho,
+      complexidade,
     });
     setCarregandoAcao(false);
     if (r.status === 'success') {
@@ -227,6 +237,8 @@ function TotemApp() {
               if (r.status === 'success') {
                 setErroAcao(null);
                 setEtapaSelecionada(null);
+                setRetrabalho(false);
+                setComplexidade(COMPLEXIDADE_PADRAO);
                 setTela('selecionar-etapa');
               } else {
                 setTela('resultado-os');
@@ -242,6 +254,8 @@ function TotemApp() {
             onIniciarTarefa={() => {
               setErroAcao(null);
               setEtapaSelecionada(null);
+              setRetrabalho(false);
+              setComplexidade(COMPLEXIDADE_PADRAO);
               setTela('selecionar-etapa');
             }}
             onNovaConsulta={() => {
@@ -258,6 +272,10 @@ function TotemApp() {
             etapaIniciando={carregandoAcao ? etapaSelecionada : null}
             carregando={carregandoAcao}
             erro={erroAcao}
+            retrabalho={retrabalho}
+            onToggleRetrabalho={setRetrabalho}
+            complexidade={complexidade}
+            onComplexidade={setComplexidade}
             onEscolher={(etapa) => iniciarTarefa(etapa)}
             onVoltar={() => {
               setResultadoOS({ status: 'idle' });
@@ -354,8 +372,10 @@ function Header({
   return (
     <header className="totem-header">
       <div className="brand">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="brand-mark" src="/gdelta-symbol.png" alt="GDelta" />
+        <span className="brand-seal">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="brand-mark" src="/gdelta-totem-symbol.png" alt="GDelta" />
+        </span>
         <span className="brand-name">GDelta · Apontamento</span>
         {emTarefa && <span className="status-pill">EM TAREFA</span>}
         {pausada && <span className="status-pill pausado">PAUSADO</span>}
@@ -550,6 +570,10 @@ function TelaSelecionarEtapa({
   etapaIniciando,
   carregando,
   erro,
+  retrabalho,
+  onToggleRetrabalho,
+  complexidade,
+  onComplexidade,
   onEscolher,
   onVoltar,
 }: {
@@ -557,6 +581,10 @@ function TelaSelecionarEtapa({
   etapaIniciando: EtapaInfo | null;
   carregando: boolean;
   erro: string | null;
+  retrabalho: boolean;
+  onToggleRetrabalho: (v: boolean) => void;
+  complexidade: ComplexidadeId;
+  onComplexidade: (c: ComplexidadeId) => void;
   onEscolher: (etapa: EtapaInfo) => void;
   onVoltar: () => void;
 }) {
@@ -589,6 +617,41 @@ function TelaSelecionarEtapa({
           <span aria-hidden>⚠</span> {erro} Toque na etapa de novo para tentar.
         </div>
       )}
+
+      {/* Extras do apontamento (escopo travado): retrabalho + complexidade.
+          Já vêm no padrão (off / Simples) — tocar a etapa inicia sem toque extra. */}
+      <div className="etapa-extras">
+        <button
+          type="button"
+          className={`retrab-toggle ${retrabalho ? 'retrab-toggle-on' : ''}`}
+          onClick={() => onToggleRetrabalho(!retrabalho)}
+          disabled={carregando}
+          aria-pressed={retrabalho}
+        >
+          <span className="retrab-check" aria-hidden>
+            {retrabalho ? '✓' : ''}
+          </span>
+          Retrabalho
+        </button>
+
+        <div className="complex-group" role="group" aria-label="Complexidade da tarefa">
+          <span className="complex-label">Complexidade</span>
+          <div className="complex-seg">
+            {COMPLEXIDADES.map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                className={`complex-btn ${complexidade === c.id ? 'complex-btn-on' : ''}`}
+                onClick={() => onComplexidade(c.id)}
+                disabled={carregando}
+                aria-pressed={complexidade === c.id}
+              >
+                {c.nome}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
 
       <ul className="grid-etapas" aria-busy={carregando}>
         {ETAPAS.map((e) => {
@@ -1091,8 +1154,22 @@ function Estilos() {
         gap: 14px;
         flex-wrap: wrap;
       }
+      .brand-seal {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: #ffffff;
+        border: 1px solid rgba(16, 137, 168, 0.35);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.8),
+          0 4px 12px -4px rgba(0, 0, 0, 0.6);
+        flex-shrink: 0;
+      }
       .brand-mark {
-        height: 38px;
+        height: 30px;
         width: auto;
         object-fit: contain;
         display: block;
@@ -1987,6 +2064,110 @@ function Estilos() {
         line-height: 1.4;
       }
 
+      /* Extras do apontamento: retrabalho (flag âmbar) + complexidade (acento teal).
+         Ficam ACIMA das etapas; padrões pré-setados pra não custar toque extra. */
+      .etapa-extras {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 14px 24px;
+        background: var(--bg-2);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 16px 20px;
+        margin-bottom: 20px;
+        box-shadow: var(--shadow-card);
+      }
+      .retrab-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 48px;
+        padding: 10px 18px;
+        border-radius: 999px;
+        border: 1.5px solid var(--line);
+        background: var(--bg);
+        color: var(--ink-soft);
+        font-family: inherit;
+        font-weight: 700;
+        font-size: 15px;
+        cursor: pointer;
+        transition: all 140ms ease;
+      }
+      .retrab-toggle:hover:not(:disabled) {
+        border-color: var(--accent);
+        color: var(--ink);
+      }
+      .retrab-check {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 22px;
+        height: 22px;
+        border-radius: 6px;
+        border: 1.5px solid var(--ink-soft);
+        font-size: 14px;
+        font-weight: 900;
+      }
+      .retrab-toggle-on {
+        border-color: var(--caution);
+        background: rgba(251, 191, 36, 0.12);
+        color: #fbe6a6;
+      }
+      .retrab-toggle-on .retrab-check {
+        background: var(--caution);
+        border-color: var(--caution);
+        color: #1a1206;
+      }
+      .complex-group {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-left: auto;
+      }
+      .complex-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        font-weight: 700;
+      }
+      .complex-seg {
+        display: inline-flex;
+        background: var(--bg);
+        border: 1.5px solid var(--line);
+        border-radius: 999px;
+        padding: 4px;
+        gap: 4px;
+      }
+      .complex-btn {
+        min-height: 40px;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 999px;
+        background: transparent;
+        color: var(--ink-soft);
+        font-family: inherit;
+        font-weight: 800;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 140ms ease;
+      }
+      .complex-btn:hover:not(:disabled) {
+        color: var(--ink);
+      }
+      .complex-btn-on {
+        background: var(--accent);
+        color: #fff;
+        box-shadow: 0 2px 10px -3px var(--accent-glow);
+      }
+      .retrab-toggle:disabled,
+      .complex-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
       /* Carro confirmado no topo da escolha de etapa — É um BOTÃO: tocar troca
          o carro (volta pra busca), pra não bater tempo no carro errado. */
       .etapa-carro {
@@ -2500,6 +2681,22 @@ function Estilos() {
         }
         .acoes-linha {
           flex-direction: column;
+        }
+        .etapa-extras {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .complex-group {
+          margin-left: 0;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+        }
+        .complex-seg {
+          width: 100%;
+        }
+        .complex-btn {
+          flex: 1;
         }
         .botoes-tarefa {
           grid-template-columns: 1fr;
