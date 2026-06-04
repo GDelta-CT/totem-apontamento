@@ -1,95 +1,77 @@
 # Backlog do Code — fila única priorizada
 
-Consolida TUDO que os agentes acharam (design, funcional, segurança, gaps, awwwards, UX do
-totem, acessibilidade) numa fila deduplicada. Detalhes nos docs citados. **Escrita de código
-serializada** (um executor por vez — regra anti-colisão). Fale com o Code por nome de item.
-
-> Já em andamento pelo Code (apareceu desde a última auditoria): benchmark bars, tokens
-> semânticos, anel de foco no login do totem, `prefers-reduced-motion`. Bom — manter.
+> **Reconciliado em 2026-06-04** com o estado real do repo. O backlog antigo
+> (P0–P4 das auditorias) está ~90% concluído — ver "✅ Já fechado". O que segue
+> abaixo é o que **realmente falta**. Escrita de código serializada (anti-colisão).
+> Legenda: 🔴 = precisa de decisão/OK do fundador · ▶️ = autônomo (o Code faz) ·
+> 📦 = Fase 2 (fora do MVP travado).
 
 ---
 
-## P0 — Correção / integridade (faz primeiro)
+## ✅ Já fechado (era o grosso do backlog antigo)
 
-- **BUG do recovery em queda de conexão** (`totem/page.tsx:99`): hoje, se a checagem de tarefa
-  ativa falha (timeout), o operário é tratado como "sem tarefa" e mandado começar do zero →
-  risco de **apontamento duplicado / trabalho perdido**. Distinguir `status==='error'` de "sem
-  tarefa" e mostrar "não consegui conferir, tenta de novo" — **nunca seguir em frente**.
-- **Anomalia append-only** (substituir o UPDATE destrutivo): conforme `PLANO-CORRECAO-ANOMALIA.md`.
-  **Requer aval do fundador no plano de schema.** Manter a 006 desligada até a troca.
+- **P0** — bug de recovery em queda de conexão (distingue erro de "sem tarefa");
+  anomalia append-only (migration 010 `apontamento_correcoes` + correção do admin).
+- **P1** — G1 (faixa "Equipe agora" com estado vazio); G2 (`oficina_id` no JWT);
+  jargão do operário ("carro", não "OS").
+- **P1.5** — iniciar tarefa em ~2–3 toques (cortada a tela de confirmação).
+- **P2** — G7 (totem não aponta em OS "Entregue", usa índice).
+- **P2.5** — G4 (nome de funcionário duplicado → confirmação); G5 (desativar com
+  apontamento ativo → confirmação em modal).
+- **P3 (design)** — admin com cabeçalho/marca, tokens semânticos, pílulas de status,
+  cor de prazo, abas de navegação, kanban; **redesenho comercial do totem** (navy
+  alto-contraste) + logo no selo.
+- **P3.5 (a11y)** — `:focus-visible` com anel; **contraste APCA** do totem e do
+  login (texto secundário, teal-como-texto, placeholder) corrigidos.
+- **P3.7 (nome)** — `package.json` = `gdelta-totem`; marca "GDelta".
+- **P4 (parcial)** — leituras do painel movidas pro **servidor** (RSC + Server
+  Actions); **lockdown 007** aplicado; gate de leitura por papel (`sessaoGestorOuNull`).
+- **Outros (desta rodada)** — nomes de oficina removidos (sem piloto ainda);
+  "Entregue fecha apontamentos abertos"; retrabalho + complexidade no totem.
 
-## P1 — Demo de HOJE (caminho feliz, 1 oficina, teste) — ref. `GAPS-PILOTO-E-POLIMENTO.md`
+---
 
-- **G1**: faixa "Equipe agora" some em dia sem apontamento (`producao:127` `return null`) → estado
-  vazio "Ninguém apontou ainda hoje".
-- **G2**: conferir no navegador que a claim `oficina_id` do JWT está preenchida (crachá ≠ "—").
-- **G3**: validar no cadastro de OS — `data_prometida ≥ data_entrada` e `valor ≥ 0`.
-- **Mensagens técnicas vazando pro operário** (`queries.ts` `traduzirErro`, telas Vazio): textos de
-  RLS/admin aparecem na tela do operário. Esconder; mostrar só mensagem amigável.
+## 🔴 Precisa de decisão / OK do fundador (mexe em permissão, auth ou publicação)
 
-## P1.5 — Adoção do totem (a lei dos 2 toques) — ref. agente UX do totem
+1. **Relógio do servidor (migration 011).** Pausa/fim ainda usam o relógio do
+   tablet; o escopo exige o do servidor. As funções estão escritas (011), mas
+   aplicá-las **cria funções com permissão especial no banco** → precisa do seu OK.
+   Plano: mostrar a 011 → aplicar **só no TESTE** → migrar o código → testar o totem.
+2. **Grant de escrita admin em `apontamentos`.** Sem ele, o "Entregue fecha
+   apontamentos" (código já pronto) é recusado pelo banco em silêncio. Aplicar o
+   grant = mudança de permissão → seu OK.
+3. **Totem escrevendo no servidor (Passo 2) + lockdown final.** Mover a escrita do
+   totem pro servidor e então revogar os acessos abertos do `anon` + travar FK entre
+   oficinas. **Só antes de cadastrar a 2ª oficina.** Permissões/auth → seu OK.
+4. **`git push` / deploy.** 7+ commits locais acumulados, nenhum publicado. Sua decisão.
 
-- **Iniciar tarefa custa 5 toques** (viola a regra de ouro na ação mais comum). Cortar a tela de
-  confirmação (passo 5) e, quando a placa retorna 1 OS ativa, ir direto pra etapas → ~2-3 toques.
-- **Placa só por digitação**: o escopo pede "lista buscável de carros ativos por placa, mais
-  recentes primeiro" — tocar é muito mais rápido que digitar com mãos sujas.
-- **Jargão "OS"** na tela do operário → "carro". ("NOVA CONSULTA" → linguagem de chão.)
+## ▶️ Autônomo — o Code faz sem travar você (escopo travado do MVP)
 
-## P2 — Acurácia / regras — ref. `AUDITORIA-FUNCIONAL.md`
+5. **Bloqueio com motivo** (peça / aprovação / cura / outro setor; problema × fluxo,
+   cor/ícone distintos). A base de dados já existe (migration 003 + tipos +
+   `MOTIVOS_BLOQUEIO`); falta a tela no `/admin/os` e a exibição no kanban.
+6. **"Etapa concluída?"** ao finalizar (escopo travado, nunca construído nem cortado).
+   Recomendação: **construir** mínimo (+1 toque, com padrão) — dá ao painel o sinal
+   real de "aguardando próxima etapa" (hoje ele só deriva/adivinha).
+7. **Placa buscável** — lista de carros ativos por placa (tocar em vez de digitar
+   com mão suja). É o que o escopo de adoção pede.
+8. **`next/font`** — auto-hospedar as fontes (hoje `@import` do Google bloqueia o
+   render). Adiado do pass de a11y por ser mais delicado.
+9. **Miudezas a verificar/ajustar** — validação `data_prometida ≥ data_entrada` e
+   `valor ≥ 0` (G3); flash "OS criada." auto-sumir (~3s, G6); tamanhos de toque/fonte
+   residuais no totem.
 
-- **Relógio do servidor**: tempo decorrido (teto de fantasma, prazo) calculado no Postgres, não
-  com `Date.now()` do dispositivo.
-- **G7**: totem `buscarOSPorPlaca` filtrar `status_geral != 'Entregue'` + ordenar (não apontar em OS entregue).
-- **G8**: "atrasado" no card usa relógio/UTC do cliente — corrigir com o tempo do servidor.
+## 📦 Fase 2 — fora do MVP (travado, não construir agora)
 
-## P2.5 — Integridade rápida
+Integração Cília · PIN forte (atribuição intra-oficina) · Realtime · multi-totem ·
+sync offline · ROI "antes × depois" (hora-homem) · ranking/reconhecimento ·
+análise de complexidade por nível · 4º tipo de cliente "frota" · etapas configuráveis.
 
-- **G4**: bloquear/avisar nome de funcionário duplicado (totem identifica só por nome).
-- **G5**: confirmar antes de desativar funcionário com apontamento ativo (senão vira fantasma órfão).
-- **G6**: flash "OS criada." auto-limpar em ~3s.
+---
 
-## P3 — Credibilidade / design — ref. `PUNCH-LIST-DESIGN.md` + awwwards (73/100)
+## Decisões do fundador — registradas
 
-- **Cabeçalho branco + ícone da marca** nas telas do admin (hoje barra navy sem marca) — **maior
-  ganho de credibilidade**; replicar nas 5 telas.
-- **Centralizar cores nos tokens semânticos** (`--gd-ok/warn/danger/neutral/info`) — hexes hoje
-  divergem do guia em vários lugares.
-- **`tabular-nums`** em KPIs, placa, datas, valor, horas ("números com autoridade").
-- **Benchmark sob cada KPI** ("● meta < 7 dias") onde ainda falta.
-- **Pílulas de status semânticas** (os/funcionarios): cada status na sua família de cor.
-- **Cor de prazo na tabela de OS** (coluna Prometida): verde/âmbar/vermelho.
-- **Funcionário inativo**: trocar `line-through` (hostil) por opacidade + pílula cinza.
-- **Abas de navegação** entre OS/Funcionários/Anomalias/Produção/Prazos (underline teal).
-- **Precedência de cor do Kanban**: cinza "parado sem bloqueio"; separar bloqueio-problema
-  (vermelho) × fluxo (âmbar). Padronizar KPI 24/700, raio 10px.
-
-## P3.5 — Acessibilidade — ref. agente de a11y
-
-- Tag **"DISPARA ALERTA" a 9px** no totem → ≥11px (é consequência, tem que ler).
-- **Alvos de toque ≥44px**: "SAIR" e "Trocar" no totem (hoje ~32-36px); botões refresh.
-- **`:focus-visible`** com anel claro (vários `outline:none` sem substituto no totem/forms).
-- **Contraste**: `--gd-neutral-ink` sobre fill claro ≈4.0:1 (abaixo de AA) → escurecer.
-- **`aria-label`** no refresh de anomalias (as outras telas já têm).
-- Texto secundário do totem (descrições 12px) → 13px (uso de parede).
-
-## P3.7 — Padronização do nome (GDelta) — ref. CLAUDE.md "Padrão de nome"
-
-Marca **GDelta** (uma palavra), produto **GDelta Totem**. No `src` + config (Code):
-- `package.json` `name`: `app-nextjs` → `gdelta-totem`.
-- Trocar **"G Delta"** (com espaço) → **"GDelta"** em strings visíveis e metadados:
-  `layout.tsx` (title/keywords), `globals.css` (comentários), `DeviceAuthGate.tsx` /
-  `AdminAuthGate.tsx` (rodapés + `alt` das imagens). Não tocar nos nomes literais externos
-  (pasta, projeto Supabase). A logo mantém o estilo "G|DELTA".
-
-## P4 — Segurança (antes de QUALQUER 2ª oficina) — ref. `AUDITORIA-FUNCIONAL.md` D
-
-- Mover leituras do painel pro **servidor** (não browser/anon) **e** aplicar o **lockdown** das
-  policies abertas do anon (nessa ordem). Plano + aprovação. **NÃO cadastrar 2ª oficina até lá.**
-
-## Decisões do fundador — RESOLVIDAS (01/06/2026)
-
-1. **Plano append-only da anomalia: APROVADO.** Code implementa conforme
-   `PLANO-CORRECAO-ANOMALIA.md`, com diff antes de aplicar a migration; 006 desligada até a troca.
-2. **G9: SIM — o totem seta `etapa_atual` ao operário dar play.** É o que o escopo travado já
-   manda ("último que iniciou vence"); corrigir em `iniciarApontamento` (atualizar
-   `ordens_servico.etapa_atual` para a etapa iniciada). Não é mais decisão aberta.
+- **Marca SEM dourado** (navy + teal + off-white). Logos oficiais não regenerar.
+- **Nome:** marca **GDelta**, produto **GDelta Totem**.
+- **Piloto:** _a definir_ — ainda não há oficina piloto.
+- **Sem 2ª oficina** até o lockdown final (item 🔴 3).
