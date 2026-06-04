@@ -275,17 +275,15 @@ export async function pausarApontamento(params: {
   motivo: MotivoPausaId;
 }): Promise<FetchState<Apontamento>> {
   try {
+    // Relógio do SERVIDOR: a RPC carimba pausado_em com now() do banco (migration
+    // 011), nunca com a hora do tablet. Retorna a própria linha de apontamentos
+    // (objeto único, não array) — ou NULL se nada bateu (oficina errada / não
+    // estava 'Em andamento'), tratado como erro abaixo.
     const result = await withTimeout(
-      getSupabase()
-        .from('apontamentos')
-        .update({
-          status_tarefa: 'Pausado',
-          motivo_pausa: params.motivo,
-          pausado_em: new Date().toISOString(),
-        })
-        .eq('id', params.apontamentoId)
-        .select()
-        .single()
+      getSupabase().rpc('fn_pausar_apontamento', {
+        p_id: params.apontamentoId,
+        p_motivo: params.motivo,
+      })
     );
     const { data, error } = result as {
       data: Apontamento | null;
@@ -313,22 +311,14 @@ export async function retomarApontamento(
   }
 
   try {
-    const pausadoEmISO = parseISOComUTC(apontamento.pausado_em);
-    const segundosPausados = Math.max(0, Math.floor((Date.now() - pausadoEmISO) / 1000));
-    const tempoPausadoTotal = (apontamento.tempo_pausado_seg ?? 0) + segundosPausados;
-
+    // Relógio do SERVIDOR: a RPC deriva tempo_pausado_seg no banco
+    // (now() - pausado_em, em epoch) e volta a 'Em andamento' (migration 011) —
+    // o browser não soma mais a janela de pausa. Retorna a linha de apontamentos
+    // (objeto único) ou NULL se nada bateu (não estava 'Pausado'), tratado abaixo.
     const result = await withTimeout(
-      getSupabase()
-        .from('apontamentos')
-        .update({
-          status_tarefa: 'Em andamento',
-          motivo_pausa: null,
-          pausado_em: null,
-          tempo_pausado_seg: tempoPausadoTotal,
-        })
-        .eq('id', apontamento.id)
-        .select()
-        .single()
+      getSupabase().rpc('fn_retomar_apontamento', {
+        p_id: apontamento.id,
+      })
     );
     const { data, error } = result as {
       data: Apontamento | null;
@@ -350,26 +340,14 @@ export async function finalizarApontamento(
   etapaConcluida: boolean
 ): Promise<FetchState<Apontamento>> {
   try {
-    let tempoPausadoTotal = apontamento.tempo_pausado_seg ?? 0;
-    if (apontamento.status_tarefa === 'Pausado' && apontamento.pausado_em) {
-      const pausadoEmISO = parseISOComUTC(apontamento.pausado_em);
-      const segundosPausados = Math.max(0, Math.floor((Date.now() - pausadoEmISO) / 1000));
-      tempoPausadoTotal += segundosPausados;
-    }
-
+    // Relógio do SERVIDOR: a RPC carimba hora_fim com now() do banco e, se estava
+    // 'Pausado', fecha a última janela de pausa antes (tempo_pausado_seg derivado
+    // no servidor) — migration 011. Retorna a linha de apontamentos (objeto único)
+    // ou NULL se nada bateu (não estava em andamento/pausado), tratado abaixo.
     const result = await withTimeout(
-      getSupabase()
-        .from('apontamentos')
-        .update({
-          hora_fim: new Date().toISOString(),
-          status_tarefa: 'Finalizado',
-          pausado_em: null,
-          tempo_pausado_seg: tempoPausadoTotal,
-          etapa_concluida: etapaConcluida,
-        })
-        .eq('id', apontamento.id)
-        .select()
-        .single()
+      getSupabase().rpc('fn_finalizar_apontamento', {
+        p_id: apontamento.id,
+      })
     );
     const { data, error } = result as {
       data: Apontamento | null;
@@ -377,6 +355,29 @@ export async function finalizarApontamento(
     };
     if (error) return { status: 'error', message: traduzirErro(error.message) };
     if (!data) return { status: 'error', message: 'Falha ao finalizar.' };
+
+    // "etapa concluída?" (commit f7f44d8): a RPC NÃO grava etapa_concluida — então,
+    // best-effort, gravamos só esse campo aqui (mesmo padrão do etapa_atual em
+    // iniciarApontamento). A verdade (hora_fim/status) já foi carimbada pelo
+    // servidor; uma falha neste extra NÃO desfaz a finalização. Refletimos o valor
+    // no objeto retornado para a UI ficar coerente sem um re-fetch.
+    try {
+      const upd = await withTimeout(
+        getSupabase()
+          .from('apontamentos')
+          .update({ etapa_concluida: etapaConcluida })
+          .eq('id', apontamento.id)
+      );
+      const { error: erroEtapa } = upd as { error: { message: string } | null };
+      // Só reflete na UI se o banco ACEITOU. Update sem .select() NÃO lança em erro
+      // de RLS/grant — vem em {error}; sem checar, diríamos "concluída" com o banco
+      // em false (divergência UI×banco no sinal do painel). Em falha, fica o valor
+      // do servidor (false) — o fim já está carimbado, só o sinal extra não pegou.
+      if (!erroEtapa) data.etapa_concluida = etapaConcluida;
+    } catch {
+      // ignora: só falha de rede/timeout chega aqui; a finalização já vale.
+    }
+
     return { status: 'success', data };
   } catch (e) {
     return {
