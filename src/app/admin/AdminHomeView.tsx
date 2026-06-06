@@ -28,13 +28,26 @@
 import { AdminAuthGate } from './AdminAuthGate';
 import { AdminShell } from './_shell/AdminShell';
 import type { FetchState } from '@/lib/supabase/queries';
-import { oficinaCurta, type SessaoAdminView } from '@/lib/supabase/dono-shared';
+import {
+  brl,
+  DIAS_ALERTA_PRAZO,
+  oficinaCurta,
+  type PainelDono,
+  type SaudePrazo,
+  type SessaoAdminView,
+} from '@/lib/supabase/dono-shared';
 
-export function AdminHomeView({ estadoInicial }: { estadoInicial: FetchState<SessaoAdminView> }) {
+export function AdminHomeView({
+  estadoInicial,
+  painelInicial,
+}: {
+  estadoInicial: FetchState<SessaoAdminView>;
+  painelInicial: FetchState<PainelDono>;
+}) {
   return (
     <AdminAuthGate>
       <AdminShell abaAtiva={null} titulo="Painel">
-        <AdminHome estadoInicial={estadoInicial} />
+        <AdminHome estadoInicial={estadoInicial} painelInicial={painelInicial} />
       </AdminShell>
     </AdminAuthGate>
   );
@@ -145,7 +158,101 @@ function ArrowIcon() {
   );
 }
 
-function AdminHome({ estadoInicial }: { estadoInicial: FetchState<SessaoAdminView> }) {
+/**
+ * RESUMO de saúde de prazos no topo da home — o gancho do "dono abre o painel
+ * 1x/dia" (Daily Huddle). NÃO recria a tela /admin/prazos: mostra só os KPIs-chave
+ * do dono num bloco compacto e o bloco INTEIRO é um link para o detalhe.
+ *
+ * Reutiliza a MESMA fonte de verdade (PainelDono de carregarPainelDonoServer,
+ * idêntica a /admin/prazos) e os MESMOS rótulos/cores/benchmark do PrazosView,
+ * para consistência total: contagem estourado/perto/no prazo (cores de estado
+ * bad/warn/ok), ticket médio, valor em produção e ciclo médio (meta ≤7 dias).
+ *
+ * Estados: se o painel NÃO for `success` (empty/error/loading) OU não houver
+ * carro ativo, o bloco é OMITIDO — a home segue normal só com os cartões.
+ * Sem ROI/hora-homem (decisão travada): só dado real. Sem dourado (marca = marinho
+ * + teal + off-white): cores só dos tokens de estado.
+ */
+const SAUDE_RESUMO: Record<Extract<SaudePrazo, 'estourado' | 'perto' | 'no_prazo'>, { lbl: string; cls: string; foot: string }> = {
+  estourado: { lbl: 'Estourado', cls: 'bad', foot: 'passou do prazo' },
+  perto: { lbl: 'Perto de estourar', cls: 'warn', foot: `faltam ≤ ${DIAS_ALERTA_PRAZO} dias` },
+  no_prazo: { lbl: 'No prazo', cls: 'ok', foot: 'dentro do combinado' },
+};
+
+function ResumoSaude({ painelInicial }: { painelInicial: FetchState<PainelDono> }) {
+  // Sem sucesso (empty/error/loading) → omite o bloco (home não quebra).
+  if (painelInicial.status !== 'success') return null;
+  const { kpis } = painelInicial.data;
+  // Pátio vazio: nada de prazo a mostrar — segue só com os cartões.
+  if (kpis.totalAtivos === 0) return null;
+
+  return (
+    <a
+      href="/admin/prazos"
+      className="adm-card adm-card--hover adm-hub-saude"
+      aria-label="Saúde de prazos — ver detalhe no painel do dono"
+    >
+      <div className="adm-hub-saude__head">
+        <span className="adm-hub-saude__tit">Saúde de prazos</span>
+        <span className="adm-hub-saude__sub">Holofote do dono · Daily Huddle</span>
+        <span className="adm-hub-saude__go">
+          ver detalhe
+          <ArrowIcon />
+        </span>
+      </div>
+
+      <div className="adm-hub-saude__grid">
+        {/* Contadores por situação de prazo — mesma cor/rótulo do extrato de risco */}
+        {(['estourado', 'perto', 'no_prazo'] as const).map((s) => {
+          const meta = SAUDE_RESUMO[s];
+          const valor = s === 'estourado' ? kpis.estourado : s === 'perto' ? kpis.perto : kpis.noPrazo;
+          return (
+            <div key={s} className={`adm-hub-saude__stat s-${meta.cls}`}>
+              <span className="adm-hub-saude__dot" aria-hidden="true" />
+              <span className="adm-hub-saude__num gd-tabular">{valor}</span>
+              <span className="adm-hub-saude__lbl">{meta.lbl}</span>
+              <span className="adm-hub-saude__foot">{meta.foot}</span>
+            </div>
+          );
+        })}
+
+        {/* Ticket médio — mesma label/sentido de /admin/prazos */}
+        <div className="adm-hub-saude__kpi">
+          <span className="adm-hub-saude__klbl">Ticket médio</span>
+          <span className="adm-hub-saude__knum gd-tabular">{kpis.ticketMedio != null ? brl(kpis.ticketMedio) : '—'}</span>
+          <span className="adm-hub-saude__kfoot">média por carro com orçamento</span>
+        </div>
+
+        {/* Valor em produção */}
+        <div className="adm-hub-saude__kpi">
+          <span className="adm-hub-saude__klbl">Valor em produção</span>
+          <span className="adm-hub-saude__knum gd-tabular">{brl(kpis.valorEmProducao)}</span>
+          <span className="adm-hub-saude__kfoot">soma dos orçamentos no pátio</span>
+        </div>
+
+        {/* Ciclo médio (tempo de ciclo key-to-key) — benchmark ≤7 dias */}
+        <div className="adm-hub-saude__kpi">
+          <span className="adm-hub-saude__klbl">Ciclo médio</span>
+          <span className="adm-hub-saude__knum gd-tabular">
+            {kpis.cicloMedioDias}
+            <em className="un">dias</em>
+          </span>
+          <span className="adm-hub-saude__kfoot" data-state={kpis.cicloMedioDias <= 7 ? 'ok' : 'warn'}>
+            meta · até 7 dias
+          </span>
+        </div>
+      </div>
+    </a>
+  );
+}
+
+function AdminHome({
+  estadoInicial,
+  painelInicial,
+}: {
+  estadoInicial: FetchState<SessaoAdminView>;
+  painelInicial: FetchState<PainelDono>;
+}) {
   // Identidade vinda do SERVIDOR (estadoInicial). Sem sessão (empty) ou em
   // erro/loading, a linha mostra '—' — exatamente como o hub fazia enquanto o
   // cracheDaSessao() do browser ainda não tinha resolvido.
@@ -163,6 +270,8 @@ function AdminHome({ estadoInicial }: { estadoInicial: FetchState<SessaoAdminVie
         <h1 className="adm-hub-hello__tit">Aqui está sua oficina agora.</h1>
         <p className="adm-hub-hello__sub">Escolha por onde começar.</p>
       </header>
+
+      <ResumoSaude painelInicial={painelInicial} />
 
       <div className="adm-hub-grid">
         <div className="adm-hub-col">
@@ -244,6 +353,170 @@ function EstilosHub() {
         margin: 8px 0 0;
         font-size: 14px;
         color: var(--text-secondary);
+      }
+
+      /* ════════ RESUMO DE SAÚDE DE PRAZOS (topo da home — Daily Huddle) ════════
+         Bloco-link compacto: a superfície/hover/sombra vêm de .adm-card /
+         .adm-card--hover (mesma profundidade do shell). Aqui só o cabeçalho e a
+         grade de KPIs no idioma escuro. Cores SÓ dos tokens de estado (sem
+         dourado): vermelho/âmbar/verde — idênticas ao extrato de /admin/prazos. */
+      .adm-hub-saude {
+        display: block;
+        margin: 0 0 24px;
+        padding: 22px 24px;
+        text-decoration: none;
+        color: var(--text-primary);
+      }
+      .adm-hub-saude__head {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+      .adm-hub-saude__tit {
+        font-size: 16px;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+        color: var(--text-primary);
+      }
+      .adm-hub-saude__sub {
+        font-size: 12.5px;
+        color: var(--text-secondary);
+      }
+      /* "ver detalhe" empurra para a direita; seta desliza no hover do bloco */
+      .adm-hub-saude__go {
+        margin-left: auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--adm-accent);
+        white-space: nowrap;
+      }
+      .adm-hub-saude__go svg {
+        transition: transform 180ms cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .adm-hub-saude:hover .adm-hub-saude__go svg {
+        transform: translateX(3px);
+      }
+
+      /* Grade do resumo: 3 contadores de prazo + 3 KPIs, fluida e compacta */
+      .adm-hub-saude__grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 14px;
+      }
+
+      /* Contador por situação de prazo — dot + número grande na cor do estado */
+      .adm-hub-saude__stat {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        padding: 14px 14px 14px 16px;
+        background: rgba(3, 7, 15, 0.35);
+        border: 1px solid var(--border-default);
+        border-radius: 10px;
+        --st: var(--text-muted);
+        --st-glow: transparent;
+      }
+      /* Faixa fina de cor de estado à esquerda (mesma gramática do holofote) */
+      .adm-hub-saude__stat::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 8px;
+        bottom: 8px;
+        width: 3px;
+        border-radius: 999px;
+        background: var(--st);
+        box-shadow: 0 0 10px var(--st-glow);
+      }
+      .adm-hub-saude__stat.s-bad {
+        --st: var(--adm-bad-bright);
+        --st-glow: var(--red-glow);
+      }
+      .adm-hub-saude__stat.s-warn {
+        --st: var(--amber-primary);
+        --st-glow: var(--amber-glow);
+      }
+      .adm-hub-saude__stat.s-ok {
+        --st: var(--green-primary);
+        --st-glow: var(--green-glow);
+      }
+      .adm-hub-saude__dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 999px;
+        background: var(--st);
+      }
+      .adm-hub-saude__num {
+        font-family: var(--font-jetbrains-mono), ui-monospace, 'SFMono-Regular', monospace;
+        font-size: 30px;
+        font-weight: 900;
+        line-height: 1;
+        letter-spacing: -0.02em;
+        color: var(--st);
+      }
+      .adm-hub-saude__lbl {
+        margin-top: 4px;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+      .adm-hub-saude__foot {
+        font-size: 11px;
+        color: var(--text-muted);
+        line-height: 1.35;
+      }
+
+      /* KPI monetário/ciclo — mono-tabular, alto contraste, SEM glow */
+      .adm-hub-saude__kpi {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding: 14px 14px 14px 16px;
+        background: rgba(3, 7, 15, 0.35);
+        border: 1px solid var(--border-default);
+        border-radius: 10px;
+      }
+      .adm-hub-saude__klbl {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: var(--text-muted);
+      }
+      .adm-hub-saude__knum {
+        display: flex;
+        align-items: baseline;
+        gap: 5px;
+        font-family: var(--font-jetbrains-mono), ui-monospace, 'SFMono-Regular', monospace;
+        font-size: 20px;
+        font-weight: 800;
+        line-height: 1.1;
+        letter-spacing: -0.01em;
+        color: var(--text-primary);
+      }
+      .adm-hub-saude__knum .un {
+        font-family: var(--font-inter), system-ui, sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        font-style: normal;
+        color: var(--text-muted);
+        letter-spacing: 0;
+      }
+      .adm-hub-saude__kfoot {
+        font-size: 11px;
+        color: var(--text-muted);
+        line-height: 1.35;
+      }
+      .adm-hub-saude__kfoot[data-state='ok'] {
+        color: var(--green-primary);
+      }
+      .adm-hub-saude__kfoot[data-state='warn'] {
+        color: var(--amber-primary);
       }
 
       /* Grid assimétrico: heróis (2fr) | gestão (1fr) */

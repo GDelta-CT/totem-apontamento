@@ -19,17 +19,28 @@
  * View) renderiza a tela de login — o anon NÃO é lido. O hub é leve e estático
  * (a antessala não busca dado de negócio ao vivo); não há auto-refresh aqui.
  *
+ * RESUMO DE PRAZOS NA HOME (Daily Huddle): além da sessão, buscamos TAMBÉM o
+ * painel do dono no SERVIDOR — a MESMA carregarPainelDonoServer() que alimenta
+ * /admin/prazos (RLS isola por oficina_id; nada de query no browser). As duas
+ * leituras saem EM PARALELO (Promise.all). Não recriamos a tela de prazos: a
+ * View só mostra um resumo compacto dos KPIs no topo e encaminha para o detalhe.
+ * Sem sessão, carregarPainelDonoServer() devolve `empty` (não consulta como
+ * anon) e a View simplesmente omite o bloco — a home nunca quebra por isso.
+ *
  * dynamic='force-dynamic': a tela depende da sessão do cookie — nunca
  * pré-renderizar/cachear; toda visita re-lê a sessão fresh.
  */
 
-import { carregarSessaoAdminServer } from '@/lib/supabase/dono-queries.server';
+import { carregarPainelDonoServer, carregarSessaoAdminServer } from '@/lib/supabase/dono-queries.server';
 import { AdminHomeView } from './AdminHomeView';
 
 // Tela dependente do cookie de sessão: nunca pré-renderizar/cachear.
 export const dynamic = 'force-dynamic';
 
 export default async function AdminPage() {
-  const estadoInicial = await carregarSessaoAdminServer();
-  return <AdminHomeView estadoInicial={estadoInicial} />;
+  const [estadoInicial, painelInicial] = await Promise.all([
+    carregarSessaoAdminServer(),
+    carregarPainelDonoServer(),
+  ]);
+  return <AdminHomeView estadoInicial={estadoInicial} painelInicial={painelInicial} />;
 }
