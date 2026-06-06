@@ -181,7 +181,8 @@ export type MotivoPausaId =
   | 'problema_tecnico'
   | 'orcamento_extra'
   | 'almoco'
-  | 'fim_expediente';
+  | 'fim_expediente'
+  | 'troca_tarefa';
 
 export type MotivoPausaInfo = {
   id: MotivoPausaId;
@@ -235,6 +236,17 @@ export const MOTIVOS_PAUSA: MotivoPausaInfo[] = [
     icone: '🌅',
     descricao: 'Vou retomar amanhã',
     categoria: 'pessoal',
+  },
+  // Auto-pausa do servidor (migration 014): NÃO é escolhida pelo operário — a RPC
+  // fn_iniciar_apontamento carimba este motivo ao pausar o timer anterior do mesmo
+  // operário quando ele inicia outra tarefa. Existe aqui só para a UI nomear esse
+  // estado (buscarMotivoPausa('troca_tarefa') -> rótulo, não null).
+  {
+    id: 'troca_tarefa',
+    nome: 'Trocou de tarefa',
+    icone: '🔁',
+    descricao: 'Pausado automaticamente ao iniciar outra tarefa',
+    categoria: 'tecnica',
   },
 ];
 

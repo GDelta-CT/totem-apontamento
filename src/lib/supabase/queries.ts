@@ -223,44 +223,29 @@ export async function iniciarApontamento(params: {
   complexidade: ComplexidadeId;
 }): Promise<FetchState<Apontamento>> {
   try {
+    // Relógio do SERVIDOR + atômico (migration 014, "OS como Container"): a RPC,
+    // numa transação só, PAUSA o 'Em andamento' DO MESMO operário (motivo
+    // 'troca_tarefa') — garantindo a regra "um apontamento ativo por operário" —,
+    // INSERE o novo (hora_inicio = now() do banco) e alinha ordens_servico.etapa_atual
+    // ("último que iniciou vence"). NÃO toca em apontamentos de OUTROS operários do
+    // mesmo carro. Retorna a própria linha de apontamentos (objeto único) ou NULL se
+    // nada bateu (sem oficina no JWT), tratado como erro abaixo.
     const result = await withTimeout(
-      getSupabase()
-        .from('apontamentos')
-        .insert({
-          ordem_servico_id: params.ordemServicoId,
-          nome_funcionario: params.nomeFuncionario,
-          cargo_funcionario: params.cargoFuncionario,
-          status_tarefa: 'Em andamento',
-          etapa: params.etapa,
-          retrabalho: params.retrabalho,
-          complexidade: params.complexidade,
-          tempo_pausado_seg: 0,
-        })
-        .select()
-        .single()
+      getSupabase().rpc('fn_iniciar_apontamento', {
+        p_os_id: params.ordemServicoId,
+        p_nome: params.nomeFuncionario,
+        p_cargo: params.cargoFuncionario,
+        p_etapa: params.etapa,
+        p_retrabalho: params.retrabalho,
+        p_complexidade: params.complexidade,
+      })
     );
     const { data, error } = result as {
       data: Apontamento | null;
       error: { message: string } | null;
     };
     if (error) return { status: 'error', message: traduzirErro(error.message) };
-    if (!data) return { status: 'error', message: 'Falha ao criar apontamento.' };
-
-    // G9: "ultimo que iniciou vence" — alinha a coluna do kanban
-    // (ordens_servico.etapa_atual) com a etapa que o operario acabou de iniciar.
-    // Best-effort: o apontamento (fonte da verdade) ja foi criado; uma falha aqui
-    // NAO quebra o inicio da tarefa.
-    try {
-      await withTimeout(
-        getSupabase()
-          .from('ordens_servico')
-          .update({ etapa_atual: params.etapa })
-          .eq('id', params.ordemServicoId)
-      );
-    } catch {
-      // ignora: etapa_atual e conveniencia do kanban; o apontamento ja vale.
-    }
-
+    if (!data) return { status: 'error', message: 'Falha ao iniciar a tarefa.' };
     return { status: 'success', data };
   } catch (e) {
     return {
