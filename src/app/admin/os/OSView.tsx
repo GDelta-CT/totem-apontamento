@@ -238,16 +238,21 @@ function OSManager({ estadoInicial }: { estadoInicial: FetchState<OrdemServicoAd
     }
     if (r.status !== 'success') return;
     const c = r.data;
-    let preenchidos = 0;
+    // Conta os campos a partir do RESULTADO (não dentro do updater do setForm, que
+    // o React roda depois — senão a contagem sai 0 mesmo preenchendo os campos).
+    const preenchidos =
+      (c.placa ? 1 : 0) +
+      (c.modelo_veiculo ? 1 : 0) +
+      (c.valor_orcamento != null ? 1 : 0) +
+      (c.tipo_cliente ? 1 : 0);
     setForm((f) => {
       if (!f) return f;
       const novo = { ...f };
-      if (c.placa) { novo.placa = normalizarPlaca(c.placa); preenchidos++; }
-      if (c.modelo_veiculo) { novo.modelo_veiculo = c.modelo_veiculo; preenchidos++; }
-      if (c.valor_orcamento != null) { novo.valor_orcamento = String(c.valor_orcamento); preenchidos++; }
+      if (c.placa) novo.placa = normalizarPlaca(c.placa);
+      if (c.modelo_veiculo) novo.modelo_veiculo = c.modelo_veiculo;
+      if (c.valor_orcamento != null) novo.valor_orcamento = String(c.valor_orcamento);
       if (c.tipo_cliente) {
         novo.tipo_cliente = c.tipo_cliente;
-        preenchidos++;
         // Prazo: usa o do PDF; se faltar, sugere pelo tipo (igual à escolha manual).
         if (c.data_prometida) {
           novo.data_prometida = c.data_prometida;
