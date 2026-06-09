@@ -9,7 +9,7 @@ npm-debug.log*
 docs
 design-systems
 tests
-supabase/.temp
+supabase
 .claude
 .cursor
 .codex

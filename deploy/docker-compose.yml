@@ -22,6 +22,12 @@ services:
       - .env
     expose:
       - "3000"          # só interno; quem expõe pra internet é o Caddy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 25s
     networks: [web]
 
   caddy:
@@ -38,7 +44,9 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
-    depends_on: [totem]
+    depends_on:
+      totem:
+        condition: service_healthy   # Caddy só sobe quando o app responde (evita 502)
     networks: [web]
 
 volumes:
