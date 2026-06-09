@@ -1,0 +1,50 @@
+# ============================================================
+#  GDelta Totem — stack de produção (VPS Ubuntu + Docker)
+#  Uso (na pasta deploy/):
+#    cp .env.example .env   # preencha
+#    docker compose up -d --build
+#  A VPS hospeda só o app Next.js; o banco continua no Supabase (nuvem).
+# ============================================================
+services:
+  totem:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args:
+        # NEXT_PUBLIC_* são embutidas no bundle em build-time
+        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+    container_name: gdelta_totem
+    restart: unless-stopped
+    # Segredos de RUNTIME (service role, Service Account, segredo do sync) chegam
+    # pelo .env. As NEXT_PUBLIC_* acima são build-time; estas são lidas em execução.
+    env_file:
+      - .env
+    expose:
+      - "3000"          # só interno; quem expõe pra internet é o Caddy
+    networks: [web]
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: gdelta_totem_caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      TOTEM_DOMAIN: ${TOTEM_DOMAIN}
+      CADDY_EMAIL: ${CADDY_EMAIL}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on: [totem]
+    networks: [web]
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+networks:
+  web:
+    driver: bridge

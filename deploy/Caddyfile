@@ -1,0 +1,10 @@
+# GDelta Totem — Caddy (reverse proxy + HTTPS automático Let's Encrypt)
+# Domínio e e-mail vêm do .env (TOTEM_DOMAIN, CADDY_EMAIL).
+{
+	email {$CADDY_EMAIL}
+}
+
+{$TOTEM_DOMAIN} {
+	reverse_proxy totem:3000
+	encode gzip
+}
