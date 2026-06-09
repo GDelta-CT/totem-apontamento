@@ -37,7 +37,7 @@
 
 import { revalidatePath } from 'next/cache';
 
-import { getServerClient, requireGestor } from './dal';
+import { getServerClient, sessaoGestorOuNull } from './dal';
 import type { FetchState } from './queries';
 import type { EtapaId } from './client';
 import {
@@ -81,7 +81,7 @@ function withTimeout<T>(promise: PromiseLike<T>, ms = TIMEOUT_MS): Promise<T> {
  * gerente/dono.
  */
 const MSG_FORBIDDEN =
-  'Sem permissão para esta ação. Entre como gerente ou dono desta oficina.';
+  'Sessão expirada ou sem permissão. Saia e entre de novo como dono ou gerente desta oficina.';
 
 /**
  * Roda a barreira de gestor e devolve a sessão; se o papel for insuficiente,
@@ -90,20 +90,14 @@ const MSG_FORBIDDEN =
  * — controle de fluxo do Next, tratado pelo framework, não é um erro a capturar.
  */
 async function exigirGestorOuErro(): Promise<{ ok: true } | { ok: false; erro: FetchState<never> }> {
-  try {
-    await requireGestor();
-    return { ok: true };
-  } catch (e) {
-    // requireGestor lança GDELTA_FORBIDDEN para papel insuficiente. Qualquer outra
-    // exceção (ex.: falha ao ler a sessão) também vira erro amigável, sem vazar.
-    const msg = e instanceof Error ? e.message : '';
-    if (msg.includes('GDELTA_FORBIDDEN')) {
-      return { ok: false, erro: { status: 'error', message: MSG_FORBIDDEN } };
-    }
-    // redirect() do Next lança um erro de controle de fluxo (NEXT_REDIRECT) que NÃO
-    // pode ser engolido — re-lança para o framework concluir o redirect.
-    throw e;
+  // NÃO usa requireGestor() (que faz redirect): numa Server Action chamada pelo
+  // CLIENT (useTransition), o redirect vira rejeição SILENCIOSA da promise e a
+  // action morre sem mensagem. Aqui lemos a sessão e devolvemos um erro amigável.
+  const sessao = await sessaoGestorOuNull();
+  if (!sessao) {
+    return { ok: false, erro: { status: 'error', message: MSG_FORBIDDEN } };
   }
+  return { ok: true };
 }
 
 /**
@@ -274,11 +268,15 @@ export async function extrairOrcamentoAction(
     const campos = await withTimeout(extrairCamposOrcamento(base64), 30000);
     return { status: 'success', data: campos };
   } catch (e) {
-    console.error('[orcamento/extrair] falha:', e);
-    return {
-      status: 'error',
-      message: 'Não consegui ler o orçamento. Confira o PDF e tente de novo.',
-    };
+    const causa = e instanceof Error ? e.message : String(e);
+    console.error('[orcamento/extrair] falha:', causa); // detalhe real nos logs do servidor
+    let message = 'Não consegui ler o orçamento. Confira o PDF e tente de novo.';
+    if (causa.includes('ANTHROPIC_API_KEY ausente')) message = 'IA não configurada no servidor (chave ausente).';
+    else if (causa.includes('HTTP 401')) message = 'Chave da IA inválida — confira a configuração no servidor.';
+    else if (causa.includes('HTTP 429')) message = 'IA sem cota no momento. Tente de novo em instantes.';
+    else if (causa.includes('HTTP 404')) message = 'Modelo de IA indisponível para esta conta.';
+    else if (causa.includes('Conexão demorou demais')) message = 'A leitura demorou demais. Tente de novo.';
+    return { status: 'error', message };
   }
 }
 

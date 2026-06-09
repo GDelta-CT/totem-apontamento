@@ -62,7 +62,9 @@ function normalizar(raw: Record<string, unknown>): CamposOrcamento {
 export async function extrairCamposOrcamento(pdfBase64: string): Promise<CamposOrcamento> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY ausente');
-  const model = process.env.ORCAMENTO_MODEL || 'claude-haiku-4-5';
+  // Opus 4.8: mais preciso/robusto em PDFs variados (WM, Cília…). ~R$0,10/PDF.
+  // Trocável por env ORCAMENTO_MODEL (ex.: 'claude-haiku-4-5' p/ mais barato).
+  const model = process.env.ORCAMENTO_MODEL || 'claude-opus-4-8';
 
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -86,7 +88,10 @@ export async function extrairCamposOrcamento(pdfBase64: string): Promise<CamposO
     }),
   });
 
-  if (!res.ok) throw new Error(`IA falhou: ${res.status}`);
+  if (!res.ok) {
+    const corpo = await res.text().catch(() => '');
+    throw new Error(`IA HTTP ${res.status}: ${corpo.slice(0, 200)}`);
+  }
   const data = (await res.json()) as { content?: { type: string; text?: string }[] };
   const texto = data.content?.find((c) => c.type === 'text')?.text ?? '';
   const parsed = extrairJSON(texto);

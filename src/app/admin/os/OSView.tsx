@@ -127,6 +127,7 @@ function OSManager({ estadoInicial }: { estadoInicial: FetchState<OrdemServicoAd
   const [okMsg, setOkMsg] = useState<string | null>(null);
   const [lendoPdf, setLendoPdf] = useState(false);
   const [pdfMsg, setPdfMsg] = useState<string | null>(null);
+  const [pdfErro, setPdfErro] = useState<string | null>(null);
 
   // O dado vem do SERVIDOR (estadoInicial). Re-buscar = re-rodar o Server
   // Component via router.refresh() (sem query Supabase no browser para LER).
@@ -148,6 +149,7 @@ function OSManager({ estadoInicial }: { estadoInicial: FetchState<OrdemServicoAd
     setErroForm(null);
     setAvisoPlaca(null);
     setPdfMsg(null);
+    setPdfErro(null);
     setForm(formVazio());
   };
 
@@ -173,6 +175,7 @@ function OSManager({ estadoInicial }: { estadoInicial: FetchState<OrdemServicoAd
     setErroForm(null);
     setAvisoPlaca(null);
     setPdfMsg(null);
+    setPdfErro(null);
   };
 
   const set = <K extends keyof FormState>(k: K, v: FormState[K]) =>
@@ -210,27 +213,41 @@ function OSManager({ estadoInicial }: { estadoInicial: FetchState<OrdemServicoAd
     const file = e.target.files?.[0];
     e.target.value = ''; // permite reenviar o mesmo arquivo
     if (!file) return;
-    setErroForm(null);
     setPdfMsg(null);
+    setPdfErro(null);
     setLendoPdf(true);
-    const fd = new FormData();
-    fd.append('arquivo', file);
-    const r = await extrairOrcamentoAction(fd);
+    let r: Awaited<ReturnType<typeof extrairOrcamentoAction>>;
+    try {
+      const fd = new FormData();
+      fd.append('arquivo', file);
+      r = await extrairOrcamentoAction(fd);
+    } catch {
+      // Falha de "framework" (PDF grande demais, timeout, sessão) rejeita a action
+      // sem virar FetchState — capturamos pra NÃO ficar mudo/travado.
+      setLendoPdf(false);
+      setPdfErro(
+        'Não consegui enviar o orçamento (PDF grande, conexão ou sessão). ' +
+          'Tente um PDF menor, ou recarregue a página e entre de novo.'
+      );
+      return;
+    }
     setLendoPdf(false);
     if (r.status === 'error') {
-      setErroForm(r.message);
+      setPdfErro(r.message);
       return;
     }
     if (r.status !== 'success') return;
     const c = r.data;
+    let preenchidos = 0;
     setForm((f) => {
       if (!f) return f;
       const novo = { ...f };
-      if (c.placa) novo.placa = normalizarPlaca(c.placa);
-      if (c.modelo_veiculo) novo.modelo_veiculo = c.modelo_veiculo;
-      if (c.valor_orcamento != null) novo.valor_orcamento = String(c.valor_orcamento);
+      if (c.placa) { novo.placa = normalizarPlaca(c.placa); preenchidos++; }
+      if (c.modelo_veiculo) { novo.modelo_veiculo = c.modelo_veiculo; preenchidos++; }
+      if (c.valor_orcamento != null) { novo.valor_orcamento = String(c.valor_orcamento); preenchidos++; }
       if (c.tipo_cliente) {
         novo.tipo_cliente = c.tipo_cliente;
+        preenchidos++;
         // Prazo: usa o do PDF; se faltar, sugere pelo tipo (igual à escolha manual).
         if (c.data_prometida) {
           novo.data_prometida = c.data_prometida;
@@ -243,7 +260,15 @@ function OSManager({ estadoInicial }: { estadoInicial: FetchState<OrdemServicoAd
       }
       return novo;
     });
-    setPdfMsg('Orçamento lido pela IA — confira os campos antes de salvar.');
+    // "Sucesso vazio": a IA respondeu mas não achou nada — não mentir com flash verde.
+    if (preenchidos === 0) {
+      setPdfErro(
+        'Li o PDF, mas não identifiquei nenhum campo (pode ser um PDF escaneado/foto sem texto). ' +
+          'Preencha à mão ou tente outro arquivo.'
+      );
+    } else {
+      setPdfMsg(`Orçamento lido pela IA (${preenchidos} campo(s)) — confira antes de salvar.`);
+    }
   };
 
   const submeter = async (e: FormEvent) => {
@@ -425,6 +450,7 @@ function OSManager({ estadoInicial }: { estadoInicial: FetchState<OrdemServicoAd
               </div>
             )}
             {pdfMsg && <div className="adm-flash fam-ok adm-os-flash">{pdfMsg}</div>}
+            {pdfErro && <div className="adm-flash fam-bad adm-os-flash">{pdfErro}</div>}
 
             <label className="adm-field">
               <span className="adm-field__label">Placa</span>

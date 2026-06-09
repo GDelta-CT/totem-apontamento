@@ -28,6 +28,9 @@ import { OSView } from './OSView';
 
 // Tela viva e dependente do cookie de sessão: nunca pré-renderizar/cachear.
 export const dynamic = 'force-dynamic';
+// A extração de PDF por IA (Server Action) pode levar >10s — sem isto o Vercel
+// mataria a função no default. Damos folga (teto do plano Hobby).
+export const maxDuration = 60;
 
 export default async function AdminOSPage() {
   const estadoInicial = await listarOSServer();
