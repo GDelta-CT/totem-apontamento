@@ -29,7 +29,7 @@
  */
 
 import { useEffect, useState, useTransition } from 'react';
-import type { FormEvent } from 'react';
+import type { ChangeEvent, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { AdminAuthGate } from '../AdminAuthGate';
 import { AdminShell } from '../_shell/AdminShell';
@@ -43,6 +43,7 @@ import {
   atualizarOS,
   buscarOSAtivaPorPlacaAction,
   criarOS,
+  extrairOrcamentoAction,
 } from '@/lib/supabase/admin-actions';
 import {
   MOTIVOS_BLOQUEIO,
@@ -124,6 +125,8 @@ function OSManager({ estadoInicial }: { estadoInicial: FetchState<OrdemServicoAd
   const [erroForm, setErroForm] = useState<string | null>(null);
   const [avisoPlaca, setAvisoPlaca] = useState<string | null>(null);
   const [okMsg, setOkMsg] = useState<string | null>(null);
+  const [lendoPdf, setLendoPdf] = useState(false);
+  const [pdfMsg, setPdfMsg] = useState<string | null>(null);
 
   // O dado vem do SERVIDOR (estadoInicial). Re-buscar = re-rodar o Server
   // Component via router.refresh() (sem query Supabase no browser para LER).
@@ -144,6 +147,7 @@ function OSManager({ estadoInicial }: { estadoInicial: FetchState<OrdemServicoAd
   const abrirNova = () => {
     setErroForm(null);
     setAvisoPlaca(null);
+    setPdfMsg(null);
     setForm(formVazio());
   };
 
@@ -168,6 +172,7 @@ function OSManager({ estadoInicial }: { estadoInicial: FetchState<OrdemServicoAd
     setForm(null);
     setErroForm(null);
     setAvisoPlaca(null);
+    setPdfMsg(null);
   };
 
   const set = <K extends keyof FormState>(k: K, v: FormState[K]) =>
@@ -197,6 +202,48 @@ function OSManager({ estadoInicial }: { estadoInicial: FetchState<OrdemServicoAd
           'Edite a existente em vez de criar outra.'
       );
     }
+  };
+
+  // Subir orçamento em PDF → IA pré-preenche os campos (admin confere antes de salvar).
+  // Só no modo CRIAÇÃO. Cada leitura usa a API paga (centavos) — disparada pelo admin.
+  const lerOrcamento = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // permite reenviar o mesmo arquivo
+    if (!file) return;
+    setErroForm(null);
+    setPdfMsg(null);
+    setLendoPdf(true);
+    const fd = new FormData();
+    fd.append('arquivo', file);
+    const r = await extrairOrcamentoAction(fd);
+    setLendoPdf(false);
+    if (r.status === 'error') {
+      setErroForm(r.message);
+      return;
+    }
+    if (r.status !== 'success') return;
+    const c = r.data;
+    setForm((f) => {
+      if (!f) return f;
+      const novo = { ...f };
+      if (c.placa) novo.placa = normalizarPlaca(c.placa);
+      if (c.modelo_veiculo) novo.modelo_veiculo = c.modelo_veiculo;
+      if (c.valor_orcamento != null) novo.valor_orcamento = String(c.valor_orcamento);
+      if (c.tipo_cliente) {
+        novo.tipo_cliente = c.tipo_cliente;
+        // Prazo: usa o do PDF; se faltar, sugere pelo tipo (igual à escolha manual).
+        if (c.data_prometida) {
+          novo.data_prometida = c.data_prometida;
+        } else {
+          const t = TIPOS_CLIENTE.find((x) => x.id === c.tipo_cliente);
+          if (t) novo.data_prometida = somarDias(novo.data_entrada, t.prazoSugeridoDias);
+        }
+      } else if (c.data_prometida) {
+        novo.data_prometida = c.data_prometida;
+      }
+      return novo;
+    });
+    setPdfMsg('Orçamento lido pela IA — confira os campos antes de salvar.');
   };
 
   const submeter = async (e: FormEvent) => {
@@ -361,6 +408,23 @@ function OSManager({ estadoInicial }: { estadoInicial: FetchState<OrdemServicoAd
             aria-label={form.id ? 'Editar OS' : 'Nova OS'}
           >
             <h2 className="adm-modal__title">{form.id ? 'Editar OS' : 'Nova OS'}</h2>
+
+            {!form.id && (
+              <div className="adm-os-import">
+                <label className="adm-btn adm-btn--ghost adm-os-import__btn">
+                  {lendoPdf ? 'Lendo orçamento…' : '📄 Subir orçamento (PDF)'}
+                  <input
+                    type="file"
+                    accept="application/pdf"
+                    hidden
+                    disabled={lendoPdf}
+                    onChange={lerOrcamento}
+                  />
+                </label>
+                <span className="adm-os-import__hint">A IA preenche os campos pra você conferir.</span>
+              </div>
+            )}
+            {pdfMsg && <div className="adm-flash fam-ok adm-os-flash">{pdfMsg}</div>}
 
             <label className="adm-field">
               <span className="adm-field__label">Placa</span>
@@ -588,6 +652,21 @@ function EstilosOS() {
       }
       .adm-os-flash {
         margin-bottom: 16px;
+      }
+      /* Importar orçamento por PDF (só no modo criação) */
+      .adm-os-import {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+      }
+      .adm-os-import__btn {
+        cursor: pointer;
+      }
+      .adm-os-import__hint {
+        color: var(--text-secondary);
+        font-size: 12.5px;
       }
 
       /* Grade da linha (cabeçalho e linhas usam a MESMA grid → colunas alinhadas) */

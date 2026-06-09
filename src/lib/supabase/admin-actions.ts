@@ -51,6 +51,7 @@ import {
   type TipoCliente,
 } from './admin-shared';
 import { STATUS_ATIVOS } from './anomalias-shared';
+import { extrairCamposOrcamento, type CamposOrcamento } from '../orcamento/extrair';
 
 const TIMEOUT_MS = 8000;
 
@@ -238,6 +239,46 @@ export async function buscarOSAtivaPorPlacaAction(
     return { status: 'success', data: data ?? null };
   } catch (e) {
     return { status: 'error', message: traduzirErro(e instanceof Error ? e.message : null) };
+  }
+}
+
+/* ─────────────────── Orçamento (PDF) → campos da OS ─────────────────── */
+
+const MAX_PDF_BYTES = 8 * 1024 * 1024; // 8 MB
+
+/**
+ * Lê um PDF de orçamento (Cília/WM/etc.) por IA e devolve os campos para
+ * PRÉ-PREENCHER o formulário de OS — o admin confere e salva (NUNCA grava sozinho).
+ * Barreira de gestor PRIMEIRO: só dono/gerente dispara (é o que controla o gasto de
+ * API). Não toca no banco; só chama a IA (ver src/lib/orcamento/extrair.ts).
+ */
+export async function extrairOrcamentoAction(
+  formData: FormData
+): Promise<FetchState<CamposOrcamento>> {
+  const guard = await exigirGestorOuErro();
+  if (!guard.ok) return guard.erro;
+
+  const arquivo = formData.get('arquivo');
+  if (!(arquivo instanceof File)) {
+    return { status: 'error', message: 'Nenhum arquivo enviado.' };
+  }
+  if (arquivo.type && arquivo.type !== 'application/pdf') {
+    return { status: 'error', message: 'Envie o orçamento em PDF.' };
+  }
+  if (arquivo.size > MAX_PDF_BYTES) {
+    return { status: 'error', message: 'PDF muito grande (máx. 8 MB).' };
+  }
+  try {
+    const base64 = Buffer.from(await arquivo.arrayBuffer()).toString('base64');
+    // Leitura por IA pode levar alguns segundos — folga maior que o timeout padrão.
+    const campos = await withTimeout(extrairCamposOrcamento(base64), 30000);
+    return { status: 'success', data: campos };
+  } catch (e) {
+    console.error('[orcamento/extrair] falha:', e);
+    return {
+      status: 'error',
+      message: 'Não consegui ler o orçamento. Confira o PDF e tente de novo.',
+    };
   }
 }
 

@@ -79,6 +79,20 @@ o operário apontou; o agente admin grava OS no banco real). É **trabalho de ro
   ligar em produção.
 - **Unificação da automação (passo 4):** é adição de escopo — confirmar quando for a hora.
 
+## Dados reais da oficina-piloto & autorização (2026-06-08)
+O fundador forneceu dados reais da oficina-piloto (GR Reparos Automotivo, Itabaiana/SE) e
+**declarou ter autorização para tratá-los na GDelta** para o trabalho do piloto:
+- **Orçamento/OS da plataforma WM** → PoC do agente admin **provada** (extrai placa, modelo,
+  tipo de cliente, valor, prazo, ref). Cliente AUTOCAR (cooperativa), GM Corsa 2006.
+- **Pedido na casa de tintas (Leo Tintas)** → catálogo de matéria-prima (lado de custo; fora do
+  MVP do Totem).
+- **Base completa de clientes (CRM, PDF 18 MB)** → destino correto é o **Supabase** (isolado por
+  oficina), nunca Obsidian/Sheets. Pedir export em **CSV/Excel** (PDF é ruim p/ importar).
+  Alimenta o agente cliente (identidade) e a visão de Clientes do dono.
+
+> PII tratada só no Supabase de teste, escopada à oficina-piloto. Importação = passo com diff
+> mostrado antes. Gasto de API (extração de PDF) = centavos, disparado pelo admin (upload).
+
 ## Regras que continuam valendo (do CLAUDE.md)
 
 Trabalhar só no Supabase de **teste** (`pvrnimckfgdmgjrjueap`), nunca produção; parar e pedir
