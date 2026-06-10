@@ -79,6 +79,7 @@ type FormState = {
   motivo_bloqueio: MotivoBloqueio | ''; // '' = sem bloqueio (deriva o bloqueado)
   cliente_nome: string;
   cliente_whatsapp: string;
+  chassi: string;
 };
 
 const formVazio = (): FormState => ({
@@ -94,6 +95,7 @@ const formVazio = (): FormState => ({
   motivo_bloqueio: '',
   cliente_nome: '',
   cliente_whatsapp: '',
+  chassi: '',
 });
 
 /** Ícone "+" (linha) para a ação primária. */
@@ -173,6 +175,7 @@ function OSManager({ estadoInicial }: { estadoInicial: FetchState<OrdemServicoAd
       motivo_bloqueio: os.motivo_bloqueio ?? '',
       cliente_nome: os.cliente_nome ?? '',
       cliente_whatsapp: os.cliente_whatsapp ?? '',
+      chassi: os.chassi ?? '',
     });
   };
 
@@ -252,7 +255,8 @@ function OSManager({ estadoInicial }: { estadoInicial: FetchState<OrdemServicoAd
       (c.valor_orcamento != null ? 1 : 0) +
       (c.tipo_cliente ? 1 : 0) +
       (c.cliente_nome ? 1 : 0) +
-      (c.cliente_whatsapp ? 1 : 0);
+      (c.cliente_whatsapp ? 1 : 0) +
+      (c.chassi ? 1 : 0);
     setForm((f) => {
       if (!f) return f;
       const novo = { ...f };
@@ -260,6 +264,7 @@ function OSManager({ estadoInicial }: { estadoInicial: FetchState<OrdemServicoAd
       if (c.modelo_veiculo) novo.modelo_veiculo = c.modelo_veiculo;
       if (c.cliente_nome) novo.cliente_nome = c.cliente_nome;
       if (c.cliente_whatsapp) novo.cliente_whatsapp = c.cliente_whatsapp;
+      if (c.chassi) novo.chassi = c.chassi;
       if (c.valor_orcamento != null) novo.valor_orcamento = String(c.valor_orcamento);
       if (c.tipo_cliente) {
         novo.tipo_cliente = c.tipo_cliente;
@@ -332,6 +337,7 @@ function OSManager({ estadoInicial }: { estadoInicial: FetchState<OrdemServicoAd
           motivo_bloqueio: form.motivo_bloqueio || null,
           cliente_nome: form.cliente_nome || null,
           cliente_whatsapp: form.cliente_whatsapp || null,
+          chassi: form.chassi || null,
         })
       : await criarOS({
           placa: form.placa,
@@ -344,6 +350,7 @@ function OSManager({ estadoInicial }: { estadoInicial: FetchState<OrdemServicoAd
           status_geral: form.status_geral,
           cliente_nome: form.cliente_nome || null,
           cliente_whatsapp: form.cliente_whatsapp || null,
+          chassi: form.chassi || null,
         });
 
     setSalvando(false);
@@ -518,6 +525,16 @@ function OSManager({ estadoInicial }: { estadoInicial: FetchState<OrdemServicoAd
                 />
               </label>
             </div>
+
+            <label className="adm-field">
+              <span className="adm-field__label">Chassi</span>
+              <input
+                className="adm-input"
+                value={form.chassi}
+                onChange={(e) => set('chassi', e.target.value)}
+                placeholder="Ex.: 9BGXH19G07B178929"
+              />
+            </label>
 
             <div className="adm-grid-2">
               <label className="adm-field">

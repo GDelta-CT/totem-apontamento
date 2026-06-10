@@ -20,6 +20,7 @@ export interface CamposOrcamento {
   ref_externa: string | null;
   cliente_nome: string | null;
   cliente_whatsapp: string | null;
+  chassi: string | null;
 }
 
 const PROMPT = `Você recebe o PDF de um orçamento de oficina de funilaria e pintura (pode vir da
@@ -34,6 +35,7 @@ markdown) com exatamente estas chaves:
 - "ref_externa": número/identificador do orçamento na plataforma (ex.: "1140125"), ou null.
 - "cliente_nome": nome do cliente/segurado dono do veículo (pessoa física ou empresa), ou null.
 - "cliente_whatsapp": telefone/celular/WhatsApp do cliente, SÓ os dígitos com DDD (ex.: "11999887766"), ou null.
+- "chassi": número do chassi do veículo (17 caracteres alfanuméricos, ex.: "9BGXH19G07B178929"), ou null.
 Se um campo não existir no documento, use null. Não invente.`;
 
 function extrairJSON(texto: string): unknown {
@@ -63,6 +65,10 @@ function normalizar(raw: Record<string, unknown>): CamposOrcamento {
       typeof raw.cliente_nome === 'string' && raw.cliente_nome.trim() ? raw.cliente_nome.trim() : null,
     cliente_whatsapp:
       raw.cliente_whatsapp == null ? null : String(raw.cliente_whatsapp).replace(/\D/g, '') || null,
+    chassi:
+      typeof raw.chassi === 'string' && raw.chassi.trim()
+        ? raw.chassi.trim().toUpperCase().replace(/\s/g, '')
+        : null,
   };
 }
 

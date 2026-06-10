@@ -294,6 +294,7 @@ export type CriarOSInput = {
   etapa_atual?: EtapaId | null;
   cliente_nome?: string | null;
   cliente_whatsapp?: string | null;
+  chassi?: string | null;
 };
 
 /**
@@ -329,6 +330,7 @@ export async function criarOS(input: CriarOSInput): Promise<FetchState<OrdemServ
           etapa_atual: input.etapa_atual ?? null,
           cliente_nome: input.cliente_nome?.trim() || null,
           cliente_whatsapp: input.cliente_whatsapp?.trim() || null,
+          chassi: input.chassi?.trim() || null,
         })
         .select(COLS_OS)
         .single()
@@ -359,6 +361,7 @@ export type AtualizarOSInput = {
   motivo_bloqueio?: MotivoBloqueio | null;
   cliente_nome?: string | null;
   cliente_whatsapp?: string | null;
+  chassi?: string | null;
 };
 
 /**
@@ -386,6 +389,7 @@ export async function atualizarOS(
   if (input.cliente_nome !== undefined) patch.cliente_nome = input.cliente_nome?.trim() || null;
   if (input.cliente_whatsapp !== undefined)
     patch.cliente_whatsapp = input.cliente_whatsapp?.trim() || null;
+  if (input.chassi !== undefined) patch.chassi = input.chassi?.trim() || null;
 
   if (Object.keys(patch).length === 0) {
     return { status: 'error', message: 'Nada para atualizar.' };
