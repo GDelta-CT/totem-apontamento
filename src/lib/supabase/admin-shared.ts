@@ -61,6 +61,8 @@ export type OrdemServicoAdmin = {
   etapa_atual: EtapaId | null;
   bloqueado: boolean;
   motivo_bloqueio: MotivoBloqueio | null;
+  cliente_nome: string | null;
+  cliente_whatsapp: string | null;
 };
 
 /** Funcionário como o admin vê (inclui inativos). */
@@ -102,7 +104,7 @@ export const MOTIVOS_BLOQUEIO: {
 
 /** Colunas da OS lidas/escritas (única fonte — client e server iguais). */
 export const COLS_OS =
-  'id, placa, modelo_veiculo, status_geral, data_entrada, data_prometida, tipo_cliente, valor_orcamento, ref_externa, etapa_atual, bloqueado, motivo_bloqueio';
+  'id, placa, modelo_veiculo, status_geral, data_entrada, data_prometida, tipo_cliente, valor_orcamento, ref_externa, etapa_atual, bloqueado, motivo_bloqueio, cliente_nome, cliente_whatsapp';
 
 /* ─────────────────── Helpers puros ─────────────────── */
 

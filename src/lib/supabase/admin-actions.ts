@@ -292,6 +292,8 @@ export type CriarOSInput = {
   ref_externa?: string | null;
   status_geral?: string | null;
   etapa_atual?: EtapaId | null;
+  cliente_nome?: string | null;
+  cliente_whatsapp?: string | null;
 };
 
 /**
@@ -325,6 +327,8 @@ export async function criarOS(input: CriarOSInput): Promise<FetchState<OrdemServ
           ref_externa: input.ref_externa?.trim() || null,
           status_geral: input.status_geral ?? undefined, // ausente -> default do banco
           etapa_atual: input.etapa_atual ?? null,
+          cliente_nome: input.cliente_nome?.trim() || null,
+          cliente_whatsapp: input.cliente_whatsapp?.trim() || null,
         })
         .select(COLS_OS)
         .single()
@@ -353,6 +357,8 @@ export type AtualizarOSInput = {
   etapa_atual?: EtapaId | null;
   bloqueado?: boolean;
   motivo_bloqueio?: MotivoBloqueio | null;
+  cliente_nome?: string | null;
+  cliente_whatsapp?: string | null;
 };
 
 /**
@@ -377,6 +383,9 @@ export async function atualizarOS(
   if (input.etapa_atual !== undefined) patch.etapa_atual = input.etapa_atual;
   if (input.bloqueado !== undefined) patch.bloqueado = input.bloqueado;
   if (input.motivo_bloqueio !== undefined) patch.motivo_bloqueio = input.motivo_bloqueio;
+  if (input.cliente_nome !== undefined) patch.cliente_nome = input.cliente_nome?.trim() || null;
+  if (input.cliente_whatsapp !== undefined)
+    patch.cliente_whatsapp = input.cliente_whatsapp?.trim() || null;
 
   if (Object.keys(patch).length === 0) {
     return { status: 'error', message: 'Nada para atualizar.' };

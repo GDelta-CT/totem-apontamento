@@ -77,6 +77,8 @@ type FormState = {
   etapa_atual: EtapaId | '';
   status_geral: StatusOS;
   motivo_bloqueio: MotivoBloqueio | ''; // '' = sem bloqueio (deriva o bloqueado)
+  cliente_nome: string;
+  cliente_whatsapp: string;
 };
 
 const formVazio = (): FormState => ({
@@ -90,6 +92,8 @@ const formVazio = (): FormState => ({
   etapa_atual: '',
   status_geral: 'Aguardando Produção',
   motivo_bloqueio: '',
+  cliente_nome: '',
+  cliente_whatsapp: '',
 });
 
 /** Ícone "+" (linha) para a ação primária. */
@@ -167,6 +171,8 @@ function OSManager({ estadoInicial }: { estadoInicial: FetchState<OrdemServicoAd
       etapa_atual: os.etapa_atual ?? '',
       status_geral: (os.status_geral as StatusOS) ?? 'Aguardando Produção',
       motivo_bloqueio: os.motivo_bloqueio ?? '',
+      cliente_nome: os.cliente_nome ?? '',
+      cliente_whatsapp: os.cliente_whatsapp ?? '',
     });
   };
 
@@ -320,6 +326,8 @@ function OSManager({ estadoInicial }: { estadoInicial: FetchState<OrdemServicoAd
           status_geral: form.status_geral,
           bloqueado: form.motivo_bloqueio !== '',
           motivo_bloqueio: form.motivo_bloqueio || null,
+          cliente_nome: form.cliente_nome || null,
+          cliente_whatsapp: form.cliente_whatsapp || null,
         })
       : await criarOS({
           placa: form.placa,
@@ -330,6 +338,8 @@ function OSManager({ estadoInicial }: { estadoInicial: FetchState<OrdemServicoAd
           valor_orcamento: valor,
           etapa_atual: form.etapa_atual || null,
           status_geral: form.status_geral,
+          cliente_nome: form.cliente_nome || null,
+          cliente_whatsapp: form.cliente_whatsapp || null,
         });
 
     setSalvando(false);
@@ -482,6 +492,28 @@ function OSManager({ estadoInicial }: { estadoInicial: FetchState<OrdemServicoAd
                 required
               />
             </label>
+
+            <div className="adm-grid-2">
+              <label className="adm-field">
+                <span className="adm-field__label">Nome do cliente</span>
+                <input
+                  className="adm-input"
+                  value={form.cliente_nome}
+                  onChange={(e) => set('cliente_nome', e.target.value)}
+                  placeholder="Ex.: João da Silva"
+                />
+              </label>
+              <label className="adm-field">
+                <span className="adm-field__label">WhatsApp do cliente</span>
+                <input
+                  className="adm-input"
+                  inputMode="tel"
+                  value={form.cliente_whatsapp}
+                  onChange={(e) => set('cliente_whatsapp', e.target.value)}
+                  placeholder="Ex.: (11) 99988-7766"
+                />
+              </label>
+            </div>
 
             <div className="adm-grid-2">
               <label className="adm-field">
