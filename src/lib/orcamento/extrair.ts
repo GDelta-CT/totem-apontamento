@@ -18,6 +18,8 @@ export interface CamposOrcamento {
   valor_orcamento: number | null;
   data_prometida: string | null; // AAAA-MM-DD
   ref_externa: string | null;
+  cliente_nome: string | null;
+  cliente_whatsapp: string | null;
 }
 
 const PROMPT = `Você recebe o PDF de um orçamento de oficina de funilaria e pintura (pode vir da
@@ -30,6 +32,8 @@ markdown) com exatamente estas chaves:
 - "valor_orcamento": número (total do orçamento em reais, ex.: 8418.75), ou null. Use ponto decimal, sem "R$".
 - "data_prometida": prazo de entrega em "AAAA-MM-DD", ou null se não informado.
 - "ref_externa": número/identificador do orçamento na plataforma (ex.: "1140125"), ou null.
+- "cliente_nome": nome do cliente/segurado dono do veículo (pessoa física ou empresa), ou null.
+- "cliente_whatsapp": telefone/celular/WhatsApp do cliente, SÓ os dígitos com DDD (ex.: "11999887766"), ou null.
 Se um campo não existir no documento, use null. Não invente.`;
 
 function extrairJSON(texto: string): unknown {
@@ -55,6 +59,10 @@ function normalizar(raw: Record<string, unknown>): CamposOrcamento {
       ? raw.data_prometida
       : null,
     ref_externa: raw.ref_externa == null ? null : String(raw.ref_externa),
+    cliente_nome:
+      typeof raw.cliente_nome === 'string' && raw.cliente_nome.trim() ? raw.cliente_nome.trim() : null,
+    cliente_whatsapp:
+      raw.cliente_whatsapp == null ? null : String(raw.cliente_whatsapp).replace(/\D/g, '') || null,
   };
 }
 

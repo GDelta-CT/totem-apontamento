@@ -250,12 +250,16 @@ function OSManager({ estadoInicial }: { estadoInicial: FetchState<OrdemServicoAd
       (c.placa ? 1 : 0) +
       (c.modelo_veiculo ? 1 : 0) +
       (c.valor_orcamento != null ? 1 : 0) +
-      (c.tipo_cliente ? 1 : 0);
+      (c.tipo_cliente ? 1 : 0) +
+      (c.cliente_nome ? 1 : 0) +
+      (c.cliente_whatsapp ? 1 : 0);
     setForm((f) => {
       if (!f) return f;
       const novo = { ...f };
       if (c.placa) novo.placa = normalizarPlaca(c.placa);
       if (c.modelo_veiculo) novo.modelo_veiculo = c.modelo_veiculo;
+      if (c.cliente_nome) novo.cliente_nome = c.cliente_nome;
+      if (c.cliente_whatsapp) novo.cliente_whatsapp = c.cliente_whatsapp;
       if (c.valor_orcamento != null) novo.valor_orcamento = String(c.valor_orcamento);
       if (c.tipo_cliente) {
         novo.tipo_cliente = c.tipo_cliente;
