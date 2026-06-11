@@ -103,6 +103,48 @@ function TotemApp() {
     setTela('selecionar-funcionario');
   };
 
+  // ── Reset por inatividade (quiosque compartilhado de parede) ──────────────
+  // Sem timer global, quem abandona no meio da busca/etapa/motivo deixa o totem
+  // "preso" no nome de outro. Após 90s SEM toque/tecla, volta sozinho ao início —
+  // EXCETO nas telas de cronômetro ({trabalhando, tarefa-pausada}): tempo rodando
+  // ou pausa em curso NUNCA é interrompido por inatividade (seria perder dado de
+  // produção). Refs evitam re-montar os listeners e stale closure de `tela`.
+  const INATIVIDADE_MS = 90_000;
+  const telaRef = useRef(tela);
+  telaRef.current = tela;
+  const voltarInicioRef = useRef(voltarInicio);
+  voltarInicioRef.current = voltarInicio;
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    let inativoTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const aoEstourar = () => {
+      const atual = telaRef.current;
+      // Cronômetro é sagrado: não reseta enquanto trabalha/pausado. Nem re-dispara
+      // se já estiver na tela inicial (nada a "voltar").
+      if (atual === 'trabalhando' || atual === 'tarefa-pausada') return;
+      if (atual === 'selecionar-funcionario') return;
+      voltarInicioRef.current();
+    };
+
+    const rearmar = () => {
+      if (inativoTimer) clearTimeout(inativoTimer);
+      inativoTimer = setTimeout(aoEstourar, INATIVIDADE_MS);
+    };
+
+    // passive: só observamos a interação pra re-armar o relógio (não prevenimos nada).
+    window.addEventListener('pointerdown', rearmar, { passive: true });
+    window.addEventListener('keydown', rearmar, { passive: true });
+    rearmar(); // arma na montagem
+
+    return () => {
+      if (inativoTimer) clearTimeout(inativoTimer);
+      window.removeEventListener('pointerdown', rearmar);
+      window.removeEventListener('keydown', rearmar);
+    };
+  }, []);
+
   const selecionarFuncionario = async (f: Funcionario) => {
     setFuncionario(f);
     setErroAcao(null);
@@ -440,6 +482,16 @@ function TelaSelecionarFuncionario({ onSelecionar }: { onSelecionar: (f: Funcion
           {state.data.map((f) => (
             <li key={f.id}>
               <button className="card-func" onClick={() => onSelecionar(f)} type="button">
+                {f.statusTarefa && (
+                  <span
+                    className={`card-func-chip ${
+                      f.statusTarefa === 'Pausado' ? 'card-func-chip-pausada' : 'card-func-chip-ativa'
+                    }`}
+                  >
+                    <span className="card-func-chip-dot" aria-hidden />
+                    {f.statusTarefa === 'Pausado' ? 'PAUSADA' : 'EM TAREFA'}
+                  </span>
+                )}
                 <span className="avatar">{iniciais(f.nome)}</span>
                 <span className="card-func-nome">{f.nome}</span>
                 {f.cargo && <span className="card-func-cargo">{f.cargo}</span>}
@@ -666,9 +718,36 @@ function TelaSelecionarEtapa({
         </div>
       )}
 
+      <ul className="grid-etapas" aria-busy={carregando}>
+        {ETAPAS.map((e) => {
+          const iniciandoEsta = !!etapaIniciando && etapaIniciando.id === e.id;
+          return (
+            <li key={e.id}>
+              <button
+                className={`card-etapa ${iniciandoEsta ? 'card-etapa-iniciando' : ''}`}
+                onClick={() => onEscolher(e)}
+                disabled={carregando}
+                type="button"
+              >
+                <span className="card-etapa-num">{e.ordem.toString().padStart(2, '0')}</span>
+                <span className="card-etapa-icone" aria-hidden>
+                  {e.icone}
+                </span>
+                <span className="card-etapa-nome">{e.nome}</span>
+                <span className="card-etapa-desc">
+                  {iniciandoEsta ? 'Começando...' : e.descricao}
+                </span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+
       {/* Extras do apontamento (escopo travado): retrabalho + complexidade.
-          Já vêm no padrão (off / Simples) — tocar a etapa inicia sem toque extra. */}
+          Ficam ABAIXO das etapas, discretos — a ETAPA é o palco. Já vêm no
+          padrão (off / Simples): tocar a etapa inicia sem nenhum toque extra. */}
       <div className="etapa-extras">
+        <span className="extras-tag">Opcional</span>
         <button
           type="button"
           className={`retrab-toggle ${retrabalho ? 'retrab-toggle-on' : ''}`}
@@ -703,31 +782,6 @@ function TelaSelecionarEtapa({
           </div>
         </div>
       </div>
-
-      <ul className="grid-etapas" aria-busy={carregando}>
-        {ETAPAS.map((e) => {
-          const iniciandoEsta = !!etapaIniciando && etapaIniciando.id === e.id;
-          return (
-            <li key={e.id}>
-              <button
-                className={`card-etapa ${iniciandoEsta ? 'card-etapa-iniciando' : ''}`}
-                onClick={() => onEscolher(e)}
-                disabled={carregando}
-                type="button"
-              >
-                <span className="card-etapa-num">{e.ordem.toString().padStart(2, '0')}</span>
-                <span className="card-etapa-icone" aria-hidden>
-                  {e.icone}
-                </span>
-                <span className="card-etapa-nome">{e.nome}</span>
-                <span className="card-etapa-desc">
-                  {iniciandoEsta ? 'Começando...' : e.descricao}
-                </span>
-              </button>
-            </li>
-          );
-        })}
-      </ul>
 
       <div className="acoes-linha" style={{ marginTop: 24 }}>
         <button className="btn-secundario" onClick={onVoltar} disabled={carregando}>
@@ -804,8 +858,10 @@ function TelaSelecionarMotivoPausa({
   onEscolher: (motivo: MotivoPausaId) => void;
   onCancelar: () => void;
 }) {
-  const tecnicas = MOTIVOS_PAUSA.filter((m) => m.categoria === 'tecnica');
-  const pessoais = MOTIVOS_PAUSA.filter((m) => m.categoria === 'pessoal');
+  // !m.automatico: 'troca_tarefa' é carimbado pelo SERVIDOR (migration 014) ao
+  // iniciar outra tarefa — não é escolha humana, então fica fora da grade de pausa.
+  const tecnicas = MOTIVOS_PAUSA.filter((m) => m.categoria === 'tecnica' && !m.automatico);
+  const pessoais = MOTIVOS_PAUSA.filter((m) => m.categoria === 'pessoal' && !m.automatico);
 
   return (
     <div className="tela">
@@ -868,7 +924,7 @@ function TelaSelecionarMotivoPausa({
       </ul>
 
       {erro && (
-        <div className="erro-inline" style={{ marginTop: 20 }}>
+        <div className="erro-inline" role="alert" style={{ marginTop: 20 }}>
           <span aria-hidden>⚠</span> {erro}
         </div>
       )}
@@ -946,7 +1002,7 @@ function TelaTarefaPausada({
       </div>
 
       {erro && (
-        <div className="erro-inline">
+        <div className="erro-inline" role="alert">
           <span aria-hidden>⚠</span> {erro}
         </div>
       )}
@@ -1027,7 +1083,7 @@ function TelaFinalizarConfirmar({
       </article>
 
       {erro && (
-        <div className="erro-inline">
+        <div className="erro-inline" role="alert">
           <span aria-hidden>⚠</span> {erro}
         </div>
       )}
@@ -1327,7 +1383,7 @@ function Estilos() {
         border: 1px solid var(--line);
         color: var(--ink);
         padding: 8px 16px;
-        min-height: 44px;
+        min-height: 56px;
         border-radius: 4px;
         font-family: inherit;
         font-weight: 700;
@@ -1358,7 +1414,9 @@ function Estilos() {
         justify-content: center;
         line-height: 1.1;
         padding: 8px 16px;
-        min-height: 44px;
+        /* Espelha a altura do btn-ghost (56px) pra o header não pular de altura
+           entre "logado/sem tarefa" e "em tarefa". */
+        min-height: 56px;
       }
       .op-trabalhando .op-sair {
         color: var(--running);
@@ -1419,6 +1477,7 @@ function Estilos() {
         gap: 18px;
       }
       .card-func {
+        position: relative;
         width: 100%;
         min-height: 152px;
         background: var(--bg-2);
@@ -1481,6 +1540,46 @@ function Estilos() {
         color: var(--ink-soft);
         text-transform: uppercase;
         letter-spacing: 1px;
+      }
+      /* Chip de pendência no canto do card: avisa, ANTES de tocar, quem já tem
+         tarefa aberta. Texto real (não só cor): "EM TAREFA"/"PAUSADA" + bolinha. */
+      .card-func-chip {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 9px;
+        border-radius: 999px;
+        font-family: var(--font-jetbrains-mono), monospace;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        line-height: 1;
+        border: 1px solid transparent;
+      }
+      .card-func-chip-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .card-func-chip-ativa {
+        color: #bff0cf;
+        background: rgba(74, 222, 128, 0.14);
+        border-color: rgba(74, 222, 128, 0.45);
+      }
+      .card-func-chip-ativa .card-func-chip-dot {
+        background: var(--running);
+      }
+      .card-func-chip-pausada {
+        color: #fbe6a6;
+        background: rgba(251, 191, 36, 0.14);
+        border-color: rgba(251, 191, 36, 0.45);
+      }
+      .card-func-chip-pausada .card-func-chip-dot {
+        background: var(--paused);
       }
 
       /* Lista buscável de carros ativos (tocar é o caminho; digitar só filtra) */
@@ -1554,7 +1653,8 @@ function Estilos() {
         font-size: 24px;
         font-weight: 700;
         letter-spacing: 0.06em;
-        color: var(--accent);
+        /* Branca (--ink): teal some a 2 m sob luz de galpão (Lc baixo). Só a COR muda. */
+        color: var(--ink);
         line-height: 1;
       }
       .card-carro-modelo {
@@ -1931,24 +2031,33 @@ function Estilos() {
       }
 
       /* Extras do apontamento: retrabalho (flag âmbar) + complexidade (acento teal).
-         Ficam ACIMA das etapas; padrões pré-setados pra não custar toque extra. */
+         Ficam ABAIXO das etapas, REBAIXADOS (sem fundo/sombra): a etapa é o palco;
+         os padrões pré-setados (off/Simples) cobrem 90% dos casos sem toque. Os
+         alvos seguem ≥56px (dedo enluvado) — o rebaixo é visual, não de toque. */
       .etapa-extras {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
         gap: 14px 24px;
-        background: var(--bg-2);
+        background: transparent;
         border: 1px solid var(--line);
         border-radius: 14px;
-        padding: 16px 20px;
-        margin-bottom: 20px;
-        box-shadow: var(--shadow-card);
+        padding: 12px 16px;
+        margin-top: 20px;
+      }
+      .extras-tag {
+        font-family: var(--font-jetbrains-mono), monospace;
+        font-size: 10px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        font-weight: 700;
       }
       .retrab-toggle {
         display: inline-flex;
         align-items: center;
         gap: 10px;
-        min-height: 48px;
+        min-height: 56px;
         padding: 10px 18px;
         border-radius: 999px;
         border: 1.5px solid var(--line-strong);
@@ -2011,7 +2120,7 @@ function Estilos() {
         gap: 4px;
       }
       .complex-btn {
-        min-height: 40px;
+        min-height: 56px;
         padding: 8px 16px;
         border: none;
         border-radius: 999px;
@@ -2145,14 +2254,26 @@ function Estilos() {
         line-height: 1.1;
       }
       .erro-inline {
-        background: rgba(255, 77, 46, 0.1);
+        /* "Não salvou, tenta de novo" tem que GRITAR: fundo sólido, texto branco,
+           peso de alerta — equivalente em presença à tela de sucesso (verde, cheia). */
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--danger);
         border: 1px solid var(--danger);
-        color: var(--danger);
-        padding: 14px 18px;
-        border-radius: 6px;
+        color: #ffffff;
+        padding: 16px 20px;
+        border-radius: 12px;
         margin-bottom: 16px;
-        font-weight: 700;
-        font-size: 14px;
+        font-weight: 800;
+        font-size: clamp(16px, 2.2vw, 20px);
+        line-height: 1.3;
+        box-shadow: var(--shadow-card);
+      }
+      .erro-inline > span[aria-hidden] {
+        font-size: 24px;
+        line-height: 1;
+        flex-shrink: 0;
       }
 
       /* Trabalhando/Pausada */
@@ -2231,6 +2352,9 @@ function Estilos() {
           0 0 0 1px rgba(74, 222, 128, 0.25);
         width: 100%;
         max-width: 620px;
+        /* Dimensiona o cronômetro pela LARGURA DO CARTÃO (cqi), não da janela —
+           assim o HH:MM:SS nunca vaza, em PC ou tablet deitado. */
+        container-type: inline-size;
       }
       .cronometro-wrap.cronometro-pausado {
         border-color: var(--paused);
@@ -2248,11 +2372,17 @@ function Estilos() {
       }
       .cronometro-display {
         font-family: var(--font-jetbrains-mono), monospace;
-        font-size: clamp(60px, 12vw, 120px);
         font-weight: 700;
         color: var(--running);
         line-height: 1;
-        letter-spacing: 0.02em;
+        letter-spacing: 0;
+        white-space: nowrap;
+        /* 1ª: fallback por viewport (browsers sem cqi param aqui). */
+        font-size: clamp(48px, 11vw, 100px);
+        /* 2ª: dimensionada pelo CARTÃO. 18.5cqi de ~540px úteis ≈ 100px de teto,
+           com 8 chars (HH:MM:SS) ≈ 480px e 9 chars (timer-fantasma ≥100h) ≈ 540px
+           ainda cabendo. Browsers sem suporte a cqi simplesmente ignoram esta linha. */
+        font-size: clamp(48px, 18.5cqi, 100px);
       }
       .cronometro-pausado .cronometro-display {
         color: var(--paused);

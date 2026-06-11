@@ -61,6 +61,10 @@ export type Funcionario = {
   matricula?: string | null;
   ativo: boolean;
   cargo?: string | null;
+  // Derivado (best-effort) no totem: status do apontamento ABERTO deste funcionário,
+  // para o card do nome mostrar um chip "EM TAREFA"/"PAUSADA" antes de tocar. Ausente
+  // quando não há tarefa aberta OU a consulta auxiliar falhou (não é fonte da verdade).
+  statusTarefa?: 'Em andamento' | 'Pausado' | null;
 };
 
 export type OrdemServico = {
@@ -191,6 +195,10 @@ export type MotivoPausaInfo = {
   descricao: string;
   categoria: 'tecnica' | 'pessoal';
   alerta?: boolean;
+  // true = motivo CARIMBADO PELO SERVIDOR (auto-pausa), não escolha humana. A grade
+  // de "por que vai pausar?" no totem filtra estes fora (!automatico); a UI só os usa
+  // para NOMEAR um estado já existente (buscarMotivoPausa -> rótulo).
+  automatico?: boolean;
 };
 
 export const MOTIVOS_PAUSA: MotivoPausaInfo[] = [
@@ -247,6 +255,7 @@ export const MOTIVOS_PAUSA: MotivoPausaInfo[] = [
     icone: '🔁',
     descricao: 'Pausado automaticamente ao iniciar outra tarefa',
     categoria: 'tecnica',
+    automatico: true,
   },
 ];
 

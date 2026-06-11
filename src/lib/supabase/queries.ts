@@ -58,13 +58,29 @@ export function useFuncionariosAtivos() {
     const run = async () => {
       try {
         const sb = getSupabase();
-        const result = await withTimeout(
+        // Em paralelo: a equipe (fonte da verdade da lista) + os apontamentos ABERTOS
+        // da oficina (best-effort, só pra pintar o chip de pendência no card do nome).
+        // A 2ª consulta NUNCA pode derrubar a lista — por isso vai numa Promise que
+        // resolve com {} em qualquer erro (allSettled-like manual), sem rejeitar.
+        const funcsPromise = withTimeout(
           sb
             .from('funcionarios')
             .select('id, nome, ativo, cargo')
             .eq('ativo', true)
             .order('nome', { ascending: true })
         );
+        const statusPromise = withTimeout(
+          sb
+            .from('apontamentos')
+            .select('nome_funcionario, status_tarefa')
+            .in('status_tarefa', ['Em andamento', 'Pausado'])
+        ).then(
+          (r) => r as { data: { nome_funcionario: string; status_tarefa: string }[] | null },
+          // Falha (rede/permissão/timeout) NÃO quebra a lista: sem mapa, sem chips.
+          () => ({ data: null as { nome_funcionario: string; status_tarefa: string }[] | null })
+        );
+
+        const [result, statusResult] = await Promise.all([funcsPromise, statusPromise]);
         const { data, error } = result as {
           data: Funcionario[] | null;
           error: { message: string } | null;
@@ -82,7 +98,22 @@ export function useFuncionariosAtivos() {
           return;
         }
 
-        setState({ status: 'success', data });
+        // Mapa nome -> status (Pausado tem prioridade se houver linhas conflitantes,
+        // raro). Sem dados (consulta falhou) -> mapa vazio -> nenhum card ganha chip.
+        const statusPorNome = new Map<string, 'Em andamento' | 'Pausado'>();
+        for (const ap of statusResult.data ?? []) {
+          if (!ap?.nome_funcionario) continue;
+          const st = ap.status_tarefa === 'Pausado' ? 'Pausado' : 'Em andamento';
+          if (st === 'Pausado' || !statusPorNome.has(ap.nome_funcionario)) {
+            statusPorNome.set(ap.nome_funcionario, st);
+          }
+        }
+        const dataComStatus: Funcionario[] = data.map((f) => ({
+          ...f,
+          statusTarefa: statusPorNome.get(f.nome) ?? null,
+        }));
+
+        setState({ status: 'success', data: dataComStatus });
       } catch (e) {
         if (cancelled) return;
         setState({
