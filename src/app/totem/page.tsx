@@ -562,7 +562,9 @@ function TelaConsultarOS({
 
           {filtrados.length === 0 ? (
             <div className="estado estado-vazio">
-              <div className="estado-icone">∅</div>
+              <div className="estado-icone" aria-hidden>
+                <IcBusca />
+              </div>
               <h2>Nada com “{filtro}”</h2>
               <p>Confira a placa/modelo, ou limpe o filtro.</p>
             </div>
@@ -644,7 +646,7 @@ function TelaResultadoOS({
 
           <button className="btn-iniciar" onClick={onIniciarTarefa}>
             <span className="btn-iniciar-icone" aria-hidden>
-              ▶
+              <IcPlay />
             </span>
             É ESTE CARRO
           </button>
@@ -708,13 +710,16 @@ function TelaSelecionarEtapa({
         <span className="etapa-carro-modelo">{os.modelo_veiculo}</span>
         <span className="etapa-carro-placa">{formatarPlaca(os.placa)}</span>
         <span className="etapa-carro-trocar" aria-hidden>
-          ↺ trocar carro
+          <IcSwap /> trocar carro
         </span>
       </button>
 
       {erro && (
         <div className="erro-inline" role="alert" style={{ marginBottom: 16 }}>
-          <span aria-hidden>⚠</span> {erro} Toque na etapa de novo para tentar.
+          <span aria-hidden>
+            <IcWarn />
+          </span>{' '}
+          {erro} Toque na etapa de novo para tentar.
         </div>
       )}
 
@@ -731,7 +736,7 @@ function TelaSelecionarEtapa({
               >
                 <span className="card-etapa-num">{e.ordem.toString().padStart(2, '0')}</span>
                 <span className="card-etapa-icone" aria-hidden>
-                  {e.icone}
+                  <IconeEtapa id={e.id} />
                 </span>
                 <span className="card-etapa-nome">{e.nome}</span>
                 <span className="card-etapa-desc">
@@ -756,7 +761,7 @@ function TelaSelecionarEtapa({
           aria-pressed={retrabalho}
         >
           <span className="retrab-check" aria-hidden>
-            {retrabalho ? '✓' : ''}
+            {retrabalho ? <IcCheck /> : null}
           </span>
           Retrabalho
         </button>
@@ -815,7 +820,7 @@ function TelaTrabalhando({
         {etapa && (
           <div className="trabalhando-etapa">
             <span className="trabalhando-etapa-icone" aria-hidden>
-              {etapa.icone}
+              <IconeEtapa id={etapa.id} />
             </span>
             <span className="trabalhando-etapa-nome">{etapa.nome}</span>
           </div>
@@ -833,10 +838,16 @@ function TelaTrabalhando({
 
       <div className="botoes-tarefa">
         <button className="btn-pausar" onClick={onPedirPausar}>
-          <span aria-hidden>⏸</span> PAUSAR
+          <span aria-hidden>
+            <IcPause />
+          </span>{' '}
+          PAUSAR
         </button>
         <button className="btn-finalizar" onClick={onPedirFinalizar}>
-          <span aria-hidden>⏹</span> FINALIZAR
+          <span aria-hidden>
+            <IcStop />
+          </span>{' '}
+          FINALIZAR
         </button>
       </div>
     </div>
@@ -871,12 +882,19 @@ function TelaSelecionarMotivoPausa({
       </p>
 
       <div className="aviso-15min">
-        <span aria-hidden>⚠</span>{' '}
+        <span aria-hidden>
+          <IcWarn />
+        </span>{' '}
         <strong>Pausa só se for ficar parado por mais de 15 minutos.</strong> Pra água, banheiro ou
         pegar ferramenta rápida — NÃO pause.
       </div>
 
-      <h3 className="motivo-categoria">⚙ A tarefa não pode continuar</h3>
+      <h3 className="motivo-categoria">
+        <span className="motivo-categoria-icone" aria-hidden>
+          <IcGear />
+        </span>{' '}
+        A tarefa não pode continuar
+      </h3>
       <ul className="grid-motivos">
         {tecnicas.map((m) => (
           <li key={m.id}>
@@ -887,7 +905,7 @@ function TelaSelecionarMotivoPausa({
               type="button"
             >
               <span className="card-motivo-icone" aria-hidden>
-                {m.icone}
+                <IconeMotivo id={m.id} />
               </span>
               <div className="card-motivo-texto">
                 <div className="card-motivo-nome">{m.nome}</div>
@@ -900,7 +918,10 @@ function TelaSelecionarMotivoPausa({
       </ul>
 
       <h3 className="motivo-categoria" style={{ marginTop: 24 }}>
-        👤 Eu preciso parar
+        <span className="motivo-categoria-icone" aria-hidden>
+          <IcUser />
+        </span>{' '}
+        Eu preciso parar
       </h3>
       <ul className="grid-motivos">
         {pessoais.map((m) => (
@@ -912,7 +933,7 @@ function TelaSelecionarMotivoPausa({
               type="button"
             >
               <span className="card-motivo-icone" aria-hidden>
-                {m.icone}
+                <IconeMotivo id={m.id} />
               </span>
               <div className="card-motivo-texto">
                 <div className="card-motivo-nome">{m.nome}</div>
@@ -925,7 +946,10 @@ function TelaSelecionarMotivoPausa({
 
       {erro && (
         <div className="erro-inline" role="alert" style={{ marginTop: 20 }}>
-          <span aria-hidden>⚠</span> {erro}
+          <span aria-hidden>
+            <IcWarn />
+          </span>{' '}
+          {erro}
         </div>
       )}
 
@@ -968,13 +992,16 @@ function TelaTarefaPausada({
     <div className="tela tela-pausada">
       <div className="pausada-banner">
         <span className="pausada-banner-icone" aria-hidden>
-          ⏸
+          <IcPause />
         </span>
         <div>
           <div className="pausada-banner-tag">TAREFA PAUSADA</div>
           {motivo && (
             <div className="pausada-banner-motivo">
-              {motivo.icone} {motivo.nome}
+              <span aria-hidden>
+                <IconeMotivo id={motivo.id} />
+              </span>{' '}
+              {motivo.nome}
             </div>
           )}
           {tempoPausado && <div className="pausada-banner-tempo">Pausado {tempoPausado}</div>}
@@ -985,7 +1012,7 @@ function TelaTarefaPausada({
         {etapa && (
           <div className="trabalhando-etapa">
             <span className="trabalhando-etapa-icone" aria-hidden>
-              {etapa.icone}
+              <IconeEtapa id={etapa.id} />
             </span>
             <span className="trabalhando-etapa-nome">{etapa.nome}</span>
           </div>
@@ -1003,7 +1030,10 @@ function TelaTarefaPausada({
 
       {erro && (
         <div className="erro-inline" role="alert">
-          <span aria-hidden>⚠</span> {erro}
+          <span aria-hidden>
+            <IcWarn />
+          </span>{' '}
+          {erro}
         </div>
       )}
 
@@ -1013,10 +1043,22 @@ function TelaTarefaPausada({
           onClick={onFinalizar}
           disabled={carregando}
         >
-          <span aria-hidden>⏹</span> FINALIZAR
+          <span aria-hidden>
+            <IcStop />
+          </span>{' '}
+          FINALIZAR
         </button>
         <button className="btn-retomar" onClick={onRetomar} disabled={carregando}>
-          {carregando ? 'RETOMANDO...' : '▶ RETOMAR TAREFA'}
+          {carregando ? (
+            'RETOMANDO...'
+          ) : (
+            <>
+              <span aria-hidden>
+                <IcPlay />
+              </span>{' '}
+              RETOMAR TAREFA
+            </>
+          )}
         </button>
       </div>
     </div>
@@ -1056,7 +1098,7 @@ function TelaFinalizarConfirmar({
         {etapa && (
           <div className="confirmacao-etapa">
             <span className="confirmacao-etapa-icone" aria-hidden>
-              {etapa.icone}
+              <IconeEtapa id={etapa.id} />
             </span>
             <div>
               <div className="confirmacao-etapa-tag">ETAPA</div>
@@ -1084,7 +1126,10 @@ function TelaFinalizarConfirmar({
 
       {erro && (
         <div className="erro-inline" role="alert">
-          <span aria-hidden>⚠</span> {erro}
+          <span aria-hidden>
+            <IcWarn />
+          </span>{' '}
+          {erro}
         </div>
       )}
 
@@ -1115,7 +1160,16 @@ function TelaFinalizarConfirmar({
           Ainda falta
         </button>
         <button className="btn-primario" onClick={() => onConfirmar(true)} disabled={carregando}>
-          {carregando ? 'SALVANDO...' : '✓ Sim, concluí'}
+          {carregando ? (
+            'SALVANDO...'
+          ) : (
+            <>
+              <span aria-hidden>
+                <IcCheck />
+              </span>{' '}
+              Sim, concluí
+            </>
+          )}
         </button>
       </div>
 
@@ -1133,7 +1187,9 @@ function TelaFinalizarConfirmar({
 function TelaTarefaFinalizada({ onConcluir }: { onConcluir: () => void }) {
   return (
     <div className="tela tela-sucesso">
-      <div className="sucesso-icone">✓</div>
+      <div className="sucesso-icone" aria-hidden>
+        <IcCheck />
+      </div>
       <h1 className="tela-titulo">TAREFA FINALIZADA!</h1>
       <p className="tela-sub">Apontamento salvo. Bom trabalho!</p>
       <button className="btn-primario" onClick={onConcluir}>
@@ -1157,7 +1213,9 @@ function Carregando({ texto }: { texto: string }) {
 function Erro({ mensagem, onTentar }: { mensagem: string; onTentar: () => void }) {
   return (
     <div className="estado estado-erro" role="alert">
-      <div className="estado-icone">⚠</div>
+      <div className="estado-icone" aria-hidden>
+        <IcWarn />
+      </div>
       <h2>Ops, deu ruim.</h2>
       <p>{mensagem}</p>
       <button className="btn-primario" onClick={onTentar}>
@@ -1170,7 +1228,9 @@ function Erro({ mensagem, onTentar }: { mensagem: string; onTentar: () => void }
 function Vazio({ titulo, dica, onTentar }: { titulo: string; dica: string; onTentar: () => void }) {
   return (
     <div className="estado estado-vazio">
-      <div className="estado-icone">∅</div>
+      <div className="estado-icone" aria-hidden>
+        <IcVazio />
+      </div>
       <h2>{titulo}</h2>
       <p>{dica}</p>
       <button className="btn-primario" onClick={onTentar}>
@@ -1255,6 +1315,17 @@ function Estilos() {
         outline-offset: 2px;
         box-shadow: 0 0 0 4px var(--accent-ring);
         border-radius: 8px;
+      }
+
+      /* Ícones de linha (SVG): escalam pelo font-size do contêiner e herdam a
+         cor via currentColor — assim quase não há CSS de tamanho por ícone, e
+         cada contexto (teal/âmbar/vermelho/verde) já pinta o traço certo. */
+      .totem-root svg.ic {
+        width: 1em;
+        height: 1em;
+        display: inline-block;
+        vertical-align: middle;
+        flex-shrink: 0;
       }
 
       /* Respeita quem reduz movimento: nada de pulsar/girar/deslizar. */
@@ -2518,6 +2589,12 @@ function Estilos() {
         text-transform: uppercase;
         margin: 0 0 12px;
       }
+      /* Ícone da categoria: maior que o texto (13px) pra ler como rótulo. */
+      .motivo-categoria-icone {
+        font-size: 18px;
+        color: var(--accent);
+        margin-right: 2px;
+      }
       .grid-motivos {
         list-style: none;
         padding: 0;
@@ -2692,4 +2769,277 @@ function Estilos() {
       }
     `}</style>
   );
+}
+
+/* ─────────────── Ícones (estilo LINHA) ───────────────
+   Todos: stroke=currentColor, fill=none, viewBox 0 0 24 24. Escalam pelo
+   font-size do contêiner via .ic (regra global). Decorativos → aria-hidden.
+   Declarados no fim do módulo: function declarations sofrem hoisting, então
+   já estão disponíveis para o JSX acima. NÃO alteram dados em client.ts —
+   o campo `icone` (emoji) continua lá como fallback, não é mais exibido. */
+
+type IconeProps = { className?: string };
+
+// Base: aplica os atributos de linha comuns a todos os ícones.
+function Svg({ children, className }: { children: React.ReactNode; className?: string }) {
+  return (
+    <svg
+      className={`ic${className ? ` ${className}` : ''}`}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2.2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      {children}
+    </svg>
+  );
+}
+
+/* ── Glyphs de UI ── */
+
+// ▶ play (triângulo levemente preenchido p/ legibilidade em botão pequeno)
+function IcPlay(p: IconeProps) {
+  return (
+    <Svg className={p.className}>
+      <path d="M7 5l12 7-12 7V5z" fill="currentColor" />
+    </Svg>
+  );
+}
+
+// ⏸ pause
+function IcPause(p: IconeProps) {
+  return (
+    <Svg className={p.className}>
+      <line x1="9" y1="5" x2="9" y2="19" />
+      <line x1="15" y1="5" x2="15" y2="19" />
+    </Svg>
+  );
+}
+
+// ⏹ stop
+function IcStop(p: IconeProps) {
+  return (
+    <Svg className={p.className}>
+      <rect x="6" y="6" width="12" height="12" rx="2" />
+    </Svg>
+  );
+}
+
+// ✓ check
+function IcCheck(p: IconeProps) {
+  return (
+    <Svg className={p.className}>
+      <path d="M5 13l4 4L19 7" />
+    </Svg>
+  );
+}
+
+// ⚠ triângulo de aviso
+function IcWarn(p: IconeProps) {
+  return (
+    <Svg className={p.className}>
+      <path d="M12 3.5L21.5 20H2.5L12 3.5z" />
+      <line x1="12" y1="10" x2="12" y2="14" />
+      <line x1="12" y1="17.2" x2="12" y2="17.3" />
+    </Svg>
+  );
+}
+
+// ↺ seta circular (trocar)
+function IcSwap(p: IconeProps) {
+  return (
+    <Svg className={p.className}>
+      <path d="M4.5 12a7.5 7.5 0 0 1 12.8-5.3L20 9" />
+      <path d="M20 4v5h-5" />
+      <path d="M19.5 12a7.5 7.5 0 0 1-12.8 5.3L4 15" />
+      <path d="M4 20v-5h5" />
+    </Svg>
+  );
+}
+
+// ⚙ engrenagem (categoria "a tarefa não pode continuar")
+function IcGear(p: IconeProps) {
+  return (
+    <Svg className={p.className}>
+      <circle cx="12" cy="12" r="3.2" />
+      <path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.2 5.2l2.1 2.1M16.7 16.7l2.1 2.1M18.8 5.2l-2.1 2.1M7.3 16.7l-2.1 2.1" />
+    </Svg>
+  );
+}
+
+// 👤 pessoa (categoria "eu preciso parar")
+function IcUser(p: IconeProps) {
+  return (
+    <Svg className={p.className}>
+      <circle cx="12" cy="8" r="3.5" />
+      <path d="M5 20a7 7 0 0 1 14 0" />
+    </Svg>
+  );
+}
+
+// ∅ busca sem resultado (lupa vazia)
+function IcBusca(p: IconeProps) {
+  return (
+    <Svg className={p.className}>
+      <circle cx="10.5" cy="10.5" r="6" />
+      <line x1="15" y1="15" x2="20.5" y2="20.5" />
+    </Svg>
+  );
+}
+
+// caixa/inbox vazio (estado "nenhum carro")
+function IcVazio(p: IconeProps) {
+  return (
+    <Svg className={p.className}>
+      <path d="M3 8.5L6 4h12l3 4.5" />
+      <path d="M3 8.5h6l1.2 2.2h3.6L15 8.5h6v9.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18V8.5z" />
+    </Svg>
+  );
+}
+
+/* ── Ícones de ETAPA (8 ids) ── */
+
+function IconeEtapa({ id, className }: { id: string; className?: string }) {
+  switch (id) {
+    // ⚙ Desmontagem → chave de boca (desmontar)
+    case 'Desmontagem':
+      return (
+        <Svg className={className}>
+          <path d="M14.5 6.5a3.5 3.5 0 0 0-4.6 4.3L4 16.7 7.3 20l5.9-5.9a3.5 3.5 0 0 0 4.3-4.6l-2.1 2.1-2.2-.6-.6-2.2 2-2.1z" />
+        </Svg>
+      );
+    // 🔨 Funilaria → martelo
+    case 'Funilaria':
+      return (
+        <Svg className={className}>
+          <path d="M13.5 6.5l4-4 4 4-4 4-2-2-7.5 7.5" />
+          <path d="M8 12l4 4-4.5 4.5a2.1 2.1 0 0 1-3-3L9 13" />
+        </Svg>
+      );
+    // ✨ Preparação → bloco de lixa / preparo de superfície
+    case 'Preparacao':
+      return (
+        <Svg className={className}>
+          <rect x="3" y="9.5" width="18" height="6" rx="1.5" />
+          <path d="M3 12.5h18" />
+          <path d="M7.5 9.5V7M12 9.5V6M16.5 9.5V7" />
+        </Svg>
+      );
+    // 🎨 Pintura → pistola/rolo de pintura
+    case 'Pintura':
+      return (
+        <Svg className={className}>
+          <path d="M4 8.5h9v4H4z" />
+          <path d="M13 9.5h3l3-2v7l-3-2h-3" />
+          <path d="M7 12.5v5.5a1.5 1.5 0 0 0 1.5 1.5h0A1.5 1.5 0 0 0 10 18v-5.5" />
+        </Svg>
+      );
+    // 💎 Polimento → brilho (estrela 4 pontas)
+    case 'Polimento':
+      return (
+        <Svg className={className}>
+          <path d="M12 3l2.2 6.8L21 12l-6.8 2.2L12 21l-2.2-6.8L3 12l6.8-2.2L12 3z" />
+        </Svg>
+      );
+    // 🔧 Montagem → chave inglesa
+    case 'Montagem':
+      return (
+        <Svg className={className}>
+          <path d="M15.5 4.5a4.5 4.5 0 0 0-5.8 5.5l-6 6a2.1 2.1 0 0 0 3 3l6-6a4.5 4.5 0 0 0 5.5-5.8l-2.7 2.7-2.5-.7-.7-2.5 2.9-2.4z" />
+        </Svg>
+      );
+    // 🔍 Qualidade → lupa com check
+    case 'Qualidade':
+      return (
+        <Svg className={className}>
+          <circle cx="10.5" cy="10.5" r="6" />
+          <line x1="15" y1="15" x2="20.5" y2="20.5" />
+          <path d="M8 10.5l2 2 3-3.5" />
+        </Svg>
+      );
+    // 🚗 Entrega → carro
+    case 'Entrega':
+      return (
+        <Svg className={className}>
+          <path d="M3 13l1.8-4.5A2 2 0 0 1 6.7 7h10.6a2 2 0 0 1 1.9 1.5L21 13v4.5h-3" />
+          <path d="M3 13v4.5h3" />
+          <path d="M3 13h18" />
+          <circle cx="7.5" cy="17.5" r="1.6" />
+          <circle cx="16.5" cy="17.5" r="1.6" />
+        </Svg>
+      );
+    default:
+      return null;
+  }
+}
+
+/* ── Ícones de MOTIVO de pausa (7 ids) ── */
+
+function IconeMotivo({ id, className }: { id: string; className?: string }) {
+  switch (id) {
+    // ⏳ secagem → ampulheta
+    case 'secagem':
+      return (
+        <Svg className={className}>
+          <path d="M6 4h12M6 20h12" />
+          <path d="M7 4c0 4 5 5.5 5 8s-5 4-5 8" />
+          <path d="M17 4c0 4-5 5.5-5 8s5 4 5 8" />
+        </Svg>
+      );
+    // 📦 falta_peca → caixa/pacote
+    case 'falta_peca':
+      return (
+        <Svg className={className}>
+          <path d="M3.5 7.5L12 3l8.5 4.5v9L12 21l-8.5-4.5v-9z" />
+          <path d="M3.5 7.5L12 12l8.5-4.5M12 12v9" />
+        </Svg>
+      );
+    // 🛠 problema_tecnico → raio (falta luz/ar)
+    case 'problema_tecnico':
+      return (
+        <Svg className={className}>
+          <path d="M13 2L4 13h6l-1 9 9-11h-6l1-9z" />
+        </Svg>
+      );
+    // 💰 orcamento_extra → nota/cifrão
+    case 'orcamento_extra':
+      return (
+        <Svg className={className}>
+          <rect x="3" y="6" width="18" height="12" rx="2" />
+          <circle cx="12" cy="12" r="2.6" />
+          <path d="M6.5 9.5h.01M17.5 14.5h.01" />
+        </Svg>
+      );
+    // 🍽 almoço → talheres
+    case 'almoco':
+      return (
+        <Svg className={className}>
+          <path d="M7 3v8M5 3v4a2 2 0 0 0 2 2M9 3v4a2 2 0 0 1-2 2M7 11v10" />
+          <path d="M16.5 3c-1.7 0-2.5 2-2.5 4.5S15 12 16.5 12 19 9 19 7.5 18.2 3 16.5 3zM16.5 12v9" />
+        </Svg>
+      );
+    // 🌅 fim_expediente → lua (retomo amanhã)
+    case 'fim_expediente':
+      return (
+        <Svg className={className}>
+          <path d="M20 13.5A8 8 0 0 1 9.5 4 7 7 0 1 0 20 13.5z" />
+        </Svg>
+      );
+    // 🔁 troca_tarefa → setas de repetição (só nomeia estado, não na grade)
+    case 'troca_tarefa':
+      return (
+        <Svg className={className}>
+          <path d="M4 9a5 5 0 0 1 5-5h7" />
+          <path d="M13 1l3 3-3 3" />
+          <path d="M20 15a5 5 0 0 1-5 5H8" />
+          <path d="M11 23l-3-3 3-3" />
+        </Svg>
+      );
+    default:
+      return null;
+  }
 }
