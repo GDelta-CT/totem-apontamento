@@ -15,6 +15,7 @@ import {
   type MotivoPausaId,
   type OrdemServico,
 } from './client';
+import { ACOES_ENCERRANTES_LIVE } from './live-shared';
 
 const TIMEOUT_MS = 8000;
 
@@ -72,12 +73,17 @@ export function useFuncionariosAtivos() {
         const statusPromise = withTimeout(
           sb
             .from('apontamentos')
-            .select('nome_funcionario, status_tarefa')
+            .select('id, nome_funcionario, status_tarefa')
             .in('status_tarefa', ['Em andamento', 'Pausado'])
         ).then(
-          (r) => r as { data: { nome_funcionario: string; status_tarefa: string }[] | null },
+          (r) =>
+            r as {
+              data: { id: string; nome_funcionario: string; status_tarefa: string }[] | null;
+            },
           // Falha (rede/permissão/timeout) NÃO quebra a lista: sem mapa, sem chips.
-          () => ({ data: null as { nome_funcionario: string; status_tarefa: string }[] | null })
+          () => ({
+            data: null as { id: string; nome_funcionario: string; status_tarefa: string }[] | null,
+          })
         );
 
         const [result, statusResult] = await Promise.all([funcsPromise, statusPromise]);
@@ -98,11 +104,38 @@ export function useFuncionariosAtivos() {
           return;
         }
 
+        // §4 (correção append-only): o apontamento bruto segue 'Em andamento'/
+        // 'Pausado' de propósito (imutável). Se o admin ENCERROU um timer esquecido
+        // (ajustar_fim/descartar na trilha de correções), ele já NÃO é ativo — então
+        // o chip do card precisa excluí-lo, igualzinho ao admin (excluirCorrigidos) e
+        // ao buscarApontamentoAtivo. Sem isto o chip mostrava "PAUSADA" para um timer
+        // que o admin já tinha fechado (totem ⇄ admin descasavam). Best-effort: se a
+        // checagem falhar, mantém os chips como estão — nunca derruba a lista.
+        const statusRows = statusResult.data ?? [];
+        let encerrados = new Set<string>();
+        const idsAtivos = statusRows.map((a) => a.id).filter(Boolean);
+        if (idsAtivos.length > 0) {
+          try {
+            const corr = await withTimeout(
+              sb
+                .from('apontamento_correcoes')
+                .select('apontamento_id')
+                .in('apontamento_id', idsAtivos)
+                .in('acao', [...ACOES_ENCERRANTES_LIVE])
+            );
+            const corrData = (corr as { data: { apontamento_id: string }[] | null }).data;
+            encerrados = new Set((corrData ?? []).map((c) => c.apontamento_id));
+          } catch {
+            // checagem auxiliar do chip: falha não quebra a lista de funcionários.
+          }
+        }
+
         // Mapa nome -> status (Pausado tem prioridade se houver linhas conflitantes,
         // raro). Sem dados (consulta falhou) -> mapa vazio -> nenhum card ganha chip.
         const statusPorNome = new Map<string, 'Em andamento' | 'Pausado'>();
-        for (const ap of statusResult.data ?? []) {
+        for (const ap of statusRows) {
           if (!ap?.nome_funcionario) continue;
+          if (ap.id && encerrados.has(ap.id)) continue; // já encerrado pelo admin → sem chip
           const st = ap.status_tarefa === 'Pausado' ? 'Pausado' : 'Em andamento';
           if (st === 'Pausado' || !statusPorNome.has(ap.nome_funcionario)) {
             statusPorNome.set(ap.nome_funcionario, st);
